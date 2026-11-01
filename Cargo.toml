@@ -3,6 +3,7 @@
 [workspace]
 resolver = "3"
 members = [
+    "crates/cantrip-generated",
     "crates/cantrip-state",
     "crates/cantrip-api",
     "crates/cantrip-rules",

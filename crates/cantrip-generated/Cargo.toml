@@ -1,0 +1,15 @@
+[package]
+name = "cantrip-generated"
+description = "Every card as mtgish generates it. Nothing here is registered as a playable card."
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[features]
+# Compile every card, not the sample: twenty minutes.
+all = []
+
+[dependencies]
+cantrip-api.workspace = true
+cantrip-mechanics.workspace = true
