@@ -1,11 +1,11 @@
 // Dread Charge
 // status: planned
-// requires: engine: no resolving rule on an open set: Prohibit BeBlocked
+// requires: engine: no resolving rule on an open set: Prohibit BeBlocked beyond lasting rules
 // Black creatures you control can't be blocked this turn except by black creatures.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn block_rule_0(q: &dyn Query, source: ObjectId, blocker: ObjectId, attacker: ObjectId) -> bool { let asker = &Asker::new(source, q.controller(source)); !(attacker == source && !((q.chars(blocker).colors.has(q.words(asker.source).color(Color::Black)) && q.chars(blocker).is(CardType::Creature)))) }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("engine-no-resolving-rule-on-an-open-set-prohibit-be-blocked" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| (q.chars(id).colors.has(q.words(asker.source).color(Color::Black)) && q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id))), EffectKind::BlockRestriction { card: { let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, index: 0 }, Duration::EndOfTurn); });
+planned!("engine-no-resolving-rule-on-an-open-set-prohibit-be-blocked-beyond-lasting-rules" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| (q.chars(id).colors.has(q.words(asker.source).color(Color::Black)) && q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id))), EffectKind::BlockRestriction { card: { let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, index: 0 }, Duration::EndOfTurn); });
 g.end_sentence();
  Ok(()) }
 

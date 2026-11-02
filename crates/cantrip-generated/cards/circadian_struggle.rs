@@ -11,8 +11,7 @@ let objects_1 = { let q: &dyn Query = g; picked_0.clone() }; let moved_1 = g.ret
 g.end_sentence();
 let mut runs_2: u32 = { let q: &dyn Query = g; ({ let mut seen = ColorSet::NONE; for id in q.state().battlefield().iter().copied().filter(|&id| ((q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Battle) || q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Enchantment) || q.chars(id).is(CardType::Land) || q.chars(id).is(CardType::Planeswalker)) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() { for color in q.chars(id).colors.iter() { seen = seen.with(color); } } seen.iter().count() as i64 }).max(0) as u32 }; while runs_2 > 0 { runs_2 -= 1; let mut again_2 = false;
 planned!("engine-no-perpetual-effects" => let objects_4: Vec<ObjectId> = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (moved_1.clone()).contains(&id)).collect::<Vec<ObjectId>>() };
-let kind_4_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_5) };
-for &object in &objects_4 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_4_0); });
+for &object in &objects_4 { let kind_4_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_5) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_4_0); });
 g.end_sentence();
 if !again_2 { break; } }
 g.end_sentence();

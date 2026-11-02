@@ -19,8 +19,7 @@ let duplicated_6 = { let q: &dyn Query = g; item.subject.object().into_iter().co
 let count_6: u32 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let mut conjured_6: Vec<ObjectId> = Vec::new(); for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { conjured_6.extend(planned_value!("operation Conjure", Vec::<ObjectId>::new() => cantrip_mechanics::conjure::conjure(g, player, player, asker.source, Conjured::DuplicateOf(&duplicated_6), count_6, ConjureTo::Hand)?)); }
 g.end_sentence();
 planned!("engine-no-perpetual-effects" => let objects_8: Vec<ObjectId> = { let q: &dyn Query = g; (conjured_6.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() };
-let kind_8_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::SpendAsThoughAnyType };
-for &object in &objects_8 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_8_0); });
+for &object in &objects_8 { let kind_8_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::SpendAsThoughAnyType }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_8_0); });
 g.end_sentence();
 hoisted_9.extend(conjured_6.clone());
 hoisted_10.extend(conjured_6.clone());

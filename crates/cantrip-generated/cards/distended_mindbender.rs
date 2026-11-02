@@ -1,7 +1,6 @@
 // Distended Mindbender
 // status: planned
 // requires: operation PickFromHand
-// requires: operation Together
 // Emerge {5}{B}{B} (You may cast this spell by sacrificing a creature and paying the emerge cost reduced by that creature's mana value.)
 // When you cast this spell, target opponent reveals their hand. You choose from it a nonland card with mana value 3 or less and a card with mana value 4 or greater. That player discards those cards.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -11,10 +10,10 @@ static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-planned!("operation-together" => g.begin_simultaneous());
+planned!("depends-on-an-instruction-with-a-gap" => g.begin_simultaneous());
 planned!("operation-pick-from-hand" => cantrip_mechanics::hand::pick_from_hand(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.player()).expect("a reference that always names a player") }, asker.source, |q: &dyn Query, asker: &Asker, id: ObjectId| (!(q.chars(id).is(CardType::Land)) && (i64::from(q.mana_value(id))) <= (3i64)), { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }, HandPick::Discard)?);
 planned!("operation-pick-from-hand" => cantrip_mechanics::hand::pick_from_hand(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.player()).expect("a reference that always names a player") }, asker.source, |q: &dyn Query, asker: &Asker, id: ObjectId| (i64::from(q.mana_value(id))) >= (4i64), { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }, HandPick::Discard)?);
-planned!("operation-together" => g.end_simultaneous());
+planned!("depends-on-an-instruction-with-a-gap" => g.end_simultaneous());
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

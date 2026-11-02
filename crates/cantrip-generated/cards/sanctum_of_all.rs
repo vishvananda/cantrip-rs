@@ -10,7 +10,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mu
 let mut hoisted_5: Vec<ObjectId> = Vec::new();
 let mut hoisted_4: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-let decider_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if g.may_search(decider_0, decider_0) && cantrip_mechanics::effects::ask_may(g, decider_0, asker.source, Purpose::Optional)? {
+let decider_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_0, asker.source, Purpose::Optional)? {
 let searcher_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let owner_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
 let rule_count_1 = { let q: &dyn Query = g; cantrip_mechanics::select::Count::UpTo((1i64).max(0) as u32) }; let zone_1 = Zone::graveyard(searcher_1); let mut shown_1 = cantrip_mechanics::library::searched_cards(g, searcher_1); shown_1.extend(g.state().zone(zone_1).iter().copied()); let can_1: Vec<ObjectId> = { let q: &dyn Query = g; shown_1.iter().copied().filter(|&id| q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Shrine))).collect() }; let (found_1, searched_1) = cantrip_mechanics::library::search_zone_and_or_library(g, searcher_1, asker.source, zone_1, SearchDestination::Battlefield, Purpose::PutOntoBattlefield, &ASK_1, cantrip_mechanics::select::Selection::listed(rule_count_1, &shown_1, can_1))?;
 let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };

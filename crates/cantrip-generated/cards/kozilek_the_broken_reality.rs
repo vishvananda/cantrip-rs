@@ -1,6 +1,5 @@
 // Kozilek, the Broken Reality
 // status: planned
-// requires: earlier objects Manifested
 // requires: per-player Manifest
 // When you cast this spell, up to two target players each manifest two cards from their hands. For each card manifested this way, you draw a card. (To manifest a card, put it onto the battlefield face down as a 2/2 creature. Turn it face up any time for its mana cost if it's a creature card.)
 // Other colorless creatures you control get +3/+2.
@@ -25,7 +24,7 @@ each_6[index_0] = { let q: &dyn Query = g; cards_3.iter().copied().filter(|&o| q
    } 
 planned!("per-player-manifest" => g.end_batch(););
 g.end_sentence();
-let amount_7 = { let q: &dyn Query = g; ((planned_value!("earlier objects Manifested", Vec::<ObjectId>::new() => q.acted_on(asker, Acted::Manifested))).into_iter().count() as i64).max(0) as u32 }; let players_7 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_7 = { let q: &dyn Query = g; ((all_5.clone()).into_iter().count() as i64).max(0) as u32 }; let players_7 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_7 { g.draw(player, amount_7); }
 g.end_sentence();
  Ok(()) }

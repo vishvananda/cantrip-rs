@@ -12,8 +12,7 @@ let objects_0 = { let q: &dyn Query = g; (((Some(PlayerId(item.data[1] as u8)).i
 g.end_sentence();
 if { let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied().is_some_and(|candidate: ObjectId| (!(q.chars(candidate).is(CardType::Land)) && (q.chars(candidate).is(CardType::Artifact) || q.chars(candidate).is(CardType::Battle) || q.chars(candidate).is(CardType::Creature) || q.chars(candidate).is(CardType::Enchantment) || q.chars(candidate).is(CardType::Land) || q.chars(candidate).is(CardType::Planeswalker)))) } {
 planned!("engine-no-perpetual-effects" => let objects_2: Vec<ObjectId> = { let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() };
-let kind_2_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::AddTypes(TypeSet::of(&[CardType::Artifact]))) };
-for &object in &objects_2 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_2_0); });
+for &object in &objects_2 { let kind_2_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::AddTypes(TypeSet::of(&[CardType::Artifact]))) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_2_0); });
 g.end_sentence();
 }
 g.end_sentence();

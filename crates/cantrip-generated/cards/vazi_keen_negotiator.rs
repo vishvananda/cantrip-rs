@@ -1,6 +1,5 @@
 // Vazi, Keen Negotiator
-// status: planned
-// requires: activated ability ManaSpentFrom
+// status: ready
 // Haste
 // {T}: Target opponent creates X Treasure tokens, where X is the number of Treasure tokens you created this turn.
 // Whenever an opponent casts a spell or activates an ability, if mana from a Treasure was spent to cast it or activate it, put a +1/+1 counter on target creature, then draw a card.
@@ -46,7 +45,7 @@ g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_2_or_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
 static ABILITY_2_OR_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_or_1_target_0)];
-#[allow(unused_variables)] fn ability_2_or_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::AbilityActivated { source, ability, player, .. } = event { let id = *source; let def = q.activated_ability(*ability); let subject = Target::Player(*player); let serial = match cantrip_mechanics::triggers::activated_ability_on_stack(q, event) { Some(Target::Ability(serial)) => serial, _ => 0 }; let data = [id.0, serial]; if def.is_some() && (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&*player) && true && planned_value!("activated ability ManaSpentFrom", false => q.activation_mana_from(id).any(|source: ObjectId| q.chars(source).has_subtype(q.words(asker.source).subtype(Subtype::Treasure)))) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_2_or_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::AbilityActivated { source, ability, player, .. } = event { let id = *source; let def = q.activated_ability(*ability); let subject = Target::Player(*player); let serial = match cantrip_mechanics::triggers::activated_ability_on_stack(q, event) { Some(Target::Ability(serial)) => serial, _ => 0 }; let data = [id.0, serial]; if def.is_some() && (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&*player) && true && q.state().stack.iter().find(|i| serial != 0 && i.serial == serial && i.kind == StackKind::Activated).is_some_and(|i| q.history().all().get(i.since as usize..).unwrap_or(&[]).iter().filter_map(|r| match r.event { Event::ManaSpent { on, cast: false, source, mana, .. } if on == id => Some((source, mana)), _ => None }).any(|(source, _)| source != ObjectId::NONE && q.chars(source).has_subtype(q.words(asker.source).subtype(Subtype::Treasure)))) { return Some(Fired { subject, data }); } }
  None }
 fn ability_2_or_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);

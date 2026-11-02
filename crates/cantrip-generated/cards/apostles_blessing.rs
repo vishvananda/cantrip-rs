@@ -1,6 +1,5 @@
 // Apostle's Blessing
 // status: planned
-// requires: a choice of Color outside its body
 // requires: keyword action ChooseProtection
 // ({W/P} can be paid with either {W} or 2 life.)
 // Target artifact or creature you control gains protection from artifacts or from the color of your choice until end of turn.
@@ -12,7 +11,7 @@ let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true
 planned!("keyword-action-choose-protection" => { let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; cantrip_mechanics::choose::protection(g, player, asker.source)?; });
 g.end_sentence();
 let objects_1 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let duration_1 = Duration::EndOfTurn;
-let kind_1_0_0 = { let q: &dyn Query = g; EffectKind::Protection(ColorSet::of(planned_value!("a choice of Color outside its body", Color::White => q.state().chosen_color(q.linked(item)).expect("it chose one")))) };
+let kind_1_0_0 = { let q: &dyn Query = g; EffectKind::Protection(ColorSet::of(planned_value!("depends on an instruction with a gap", Color::White => q.state().chosen_color(q.linked(item)).expect("it chose one")))) };
 if let Some(source) = source_1 { cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.add_effect(source, object, kind_1_0_0, duration_1);  } }); }
 g.end_sentence();
  Ok(()) }

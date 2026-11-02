@@ -15,8 +15,7 @@ let objects_2 = ({ let q: &dyn Query = g; (moved_1.clone()).get(0 as usize).copi
 g.end_sentence();
 if { let q: &dyn Query = g; (((moved_2.clone()).into_iter().filter(|&id| (i64::from(q.mana_value(id))) < (i64::from(item.x))).collect::<Vec<ObjectId>>()).len() as i64) > (0i64) } {
 planned!("engine-no-perpetual-effects" => let objects_4: Vec<ObjectId> = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() };
-let kind_4_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_5) };
-for &object in &objects_4 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_4_0); });
+for &object in &objects_4 { let kind_4_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_5) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_4_0); });
 g.end_sentence();
 let objects_6 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let moved_6 = g.return_to_hand(&objects_6);
 g.end_sentence();

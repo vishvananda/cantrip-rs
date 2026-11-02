@@ -2,7 +2,6 @@
 // status: planned
 // requires: operation PutSticker
 // requires: stickers
-// requires: target cardinality UpTo
 // requires: trigger event Player PutsSticker
 // Flash
 // When this enchantment enters, you may put a name sticker on it.
@@ -19,7 +18,7 @@ g.end_sentence();
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
-static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target_0).between(0, planned_value!("target cardinality UpTo", 1u32 => TargetSpec::read_as_chosen(|q: &dyn Query, asker: &Asker| (planned_value!("stickers", 0i64 => cantrip_mechanics::stickers::measure(q, &Some(asker.source).into_iter().collect::<Vec<ObjectId>>(), StickerMeasure::Letter))).max(0) as u32)))];
+static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target_0).between(0, planned_value!("depends on an instruction with a gap", 1u32 => TargetSpec::read_as_chosen(|q: &dyn Query, asker: &Asker| (planned_value!("stickers", 0i64 => cantrip_mechanics::stickers::measure(q, &Some(asker.source).into_iter().collect::<Vec<ObjectId>>(), StickerMeasure::Letter))).max(0) as u32)))];
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);

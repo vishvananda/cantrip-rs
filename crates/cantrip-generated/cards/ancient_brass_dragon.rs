@@ -1,14 +1,12 @@
 // Ancient Brass Dragon
-// status: planned
-// requires: a target filter reading the amount its ability was told
-// requires: target constraint TotalProperty
+// status: ready
 // Flying
 // Whenever this creature deals combat damage to a player, roll a d20. When you do, put any number of target creature cards with total mana value X or less from graveyards onto the battlefield under your control, where X is the result.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Damage { source, target, amount, kind, .. } = event { let (source, amount, combat) = (*source, *amount, kind.is_combat()); let subject = Target::Object(source); let data = [u32::from(amount), match target { Target::Player(p) => u32::from(p.0), _ => u32::MAX }]; if combat && !q.state().obj(source).zone.is(ZoneKind::Stack) && Some(asker.source) == Some(source) && matches!(*target, Target::Player(p) if true) { return Some(Fired { subject, data }); } }
  None }
 #[allow(unused_variables)] fn reflexive_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && (q.chars(id).is(CardType::Creature))) }
-static REFLEXIVE_2_TARGETS: &[cantrip_api::TargetSpec] = &[planned_value!("target constraint TotalProperty", target(reflexive_2_target_0).between(0, cantrip_api::TargetSpec::ANY_NUMBER) => target(reflexive_2_target_0).between(0, cantrip_api::TargetSpec::ANY_NUMBER).with_rules(&[SelectionRule::Total(Property::ManaValue, Comparison::LessOrEqual, { let q: &dyn Query = g; planned_value!("a target filter reading the amount its ability was told", 0i64 => q.told_amount(asker)) })]))];
+static REFLEXIVE_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(reflexive_2_target_0).between(0, cantrip_api::TargetSpec::ANY_NUMBER).together(cantrip_mechanics::select::total_mana_value_at_most(TargetSpec::COUNTED))];
 fn reflexive_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let player_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };

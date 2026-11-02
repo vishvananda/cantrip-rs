@@ -1,9 +1,8 @@
 // Cyclopean Tomb
 // status: planned
+// requires: counters removed from an object, which the history does not record
 // requires: engine: no resolving effect sets land types
 // requires: event trigger for Indefinite
-// requires: object filter History CountersPutWith
-// requires: object filter History CountersRemovedWith
 // {2}, {T}: Put a mire counter on target non-Swamp land. That land is a Swamp for as long as it has a mire counter on it. Activate only during your upkeep.
 // When this artifact is put into a graveyard from the battlefield, at the beginning of each of your upkeeps for the rest of the game, remove all mire counters from a land that a mire counter was put onto with this artifact but that a mire counter has not been removed from with this artifact.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -26,9 +25,7 @@ fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.controller).i
 #[allow(unused_variables)] fn watch_3_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::Upkeep) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 fn watch_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let mut removed_4: i64 = 0;
-let among_4_0 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Land) && planned_value!("object filter History CountersPutWith", false => cantrip_mechanics::history::counters_put_with(q.history().all().iter(), id, CounterKind::Mire, Some(asker.source))) && !(planned_value!("object filter History CountersRemovedWith", false => cantrip_mechanics::history::counters_removed_with(q.history().all().iter(), id, CounterKind::Mire, Some(asker.source)))))).collect::<Vec<ObjectId>>() }; let chooser_4_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let count_4_0 = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let objects_4_0 = cantrip_mechanics::choose::select(g, chooser_4_0, asker.source, Purpose::Choose, among_4_0, cantrip_mechanics::select::Selection::of(count_4_0, &[]))?;
-let amount_4_0 = i16::MAX; cantrip_api::instruction(g, |g| { for object in objects_4_0 { removed_4 += i64::from(g.remove_counters(object, CounterKind::Mire, amount_4_0)); } });
+planned!("counters-removed-from-an-object-which-the-history-does-not-record", RemoveCounters, "removals" = "[{\"amount\":\"All\",\"kind\":{\"Named\":\"MireCounter\"},\"player\":{\"kind\":\"AbilityController\"},\"recipients\":{\"args\":{\"args\":{\"args\":[{\"args\":\"Land\",\"kind\":\"CardType\"},{\"args\":{\"event\":{\"CountersPutWith\":{\"kind\":{\"Named\":\"MireCounter\"},\"with\":{\"kind\":\"Source\"}}},\"window\":\"ThisGame\"},\"kind\":\"History\"},{\"args\":{\"args\":{\"event\":{\"CountersRemovedWith\":{\"kind\":{\"Named\":\"MireCounter\"},\"with\":{\"kind\":\"Source\"}}},\"window\":\"ThisGame\"},\"kind\":\"History\"},\"kind\":\"Not\"}],\"kind\":\"All\"},\"kind\":\"Battlefield\"},\"kind\":\"Objects\"},\"selection\":{\"count\":{\"Exactly\":{\"args\":1,\"kind\":\"Constant\"}},\"player\":{\"kind\":\"AbilityController\"}}}]");
 g.end_sentence();
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

@@ -1,6 +1,6 @@
 // Haruspex
 // status: planned
-// requires: numeric expression AnnouncedX
+// requires: removing X counters to activate a mana ability
 // Rapacious Hunger — Whenever another creature dies, put a +1/+1 counter on this creature.
 // Devouring Monster — {T}, Remove X +1/+1 counters from this creature: Add X mana of any one color.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -13,11 +13,11 @@ let had_0: Vec<_> = counters_0.iter().map(|c| g.state().obj(c.0).counters(c.1)).
 g.end_sentence();
  Ok(()) }
 fn ability_1_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let mana_players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_1 = { let q: &dyn Query = g; (planned_value!("numeric expression AnnouncedX", 0i64 => i64::from(q.announced_x().unwrap_or(0)))).max(0) as u32 };
+let mana_1 = { let q: &dyn Query = g; (planned_value!("removing X counters to activate a mana ability", 0i64 => i64::from(q.obj(asker.source).x))).max(0) as u32 };
 for player in mana_players_1 {
 let color = chosen.expect("mana activation selected a color");
 g.add_mana(player, color.mana(), mana_1);}
  Ok(()) }
 
-pub static CARD: CardDef = CardDef { name: "Haruspex", token_words: &[], oracle: true, cost: ManaCost { generic: 3, x: 0, symbols: [0, 0, 0, 0, 1, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Tyranid]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: Some(2), toughness: Some(2), loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::ZONE_CHANGE.0), ability_0_event), ability_0, "Rapacious Hunger — Whenever another creature dies, put a +1/+1 counter on this creature.").targets(&[]),mana_ability(Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(Cost { tap: true, ..Cost::NONE }).and(Cost { variable: Some(VariableCost::RemoveAnyNumberOfCounters(CounterKind::PlusOne)), ..Cost::NONE }), add_by(ability_1_mana).choose_color().colors(ColorSet(31)), "Devouring Monster — {T}, Remove X +1/+1 counters from this creature: Add X mana of any one color.")], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
+pub static CARD: CardDef = CardDef { name: "Haruspex", token_words: &[], oracle: true, cost: ManaCost { generic: 3, x: 0, symbols: [0, 0, 0, 0, 1, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Tyranid]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: Some(2), toughness: Some(2), loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::ZONE_CHANGE.0), ability_0_event), ability_0, "Rapacious Hunger — Whenever another creature dies, put a +1/+1 counter on this creature.").targets(&[]),mana_ability(Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(Cost { tap: true, ..Cost::NONE }).and(planned_value!("removing X counters to activate a mana ability", Cost::NONE => Cost { variable: Some(VariableCost::RemoveAnyNumberOfCounters(CounterKind::PlusOne)), ..Cost::NONE })), add_by(ability_1_mana).choose_color().colors(ColorSet(31)), "Devouring Monster — {T}, Remove X +1/+1 counters from this creature: Add X mana of any one color.")], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

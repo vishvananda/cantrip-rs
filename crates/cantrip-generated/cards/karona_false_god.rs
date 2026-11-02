@@ -1,6 +1,5 @@
 // Karona, False God
-// status: planned
-// requires: a chosen card type where its body chose a creature type, in the data
+// status: ready
 // Haste
 // At the beginning of each player's upkeep, that player untaps Karona and gains control of it.
 // Whenever Karona attacks, creatures of the creature type of your choice get +3/+3 until end of turn.
@@ -19,7 +18,9 @@ g.end_sentence();
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let chosen_2 = cantrip_mechanics::chosen_type::creature_type_now(g, player_2, asker.source)?;
 g.end_sentence();
-planned!("a-chosen-card-type-where-its-body-chose-a-creature-type-in-the-data", CreateContinuousEffect, "affected" = "{\"Objects\":{\"args\":{\"args\":[{\"args\":\"Creature\",\"kind\":\"CardType\"},{\"args\":\"CardType\",\"kind\":\"Chosen\"}],\"kind\":\"All\"},\"kind\":\"Battlefield\"}}", "changes" = "[{\"args\":{\"power\":{\"args\":3,\"kind\":\"Constant\"},\"toughness\":{\"args\":3,\"kind\":\"Constant\"}},\"kind\":\"Pump\"}]", "duration" = "\"EndOfTurn\"", "evaluation" = "\"Snapshot\"", "source" = { let q: &dyn Query = g; Some(asker.source) });
+let objects_3 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(chosen_2).is_some_and(|chosen| q.chars(id).has_subtype(chosen)))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_3 = { let q: &dyn Query = g; Some(asker.source) }; let duration_3 = Duration::EndOfTurn;
+let kind_3_0_0 = { let q: &dyn Query = g; EffectKind::Pump((3i64) as i16, (3i64) as i16) };
+if let Some(source) = source_3 { cantrip_api::instruction(g, |g| { for &object in &objects_3 { g.add_effect(source, object, kind_3_0_0, duration_3);  } }); }
 g.end_sentence();
  Ok(()) }
 

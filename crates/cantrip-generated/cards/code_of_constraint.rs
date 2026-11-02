@@ -1,5 +1,7 @@
 // Code of Constraint
-// status: ready
+// status: planned
+// requires: continuous rule UntapStep
+// requires: duration DuringControllersNextUntapStep
 // Target creature gets -4/-0 until end of turn.
 // Draw a card.
 // Addendum — If you cast this spell during your main phase, tap that creature and it doesn't untap during its controller's next untap step.
@@ -22,7 +24,8 @@ g.end_sentence();
 if { let q: &dyn Query = g; Some(asker.source).is_some_and(|candidate: ObjectId| cast_of(q, candidate).is_some_and(|cast| q.history().all().iter().any(|r| matches!(r.event, Event::Cast(c) if c.spell == cast.spell) && r.active == cast.player && matches!(r.step, Step::PrecombatMain | Step::PostcombatMain)))) } {
 let objects_2 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_2: Vec<ObjectId> = objects_2.iter().copied().filter(|&o| g.state().obj(o).tapped != true).collect(); g.tap_together(&turned_2);
 g.end_sentence();
-let objects_3 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; cantrip_api::instruction(g, |g| { for &object in &objects_3 { g.exert(object); } });
+let objects_3 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_3 = { let q: &dyn Query = g; Some(asker.source) }; let duration_3 = planned_value!("duration DuringControllersNextUntapStep", Duration::Indefinite => Duration::DuringItsControllersNextUntapStep);
+let kinds_3 = { let mut all = Vec::new(); for &object in &objects_3 { let kind = { let q: &dyn Query = g; planned_value!("continuous rule UntapStep", EffectKind::CantBlock => EffectKind::DoesntUntap) }; all.push((object, kind));  } all }; if let Some(source) = source_3 { cantrip_api::instruction(g, |g| { for &(object, kind) in &kinds_3 { g.add_effect(source, object, kind, duration_3); } }); }
 g.end_sentence();
 hoisted_4.extend(turned_2.clone());
 hoisted_5.extend(objects_2.clone());

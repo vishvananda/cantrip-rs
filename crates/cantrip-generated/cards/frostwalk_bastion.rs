@@ -1,5 +1,7 @@
 // Frostwalk Bastion
 // status: planned
+// requires: continuous rule UntapStep
+// requires: duration DuringControllersNextUntapStep
 // requires: engine: no snow or hybrid Phyrexian mana symbol
 // {T}: Add {C}.
 // {1}{S}: Until end of turn, this land becomes a 2/3 Construct artifact creature. It's still a land. ({S} can be paid with one mana from a snow source.)
@@ -24,7 +26,8 @@ g.end_sentence();
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let objects_2 = { let q: &dyn Query = g; (Some(ObjectId(item.data[1])).filter(|o| *o != ObjectId::NONE).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_2: Vec<ObjectId> = objects_2.iter().copied().filter(|&o| g.state().obj(o).tapped != true).collect(); g.tap_together(&turned_2);
 g.end_sentence();
-let objects_3 = { let q: &dyn Query = g; (Some(ObjectId(item.data[1])).filter(|o| *o != ObjectId::NONE).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; cantrip_api::instruction(g, |g| { for &object in &objects_3 { g.exert(object); } });
+let objects_3 = { let q: &dyn Query = g; (Some(ObjectId(item.data[1])).filter(|o| *o != ObjectId::NONE).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_3 = { let q: &dyn Query = g; Some(asker.source) }; let duration_3 = planned_value!("duration DuringControllersNextUntapStep", Duration::Indefinite => Duration::DuringItsControllersNextUntapStep);
+let kinds_3 = { let mut all = Vec::new(); for &object in &objects_3 { let kind = { let q: &dyn Query = g; planned_value!("continuous rule UntapStep", EffectKind::CantBlock => EffectKind::DoesntUntap) }; all.push((object, kind));  } all }; if let Some(source) = source_3 { cantrip_api::instruction(g, |g| { for &(object, kind) in &kinds_3 { g.add_effect(source, object, kind, duration_3); } }); }
 g.end_sentence();
  Ok(()) }
 

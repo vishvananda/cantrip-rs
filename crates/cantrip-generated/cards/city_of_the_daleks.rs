@@ -33,6 +33,7 @@ g.end_sentence();
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_1: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_1.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut gathered_2: Vec<(CardId, PlayerId, Target)> = Vec::new();
  for (index_1, bound_0) in players_1.iter().copied().enumerate() { let def_3 = g.card_id(&token_4::CARD); let count_3 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let player_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let defender_3 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") };
 gathered_2.extend(std::iter::repeat((def_3, player_3, Target::Player(defender_3))).take(count_3 as usize));

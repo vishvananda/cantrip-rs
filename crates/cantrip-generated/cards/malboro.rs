@@ -12,6 +12,7 @@ let amount_1 = { let q: &dyn Query = g; (2i64).max(0) as i32 }; let players_1 = 
 for player in players_1 { g.lose_life(player, amount_1); }
 g.end_sentence();
 let mut players_2: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_2.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut gathered_3: Vec<ObjectId> = Vec::new();
  for (index_2, bound_0) in players_2.iter().copied().enumerate() { gathered_3.extend({ let q: &dyn Query = g; (((Some(bound_0).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((3i64).max(0) as usize).collect::<Vec<ObjectId>>() });
     } 

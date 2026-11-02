@@ -1,6 +1,6 @@
 // Lynde, Cheerful Tormentor
 // status: planned
-// requires: cost part ObjectAction
+// requires: an Aura attached to a player by an effect
 // requires: move arrival AttachedToPlayer
 // Deathtouch
 // Whenever a Curse is put into your graveyard from the battlefield, return it to the battlefield attached to you at the beginning of the next end step.
@@ -20,9 +20,9 @@ g.end_sentence();
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::Upkeep) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let payer_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let paid_3 = g.may_pay(payer_3, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(planned_value!("cost part ObjectAction", Cost::NONE => Cost::object_action(Picks::Matching(|q: &dyn Query, asker: &Asker, id: ObjectId| (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Curse)) && q.state().obj(id).attached_player.is_some() && q.state().obj(id).attached_player == Some(asker.controller))), CostObjectAction::AttachToPlayer(|q: &dyn Query, asker: &Asker| Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>())))), &PAY_QUESTION)?;
+planned!("an-aura-attached-to-a-player-by-an-effect", PayCost, "cost" = "{\"parts\":[{\"ObjectAction\":{\"action\":{\"AttachToPlayer\":{\"args\":{\"kind\":\"AbilityController\"},\"kind\":\"OpponentsOf\"}},\"objects\":{\"args\":{\"args\":[{\"args\":\"Curse\",\"kind\":\"Subtype\"},{\"args\":{\"kind\":\"AbilityController\"},\"kind\":\"AttachedToPlayer\"}],\"kind\":\"All\"},\"kind\":\"Battlefield\"}}}]}", "optional" = "true", "player" = { let q: &dyn Query = g; Some(asker.controller) });
 g.end_sentence();
-if { let q: &dyn Query = g; ((paid_3 as i64) != 0) } {
+if { let q: &dyn Query = g; planned_value!("depends on an instruction with a gap", false => result_0) } {
 let amount_4 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_4 { g.draw(player, amount_4); }
 g.end_sentence();

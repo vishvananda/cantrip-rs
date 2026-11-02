@@ -1,6 +1,5 @@
 // Regna's Sanction
-// status: planned
-// requires: object collection Chosen
+// status: ready
 // For each player, choose friend or foe. Each friend puts a +1/+1 counter on each creature they control. Each foe chooses one untapped creature they control, then taps the rest.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
@@ -16,7 +15,7 @@ let had_2: Vec<_> = gathered_2.iter().map(|c| g.state().obj(c.1).counters(c.2)).
 g.end_sentence();
 let mut players_5: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| words_0.iter().any(|&(p, word)| Some(p) == Some(bound_0) && word == 1)).collect::<Vec<PlayerId>>() };
 let mut gathered_6: Vec<ObjectId> = Vec::new();
- for (index_5, bound_0) in players_5.iter().copied().enumerate() { gathered_6.extend({ let q: &dyn Query = g; { let without: Vec<ObjectId> = planned_value!("object collection Chosen", Vec::<ObjectId>::new() => cantrip_mechanics::choose::among(g, Some(bound_0).into_iter().collect::<Vec<PlayerId>>(), asker.source, q.state().battlefield().iter().copied().filter(|&id| (!(q.state().obj(id).tapped) && q.chars(id).is(CardType::Creature) && Some(bound_0) == Some(q.controller(id)))).collect::<Vec<ObjectId>>(), cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32))?); (q.state().battlefield().iter().copied().filter(|&id| (!(q.state().obj(id).tapped) && q.chars(id).is(CardType::Creature) && Some(bound_0) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().filter(|id| !without.contains(id)).collect::<Vec<ObjectId>>() } });
+ for (index_5, bound_0) in players_5.iter().copied().enumerate() { let all_7: Vec<ObjectId> = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (!(q.state().obj(id).tapped) && q.chars(id).is(CardType::Creature) && Some(bound_0) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }; let count_7 = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let kept_7 = cantrip_mechanics::choose::select(g, bound_0, asker.source, Purpose::Keep, all_7.clone(), cantrip_mechanics::select::Selection::of(count_7, &[]))?; gathered_6.extend(all_7.iter().copied().filter(|o| !kept_7.contains(o)));
     } 
 let objects_8 = { let q: &dyn Query = g; (gathered_6.clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_8: Vec<ObjectId> = objects_8.iter().copied().filter(|&o| g.state().obj(o).tapped != true).collect(); g.tap_together(&turned_8);
 g.end_sentence();

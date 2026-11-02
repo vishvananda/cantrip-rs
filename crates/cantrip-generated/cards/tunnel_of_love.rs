@@ -2,7 +2,6 @@
 // status: planned
 // requires: ability Visit
 // requires: move cost Exile from One
-// requires: objects that paid a cost at resolution
 // Visit — Choose an opponent. They choose a creature they control, then you choose a creature you control. You may exile the chosen creatures. If you do, return them to the battlefield under their owners' control at the beginning of the next end step. Otherwise, the chosen creatures fight each other.
 #[allow(unused_imports)] use cantrip_api::*;
 fn delayed_5(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
@@ -17,7 +16,7 @@ g.end_sentence();
 let selected_2_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_2_candidates = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }; let selected_2_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let selected_2 = { cantrip_mechanics::choose::select(g, selected_2_player, asker.source, Purpose::ChooseAsEnters, selected_2_candidates, cantrip_mechanics::select::Selection::of(selected_2_count, &[]))? };
 g.end_sentence();
 let payer_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let paid_3 = g.may_pay(payer_3, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(planned_value!("move cost Exile from One", Cost::NONE => Cost::moves(&[Selection { objects: Picks::These(|q: &dyn Query, asker: &Asker| (selected_2.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>()), count: Count::Each }, Selection { objects: Picks::These(|q: &dyn Query, asker: &Asker| (selected_2.clone()).get(1 as usize).copied().into_iter().collect::<Vec<ObjectId>>()), count: Count::Each }], Destination::Exile, Arrival { tapped: false, face_down: false, states: &[] }))), &PAY_QUESTION)?;
-let paid_objects_3: Vec<ObjectId> = planned_value!("objects that paid a cost at resolution", Vec::<ObjectId>::new() => g.objects_that_paid());
+let paid_objects_3: Vec<ObjectId> = planned_value!("depends on an instruction with a gap", Vec::<ObjectId>::new() => g.objects_that_paid());
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_3 as i64) != 0) } {
 { let mut about: Vec<ObjectId> = Vec::new(); about.extend({ let q: &dyn Query = g; paid_objects_3.clone() }); about.push(ObjectId::NONE);  { g.delayed_trigger_about(DelayedWhen::Step { step: Step::End, on_turn_of: None }, item.object, item.controller, AbilityRef::delayed(item.ability.card, 0), &about); } }

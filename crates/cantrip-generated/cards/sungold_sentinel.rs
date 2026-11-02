@@ -1,7 +1,6 @@
 // Sungold Sentinel
 // status: planned
 // requires: a lasting block rule reading what its ability chose
-// requires: keyword HexproofFrom Chosen
 // Whenever this creature enters or attacks, exile up to one target card from a graveyard.
 // Coven — {1}{W}: Choose a color. This creature gains hexproof from that color until end of turn and can't be blocked by creatures of that color this turn. Activate only if you control three or more creatures with different powers.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -19,7 +18,7 @@ fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let Answer::Colors(colors_1) = g.ask(player_1, RequestKind::ChooseColors { source: asker.source, choices: ColorSet(31), count: 1, purpose: ColorUse::Any })? else { return Ok(()) }; let chosen_1 = colors_1[0];
 g.end_sentence();
 let objects_2 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_2 = { let q: &dyn Query = g; Some(asker.source) }; let duration_2 = Duration::EndOfTurn;
-let kind_2_0_0 = { let q: &dyn Query = g; EffectKind::HexproofFrom(planned_value!("keyword HexproofFrom Chosen", HexproofFrom::NONE => HexproofFrom::color(chosen_1))) };
+let kind_2_0_0 = { let q: &dyn Query = g; EffectKind::HexproofFrom(HexproofFrom::color(chosen_1)) };
 if let Some(source) = source_2 { cantrip_api::instruction(g, |g| { for &object in &objects_2 { g.add_effect(source, object, kind_2_0_0, duration_2);  } }); }
 g.end_sentence();
 planned!("a-lasting-block-rule-reading-what-its-ability-chose", CreateContinuousEffect, "affected" = "{\"Objects\":{\"args\":{\"kind\":\"Source\"},\"kind\":\"One\"}}", "changes" = "[{\"args\":{\"Prohibit\":{\"BeBlocked\":{\"args\":[{\"args\":\"Creature\",\"kind\":\"CardType\"},{\"args\":\"Color\",\"kind\":\"Chosen\"}],\"kind\":\"All\"}}},\"kind\":\"Rule\"}]", "duration" = "\"EndOfTurn\"", "evaluation" = "\"LiveObjects\"", "source" = { let q: &dyn Query = g; Some(asker.source) });

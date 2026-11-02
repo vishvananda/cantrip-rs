@@ -1,6 +1,5 @@
 // The Serpent Society
-// status: planned
-// requires: counters put as a cost on another object
+// status: ready
 // Deathtouch
 // Ward—Get five poison counters. (A player with ten or more poison counters loses the game.)
 // Whenever another creature you control with deathtouch dies, each opponent sacrifices a nontoken creature of their choice.
@@ -13,7 +12,6 @@ let count_0 = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyA
 let sacrificed_0 = g.sacrifice_each(&picks_0);
 g.end_sentence();
  Ok(()) }
-planned_item!("counters-put-as-a-cost-on-another-object", "(kind:Keyword,args:(kind:Ward,args:(parts:[PutCounters([(recipients:(kind:Players,args:(kind:One,args:(kind:AbilityController))),kind:Named(PoisonCounter),amount:(kind:Constant,args:5),selection:None)])])))");
 
-pub static CARD: CardDef = CardDef { name: "The Serpent Society", token_words: &[], oracle: true, cost: ManaCost { generic: 1, x: 0, symbols: [0, 0, 1, 0, 1, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Human,Subtype::Snake,Subtype::Villain]), supertypes: Supertypes { basic: false, legendary: true, snow: false }, colors: None, power: Some(3), toughness: Some(4), loyalty: None, defense: None, keywords: Keywords::of(&[Keyword::Deathtouch]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::ZONE_CHANGE.0), ability_2_event), ability_2, "Whenever another creature you control with deathtouch dies, each opponent sacrifices a nontoken creature of their choice.").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
+pub static CARD: CardDef = CardDef { name: "The Serpent Society", token_words: &[], oracle: true, cost: ManaCost { generic: 1, x: 0, symbols: [0, 0, 1, 0, 1, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Human,Subtype::Snake,Subtype::Villain]), supertypes: Supertypes { basic: false, legendary: true, snow: false }, colors: None, power: Some(3), toughness: Some(4), loyalty: None, defense: None, keywords: Keywords::of(&[Keyword::Deathtouch]), protection: ColorSet(0), spell: None, abilities: &[cantrip_mechanics::triggers::ward_poison::<5>("Ward—Get five poison counters."),triggered(when_asked(EventMask(EventMask::ZONE_CHANGE.0), ability_2_event), ability_2, "Whenever another creature you control with deathtouch dies, each opponent sacrifices a nontoken creature of their choice.").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

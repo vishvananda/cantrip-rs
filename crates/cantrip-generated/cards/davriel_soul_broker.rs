@@ -44,8 +44,7 @@ let mut pool_12 = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().
 let objects_13 = { let q: &dyn Query = g; picked_12.clone() }; let moved_13 = g.return_to_hand(&objects_13);
 g.end_sentence();
 planned!("engine-no-perpetual-effects" => let objects_15: Vec<ObjectId> = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (moved_13.clone()).contains(&id)).collect::<Vec<ObjectId>>() };
-let kind_15_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::Pump((1i64) as i16, (1i64) as i16)) };
-for &object in &objects_15 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_15_0); });
+for &object in &objects_15 { let kind_15_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::Pump((1i64) as i16, (1i64) as i16)) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_15_0); });
 g.end_sentence();
  Ok(()) }
 fn offer_16(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
@@ -140,8 +139,7 @@ g.end_sentence();
  Ok(()) }
 fn offer_35(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 planned!("engine-no-perpetual-effects" => let objects_37: Vec<ObjectId> = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && ({ let other = Some(asker.controller); q.state().apnap().filter(|p| Some(*p) != other).collect::<Vec<PlayerId>>() }).contains(&q.controller(id)))).collect::<Vec<ObjectId>>() };
-let kind_37_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::Pump((1i64) as i16, (1i64) as i16)) };
-for &object in &objects_37 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_37_0); });
+for &object in &objects_37 { let kind_37_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::Pump((1i64) as i16, (1i64) as i16)) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_37_0); });
 g.end_sentence();
  Ok(()) }
 pub mod emblem_39 {
@@ -215,8 +213,7 @@ static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 planned!("engine-no-perpetual-effects" => let objects_47: Vec<ObjectId> = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() };
-let kind_47_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::Pump((-3i64) as i16, (-3i64) as i16)) };
-for &object in &objects_47 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_47_0); });
+for &object in &objects_47 { let kind_47_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::Pump((-3i64) as i16, (-3i64) as i16)) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_47_0); });
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

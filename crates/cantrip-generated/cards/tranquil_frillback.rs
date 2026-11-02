@@ -1,6 +1,5 @@
 // Tranquil Frillback
-// status: planned
-// requires: mode count that is not a constant
+// status: ready
 // When this creature enters, you may pay {G} up to three times. When you pay this cost one or more times, choose up to that many —
 // • Destroy target artifact or enchantment.
 // • Exile target player's graveyard.
@@ -27,7 +26,7 @@ let amount_5 = { let q: &dyn Query = g; (4i64).max(0) as i32 }; let players_5 = 
 for player in players_5 { g.gain_life(player, amount_5); }
 g.end_sentence();
  Ok(()) }
-static REFLEXIVE_2_MODES: ModalDef = planned_value!("mode count that is not a constant", modes(&[mode(reflexive_2_mode_0, "Destroy target artifact or enchantment.").targets(REFLEXIVE_2_MODE_0_TARGETS),mode(reflexive_2_mode_1, "Exile target player's graveyard.").targets(REFLEXIVE_2_MODE_1_TARGETS),mode(reflexive_2_mode_2, "You gain 4 life.").targets(&[])]).choose(1, 1) => modes(&[mode(reflexive_2_mode_0, "Destroy target artifact or enchantment.").targets(REFLEXIVE_2_MODE_0_TARGETS),mode(reflexive_2_mode_1, "Exile target player's graveyard.").targets(REFLEXIVE_2_MODE_1_TARGETS),mode(reflexive_2_mode_2, "You gain 4 life.").targets(&[])]).choose_counted(|q: &dyn Query, asker: &Asker| 0i64, |q: &dyn Query, asker: &Asker| q.told_amount(asker)));
+static REFLEXIVE_2_MODES: ModalDef = modes(&[mode(reflexive_2_mode_0, "Destroy target artifact or enchantment.").targets(REFLEXIVE_2_MODE_0_TARGETS),mode(reflexive_2_mode_1, "Exile target player's graveyard.").targets(REFLEXIVE_2_MODE_1_TARGETS),mode(reflexive_2_mode_2, "You gain 4 life.").targets(&[])]).up_to_that_many();
 fn reflexive_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
  Ok(()) }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

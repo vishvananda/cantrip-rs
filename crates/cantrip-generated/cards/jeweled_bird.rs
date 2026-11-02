@@ -1,16 +1,15 @@
 // Jeweled Bird
 // status: planned
 // requires: card outside ordinary play
-// requires: cost part ObjectAction
 // requires: resolution cost ObjectAction
 // requires: zone that belongs to no player
 // Remove this card from your deck before playing if you're not playing for ante.
 // {T}: Ante this artifact. If you do, put all other cards you own from the ante into your graveyard, then draw a card.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let paid_0 = planned_value!("resolution cost ObjectAction", false => cantrip_mechanics::effects::pay(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(planned_value!("cost part ObjectAction", Cost::NONE => Cost::object_action(Picks::Matching(|q: &dyn Query, asker: &Asker, id: ObjectId| id == asker.source), CostObjectAction::Ante))))?);
+planned!("resolution-cost-object-action", PayCost, "cost" = "{\"parts\":[{\"ObjectAction\":{\"action\":\"Ante\",\"objects\":{\"args\":{\"kind\":\"Source\"},\"kind\":\"One\"}}}]}", "optional" = "false", "player" = { let q: &dyn Query = g; Some(asker.controller) });
 g.end_sentence();
-if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
+if { let q: &dyn Query = g; planned_value!("depends on an instruction with a gap", false => result_0) } {
 planned!("zone-that-belongs-to-no-player", ChangeZone, "actor" = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, "cards" = "{\"args\":{\"filter\":{\"args\":{\"args\":{\"kind\":\"AbilityController\"},\"kind\":\"One\"},\"kind\":\"OwnedBy\"},\"kind\":\"Card\",\"scope\":{\"Shared\":\"Ante\"}},\"kind\":\"Zone\"}", "count" = "()", "destination" = "\"OwnersGraveyard\"", "entry" = "[]", "face_down" = "()", "group" = "()", "random" = "false");
 g.end_sentence();
 let amount_3 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };

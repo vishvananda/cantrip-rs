@@ -1,6 +1,5 @@
 // Vizier of the Anointed
 // status: planned
-// requires: activated ability OnStack
 // requires: object filter HasKeywordFamily
 // When this creature enters, you may search your library for a creature card with eternalize or embalm, put that card into your graveyard, then shuffle.
 // Whenever you activate an eternalize or embalm ability, draw a card.
@@ -22,7 +21,7 @@ hoisted_6.extend({ let q: &dyn Query = g; objects_2.iter().copied().filter(|&o| 
 }
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::AbilityActivated { source, ability, player, .. } = event { let id = *source; let def = q.activated_ability(*ability); let subject = Target::Player(*player); let serial = match cantrip_mechanics::triggers::activated_ability_on_stack(q, event) { Some(Target::Ability(serial)) => serial, _ => 0 }; let data = [id.0, serial]; if def.is_some() && Some(asker.controller) == Some(*player) && (planned_value!("activated ability OnStack", false => def.is_some_and(|d| d.keyword_of() == Some(AbilityKeyword::Eternalize))) || planned_value!("activated ability OnStack", false => def.is_some_and(|d| d.keyword_of() == Some(AbilityKeyword::Embalm)))) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::AbilityActivated { source, ability, player, .. } = event { let id = *source; let def = q.activated_ability(*ability); let subject = Target::Player(*player); let serial = match cantrip_mechanics::triggers::activated_ability_on_stack(q, event) { Some(Target::Ability(serial)) => serial, _ => 0 }; let data = [id.0, serial]; if def.is_some() && Some(asker.controller) == Some(*player) && (def.is_some_and(|d| d.text.starts_with("Eternalize")) || def.is_some_and(|d| d.text.starts_with("Embalm"))) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let amount_7 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_7 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };

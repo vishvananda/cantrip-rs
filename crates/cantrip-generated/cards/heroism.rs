@@ -1,6 +1,6 @@
 // Heroism
 // status: planned
-// requires: event change in the program of another event
+// requires: damage prevented by what the effect asks as it would be dealt
 // Sacrifice a white creature: For each attacking red creature, prevent all combat damage that would be dealt by that creature this turn unless its controller pays {2}{R}.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn made_1_applies(q: &dyn Query, asker: &Asker, affected: ObjectId, proposal: &Proposal) -> bool { if let Proposal::Damage(e) = proposal { let (source, target, amount, combat) = (e.source, &e.target, e.amount, e.combat); let subject = *target; let data = [u32::from(amount), source.0]; if combat && !q.state().obj(source).zone.is(ZoneKind::Stack) && ((q.state().attackers.iter().any(|a| a.id == source) || q.was_attacking(source)) && q.chars(source).colors.has(q.words(asker.source).color(Color::Red)) && q.chars(source).is(CardType::Creature)) && true { return true; } }
@@ -8,7 +8,7 @@
 #[allow(unused_variables, unused_mut)] fn made_1_apply(q: &dyn Query, asker: &Asker, affected: ObjectId, proposal: &mut Proposal) { let seen = *proposal; if let Proposal::Damage(seen) = &seen { let e = seen; let (source, target, amount, combat) = (e.source, &e.target, e.amount, e.combat); let subject = *target; let data = [u32::from(amount), source.0]; if let Proposal::Damage(e) = proposal {  } } }
 #[allow(unused_variables, unused_mut)] fn made_1_then_steps(g: &mut dyn Game, asker: &Asker, affected: ObjectId, subject: Target, data: [u32; 2]) -> Result<(), Suspend> { let payer_2 = { let q: &dyn Query = g; Some(ObjectId(data[1])).filter(|o| *o != ObjectId::NONE).map(|o: ObjectId| q.controller(o)).expect("a reference that always names a player") }; let paid_2 = g.may_pay(payer_2, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 2, x: 0, symbols: [0, 0, 0, 1, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })), &PAY_QUESTION)?;
 if { let q: &dyn Query = g; !(((paid_2 as i64) != 0)) } {
-planned!("event-change-in-the-program-of-another-event" => g.change_event(|q, proposal| { if let Proposal::Damage(e) = proposal { e.prevent(None); } }););
+planned!("damage-prevented-by-what-the-effect-asks-as-it-would-be-dealt" => g.change_event(|q, proposal| { if let Proposal::Damage(e) = proposal { e.prevent(None); } }););
 }
  Ok(()) }
 #[allow(unused_variables)] fn made_1_then(g: &mut dyn Game, asker: &Asker, affected: ObjectId, before: &Proposal, _: &Proposal) { if let Proposal::Damage(e) = before { let q: &dyn Query = g; let (source, target, amount, combat) = (e.source, &e.target, e.amount, e.combat); let subject = *target; let data = [u32::from(amount), source.0]; let _ = made_1_then_steps(g, asker, affected, subject, data); } }

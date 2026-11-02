@@ -1,6 +1,5 @@
 // Noctis, Heir Apparent
-// status: planned
-// requires: several objects arriving in a state
+// status: ready
 // Whenever a creature you control enters during combat, you may attach target Equipment you control to target creature you control.
 // Warp-Strike — {3}: Exile Noctis. Return it to the battlefield under its owner's control tapped and attacking at the beginning of that player's next declare attackers step. It can't be blocked that combat.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -19,7 +18,7 @@ g.end_sentence();
 g.end_sentence();
  Ok(()) }
 fn delayed_4(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let objects_5: Vec<ObjectId> = { let q: &dyn Query = g; (about(q, item, 0)).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Exile).collect::<Vec<ObjectId>>() }; let moved_5: Vec<ObjectId> = planned_value!("several objects arriving in a state", Vec::<ObjectId>::new() => cantrip_mechanics::enter::in_state(g, asker, &objects_5, Destination::OwnersBattlefield, Arrival { tapped: true, counters: &[], states: &[ArrivalState::Attacking { player: None, or_planeswalker: false }] }, false)?);
+let objects_5 = ({ let q: &dyn Query = g; (about(q, item, 0)).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Exile).collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_5 = { let rows_5: Vec<(ObjectId, PlayerId, bool)> = objects_5.iter().map(|&o| (o, g.state().obj(o).owner, true)).collect(); let entered_5 = g.put_all_onto_battlefield_with_counters(&rows_5, &[])?; for &entered in &entered_5 { if g.is_on_battlefield(entered) { let controller = g.controller(entered); let defender = cantrip_mechanics::combat::choose_attack_target(g, controller, asker.source)?.unwrap_or(Target::None); g.enter_attacking(&[entered], defender); } } entered_5 };
 g.end_sentence();
 let objects_6 = { let q: &dyn Query = g; (moved_5.clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_6 = { let q: &dyn Query = g; Some(asker.source) }; let duration_6 = Duration::EndOfCombat;
 let kind_6_0_0 = { let q: &dyn Query = g; EffectKind::CantBeBlocked };

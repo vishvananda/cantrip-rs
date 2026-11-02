@@ -8,6 +8,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let amount_0 = { let q: &dyn Query = g; (2i64).max(0) as usize }; let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; cantrip_mechanics::scry(g, player_0, asker.source, amount_0)?;
 g.end_sentence();
 let mut players_1: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_1.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut guard_1_0 = vec![false; players_1.len()];
  for (index_1, bound_0) in players_1.iter().copied().enumerate() { if cantrip_mechanics::effects::ask_may(g, bound_0, asker.source, Purpose::Optional)? { guard_1_0[index_1] = true;
 let amount_2 = { let q: &dyn Query = g; (1i64).max(0) as usize }; let player_2 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; cantrip_mechanics::scry(g, player_2, asker.source, amount_2)?;

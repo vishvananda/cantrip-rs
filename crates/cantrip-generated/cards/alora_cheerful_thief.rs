@@ -16,8 +16,7 @@ if { let q: &dyn Query = g; ((paid_3 as i64) != 0) } {
 let selected_4_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_4_candidates = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&q.controller(id)))).collect::<Vec<ObjectId>>() }; let selected_4_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let selected_4 = { cantrip_mechanics::choose::select(g, selected_4_player, asker.source, Purpose::ChooseAsEnters, selected_4_candidates, cantrip_mechanics::select::Selection::of(selected_4_count, &[]))? };
 g.end_sentence();
 planned!("engine-no-perpetual-effects" => let objects_6: Vec<ObjectId> = { let q: &dyn Query = g; (selected_4.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() };
-let kind_6_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::Pump((-1i64) as i16, (0i64) as i16)) };
-for &object in &objects_6 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_6_0); });
+for &object in &objects_6 { let kind_6_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::Pump((-1i64) as i16, (0i64) as i16)) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_6_0); });
 g.end_sentence();
 hoisted_7.extend(selected_4.clone());
 }

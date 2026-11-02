@@ -1,7 +1,6 @@
 // Hulk's Thunderclap
 // status: planned
 // requires: cost branch AdditionalCost with targets of its own
-// requires: engine: behold outside the casting of a spell
 // As an additional cost to cast this spell, you may behold a Gamma creature. (You may choose a Gamma creature you control or reveal a Gamma creature card from your hand.)
 // Target creature you control deals damage equal to its power to another target creature. If this spell's additional cost was paid, destroy target noncreature artifact or noncreature enchantment.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -30,7 +29,7 @@ let source_4 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.c
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
-planned_item!("cost-branch-additional-cost-with-targets-of-its-own" => cost_branches: CostBranch { keyword: "AdditionalCost", cost: Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(planned_value!("engine: behold outside the casting of a spell", Cost::NONE => cantrip_mechanics::behold::cost_of(1, ability_0_branch_cost_behold_1, "Gamma creature"))), paid: spell(ABILITY_0_BRANCH_PAID_TARGETS, ability_0_branch_paid), unpaid: spell(ABILITY_0_BRANCH_UNPAID_TARGETS, ability_0_branch_unpaid) });
+planned_item!("cost-branch-additional-cost-with-targets-of-its-own" => cost_branches: CostBranch { keyword: "AdditionalCost", cost: Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(cantrip_mechanics::behold::cost_of(1, ability_0_branch_cost_behold_1, "Gamma creature")), paid: spell(ABILITY_0_BRANCH_PAID_TARGETS, ability_0_branch_paid), unpaid: spell(ABILITY_0_BRANCH_UNPAID_TARGETS, ability_0_branch_unpaid) });
 
 pub static CARD: CardDef = CardDef { name: "Hulk's Thunderclap", token_words: &[], oracle: true, cost: ManaCost { generic: 1, x: 0, symbols: [0, 0, 0, 0, 1, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Sorcery]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, labels: &["Cast without beholding", "Behold a Gamma creature"], late_targets: true, optional_cost: Some(OptionalCost::new(Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(cantrip_mechanics::behold::cost_of(1, ability_0_behold_0, "Gamma creature")))), ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

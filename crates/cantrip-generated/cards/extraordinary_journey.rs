@@ -1,6 +1,5 @@
 // Extraordinary Journey
 // status: planned
-// requires: duration WhileAnyExiled
 // requires: play permission on an open set of cards
 // When this enchantment enters, exile up to X target creatures. For each of those cards, its owner may play it for as long as it remains exiled.
 // Whenever one or more nontoken creatures enter, if one or more of them entered from exile or was cast from exile, you draw a card. This ability triggers only once each turn.
@@ -14,7 +13,7 @@ let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true
 let objects_0 = { let q: &dyn Query = g; t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>() }; let moved_0 = g.exile_all(&objects_0);
 g.end_sentence();
 let mut players_1: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
-g.one_instruction(&mut |g| { for (index_1, bound_0) in players_1.iter().copied().enumerate() { planned!("play-permission-on-an-open-set-of-cards" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for player in { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() } { g.add_player_effect(player, source, EffectKind::PlayerRule(PlayerRule::Play { zone: ZoneKind::Exile, cards: CardsOfRule::kept(move |q: &dyn Query, asker: &Asker, card: ObjectId| (((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && ((moved_0.clone()).contains(&id) && Some(bound_0) == Some(q.state().obj(id).owner))).collect::<Vec<ObjectId>>()).contains(&card)), grant: PlayGrant { lands: true, ..PlayGrant::CAST } }), planned_value!("duration WhileAnyExiled", Duration::Indefinite => Duration::WhileAnyExiled({ let q: &dyn Query = g; moved_0.clone() }))); } });
+g.one_instruction(&mut |g| { for (index_1, bound_0) in players_1.iter().copied().enumerate() { planned!("play-permission-on-an-open-set-of-cards" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for player in { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() } { g.add_player_effect(player, source, EffectKind::PlayerRule(PlayerRule::Play { zone: ZoneKind::Exile, cards: CardsOfRule::kept(move |q: &dyn Query, asker: &Asker, card: ObjectId| (((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && ((moved_0.clone()).contains(&id) && Some(bound_0) == Some(q.state().obj(id).owner))).collect::<Vec<ObjectId>>()).contains(&card)), grant: PlayGrant { lands: true, ..PlayGrant::CAST } }), Duration::Indefinite); } });
     } Ok(()) })?;
 g.end_sentence();
  Ok(()) }

@@ -1,6 +1,5 @@
 // The Wedding of River Song
 // status: planned
-// requires: earlier objects It
 // requires: exiled card gains suspend
 // Draw two cards, then you may exile a nonland card from your hand with a number of time counters on it equal to its mana value. Then target opponent does the same. Cards exiled this way that don't have suspend gain suspend.
 // Time travel. (For each suspended card you own and each permanent you control with a time counter on it, you may add or remove a time counter.)
@@ -21,7 +20,7 @@ g.end_sentence();
 {
 let selected_1_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_1_candidates = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && !(q.chars(id).is(CardType::Land))).collect::<Vec<ObjectId>>() }; let selected_1_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::UpTo((1i64).max(0) as u32) }; let selected_1 = { cantrip_mechanics::choose::select(g, selected_1_player, asker.source, Purpose::Exile, selected_1_candidates, cantrip_mechanics::select::Selection::of(selected_1_count, &[]))? };
 if !selected_1.is_empty() { 
-let objects_2 = { let q: &dyn Query = g; selected_1.clone() }; let moved_2 = { let counters: Vec<(CounterKind, i16)> = vec![(CounterKind::Time, { let q: &dyn Query = g; ((planned_value!("earlier objects It", Vec::<ObjectId>::new() => q.acted_on(asker, Acted::It))).into_iter().next().map_or(0i64, |id: ObjectId| i64::from(q.mana_value(id)))).clamp(0, 32767) as i16 })]; let exiled = g.exile_all(&objects_2); let puts: Vec<(ObjectId, CounterKind, i16)> = exiled.iter().flat_map(|&o| counters.iter().map(move |&(kind, n)| (o, kind, n))).collect(); g.add_counters_together(&puts); exiled };
+let objects_2 = { let q: &dyn Query = g; selected_1.clone() }; let moved_2 = { let exiled = g.exile_all(&objects_2); let puts: Vec<(ObjectId, CounterKind, i16)> = { let q: &dyn Query = g; exiled.iter().flat_map(|&moved_o| [(CounterKind::Time, ((vec![moved_o]).into_iter().next().map_or(0i64, |id: ObjectId| i64::from(q.mana_value(id)))).clamp(0, 32767) as i16)].into_iter().map(move |(kind, n): (CounterKind, i16)| (moved_o, kind, n))).collect() }; g.add_counters_together(&puts); exiled };
 g.end_sentence();
 let cards_3 = { let q: &dyn Query = g; (moved_2.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() };
 planned!("exiled-card-gains-suspend" => for card in cards_3 { cantrip_mechanics::suspend::gains_suspend(g, card); });
@@ -38,7 +37,7 @@ g.end_sentence();
 {
 let selected_8_player = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.player()).expect("a reference that always names a player") }; let selected_8_candidates = { let q: &dyn Query = g; ((t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && !(q.chars(id).is(CardType::Land))).collect::<Vec<ObjectId>>() }; let selected_8_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::UpTo((1i64).max(0) as u32) }; let selected_8 = { cantrip_mechanics::choose::select(g, selected_8_player, asker.source, Purpose::Exile, selected_8_candidates, cantrip_mechanics::select::Selection::of(selected_8_count, &[]))? };
 if !selected_8.is_empty() { 
-let objects_9 = { let q: &dyn Query = g; selected_8.clone() }; let moved_9 = { let counters: Vec<(CounterKind, i16)> = vec![(CounterKind::Time, { let q: &dyn Query = g; ((planned_value!("earlier objects It", Vec::<ObjectId>::new() => q.acted_on(asker, Acted::It))).into_iter().next().map_or(0i64, |id: ObjectId| i64::from(q.mana_value(id)))).clamp(0, 32767) as i16 })]; let exiled = g.exile_all(&objects_9); let puts: Vec<(ObjectId, CounterKind, i16)> = exiled.iter().flat_map(|&o| counters.iter().map(move |&(kind, n)| (o, kind, n))).collect(); g.add_counters_together(&puts); exiled };
+let objects_9 = { let q: &dyn Query = g; selected_8.clone() }; let moved_9 = { let exiled = g.exile_all(&objects_9); let puts: Vec<(ObjectId, CounterKind, i16)> = { let q: &dyn Query = g; exiled.iter().flat_map(|&moved_o| [(CounterKind::Time, ((vec![moved_o]).into_iter().next().map_or(0i64, |id: ObjectId| i64::from(q.mana_value(id)))).clamp(0, 32767) as i16)].into_iter().map(move |(kind, n): (CounterKind, i16)| (moved_o, kind, n))).collect() }; g.add_counters_together(&puts); exiled };
 g.end_sentence();
 let cards_10 = { let q: &dyn Query = g; (moved_9.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() };
 planned!("exiled-card-gains-suspend" => for card in cards_10 { cantrip_mechanics::suspend::gains_suspend(g, card); });

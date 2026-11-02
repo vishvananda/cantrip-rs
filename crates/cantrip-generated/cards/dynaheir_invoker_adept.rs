@@ -1,12 +1,11 @@
 // Dynaheir, Invoker Adept
-// status: planned
-// requires: activated ability ManaSpent
+// status: ready
 // Haste
 // You may activate abilities of other creatures you control as though those creatures had haste.
 // {T}: When you next activate an ability that isn't a mana ability this turn by spending four or more mana to activate it, copy that ability. You may choose new targets for the copy.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_1_0_rule(q: &dyn Query, asker: &Asker, creature: ObjectId) -> bool { (!(Some(asker.source) == Some(creature)) && (q.chars(creature).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(creature)))) }
-#[allow(unused_variables)] fn delayed_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::AbilityActivated { source, ability, player, .. } = event { let id = *source; let def = q.activated_ability(*ability); let subject = Target::Player(*player); let serial = match cantrip_mechanics::triggers::activated_ability_on_stack(q, event) { Some(Target::Ability(serial)) => serial, _ => 0 }; let data = [id.0, serial]; if def.is_some() && Some(asker.controller) == Some(*player) && (!(def.is_some_and(|d| d.is_mana_ability())) && planned_value!("activated ability ManaSpent", false => (q.activation_mana_spent(id)) >= (4i64))) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn delayed_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::AbilityActivated { source, ability, player, .. } = event { let id = *source; let def = q.activated_ability(*ability); let subject = Target::Player(*player); let serial = match cantrip_mechanics::triggers::activated_ability_on_stack(q, event) { Some(Target::Ability(serial)) => serial, _ => 0 }; let data = [id.0, serial]; if def.is_some() && Some(asker.controller) == Some(*player) && (!(def.is_some_and(|d| d.is_mana_ability())) && q.state().stack.iter().find(|i| serial != 0 && i.serial == serial && i.kind == StackKind::Activated).is_some_and(|i| (q.history().all().get(i.since as usize..).unwrap_or(&[]).iter().filter_map(|r| match r.event { Event::ManaSpent { on, cast: false, source, mana, .. } if on == id => Some((source, mana)), _ => None }).map(|(_, mana)| i64::from(mana.total())).sum::<i64>()) >= (4i64))) { return Some(Fired { subject, data }); } }
  None }
 fn delayed_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let copier_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let t = Target::Ability(item.data[1]); g.copy_ability(t, copier_2, true)?;

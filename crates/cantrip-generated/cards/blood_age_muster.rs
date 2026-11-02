@@ -10,8 +10,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let count_0: u32 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let mut conjured_0: Vec<ObjectId> = Vec::new(); for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { conjured_0.extend(planned_value!("operation Conjure", Vec::<ObjectId>::new() => cantrip_mechanics::conjure::conjure(g, player, player, asker.source, Conjured::FromSpellbook("Blood Age Muster", SpellbookPick::Random), count_0, ConjureTo::Battlefield { tapped: false })?)); }
 g.end_sentence();
 planned!("engine-no-perpetual-effects" => let objects_2: Vec<ObjectId> = { let q: &dyn Query = g; (conjured_0.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() };
-let kind_2_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::SetPt((2i64) as i16, (2i64) as i16)) };
-for &object in &objects_2 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_2_0); });
+for &object in &objects_2 { let kind_2_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::SetPt((2i64) as i16, (2i64) as i16)) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_2_0); });
 g.end_sentence();
  Ok(()) }
 

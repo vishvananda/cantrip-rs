@@ -1,12 +1,11 @@
 // Hazel of the Rootbloom
 // status: planned
-// requires: numeric expression AnnouncedX
 // requires: tapping X permanents as a cost
 // {T}, Pay 2 life, Tap X untapped tokens you control: Add X mana in any combination of colors.
 // At the beginning of your end step, create a token that's a copy of target token you control. If that token is a Squirrel, instead create two tokens that are copies of it.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let mana_players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_0 = { let q: &dyn Query = g; (planned_value!("numeric expression AnnouncedX", 0i64 => i64::from(q.announced_x().unwrap_or(0)))).clamp(0, 255) as u8 };
+let mana_0 = { let q: &dyn Query = g; (planned_value!("depends on an instruction with a gap", 0i64 => i64::from(q.obj(asker.source).x))).clamp(0, 255) as u8 };
 for player in mana_players_0 {
 if mana_0 > 0 { let colors = cantrip_mechanics::choose_colors(g, player, asker.source, ColorSet(31), mana_0)?;
 for color in colors { g.add_mana(player, color.mana(), 1); }

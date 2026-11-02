@@ -1,6 +1,5 @@
 // Struggle for Project Purity
 // status: planned
-// requires: amount of an event its trigger does not carry
 // requires: rad counters
 // As this enchantment enters, choose Brotherhood or Enclave.
 // • Brotherhood — At the beginning of your upkeep, each opponent draws a card. You draw a card for each card drawn this way.
@@ -23,7 +22,7 @@ g.end_sentence();
  None }
 fn ability_2_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut counters_3: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-planned!("rad-counters" => let amount = { let q: &dyn Query = g; ((2i64 * planned_value!("amount of an event its trigger does not carry", 0i64 => q.event_total(item)))).clamp(0, 4294967295) as u32 }; for player in { let q: &dyn Query = g; Some(PlayerId(item.data[0] as u8)).into_iter().collect::<Vec<PlayerId>>() } { cantrip_mechanics::rad::give(g, player, amount); });
+planned!("rad-counters" => let amount = { let q: &dyn Query = g; ((2i64 * q.event_objects(item).len() as i64)).clamp(0, 4294967295) as u32 }; for player in { let q: &dyn Query = g; Some(PlayerId(item.data[0] as u8)).into_iter().collect::<Vec<PlayerId>>() } { cantrip_mechanics::rad::give(g, player, amount); });
 let had_3: Vec<_> = counters_3.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_3); let applied_3: Vec<ObjectId> = counters_3.iter().zip(had_3).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
  Ok(()) }

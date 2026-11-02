@@ -18,7 +18,7 @@ pub static EXTRA: &[&CardDef] = &[];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
 let mut gathered_1: Vec<(PlayerId, ObjectId)> = Vec::new();
- for (index_0, bound_0) in players_0.iter().copied().enumerate() { let own_2: Vec<ObjectId> = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>() }.into_iter().filter(|&o| g.controller(o) == bound_0).collect(); let kept_2 = cantrip_mechanics::choose::select(g, bound_0, asker.source, Purpose::Keep, own_2.clone(), cantrip_mechanics::select::Selection::of(cantrip_mechanics::select::up_to({ let q: &dyn Query = g; (2i64).max(0) as u32 }), &[]))?; gathered_1.extend(own_2.iter().filter(|o| !kept_2.contains(o)).map(|&o| (bound_0, o)));
+ for (index_0, bound_0) in players_0.iter().copied().enumerate() { let own_2: Vec<ObjectId> = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>() }.into_iter().filter(|&o| g.controller(o) == bound_0).collect(); let keep_2 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let kept_2 = cantrip_mechanics::choose::select(g, bound_0, asker.source, Purpose::Keep, own_2.clone(), cantrip_mechanics::select::Selection::of(cantrip_mechanics::select::up_to(keep_2), &[]))?; gathered_1.extend(own_2.iter().filter(|o| !kept_2.contains(o)).map(|&o| (bound_0, o)));
     } 
 let sacrificed_1 = g.sacrifice_each(&gathered_1);
 g.end_sentence();

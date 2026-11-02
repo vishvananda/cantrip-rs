@@ -1,5 +1,7 @@
 // Mesmerizing Benthid
-// status: ready
+// status: planned
+// requires: continuous rule UntapStep
+// requires: duration DuringControllersNextUntapStep
 // When this creature enters, create two 0/2 blue Illusion creature tokens with "Whenever this token blocks a creature, that creature doesn't untap during its controller's next untap step."
 // This creature has hexproof as long as you control an Illusion.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -10,7 +12,8 @@ pub mod token_1 {
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Blocks { blocker, attacker, .. } = event { let id = *blocker; let other = *attacker; let subject = Target::Object(id); let data = [other.0, u32::MAX]; if Some(asker.source) == Some(id) && q.chars(other).is(CardType::Creature) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let objects_0 = { let q: &dyn Query = g; (Some(ObjectId(item.data[0])).filter(|o| *o != ObjectId::NONE).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; cantrip_api::instruction(g, |g| { for &object in &objects_0 { g.exert(object); } });
+let objects_0 = { let q: &dyn Query = g; (Some(ObjectId(item.data[0])).filter(|o| *o != ObjectId::NONE).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_0 = { let q: &dyn Query = g; Some(asker.source) }; let duration_0 = planned_value!("duration DuringControllersNextUntapStep", Duration::Indefinite => Duration::DuringItsControllersNextUntapStep);
+let kinds_0 = { let mut all = Vec::new(); for &object in &objects_0 { let kind = { let q: &dyn Query = g; planned_value!("continuous rule UntapStep", EffectKind::CantBlock => EffectKind::DoesntUntap) }; all.push((object, kind));  } all }; if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &(object, kind) in &kinds_0 { g.add_effect(source, object, kind, duration_0); } }); }
 g.end_sentence();
  Ok(()) }
 

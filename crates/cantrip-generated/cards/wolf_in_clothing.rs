@@ -1,6 +1,5 @@
 // Wolf in _____ Clothing
 // status: planned
-// requires: earlier objects It
 // requires: operation PutSticker
 // requires: stickers
 // When this creature enters, you may put a name sticker on it. When you do, up to X target creatures each get -1/-1 until end of turn, where X is the number of unique vowels on that sticker. (The vowels are A, E, I, O, U, and Y.)
@@ -20,7 +19,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let decider_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_0, asker.source, Purpose::Optional)? {
 let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let objects_1 = { let q: &dyn Query = g; item.subject.object().into_iter().collect::<Vec<ObjectId>>() };
 planned!("operation-put-sticker" => cantrip_mechanics::stickers::name_sticker(g, player_1, asker.source, &objects_1)?);
-if planned_value!("depends on an instruction with a gap", false => result_0) && true { g.reflexive_trigger_counted(item.object, item.controller, AbilityRef::delayed(item.ability.card, 0), Target::None, (({ let q: &dyn Query = g; planned_value!("stickers", 0i64 => cantrip_mechanics::stickers::measure(q, &planned_value!("earlier objects It", Vec::<ObjectId>::new() => q.acted_on(asker, Acted::It)), StickerMeasure::UniqueVowels)) } as i64)).clamp(0, i64::from(u16::MAX)) as u16); }
+if planned_value!("depends on an instruction with a gap", false => result_0) && true { g.reflexive_trigger_counted(item.object, item.controller, AbilityRef::delayed(item.ability.card, 0), Target::None, (({ let q: &dyn Query = g; planned_value!("stickers", 0i64 => cantrip_mechanics::stickers::measure(q, &Vec::<ObjectId>::new(), StickerMeasure::UniqueVowels)) } as i64)).clamp(0, i64::from(u16::MAX)) as u16); }
 g.end_sentence();
 }
 g.end_sentence();

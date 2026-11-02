@@ -20,8 +20,7 @@ g.end_sentence();
  Ok(()) }
 fn ability_2_mode_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 planned!("engine-no-perpetual-effects" => let objects_2: Vec<ObjectId> = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() };
-let kind_2_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::SetPt((4i64) as i16, (1i64) as i16)) };
-for &object in &objects_2 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_2_0); });
+for &object in &objects_2 { let kind_2_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::SetPt((4i64) as i16, (1i64) as i16)) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_2_0); });
 g.end_sentence();
  Ok(()) }
 static ABILITY_2_MODES: ModalDef = modes(&[mode(ability_2_mode_0, "Perpetually exchange target creature's base power with another target creature's base power.").targets(ABILITY_2_MODE_0_TARGETS),mode(ability_2_mode_1, "This creature perpetually has base power and toughness 4/1.").targets(&[])]).choose(0, 1);

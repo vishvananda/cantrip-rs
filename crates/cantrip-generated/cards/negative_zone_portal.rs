@@ -1,7 +1,5 @@
 // Negative Zone Portal
-// status: planned
-// requires: numeric expression CoinFlipsWon
-// requires: operation CoinFlips
+// status: ready
 // {2}, {T}: Exile target card from an opponent's graveyard. If it's a creature card, draw a card.
 // At the beginning of your upkeep, if there are four or more creature cards exiled with this artifact, flip a coin. If you lose the flip, sacrifice this artifact and return a card exiled with it at random to its owner's hand.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -27,9 +25,9 @@ let mut hoisted_8: Vec<ObjectId> = Vec::new();
 let mut hoisted_7: Vec<ObjectId> = Vec::new();
 let mut hoisted_6: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-planned!("operation-coin-flips" => cantrip_mechanics::coins::flips(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, Some({ let q: &dyn Query = g; (1i64).max(0) as u32 }), false, false, true)?);
+let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let times_2: Option<u32> = Some({ let q: &dyn Query = g; (1i64).max(0) as u32 }); let mut done_2: i64 = 0; let mut flips_2: u32 = 0; while times_2.map_or(true, |n| flips_2 < n) { flips_2 += 1; if g.flip_coin(player_2) { done_2 += 1; } else if false { break; } }
 g.end_sentence();
-if { let q: &dyn Query = g; (planned_value!("numeric expression CoinFlipsWon", 0i64 => g.coin_flips(asker.controller, false))) >= (1i64) } {
+if { let q: &dyn Query = g; ((i64::from(flips_2) - done_2)) >= (1i64) } {
 let objects_3 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut picks_3: Vec<(PlayerId, ObjectId)> = Vec::new();
 for &object in &objects_3 { let controller = g.controller(object); if players_3.contains(&controller) && g.can_sacrifice(controller, object) { picks_3.push((controller, object)); } }
 let sacrificed_3 = g.sacrifice_each(&picks_3);

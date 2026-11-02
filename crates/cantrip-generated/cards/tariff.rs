@@ -1,13 +1,13 @@
 // Tariff
 // status: planned
-// requires: cost part ObjectAction
+// requires: a mana cost paid for one creature and a sacrifice choosing again
 // Each player sacrifices the creature they control with the greatest mana value unless they pay that creature's mana cost. If two or more creatures a player controls are tied for greatest, that player chooses one.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
 let mut guard_0_0 = vec![false; players_0.len()];
 let mut each_2 = vec![Default::default(); players_0.len()];
- for (index_0, bound_0) in players_0.iter().copied().enumerate() { let payer_1 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; let paid_1 = g.may_pay(payer_1, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(planned_value!("cost part ObjectAction", Cost::NONE => Cost::object_action(Picks::Matching(|q: &dyn Query, asker: &Asker, id: ObjectId| (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(bound_0) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.mana_value(o))).max().is_some_and(|best| i64::from(q.mana_value(id)) == best)), CostObjectAction::PayManaCost))), &PAY_QUESTION)?;
+ for (index_0, bound_0) in players_0.iter().copied().enumerate() { let payer_1 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; let paid_1 = g.may_pay(payer_1, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(planned_value!("a mana cost paid for one creature and a sacrifice choosing again", Cost::NONE => Cost::object_action(Picks::Matching(|q: &dyn Query, asker: &Asker, id: ObjectId| (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(bound_0) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.mana_value(o))).max().is_some_and(|best| i64::from(q.mana_value(id)) == best)), CostObjectAction::PayManaCost))), &PAY_QUESTION)?;
  each_2[index_0] = paid_1;
    } 
 g.end_sentence();

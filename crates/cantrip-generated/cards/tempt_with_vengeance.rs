@@ -33,6 +33,7 @@ tokens_0.extend(std::iter::repeat((def_0_0,player)).take(count_0_0 as usize));
 let created_0 = g.create_tokens_worded(&tokens_0, false, None, words_0)?;
 g.end_sentence();
 let mut players_2: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_2.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut each_7: Vec<Vec<ObjectId>> = vec![Vec::new(); players_2.len()]; let mut all_7: Vec<ObjectId> = Vec::new();
 let mut each_8 = vec![Default::default(); players_2.len()];
  for (index_2, bound_0) in players_2.iter().copied().enumerate() { let payer_3 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") };

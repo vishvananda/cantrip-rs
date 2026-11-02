@@ -1,6 +1,5 @@
 // The Temporal Anchor
 // status: planned
-// requires: amount of an event its trigger does not carry
 // requires: trigger event Player BottomsWhileScrying
 // At the beginning of your upkeep, scry 2.
 // Whenever you choose to put one or more cards on the bottom of your library while scrying, exile that many cards from the bottom of your library.
@@ -14,7 +13,7 @@ g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let objects_1 = { let q: &dyn Query = g; { let mut end = (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().rev().take((planned_value!("amount of an event its trigger does not carry", 0i64 => q.event_total(item))).max(0) as usize).collect::<Vec<ObjectId>>(); end.reverse(); end } }; let moved_1 = { let by = g.linked(item); g.exile_with(&objects_1, by, false) };
+let objects_1 = { let q: &dyn Query = g; { let mut end = (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().rev().take((planned_value!("depends on an instruction with a gap", 0i64 => q.event_total(item))).max(0) as usize).collect::<Vec<ObjectId>>(); end.reverse(); end } }; let moved_1 = { let by = g.linked(item); g.exile_with(&objects_1, by, false) };
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_2_0_0_allows(q: &dyn Query, asker: &Asker, card: ObjectId, player: PlayerId) -> bool { player == asker.controller && (Some(asker.controller) == Some(q.state().turn.active)) && q.exiled_with(q.linked_to(asker)).contains(&card) }

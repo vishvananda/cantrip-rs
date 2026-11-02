@@ -23,8 +23,7 @@ let duplicated_1 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t
 let count_1: u32 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let mut conjured_1: Vec<ObjectId> = Vec::new(); for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { conjured_1.extend(planned_value!("operation Conjure", Vec::<ObjectId>::new() => cantrip_mechanics::conjure::conjure(g, player, player, asker.source, Conjured::DuplicateOf(&duplicated_1), count_1, ConjureTo::Hand)?)); }
 g.end_sentence();
 planned!("engine-no-perpetual-effects" => let objects_3: Vec<ObjectId> = { let q: &dyn Query = g; (conjured_1.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() };
-let kind_3_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::SpendAsThoughAnyType };
-for &object in &objects_3 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_3_0); });
+for &object in &objects_3 { let kind_3_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::SpendAsThoughAnyType }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_3_0); });
 g.end_sentence();
  Ok(()) }
 static ABILITY_0_MODES: ModalDef = modes(&[mode(ability_0_mode_0, "Counter target noncreature spell.").targets(ABILITY_0_MODE_0_TARGETS),mode(ability_0_mode_1, "Conjure a duplicate of target creature card in an opponent's graveyard into your hand. It perpetually gains \"Mana of any type can be spent to cast this spell.\"").targets(ABILITY_0_MODE_1_TARGETS)]).choose(1, 1).shared(ability_1_then);

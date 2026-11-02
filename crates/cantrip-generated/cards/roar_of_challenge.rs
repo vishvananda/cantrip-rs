@@ -1,6 +1,6 @@
 // Roar of Challenge
 // status: planned
-// requires: engine: no resolving rule on an open set: RequireCombat Block
+// requires: engine: no resolving rule on an open set: RequireCombat Block beyond lasting rules
 // All creatures able to block target creature this turn do so.
 // Ferocious — That creature gains indestructible until end of turn if you control a creature with power 4 or greater.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -9,7 +9,7 @@ static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_2: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-planned!("engine-no-resolving-rule-on-an-open-set-require-combat-block" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Creature), match t_0_raw.get(0).copied().and_then(|t: Target| t.object()) { Some(attacker) => EffectKind::MustBlockAttacker(attacker), None => EffectKind::Pump(0, 0) }, Duration::EndOfTurn); });
+planned!("engine-no-resolving-rule-on-an-open-set-require-combat-block-beyond-lasting-rules" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Creature), match t_0_raw.get(0).copied().and_then(|t: Target| t.object()) { Some(attacker) => EffectKind::MustBlockAttacker(attacker), None => EffectKind::Pump(0, 0) }, Duration::EndOfTurn); });
 g.end_sentence();
 if { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| q.controller(id) == Some(asker.controller).unwrap_or(PlayerId(u8::MAX)) && (q.chars(id).is(CardType::Creature) && q.chars(id).power.is_some_and(|v| (i64::from(v)) >= (4i64)))).count() >= 1 } {
 let objects_1 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let duration_1 = Duration::EndOfTurn;

@@ -24,9 +24,7 @@ hoisted_2.extend(selected_1.clone());
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
 planned!("engine-no-perpetual-effects" => let objects_4: Vec<ObjectId> = { let q: &dyn Query = g; (hoisted_2.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() };
-let kind_4_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Incorporate(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 1, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }) };
-let kind_4_1 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::AddAbility(AbilityRef::delayed({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, 0))) };
-for &object in &objects_4 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_4_0); cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_4_1); });
+for &object in &objects_4 { let kind_4_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Incorporate(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 1, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_4_0); let kind_4_1 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::AddAbility(AbilityRef::delayed({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, 0))) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_4_1); });
 g.end_sentence();
 }
 g.end_sentence();

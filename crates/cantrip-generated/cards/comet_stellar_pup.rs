@@ -1,7 +1,6 @@
 // Comet, Stellar Pup
 // status: planned
 // requires: player rule for a while ActivationGrant
-// requires: resolution cost Loyalty
 // [0]: Roll a six-sided die.
 // 1 or 2 — [+2], then create two 1/1 green Squirrel creature tokens. They gain haste until end of turn.
 // 3 — [−1], then return a card with mana value 2 or less from your graveyard to your hand.
@@ -24,7 +23,7 @@ let asker = &Asker::new(item.object, item.controller);
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let value_0 = i64::from(g.roll_die(player_0, 6).result);
 g.end_sentence();
 if { let q: &dyn Query = g; ((value_0) >= (1i64) && (value_0) <= (2i64)) } {
-let paid_1 = planned_value!("resolution cost Loyalty", false => cantrip_mechanics::effects::pay(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(loyalty(2)))?);
+let delta_1: i64 = { let q: &dyn Query = g; 2i64 }; let paid_1 = if delta_1 >= 0 { g.add_counters(asker.source, CounterKind::Loyalty, delta_1.min(i64::from(i16::MAX)) as i16); true } else { let owed = (-delta_1).min(i64::from(i16::MAX)) as i16; g.remove_counters(asker.source, CounterKind::Loyalty, owed) == owed };
 g.end_sentence();
 let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_2 = Vec::new();
 let count_2_0 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let def_2_0 = g.card_id(&token_3::CARD);
@@ -41,7 +40,7 @@ hoisted_5.extend(objects_4.clone());
 hoisted_6.extend(created_2.clone());
 }
 if { let q: &dyn Query = g; (value_0) == (3i64) } {
-let paid_7 = planned_value!("resolution cost Loyalty", false => cantrip_mechanics::effects::pay(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(loyalty(-1)))?);
+let delta_7: i64 = { let q: &dyn Query = g; -1i64 }; let paid_7 = if delta_7 >= 0 { g.add_counters(asker.source, CounterKind::Loyalty, delta_7.min(i64::from(i16::MAX)) as i16); true } else { let owed = (-delta_7).min(i64::from(i16::MAX)) as i16; g.remove_counters(asker.source, CounterKind::Loyalty, owed) == owed };
 g.end_sentence();
 let selected_8_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_8_candidates = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (i64::from(q.mana_value(id))) <= (2i64)).collect::<Vec<ObjectId>>() }; let selected_8_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let selected_8 = { cantrip_mechanics::choose::select(g, selected_8_player, asker.source, Purpose::PutIntoHand, selected_8_candidates, cantrip_mechanics::select::Selection::of(selected_8_count, &[]))? };
 let objects_9 = { let q: &dyn Query = g; selected_8.clone() }; let moved_9 = g.return_to_hand(&objects_9);
@@ -55,11 +54,11 @@ let player_13 = { let q: &dyn Query = g; Some(asker.controller).expect("a refere
 g.end_sentence();
 let source_14 = { let q: &dyn Query = g; Some(asker.source) }; let amount_14 = { let q: &dyn Query = g; ((Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.state().obj(o).counters(CounterKind::Loyalty))).sum::<i64>()).clamp(0, 65535) as u16 }; let recipients_14 = { let q: &dyn Query = g; vec![chosen_13] }; if let Some(source) = source_14 { let batch: Vec<(ObjectId, Target, u16)> = recipients_14.iter().map(|t| (source, *t, amount_14)).collect(); g.damage_together(&batch); }
 g.end_sentence();
-let paid_15 = planned_value!("resolution cost Loyalty", false => cantrip_mechanics::effects::pay(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(loyalty(-2)))?);
+let delta_15: i64 = { let q: &dyn Query = g; -2i64 }; let paid_15 = if delta_15 >= 0 { g.add_counters(asker.source, CounterKind::Loyalty, delta_15.min(i64::from(i16::MAX)) as i16); true } else { let owed = (-delta_15).min(i64::from(i16::MAX)) as i16; g.remove_counters(asker.source, CounterKind::Loyalty, owed) == owed };
 g.end_sentence();
 }
 if { let q: &dyn Query = g; (value_0) == (6i64) } {
-let paid_16 = planned_value!("resolution cost Loyalty", false => cantrip_mechanics::effects::pay(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(loyalty(1)))?);
+let delta_16: i64 = { let q: &dyn Query = g; 1i64 }; let paid_16 = if delta_16 >= 0 { g.add_counters(asker.source, CounterKind::Loyalty, delta_16.min(i64::from(i16::MAX)) as i16); true } else { let owed = (-delta_16).min(i64::from(i16::MAX)) as i16; g.remove_counters(asker.source, CounterKind::Loyalty, owed) == owed };
 g.end_sentence();
 planned!("player-rule-for-a-while-activation-grant" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.add_player_effect(player, source, EffectKind::PlayerRule(PlayerRule::ActivationGrant { abilities: |q: &dyn Query, asker: &Asker, permanent: ObjectId, def: Option<&ActivatedDef>| (def.is_some_and(|d| d.is_loyalty_ability()) && (def.is_some_and(|d| d.from == ZoneKind::Battlefield) && Some(asker.source) == Some(permanent))), grant: ActivationGrant::AdditionalTimes(2i64) }), Duration::EndOfTurn); } });
 g.end_sentence();

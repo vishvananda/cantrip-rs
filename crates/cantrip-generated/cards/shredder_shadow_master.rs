@@ -13,6 +13,7 @@ g.end_sentence();
  Ok(()) }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; { let mut all = { let other = Some(PlayerId(item.data[1] as u8)); q.state().apnap().filter(|p| Some(*p) != other).collect::<Vec<PlayerId>>() }; let other = Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all } };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_0.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut gathered_1: Vec<Target> = Vec::new();
  for (index_0, bound_0) in players_0.iter().copied().enumerate() { gathered_1.push(Target::Player({ let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }));
     } 

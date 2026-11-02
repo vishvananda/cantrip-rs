@@ -1,5 +1,7 @@
 // Kiora Bests the Sea God
-// status: ready
+// status: planned
+// requires: continuous rule UntapStep
+// requires: duration DuringControllersNextUntapStep
 // (As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)
 // I — Create an 8/8 blue Kraken creature token with hexproof.
 // II — Tap all nonland permanents target opponent controls. They don't untap during their controller's next untap step.
@@ -29,7 +31,8 @@ let noted_2: Vec<ObjectId> = { let q: &dyn Query = g; q.state().battlefield().it
 g.end_sentence();
 let objects_3 = { let q: &dyn Query = g; (noted_2.clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_3: Vec<ObjectId> = objects_3.iter().copied().filter(|&o| g.state().obj(o).tapped != true).collect(); g.tap_together(&turned_3);
 g.end_sentence();
-let objects_4 = { let q: &dyn Query = g; (noted_2.clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; cantrip_api::instruction(g, |g| { for &object in &objects_4 { g.exert(object); } });
+let objects_4 = { let q: &dyn Query = g; (noted_2.clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_4 = { let q: &dyn Query = g; Some(asker.source) }; let duration_4 = planned_value!("duration DuringControllersNextUntapStep", Duration::Indefinite => Duration::DuringItsControllersNextUntapStep);
+let kinds_4 = { let mut all = Vec::new(); for &object in &objects_4 { let kind = { let q: &dyn Query = g; planned_value!("continuous rule UntapStep", EffectKind::CantBlock => EffectKind::DoesntUntap) }; all.push((object, kind));  } all }; if let Some(source) = source_4 { cantrip_api::instruction(g, |g| { for &(object, kind) in &kinds_4 { g.add_effect(source, object, kind, duration_4); } }); }
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_0_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&q.controller(id)))) }

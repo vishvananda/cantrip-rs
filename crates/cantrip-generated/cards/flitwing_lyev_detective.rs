@@ -1,7 +1,6 @@
 // Flitwing, Lyev Detective
 // status: planned
 // requires: event change in the program of another event
-// requires: instruction ChooseOne
 // requires: replacement of token creation with other tokens
 // Flying
 // If you would create one or more tokens, you may create that many Clue tokens instead. (They're artifacts with "{2}, Sacrifice this token: Draw a card.")
@@ -22,7 +21,7 @@ pub static EXTRA: &[&CardDef] = &[];
 
 }
 #[allow(unused_variables, unused_mut)] fn ability_1_then_steps(g: &mut dyn Game, asker: &Asker, subject: Target, data: [u32; 2]) -> Result<(), Suspend> { let decider_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
-match planned_value!("instruction ChooseOne", 0u8 => cantrip_mechanics::choose::one_of(g, decider_1, asker.source, vec![Label::Card(card_1, 0), Label::Card(card_1, 1)])?) {
+match planned_value!("depends on an instruction with a gap", 0u8 => cantrip_mechanics::choose::one_of(g, decider_1, asker.source, vec![Label::Card(card_1, 0), Label::Card(card_1, 1)])?) {
 0 => {
 planned!("event-change-in-the-program-of-another-event" => g.change_event(|q, proposal| { if let Proposal::TokenCreation(t) = proposal { let each = t.count; t.count = t.count.saturating_mul(0); planned_value!("replacement of token creation with other tokens", () => t.also(q.card_id(&token_3::CARD), (i64::from(data[0])).max(0) as u32, Words::NONE)); } }););
 }

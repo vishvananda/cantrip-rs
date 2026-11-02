@@ -2,7 +2,6 @@
 // status: planned
 // requires: engine: no effect sets power or toughness alone
 // requires: engine: no perpetual effects
-// requires: object reference Affected
 // requires: operation Conjure
 // [+1]: Up to one target creature's base power perpetually becomes equal to its toughness. It perpetually gains "This creature can attack as though it didn't have defender."
 // [−2]: Conjure a card named Lumbering Lightshield onto the battlefield.
@@ -15,12 +14,10 @@ static PERPETUAL_4: CardDef = CardDef { keywords: Keywords::of(&[]), abilities: 
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 planned!("engine-no-perpetual-effects" => let objects_1: Vec<ObjectId> = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() };
-let kind_1_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(planned_value!("engine: no effect sets power or toughness alone", EffectKind::Pump(0, 0) => EffectKind::SetPower((planned_value!("object reference Affected", None::<ObjectId> => asker.affected()).map_or(0i64, |o: ObjectId| i64::from(q.chars(o).toughness.unwrap_or(0)))) as i16))) };
-for &object in &objects_1 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_1_0); });
+for &object in &objects_1 { let kind_1_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(planned_value!("engine: no effect sets power or toughness alone", EffectKind::Pump(0, 0) => EffectKind::SetPower((Some(object).map_or(0i64, |o: ObjectId| i64::from(q.chars(o).toughness.unwrap_or(0)))) as i16))) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_1_0); });
 g.end_sentence();
 planned!("engine-no-perpetual-effects" => let objects_3: Vec<ObjectId> = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() };
-let kind_3_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_4) };
-for &object in &objects_3 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_3_0); });
+for &object in &objects_3 { let kind_3_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_4) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_3_0); });
 g.end_sentence();
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

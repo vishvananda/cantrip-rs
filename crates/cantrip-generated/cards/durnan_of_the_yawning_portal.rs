@@ -1,6 +1,5 @@
 // Durnan of the Yawning Portal
 // status: planned
-// requires: duration WhileExiled
 // requires: play permission with an effect on what is played
 // Whenever Durnan attacks, look at the top four cards of your library. You may exile a creature card from among them. Put the rest on the bottom of your library in any order. For as long as that card remains exiled, you may cast it. That spell has undaunted. (It costs {1} less to cast for each opponent.)
 // Choose a Background (You can have a Background as a second commander.)
@@ -14,7 +13,7 @@ let objects_3 = { let q: &dyn Query = g; selected_2.clone() }; let moved_3 = g.e
 let library_4 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let cards_4: Vec<ObjectId> = { let q: &dyn Query = g; ({ let without: Vec<ObjectId> = { let mut all: Vec<ObjectId> = Vec::new(); for id in objects_3.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() { if !all.contains(&id) { all.push(id); } } all }; (objects_1.clone()).into_iter().filter(|id| !without.contains(id)).collect::<Vec<ObjectId>>() }).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Library).collect::<Vec<ObjectId>>() }.into_iter().filter(|&o| g.state().obj(o).became.is_none() && g.state().obj(o).zone == Zone::library(library_4)).collect(); let placed_4 = cards_4.clone();
 let chooser_4 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let order_4 = cantrip_mechanics::library::ask_library_order(g, chooser_4, asker.source, &cards_4, DestinationKind::LibraryBottom)?; g.arrange_library(library_4, &[], &order_4);
 g.end_sentence();
-planned!("play-permission-with-an-effect-on-what-is-played" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.add_player_effect(player, source, EffectKind::PlayerRule(PlayerRule::Play { zone: ZoneKind::Exile, cards: CardsOfRule::These({ let q: &dyn Query = g; (moved_3.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }), grant: PlayGrant { rider: Some(&[&[SpellEffect::Undaunted]]), ..PlayGrant::CAST } }), planned_value!("duration WhileExiled", Duration::Indefinite => Duration::WhileExiled({ let q: &dyn Query = g; (moved_3.clone()).get(0 as usize).copied() }))); } });
+planned!("play-permission-with-an-effect-on-what-is-played" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.add_player_effect(player, source, EffectKind::PlayerRule(PlayerRule::Play { zone: ZoneKind::Exile, cards: CardsOfRule::These({ let q: &dyn Query = g; (moved_3.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }), grant: PlayGrant { rider: Some(&[&[SpellEffect::Undaunted]]), ..PlayGrant::CAST } }), Duration::Indefinite); } });
 g.end_sentence();
  Ok(()) }
 

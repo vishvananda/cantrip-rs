@@ -1,10 +1,10 @@
 // Mortipede
 // status: planned
-// requires: engine: no resolving rule on an open set: RequireCombat Block
+// requires: engine: no resolving rule on an open set: RequireCombat Block beyond lasting rules
 // {2}{G}: All creatures able to block this creature this turn do so.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("engine-no-resolving-rule-on-an-open-set-require-combat-block" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Creature), match Some(asker.source) { Some(attacker) => EffectKind::MustBlockAttacker(attacker), None => EffectKind::Pump(0, 0) }, Duration::EndOfTurn); });
+planned!("engine-no-resolving-rule-on-an-open-set-require-combat-block-beyond-lasting-rules" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Creature), match Some(asker.source) { Some(attacker) => EffectKind::MustBlockAttacker(attacker), None => EffectKind::Pump(0, 0) }, Duration::EndOfTurn); });
 g.end_sentence();
  Ok(()) }
 

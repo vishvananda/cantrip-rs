@@ -16,6 +16,7 @@ let paid_1 = !picks_1.is_empty();
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
 let mut players_2: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_2.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut guard_2_0 = vec![false; players_2.len()];
 let mut gathered_3: Vec<(PlayerId, ObjectId)> = Vec::new();
  for (index_2, bound_0) in players_2.iter().copied().enumerate() { if true { guard_2_0[index_2] = true;
@@ -27,6 +28,7 @@ gathered_3.extend(picks_4.iter().copied());
 let sacrificed_3 = g.sacrifice_each(&gathered_3);
 g.end_sentence();
 let mut players_5: Vec<PlayerId> = { let q: &dyn Query = g; { let mut all = Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>(); let other = q.state().apnap().filter(|&bound_0: &PlayerId| !(Some(bound_0).and_then(|p: PlayerId| players_2.iter().position(|&next| next == p)).is_some_and(|at| gathered_3.iter().any(|(who, _)| *who == players_2[at])))).collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all } };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_5.sort_by_key(|p| order.iter().position(|o| o == p)); }
  for (index_5, bound_0) in players_5.iter().copied().enumerate() { let amount_6 = { let q: &dyn Query = g; (2i64).max(0) as i32 }; let players_6 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_6 { g.lose_life(player, amount_6); }
     } 

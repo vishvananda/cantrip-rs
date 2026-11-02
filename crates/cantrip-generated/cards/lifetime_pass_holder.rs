@@ -1,6 +1,5 @@
 // "Lifetime" Pass Holder
 // status: planned
-// requires: amount of an event its trigger does not carry
 // requires: engine: no Attractions
 // requires: trigger event Player RollsToVisit
 // This creature enters tapped.
@@ -16,7 +15,7 @@ planned!("engine-no-attractions" => { let player = { let q: &dyn Query = g; Some
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { None }
-fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller); if !{ let q: &dyn Query = g; (planned_value!("amount of an event its trigger does not carry", 0i64 => q.event_total(item))) == (6i64) } { return Ok(()); } let mut hoisted_5: Vec<ObjectId> = Vec::new();
+fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller); if !{ let q: &dyn Query = g; (planned_value!("depends on an instruction with a gap", 0i64 => q.event_total(item))) == (6i64) } { return Ok(()); } let mut hoisted_5: Vec<ObjectId> = Vec::new();
 let mut hoisted_4: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let decider_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if g.state().obj(asker.source).became.is_none() && cantrip_mechanics::effects::ask_may(g, decider_2, asker.source, Purpose::Optional)? {
@@ -28,7 +27,7 @@ hoisted_5.extend({ let q: &dyn Query = g; objects_3.iter().copied().filter(|&o| 
 }
 g.end_sentence();
  Ok(()) }
-planned_item!("trigger-event-player-rolls-to-visit" => matcher: #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::RolledToVisit { player, .. } = event { let subject = Target::Player(*player); let data = [0u32; 2]; if Some(asker.controller) == Some(*player) && (planned_value!("amount of an event its trigger does not carry", 0i64 => q.event_total_at(asker))) == (6i64) { return Some(Fired { subject, data }); } }
+planned_item!("trigger-event-player-rolls-to-visit" => matcher: #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::RolledToVisit { player, .. } = event { let subject = Target::Player(*player); let data = [0u32; 2]; if Some(asker.controller) == Some(*player) && (planned_value!("depends on an instruction with a gap", 0i64 => q.event_total_at(asker))) == (6i64) { return Some(Fired { subject, data }); } }
  None });
 
 pub static CARD: CardDef = CardDef { name: "\"Lifetime\" Pass Holder", token_words: &[], oracle: true, cost: ManaCost { generic: 0, x: 0, symbols: [0, 0, 1, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Zombie,Subtype::Guest]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: Some(2), toughness: Some(1), loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::ZONE_CHANGE.0), ability_1_event), ability_1, "When this creature dies, open an Attraction.").targets(&[]),triggered(when_asked(planned_value!("trigger event Player RollsToVisit", EventMask(0) => EventMask(EventMask::ROLLED_TO_VISIT.0)), ability_2_event), ability_2, "Whenever you roll to visit your Attractions, if you roll a 6, you may return this card from your graveyard to the battlefield.").targets(&[]).functions_in(ZoneKinds::of(&[ZoneKind::Graveyard]))], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: Some(ability_0_enters), modal: None, enchant: None, ..CardDef::BLANK };

@@ -1,8 +1,5 @@
 // Riptide Replicator
-// status: planned
-// requires: a choice of Color outside its body
-// requires: a choice of CreatureType outside its body
-// requires: token of the chosen color
+// status: ready
 // As this artifact enters, choose a color and a creature type.
 // This artifact enters with X charge counters on it.
 // {4}, {T}: Create an X/X creature token of the chosen color and type, where X is the number of charge counters on this artifact.
@@ -23,7 +20,8 @@ pub static EXTRA: &[&CardDef] = &[];
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_5: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 if { let q: &dyn Query = g; (q.state().chosen_color(q.linked(item)).is_some() && q.state().chosen_subtype(q.linked(item)).is_some()) } {
-let created_3: Vec<ObjectId> = planned_value!("token of the chosen color", Vec::<ObjectId>::new() => cantrip_mechanics::tokens::create(g, asker, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[({ let q: &dyn Query = g; (1i64).max(0) as u32 }, TokenRecipe::Filled(g.card_id(&token_4::CARD), TokenFill { color: Some({ let q: &dyn Query = g; planned_value!("a choice of Color outside its body", Color::White => q.state().chosen_color(q.linked(item)).expect("it chose one")) }), creature_type: Some({ let q: &dyn Query = g; planned_value!("a choice of CreatureType outside its body", Subtype::Plains => q.state().chosen_subtype(q.linked(item)).expect("it chose one")) }), power_toughness: Some(({ let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.state().obj(o).counters(CounterKind::Charge))).sum::<i64>() }, { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.state().obj(o).counters(CounterKind::Charge))).sum::<i64>() })), abilities_of: None }))], Arrival { tapped: false, counters: &[], states: &[] })?);
+let kind_3: Subtype = { let q: &dyn Query = g; q.state().chosen_subtype(q.linked(item)).expect("it chose one") };
+let values_3 = Copiable::of(g.card_id(&token_4::CARD)).sized(({ let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.state().obj(o).counters(CounterKind::Charge))).sum::<i64>() }).clamp(0, i64::from(i16::MAX)) as i16, ({ let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.state().obj(o).counters(CounterKind::Charge))).sum::<i64>() }).clamp(0, i64::from(i16::MAX)) as i16).colored(ColorSet::of({ let q: &dyn Query = g; q.state().chosen_color(q.linked(item)).expect("it chose one") })).with_subtype(kind_3).named(kind_3.name()); let mut created_3: Vec<ObjectId> = Vec::new(); let count_3 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { created_3.extend(g.create_token_copies_of(values_3, player, count_3)?); }
 g.end_sentence();
 hoisted_5.extend(created_3.clone());
 }

@@ -1,6 +1,6 @@
 // Thieves' Auction
 // status: planned
-// requires: per-player move under each player's control
+// requires: auction of the exiled cards until each is chosen
 // Exile all nontoken permanents. Starting with you, each player chooses one of the exiled cards and puts it onto the battlefield tapped under their control. Repeat this process until all cards exiled this way have been chosen.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_11: Vec<ObjectId> = Vec::new();
@@ -17,7 +17,7 @@ let mut each_4: Vec<Vec<ObjectId>> = vec![Vec::new(); players_2.len()]; let mut 
  each_4[index_2] = selected_3.clone(); all_4.extend(each_4[index_2].iter().copied());
    } 
 g.end_sentence();
-planned!("per-player-move-under-each-player-s-control" => g.begin_batch(););
+planned!("auction-of-the-exiled-cards-until-each-is-chosen" => g.begin_batch(););
 let mut each_6: Vec<Vec<ObjectId>> = vec![Vec::new(); players_2.len()]; let mut all_6: Vec<ObjectId> = Vec::new();
 let mut each_7: Vec<Vec<ObjectId>> = vec![Vec::new(); players_2.len()]; let mut all_7: Vec<ObjectId> = Vec::new();
  for (index_2, bound_0) in players_2.iter().copied().enumerate() { let player_5 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") };
@@ -25,7 +25,7 @@ let objects_5 = ({ let q: &dyn Query = g; each_4[index_2].clone() }).into_iter()
  each_6[index_2] = moved_5.clone(); all_6.extend(each_6[index_2].iter().copied());
 each_7[index_2] = { let q: &dyn Query = g; objects_5.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() }; all_7.extend(each_7[index_2].iter().copied());
    } 
-planned!("per-player-move-under-each-player-s-control" => g.end_batch(););
+planned!("auction-of-the-exiled-cards-until-each-is-chosen" => g.end_batch(););
 g.end_sentence();
 if { let q: &dyn Query = g; ((((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (moved_0.clone()).contains(&id)).collect::<Vec<ObjectId>>()).len() as i64) > (0i64) } {
 again_1 = true;

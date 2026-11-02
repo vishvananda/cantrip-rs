@@ -8,6 +8,7 @@
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_0.sort_by_key(|p| order.iter().position(|o| o == p)); }
  for (index_0, bound_0) in players_0.iter().copied().enumerate() { planned!("engine-no-skipped-step-or-phase" => { let player = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; g.skip_next(player, Skipped::UntapStep); });
     } 
 g.end_sentence();

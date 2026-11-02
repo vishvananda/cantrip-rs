@@ -9,6 +9,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let value_0 = i64::from(g.roll_die(player_0, 20).result);
 g.end_sentence();
 let mut players_1: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_1.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut each_3: Vec<Vec<ObjectId>> = vec![Vec::new(); players_1.len()]; let mut all_3: Vec<ObjectId> = Vec::new();
 let mut each_4: Vec<Vec<ObjectId>> = vec![Vec::new(); players_1.len()]; let mut all_4: Vec<ObjectId> = Vec::new();
  for (index_1, bound_0) in players_1.iter().copied().enumerate() { let owner_2 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; let count_2 = { let q: &dyn Query = g; (1i64).max(0) as usize }; let (found_2, rest_2) = cantrip_mechanics::library::reveal_until_n(g, owner_2, count_2, &|q: &dyn Query, id: ObjectId| (q.chars(id).is(CardType::Instant) || q.chars(id).is(CardType::Sorcery))); let shown_2 = found_2.len() + rest_2.len(); let objects_2: Vec<ObjectId> = g.state().zone(Zone::library(owner_2)).iter().copied().take(shown_2).collect();
@@ -19,6 +20,7 @@ g.end_sentence();
 let objects_5 = { let q: &dyn Query = g; all_3.clone() }; let moved_5 = g.exile_all(&objects_5);
 g.end_sentence();
 let mut players_6: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_6.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let objects_7 = { let q: &dyn Query = g; ((moved_5.clone()).into_iter().filter(|&id| !((q.chars(id).is(CardType::Instant) || q.chars(id).is(CardType::Sorcery)))).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Exile).collect::<Vec<ObjectId>>() }; let moved_7 = g.put_into_library(&objects_7, LibraryPlace::ShuffledIn);
 g.end_sentence();
 if { let q: &dyn Query = g; ((value_0) >= (1i64) && (value_0) <= (9i64)) } {

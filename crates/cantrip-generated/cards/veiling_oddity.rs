@@ -6,10 +6,13 @@
 // When the last time counter is removed from this card while it's exiled, creatures can't be blocked this turn.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { None }
+planned_item!("engine-no-resolving-rule-on-an-open-set-prohibit-be-blocked" => #[allow(unused_variables)] fn lasting_rule_0(q: &dyn Query, asker: &Asker, about: Target, id: ObjectId) -> bool { let source = asker.source; q.chars(id).is(CardType::Creature) });
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("engine-no-resolving-rule-on-an-open-set-prohibit-be-blocked" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Creature), EffectKind::CantBeBlocked, Duration::EndOfTurn); });
+let about_0 = Target::None; let until_0 = Duration::EndOfTurn;
+planned!("engine-no-resolving-rule-on-an-open-set-prohibit-be-blocked" => g.add_lasting_rule(item, 0, about_0, until_0););
 g.end_sentence();
  Ok(()) }
+planned_item!("engine-no-resolving-rule-on-an-open-set-prohibit-be-blocked" => static LASTING_RULES: &[LastingRule] = &[LastingRule { text: "When the last time counter is removed from this card while it's exiled, creatures can't be blocked this turn.", rule: LastingRuleKind::CantBeBlocked, applies: lasting_rule_0 }];);
 planned_item!("engine-no-event-for-a-counter-being-removed" => matcher: #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::CountersRemoved { object, kind, amount, by, .. } = event { let id = *object; let subject = Target::Object(id); let data = [*amount as u32, id.0]; if Some(asker.source) == Some(id) && *kind == CounterKind::Time && q.state().obj(id).counters(*kind) == 0 { return Some(Fired { subject, data }); } }
  None });
 

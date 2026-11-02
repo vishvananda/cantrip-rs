@@ -1,6 +1,6 @@
 // You Look Upon the Tarrasque
 // status: planned
-// requires: engine: no resolving rule on an open set: RequireCombat Block
+// requires: engine: no resolving rule on an open set: RequireCombat Block beyond lasting rules
 // Choose one —
 // • Run and Hide — Prevent all combat damage that would be dealt to you and creatures you control this turn.
 // • Gather Your Courage — Target creature gets +5/+5 and gains indestructible until end of turn. All creatures your opponents control able to block that creature this turn do so.
@@ -20,7 +20,7 @@ let kind_2_0_0 = { let q: &dyn Query = g; EffectKind::Pump((5i64) as i16, (5i64)
 let kind_2_1_0 = { let q: &dyn Query = g; EffectKind::AddKeywords(Keywords::of(&[Keyword::Indestructible])) };
 if let Some(source) = source_2 { cantrip_api::instruction(g, |g| { for &object in &objects_2 { g.add_effect(source, object, kind_2_0_0, duration_2); g.add_effect(source, object, kind_2_1_0, duration_2);  } }); }
 g.end_sentence();
-planned!("engine-no-resolving-rule-on-an-open-set-require-combat-block" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| (q.chars(id).is(CardType::Creature) && (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&q.controller(id))), match t_0_raw.get(0).copied().and_then(|t: Target| t.object()) { Some(attacker) => EffectKind::MustBlockAttacker(attacker), None => EffectKind::Pump(0, 0) }, Duration::EndOfTurn); });
+planned!("engine-no-resolving-rule-on-an-open-set-require-combat-block-beyond-lasting-rules" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| (q.chars(id).is(CardType::Creature) && (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&q.controller(id))), match t_0_raw.get(0).copied().and_then(|t: Target| t.object()) { Some(attacker) => EffectKind::MustBlockAttacker(attacker), None => EffectKind::Pump(0, 0) }, Duration::EndOfTurn); });
 g.end_sentence();
  Ok(()) }
 static ABILITY_0_MODES: ModalDef = modes(&[mode(ability_0_mode_0, "Run and Hide — Prevent all combat damage that would be dealt to you and creatures you control this turn.").targets(&[]),mode(ability_0_mode_1, "Gather Your Courage — Target creature gets +5/+5 and gains indestructible until end of turn. All creatures your opponents control able to block that creature this turn do so.").targets(ABILITY_0_MODE_1_TARGETS)]).choose(1, 1);

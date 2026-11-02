@@ -1,13 +1,13 @@
 // Sabertooth Alley Cat
 // status: planned
-// requires: engine: no resolving rule on an open set: Prohibit Block
+// requires: engine: no resolving rule on an open set: Prohibit Block beyond lasting rules
 // This creature attacks each combat if able.
 // {1}{R}: Creatures without defender can't block this creature this turn.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); chars.must_attack += 1; }
 #[allow(unused_variables)] fn block_rule_0(q: &dyn Query, source: ObjectId, blocker: ObjectId, attacker: ObjectId) -> bool { let asker = &Asker::new(source, q.controller(source)); !(blocker == source && Some(asker.source) == Some(attacker)) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("engine-no-resolving-rule-on-an-open-set-prohibit-block" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| (q.chars(id).is(CardType::Creature) && !(q.chars(id).keywords.has(Keyword::Defender))), EffectKind::BlockRestriction { card: { let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, index: 0 }, Duration::EndOfTurn); });
+planned!("engine-no-resolving-rule-on-an-open-set-prohibit-block-beyond-lasting-rules" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| (q.chars(id).is(CardType::Creature) && !(q.chars(id).keywords.has(Keyword::Defender))), EffectKind::BlockRestriction { card: { let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, index: 0 }, Duration::EndOfTurn); });
 g.end_sentence();
  Ok(()) }
 

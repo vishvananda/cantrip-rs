@@ -1,5 +1,7 @@
 // Clinging Mists
-// status: ready
+// status: planned
+// requires: continuous rule UntapStep
+// requires: duration DuringControllersNextUntapStep
 // Prevent all combat damage that would be dealt this turn.
 // Fateful hour — If you have 5 or less life, tap all attacking creatures. Those creatures don't untap during their controller's next untap step.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -15,7 +17,8 @@ g.end_sentence();
 if { let q: &dyn Query = g; (Some(asker.controller).map_or(0i64, |p: PlayerId| i64::from(q.state().player(p).life))) <= (5i64) } {
 let objects_2 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| ((q.state().attackers.iter().any(|a| a.id == id) || q.was_attacking(id)) && q.chars(id).is(CardType::Creature))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_2: Vec<ObjectId> = objects_2.iter().copied().filter(|&o| g.state().obj(o).tapped != true).collect(); g.tap_together(&turned_2);
 g.end_sentence();
-let objects_3 = { let q: &dyn Query = g; (turned_2.clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; cantrip_api::instruction(g, |g| { for &object in &objects_3 { g.exert(object); } });
+let objects_3 = { let q: &dyn Query = g; (turned_2.clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_3 = { let q: &dyn Query = g; Some(asker.source) }; let duration_3 = planned_value!("duration DuringControllersNextUntapStep", Duration::Indefinite => Duration::DuringItsControllersNextUntapStep);
+let kinds_3 = { let mut all = Vec::new(); for &object in &objects_3 { let kind = { let q: &dyn Query = g; planned_value!("continuous rule UntapStep", EffectKind::CantBlock => EffectKind::DoesntUntap) }; all.push((object, kind));  } all }; if let Some(source) = source_3 { cantrip_api::instruction(g, |g| { for &(object, kind) in &kinds_3 { g.add_effect(source, object, kind, duration_3); } }); }
 g.end_sentence();
 hoisted_4.extend(turned_2.clone());
 hoisted_5.extend(objects_2.clone());

@@ -1,6 +1,5 @@
 // Midnight Crusader Shuttle
 // status: planned
-// requires: earlier objects GainedControl
 // requires: operation ChangeCombat
 // requires: villainous choice
 // Midnight Entity — Whenever this Vehicle attacks, defending player faces a villainous choice — That player sacrifices a creature of their choice, or you gain control of a creature of your choice that player controls until end of turn. If you gain control of a creature this way, tap it, and it's attacking that player.
@@ -32,9 +31,9 @@ let kind_10_0_0 = { let q: &dyn Query = g; EffectKind::Control(present_11_0) };
 if let Some(source) = source_10 { cantrip_api::instruction(g, |g| { for &object in &objects_10 { g.add_effect(source, object, kind_10_0_0, duration_10);  } }); }
 (objects_10.clone(),) } else { Default::default() };
 g.end_sentence();
-let objects_12 = { let q: &dyn Query = g; ((planned_value!("earlier objects GainedControl", Vec::<ObjectId>::new() => q.acted_on(asker, Acted::GainedControl))).first().copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_12: Vec<ObjectId> = objects_12.iter().copied().filter(|&o| g.state().obj(o).tapped != true).collect(); g.tap_together(&turned_12);
+let objects_12 = { let q: &dyn Query = g; ((carried_11_0.clone()).first().copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_12: Vec<ObjectId> = objects_12.iter().copied().filter(|&o| g.state().obj(o).tapped != true).collect(); g.tap_together(&turned_12);
 g.end_sentence();
-planned!("operation-change-combat" => cantrip_mechanics::combat::change(g, asker, CombatChange::AssignAttack { objects: { let q: &dyn Query = g; (planned_value!("earlier objects GainedControl", Vec::<ObjectId>::new() => q.acted_on(asker, Acted::GainedControl))).first().copied().into_iter().collect::<Vec<ObjectId>>() }, to: AttackAssignment::Player({ let q: &dyn Query = g; item.subject.object().and_then(|o: ObjectId| q.defending_player(o)) }) })?);
+planned!("operation-change-combat" => cantrip_mechanics::combat::change(g, asker, CombatChange::AssignAttack { objects: { let q: &dyn Query = g; (carried_11_0.clone()).first().copied().into_iter().collect::<Vec<ObjectId>>() }, to: AttackAssignment::Player({ let q: &dyn Query = g; item.subject.object().and_then(|o: ObjectId| q.defending_player(o)) }) })?);
 g.end_sentence();
 hoisted_14.extend(objects_12.clone());
 hoisted_15.extend(carried_11_0.clone());

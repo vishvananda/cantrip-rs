@@ -1,7 +1,6 @@
 // Yurlok of Scorch Thrash
 // status: planned
 // requires: numeric expression Game
-// requires: per-player AddMana
 // requires: player reference Prior
 // requires: player rule AsManaEmpties
 // Vigilance
@@ -10,7 +9,6 @@
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_1_0_applies(q: &dyn Query, asker: &Asker, player: PlayerId) -> bool { true }
 fn ability_2_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let mut players_2: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
-planned!("per-player-add-mana" => g.begin_batch(););
  for (index_2, bound_0) in players_2.iter().copied().enumerate() { let mana_players_4 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
 let mana_4_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 };
 let mana_4_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 };
@@ -18,7 +16,6 @@ let mana_4_2 = { let q: &dyn Query = g; (1i64).max(0) as u32 };
 for player in mana_players_4 {
 g.add_mana(player, Mana::B, mana_4_0);g.add_mana(player, Mana::R, mana_4_1);g.add_mana(player, Mana::G, mana_4_2);}
     } 
-planned!("per-player-add-mana" => g.end_batch(););
  Ok(()) }
 planned_item!("player-rule-as-mana-empties" => statics: player_rule(ability_1_0_applies, PlayerRule::AsManaEmpties { mana: UnspentMana::AnyUnspentMana, then: &[|g: &mut dyn Game, asker: &Asker| -> Result<(), Suspend> { let mut players_0: Vec<PlayerId> = planned_value!("player reference Prior", Vec::<PlayerId>::new() => "(kind:One,args:(kind:Prior,args:That))");
  for (index_0, bound_9000) in players_0.iter().copied().enumerate() { let amount_1 = { let q: &dyn Query = g; (planned_value!("numeric expression Game", 0i64 => q.game_value(item, GameValue::ManaLostThisWay))).clamp(0, 2147483647) as i32 }; let players_1 = { let q: &dyn Query = g; Some(bound_9000).into_iter().collect::<Vec<PlayerId>>() };

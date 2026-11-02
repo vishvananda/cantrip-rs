@@ -12,20 +12,16 @@ static PERPETUAL_8: CardDef = CardDef { keywords: Keywords::of(&[]), abilities: 
 static PERPETUAL_11: CardDef = CardDef { keywords: Keywords::of(&[]), abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], enters: None, toxic: 1, ..CardDef::BLANK };
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 planned!("engine-no-perpetual-effects" => let objects_1: Vec<ObjectId> = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Insect)) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() };
-let kind_1_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_2) };
-for &object in &objects_1 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_1_0); });
+for &object in &objects_1 { let kind_1_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_2) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_1_0); });
 g.end_sentence();
 planned!("engine-no-perpetual-effects" => let objects_4: Vec<ObjectId> = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Insect))).collect::<Vec<ObjectId>>() };
-let kind_4_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_5) };
-for &object in &objects_4 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_4_0); });
+for &object in &objects_4 { let kind_4_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_5) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_4_0); });
 g.end_sentence();
 planned!("engine-no-perpetual-effects" => let objects_7: Vec<ObjectId> = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Insect))).collect::<Vec<ObjectId>>() };
-let kind_7_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_8) };
-for &object in &objects_7 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_7_0); });
+for &object in &objects_7 { let kind_7_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_8) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_7_0); });
 g.end_sentence();
 planned!("engine-no-perpetual-effects" => let objects_10: Vec<ObjectId> = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Insect))).collect::<Vec<ObjectId>>() };
-let kind_10_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_11) };
-for &object in &objects_10 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_10_0); });
+for &object in &objects_10 { let kind_10_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_11) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_10_0); });
 g.end_sentence();
  Ok(()) }
 

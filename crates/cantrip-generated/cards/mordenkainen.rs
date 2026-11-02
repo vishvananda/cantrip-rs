@@ -1,7 +1,6 @@
 // Mordenkainen
 // status: planned
 // requires: operation Exchange
-// requires: operation Together
 // [+2]: Draw two cards, then put a card from your hand on the bottom of your library.
 // [−2]: Create a blue Dog Illusion creature token with "This token's power and toughness are each equal to twice the number of cards in your hand."
 // [−10]: Exchange your hand and library, then shuffle. You get an emblem with "You have no maximum hand size."
@@ -39,10 +38,10 @@ pub static EXTRA: &[&CardDef] = &[];
 
 }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-together" => g.begin_simultaneous());
+planned!("depends-on-an-instruction-with-a-gap" => g.begin_simultaneous());
 planned!("operation-exchange" => cantrip_mechanics::exchange::exchange(g, asker.source, Exchange::Zones(Hand, Library), { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, None));
 for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.shuffle(player); }
-planned!("operation-together" => g.end_simultaneous());
+planned!("depends-on-an-instruction-with-a-gap" => g.end_simultaneous());
 g.end_sentence();
 for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { cantrip_mechanics::tokens::create_emblem(g, player, &emblem_8::CARD); }
 g.end_sentence();

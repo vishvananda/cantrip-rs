@@ -1,6 +1,5 @@
 // Lumbering Lightshield
 // status: planned
-// requires: earlier objects Selected
 // requires: engine: no perpetual effects
 // When this creature enters, target opponent reveals a nonland card at random from their hand. It perpetually gains "This spell costs {1} more to cast."
 #[allow(unused_imports)] use cantrip_api::*;
@@ -15,9 +14,8 @@ let player_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Tar
 let count_0 = { let q: &dyn Query = g; (1i64).max(0) as usize }; let mut shown_0: Vec<ObjectId> = Vec::new(); while shown_0.len() < count_0 && !pool_0.is_empty() { let at = g.choose_at_random(pool_0.len()); shown_0.push(pool_0.remove(at)); }
 g.reveal(player_0, &shown_0);
 g.end_sentence();
-planned!("engine-no-perpetual-effects" => let objects_2: Vec<ObjectId> = { let q: &dyn Query = g; (planned_value!("earlier objects Selected", Vec::<ObjectId>::new() => q.acted_on(asker, Acted::Selected))).first().copied().into_iter().collect::<Vec<ObjectId>>() };
-let kind_2_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_3) };
-for &object in &objects_2 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_2_0); });
+planned!("engine-no-perpetual-effects" => let objects_2: Vec<ObjectId> = { let q: &dyn Query = g; (shown_0.clone()).first().copied().into_iter().collect::<Vec<ObjectId>>() };
+for &object in &objects_2 { let kind_2_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_3) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_2_0); });
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

@@ -1,12 +1,12 @@
 // Walking Desecration
 // status: planned
-// requires: engine: no resolving rule on an open set: RequireCombat Attack
+// requires: a lasting rule reading what its ability chose
 // {B}, {T}: Creatures of the creature type of your choice attack this turn if able.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let chosen_0 = cantrip_mechanics::chosen_type::creature_type_now(g, player_0, asker.source)?;
 g.end_sentence();
-planned!("engine-no-resolving-rule-on-an-open-set-require-combat-attack" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| (q.chars(id).is(CardType::Creature) && Some(chosen_0).is_some_and(|chosen| q.chars(id).has_subtype(chosen))), EffectKind::MustAttack, Duration::EndOfTurn); });
+planned!("a-lasting-rule-reading-what-its-ability-chose", CreateContinuousEffect, "affected" = "{\"Objects\":{\"args\":{\"args\":[{\"args\":\"Creature\",\"kind\":\"CardType\"},{\"args\":\"CreatureType\",\"kind\":\"Chosen\"}],\"kind\":\"All\"},\"kind\":\"Battlefield\"}}", "changes" = "[{\"args\":{\"RequireCombat\":{\"action\":{\"Attack\":\"Any\"},\"amount\":{\"AtLeast\":{\"args\":1,\"kind\":\"Constant\"}}}},\"kind\":\"Rule\"}]", "duration" = "\"EndOfTurn\"", "evaluation" = "\"LiveObjects\"", "source" = { let q: &dyn Query = g; Some(asker.source) });
 g.end_sentence();
  Ok(()) }
 

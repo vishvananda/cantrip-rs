@@ -8,6 +8,7 @@ let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a referen
 let objects_1 = ({ let q: &dyn Query = g; selected_0.clone() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_1 = { let rows_1: Vec<(ObjectId, PlayerId, bool)> = objects_1.iter().map(|&o| (o, player_1, false)).collect(); let came_1 = g.put_all_onto_battlefield_as(&rows_1)?; came_1.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
 g.end_sentence();
 let mut players_2: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_2.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut guard_2_0 = vec![false; players_2.len()];
 let mut each_4: Vec<Vec<ObjectId>> = vec![Vec::new(); players_2.len()]; let mut all_4: Vec<ObjectId> = Vec::new();
  for (index_2, bound_0) in players_2.iter().copied().enumerate() { if true { guard_2_0[index_2] = true;

@@ -1,8 +1,8 @@
 // Twins of Discord
 // status: planned
+// requires: a lasting rule reading what its ability chose
 // requires: engine: no Bloodthirst
 // requires: engine: no Bloodthirst granted
-// requires: engine: no resolving rule on an open set: Prohibit Block
 // Whenever you attack, choose odd or even. Creatures with mana value of that quality can't block this turn. (Zero is even.)
 // Each other colorless creature you control has bloodthirst 2. (If an opponent was dealt damage this turn, that creature enters with two additional +1/+1 counters on it.)
 #[allow(unused_imports)] use cantrip_api::*;
@@ -11,7 +11,7 @@
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let chosen_0 = cantrip_mechanics::choose::option(g, player_0, asker.source, item.ability.card, 0..2)? - 0;
 g.end_sentence();
-planned!("engine-no-resolving-rule-on-an-open-set-prohibit-block" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| (q.chars(id).is(CardType::Creature) && ((i64::from(q.mana_value(id))) - (i64::from(chosen_0 == 0))) % 2 == 0), EffectKind::CantBlock, Duration::EndOfTurn); });
+planned!("a-lasting-rule-reading-what-its-ability-chose", CreateContinuousEffect, "affected" = "{\"Objects\":{\"args\":{\"args\":[{\"args\":\"Creature\",\"kind\":\"CardType\"},{\"args\":{\"comparison\":\"SameParity\",\"property\":\"ManaValue\",\"value\":{\"kind\":\"ChosenParity\"}},\"kind\":\"Property\"}],\"kind\":\"All\"},\"kind\":\"Battlefield\"}}", "changes" = "[{\"args\":{\"Prohibit\":{\"Block\":{\"kind\":\"Any\"}}},\"kind\":\"Rule\"}]", "duration" = "\"EndOfTurn\"", "evaluation" = "\"LiveObjects\"", "source" = { let q: &dyn Query = g; Some(asker.source) });
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); (!(Some(asker.source) == Some(affected)) && ((*so_far).colors.is_empty() && (*so_far).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(affected)))) }

@@ -1,7 +1,6 @@
 // Skrelv, Defector Mite
 // status: planned
 // requires: a lasting block rule reading what its ability chose
-// requires: keyword HexproofFrom Chosen
 // Toxic 1 (Players dealt combat damage by this creature also get a poison counter.)
 // Skrelv can't block.
 // {W/P}, {T}: Choose a color. Another target creature you control gains toxic 1 and hexproof from that color until end of turn. It can't be blocked by creatures of that color this turn. ({W/P} can be paid with either {W} or 2 life.)
@@ -14,7 +13,7 @@ let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a referen
 g.end_sentence();
 let objects_1 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let duration_1 = Duration::EndOfTurn;
 let kind_1_0_0 = { let q: &dyn Query = g; EffectKind::Toxic(1) };
-let kind_1_1_0 = { let q: &dyn Query = g; EffectKind::HexproofFrom(planned_value!("keyword HexproofFrom Chosen", HexproofFrom::NONE => HexproofFrom::color(chosen_0))) };
+let kind_1_1_0 = { let q: &dyn Query = g; EffectKind::HexproofFrom(HexproofFrom::color(chosen_0)) };
 if let Some(source) = source_1 { cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.add_effect(source, object, kind_1_0_0, duration_1); g.add_effect(source, object, kind_1_1_0, duration_1);  } }); }
 g.end_sentence();
 planned!("a-lasting-block-rule-reading-what-its-ability-chose", CreateContinuousEffect, "affected" = "{\"Objects\":{\"args\":{\"args\":{\"index\":0,\"slot\":0},\"kind\":\"Target\"},\"kind\":\"One\"}}", "changes" = "[{\"args\":{\"Prohibit\":{\"BeBlocked\":{\"args\":[{\"args\":\"Creature\",\"kind\":\"CardType\"},{\"args\":\"Color\",\"kind\":\"Chosen\"}],\"kind\":\"All\"}}},\"kind\":\"Rule\"}]", "duration" = "\"EndOfTurn\"", "evaluation" = "\"LiveObjects\"", "source" = { let q: &dyn Query = g; Some(asker.source) });

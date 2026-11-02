@@ -1,7 +1,5 @@
 // Goldberry, River-Daughter
-// status: planned
-// requires: cost part MoveCounters
-// requires: resolution cost MoveCounters
+// status: ready
 // {T}: Move a counter of each kind not on Goldberry from another target permanent you control onto Goldberry.
 // {U}, {T}: Move one or more counters from Goldberry onto another target permanent you control. If you do, draw a card.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -16,7 +14,7 @@ g.end_sentence();
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let paid_1 = planned_value!("resolution cost MoveCounters", false => cantrip_mechanics::effects::pay(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(planned_value!("cost part MoveCounters", Cost::NONE => Cost::moves_counters(Picks::Matching(|q: &dyn Query, asker: &Asker, id: ObjectId| id == asker.source), Picks::These(|q: &dyn Query, asker: &Asker| t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()), None, MovedCounters::AtLeast(1i64)))))?);
+let mut done_1: i64 = 0; let actor_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let from_1: Option<ObjectId> = ({ let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied(); let to_1: Option<ObjectId> = ({ let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied(); if let (Some(from), Some(to)) = (from_1, to_1) { let kinds: Vec<CounterKind> = CounterKind::ALL.into_iter().filter(|&kind| g.state().obj(from).counters(kind) > 0).collect(); let last = kinds.len(); for (i, kind) in kinds.into_iter().enumerate() { let most = g.state().obj(from).counters(kind).clamp(0, 255) as u32; let least = u32::from(done_1 == 0 && i + 1 == last); if most >= least { let amount = cantrip_mechanics::choose::number(g, actor_1, asker.source, least, most, "Move counters")? as i16; done_1 += i64::from(g.move_counters(from, to, kind, amount)); } } } let paid_1 = done_1 > 0;
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_1 as i64) != 0) } {
 let amount_2 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };

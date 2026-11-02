@@ -1,13 +1,12 @@
 // Demonfire
 // status: planned
-// requires: object filter DamagedBy
 // requires: operation DealDamage
 // Demonfire deals X damage to any target. If a creature dealt damage this way would die this turn, exile it instead.
 // Hellbent — If you have no cards in hand, this spell can't be countered and the damage can't be prevented.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_apply(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); if ((((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).len() as i64) == (0i64) { chars.keywords = chars.keywords.with(Keyword::CantBeCountered); } }
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[cantrip_mechanics::targets::ANY];
-#[allow(unused_variables)] fn made_6_applies(q: &dyn Query, asker: &Asker, affected: ObjectId, proposal: &Proposal) -> bool { if let Proposal::ZoneChange(z) = proposal { let id = z.object; let subject = Target::Object(id); let data = [u32::MAX; 2]; if z.to.is(ZoneKind::Graveyard) && z.from.is(ZoneKind::Battlefield) && (q.chars(id).is(CardType::Creature) && planned_value!("object filter DamagedBy", false => cantrip_mechanics::history::permanents_dealt_damage_by(q.history(), asker.source, since).contains(&id))) { return true; } }
+#[allow(unused_variables)] fn made_6_applies(q: &dyn Query, asker: &Asker, affected: ObjectId, proposal: &Proposal) -> bool { if let Proposal::ZoneChange(z) = proposal { let id = z.object; let subject = Target::Object(id); let data = [u32::MAX; 2]; if z.to.is(ZoneKind::Graveyard) && z.from.is(ZoneKind::Battlefield) && (q.chars(id).is(CardType::Creature) && cantrip_mechanics::history::permanents_dealt_damage_by(q.history(), asker.source, 0).contains(&id)) { return true; } }
  false }
 #[allow(unused_variables, unused_mut)] fn made_6_apply(q: &dyn Query, asker: &Asker, affected: ObjectId, proposal: &mut Proposal) { let seen = *proposal; if let Proposal::ZoneChange(seen) = &seen { let z = seen; let id = z.object; let subject = Target::Object(id); let data = [u32::MAX; 2]; if let Proposal::ZoneChange(z) = proposal { z.to = Zone::exile(q.state().obj(z.object).owner); } } }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_2: Vec<ObjectId> = Vec::new();

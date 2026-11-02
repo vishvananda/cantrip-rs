@@ -2,7 +2,6 @@
 // status: planned
 // requires: cost part PlayerAction
 // requires: engine: no cost moves these objects
-// requires: objects that paid a cost at resolution
 // Flying
 // When this creature enters, you may put a creature card with mana value 3 or less from your hand or graveyard onto the battlefield. That creature gains haste. Return it to your hand at the beginning of the next end step.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -26,7 +25,7 @@ hoisted_4.extend(moved_3.clone());
 hoisted_5.extend(selected_2.clone());
 hoisted_6.extend({ let q: &dyn Query = g; objects_3.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() });
  Ok(()) }))), &PAY_QUESTION)?;
-let paid_objects_0: Vec<ObjectId> = planned_value!("objects that paid a cost at resolution", Vec::<ObjectId>::new() => g.objects_that_paid());
+let paid_objects_0: Vec<ObjectId> = planned_value!("depends on an instruction with a gap", Vec::<ObjectId>::new() => g.objects_that_paid());
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
 let objects_7 = { let q: &dyn Query = g; ((paid_objects_0.clone()).get(0).copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_7 = { let q: &dyn Query = g; Some(asker.source) }; let duration_7 = Duration::Indefinite;

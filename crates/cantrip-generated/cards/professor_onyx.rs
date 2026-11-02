@@ -25,6 +25,7 @@ g.end_sentence();
  Ok(()) }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_4: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_4.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut gathered_5: Vec<(PlayerId, ObjectId)> = Vec::new();
  for (index_4, bound_0) in players_4.iter().copied().enumerate() { let objects_6 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && q.chars(id).power.is_some_and(|v| (i64::from(v)) == ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(bound_0) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0))).max().unwrap_or(0))))).collect::<Vec<ObjectId>>() }; let players_6 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() }; let mut picks_6: Vec<(PlayerId, ObjectId)> = Vec::new();
 let count_6 = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; for player in players_6 { let eligible: Vec<ObjectId> = objects_6.iter().copied().filter(|&o| g.controller(o) == player && g.can_sacrifice(player, o)).collect(); let taken = match count_6.clone() { cantrip_mechanics::select::Count::Exactly(n) | cantrip_mechanics::select::Count::AsManyAsCan(n) if eligible.len() <= n as usize => eligible, _ => cantrip_mechanics::choose::select(g, player, asker.source, Purpose::Sacrifice, eligible, cantrip_mechanics::select::Selection::of(count_6.clone(), &[]))? }; for object in taken { picks_6.push((player, object)); } }
@@ -38,6 +39,7 @@ let mut hoisted_17: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let mut runs_7: u32 = { let q: &dyn Query = g; (7i64).max(0) as u32 }; while runs_7 > 0 { runs_7 -= 1; let mut again_7 = false;
 let mut players_8: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_8.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut guard_8_0 = vec![false; players_8.len()];
 let mut each_12: Vec<Vec<ObjectId>> = vec![Vec::new(); players_8.len()]; let mut all_12: Vec<ObjectId> = Vec::new();
 let mut each_13: Vec<Vec<ObjectId>> = vec![Vec::new(); players_8.len()]; let mut all_13: Vec<ObjectId> = Vec::new();

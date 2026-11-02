@@ -20,8 +20,7 @@ let mut pool_1 = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().c
 let objects_2 = { let q: &dyn Query = g; picked_1.clone() }; let moved_2 = g.return_to_hand(&objects_2);
 g.end_sentence();
 planned!("engine-no-perpetual-effects" => let objects_4: Vec<ObjectId> = { let q: &dyn Query = g; (moved_2.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() };
-let kind_4_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::AddKeywords(Keywords::of(&[Keyword::Menace]))) };
-for &object in &objects_4 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_4_0); });
+for &object in &objects_4 { let kind_4_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::AddKeywords(Keywords::of(&[Keyword::Menace]))) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_4_0); });
 g.end_sentence();
 hoisted_5.extend(moved_2.clone());
 hoisted_6.extend(picked_1.clone());

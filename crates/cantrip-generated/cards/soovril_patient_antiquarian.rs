@@ -1,11 +1,10 @@
 // Soovril, Patient Antiquarian
 // status: planned
 // requires: exiled card gains suspend
-// requires: object filter History ExiledFromGraveyard
 // Vigilance
 // {T}: Put two time counters on target nonland card in exile that was put there from your graveyard this turn. If it doesn't have suspend, it gains suspend.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Exile) && !q.state().obj(id).token && ((!(q.chars(id).is(CardType::Land)) && planned_value!("object filter History ExiledFromGraveyard", false => cantrip_mechanics::history::exiled_from_graveyard(q.history().this_turn().iter(), id, Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()))))) }
+#[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Exile) && !q.state().obj(id).token && ((!(q.chars(id).is(CardType::Land)) && q.history().this_turn().iter().any(|r| matches!(r.event, Event::ZoneChange { new, from, to, .. } if new == id && from.is(ZoneKind::Graveyard) && to.is(ZoneKind::Exile) && Some(asker.controller) == Some(q.state().obj(new).owner)))))) }
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);

@@ -1,6 +1,5 @@
 // Timesifter
 // status: planned
-// requires: condition HadExtreme
 // requires: keyword action SetRepeatablePlayers
 // requires: player collection Scoped
 // At the beginning of each upkeep, each player exiles the top card of their library. The player who exiled the card with the greatest mana value takes an extra turn after this one. If two or more players' cards are tied for greatest, the tied players repeat this process until the tie is broken.
@@ -19,8 +18,8 @@ let mut gathered_3: Vec<ObjectId> = Vec::new();
     } 
 let objects_5 = { let q: &dyn Query = g; gathered_3.clone() }; let moved_5 = g.exile_all(&objects_5);
 g.end_sentence();
-if { let q: &dyn Query = g; (({ let mut all = q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0).is_some_and(|p: PlayerId| (planned_value!("player collection Scoped", Vec::<PlayerId>::new() => q.players_in_scope(asker))).contains(&p))).collect::<Vec<PlayerId>>(); let other = q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition HadExtreme", false => Some(bound_0).is_some_and(|p: PlayerId| q.had_extreme(item, p, EarlierObjects::Exiled, |id: ObjectId| true, true)))).collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all }).len() as i64) >= (2i64) } {
-planned!("keyword-action-set-repeatable-players" => cantrip_mechanics::players::set_repeatable(g, { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition HadExtreme", false => Some(bound_0).is_some_and(|p: PlayerId| q.had_extreme(item, p, EarlierObjects::Exiled, |id: ObjectId| true, true)))).collect::<Vec<PlayerId>>() }, asker.source)?;);
+if { let q: &dyn Query = g; (({ let mut all = q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0).is_some_and(|p: PlayerId| (planned_value!("player collection Scoped", Vec::<PlayerId>::new() => q.players_in_scope(asker))).contains(&p))).collect::<Vec<PlayerId>>(); let other = q.state().apnap().filter(|&bound_0: &PlayerId| { let those: Vec<ObjectId> = moved_5.clone(); let extreme = those.iter().map(|&o| q.mana_value(o)).max(); those.iter().any(|&o| Some(q.state().obj(o).owner) == Some(bound_0) && Some(q.mana_value(o)) == extreme) }).collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all }).len() as i64) >= (2i64) } {
+planned!("keyword-action-set-repeatable-players" => cantrip_mechanics::players::set_repeatable(g, { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| { let those: Vec<ObjectId> = moved_5.clone(); let extreme = those.iter().map(|&o| q.mana_value(o)).max(); those.iter().any(|&o| Some(q.state().obj(o).owner) == Some(bound_0) && Some(q.mana_value(o)) == extreme) }).collect::<Vec<PlayerId>>() }, asker.source)?;);
 g.end_sentence();
 again_1 = true;
 g.end_sentence();
@@ -30,7 +29,7 @@ hoisted_8.extend(moved_5.clone());
 hoisted_9.extend({ let q: &dyn Query = g; objects_5.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() });
 if !again_1 { break; } }
 g.end_sentence();
-let mut players_10: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition HadExtreme", false => Some(bound_0).is_some_and(|p: PlayerId| q.had_extreme(item, p, EarlierObjects::Exiled, |id: ObjectId| true, true)))).collect::<Vec<PlayerId>>() };
+let mut players_10: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| { let those: Vec<ObjectId> = hoisted_8.clone(); let extreme = those.iter().map(|&o| q.mana_value(o)).max(); those.iter().any(|&o| Some(q.state().obj(o).owner) == Some(bound_0) && Some(q.mana_value(o)) == extreme) }).collect::<Vec<PlayerId>>() };
  for (index_10, bound_0) in players_10.iter().copied().enumerate() { { let player = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; let times = 1u32; g.add_extra_turns(player, times); }
     } 
 g.end_sentence();

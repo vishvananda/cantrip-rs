@@ -1,6 +1,5 @@
 // _____-o-saurus
 // status: planned
-// requires: earlier objects It
 // requires: operation PutSticker
 // requires: stickers
 // Trample
@@ -15,7 +14,7 @@ let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a referen
 planned!("operation-put-sticker" => cantrip_mechanics::stickers::name_sticker(g, player_1, asker.source, &objects_1)?);
 g.end_sentence();
 let mut counters_2: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; (planned_value!("stickers", 0i64 => cantrip_mechanics::stickers::measure(q, &planned_value!("earlier objects It", Vec::<ObjectId>::new() => q.acted_on(asker, Acted::It)), StickerMeasure::UniqueVowels))).clamp(0, 32767) as i16 }; for t in { let q: &dyn Query = g; (item.subject.object().into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_2.push((object, CounterKind::PlusOne, amount)); } }
+let amount = { let q: &dyn Query = g; (planned_value!("stickers", 0i64 => cantrip_mechanics::stickers::measure(q, &Vec::<ObjectId>::new(), StickerMeasure::UniqueVowels))).clamp(0, 32767) as i16 }; for t in { let q: &dyn Query = g; (item.subject.object().into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_2.push((object, CounterKind::PlusOne, amount)); } }
 let had_2: Vec<_> = counters_2.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_2); let applied_2: Vec<ObjectId> = counters_2.iter().zip(had_2).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
 hoisted_3.extend(applied_2.clone());

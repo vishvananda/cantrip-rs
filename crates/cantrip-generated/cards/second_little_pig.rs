@@ -5,11 +5,7 @@
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 planned!("engine-no-perpetual-effects" => let objects_1: Vec<ObjectId> = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() };
-let kind_1_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::SetCreatureType(q.words(asker.source).subtype(Subtype::Boar))) };
-let kind_1_1 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::AddSubtype(q.words(asker.source).subtype(Subtype::Spirit))) };
-let kind_1_2 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::SetPt((4i64) as i16, (4i64) as i16)) };
-let kind_1_3 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::AddKeywords(Keywords::of(&[Keyword::Flying]))) };
-for &object in &objects_1 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_1_0); cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_1_1); cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_1_2); cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_1_3); });
+for &object in &objects_1 { let kind_1_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::SetCreatureType(q.words(asker.source).subtype(Subtype::Boar))) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_1_0); let kind_1_1 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::AddSubtype(q.words(asker.source).subtype(Subtype::Spirit))) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_1_1); let kind_1_2 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::SetPt((4i64) as i16, (4i64) as i16)) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_1_2); let kind_1_3 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::AddKeywords(Keywords::of(&[Keyword::Flying]))) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_1_3); });
 g.end_sentence();
  Ok(()) }
 fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.source).is_some_and(|candidate: ObjectId| !(q.chars(candidate).has_subtype(q.words(asker.source).subtype(Subtype::Spirit)))) }

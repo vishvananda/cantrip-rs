@@ -1,6 +1,5 @@
 // Myriad Landscape
-// status: planned
-// requires: search constraint CommonProperty
+// status: ready
 // This land enters tapped.
 // {T}: Add {C}.
 // {2}, {T}, Sacrifice this land: Search your library for up to two basic land cards that share a land type, put them onto the battlefield tapped, then shuffle.
@@ -12,10 +11,12 @@ let mana_1_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 };
 for player in mana_players_1 {
 g.add_mana(player, Mana::C, mana_1_0);}
  Ok(()) }
+fn share_a_land_type(q: &dyn Query, choice: &Choice, _: u32) -> Verdict { let all_have = |t: Subtype| choice.selected.iter().all(|&c| q.chars(c).subtypes.has(t)); let complete = choice.selected.is_empty() || SubtypeSet::LAND_TYPES.iter().any(all_have); let addable = Bits::of(choice.candidates.len(), |i| { let candidate = q.chars(choice.candidates[i]); choice.selected.is_empty() || SubtypeSet::LAND_TYPES.iter().any(|t| all_have(t) && candidate.subtypes.has(t)) }); Verdict { complete, addable } }
+fn largest_share_a_land_type(q: &dyn Query, choice: &Choice, _: u32) -> Vec<ObjectId> { SubtypeSet::LAND_TYPES.iter().map(|t| choice.candidates.iter().copied().filter(|&c| q.chars(c).subtypes.has(t)).collect::<Vec<ObjectId>>()).max_by_key(Vec::len).unwrap_or_default() }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("search-constraint-common-property" => cantrip_mechanics::library::search_for(g, asker.source, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, None, &[Find { filter: |q: &dyn Query, asker: &Asker, id: ObjectId| -> bool { (q.chars(id).supertypes.basic && q.chars(id).is(CardType::Land)) }, count: { let q: &dyn Query = g; cantrip_mechanics::select::Count::UpTo((2i64).max(0) as u32) }, rules: &[SelectionRule::CommonProperty(Property::LandTypes)] }], &[], false, false)?);
-let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
-let objects_2 = ({ let q: &dyn Query = g; planned_value!("depends on an instruction with a gap", Vec::<ObjectId>::new() => result_0) }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_2 = { let rows_2: Vec<(ObjectId, PlayerId, bool)> = objects_2.iter().map(|&o| (o, player_2, true)).collect(); let came_2 = g.put_all_onto_battlefield_as(&rows_2)?; came_2.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
+let searcher_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let owner_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let rule_count_2 = { let q: &dyn Query = g; cantrip_mechanics::select::Count::UpTo((2i64).max(0) as u32) }; let shown_2 = cantrip_mechanics::library::searched_cards(g, owner_2); let can_2: Vec<ObjectId> = { let q: &dyn Query = g; shown_2.iter().copied().filter(|&id| (q.chars(id).supertypes.basic && q.chars(id).is(CardType::Land))).collect() }; let found_2 = cantrip_mechanics::library::search(g, searcher_2, owner_2, asker.source, SearchDestination::BattlefieldTapped, cantrip_mechanics::select::Selection::listed(rule_count_2, &shown_2, can_2).with(cantrip_api::select::set_part(&(share_a_land_type as SelectFn), &(largest_share_a_land_type as cantrip_api::select::LargestFn), 0, "that share a land type")))?;
+let player_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
+let objects_3 = ({ let q: &dyn Query = g; found_2.clone() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_3 = { let rows_3: Vec<(ObjectId, PlayerId, bool)> = objects_3.iter().map(|&o| (o, player_3, true)).collect(); let came_3 = g.put_all_onto_battlefield_as(&rows_3)?; came_3.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
 for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.shuffle(player); }
 g.end_sentence();
  Ok(()) }

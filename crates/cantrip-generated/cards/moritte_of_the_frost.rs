@@ -1,7 +1,6 @@
 // Moritte of the Frost
 // status: planned
 // requires: copy exception AddSupertypes
-// requires: event change as it enters Copiable GrantAbility
 // Changeling (This card is every creature type.)
 // You may have Moritte enter as a copy of a permanent you control, except it's legendary and snow in addition to its other types and, if it's a creature, it enters with two additional +1/+1 counters on it and has changeling.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -9,7 +8,7 @@
 entering.copy = { let q: &dyn Query = g; Some(chosen_0).map(|original: ObjectId| planned_value!("copy exception AddSupertypes", q.copiable_values(original) => q.copiable_values(original).with_supertypes(&[Supertype::Legendary, Supertype::Snow]))) }; let picked_0 = vec![chosen_0];
 if { let q: &dyn Query = g; (((picked_0.clone()).into_iter().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>()).len() as i64) >= (1i64) } {
 let more = { let q: &dyn Query = g; (2i64).max(0) as i16 }; entering.counters[CounterKind::PlusOne as usize] = entering.counters[CounterKind::PlusOne as usize].saturating_add(more);
-planned!("event-change-as-it-enters-copiable-grant-ability" => entering.copy = entering.copy.map(|values| values.with_every_creature_type()););
+entering.copy = entering.copy.map(|values| values.with_keyword(Keyword::Changeling));
 }
 }
  Ok(()) }

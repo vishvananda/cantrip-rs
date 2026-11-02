@@ -16,6 +16,7 @@ let mut hoisted_13: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 if { let q: &dyn Query = g; Some(asker.controller).is_some_and(|player: PlayerId| q.state().player(player).monarch) } {
 let mut players_1: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_1.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut guard_1_0 = vec![false; players_1.len()];
 let mut each_3 = vec![Default::default(); players_1.len()];
  for (index_1, bound_0) in players_1.iter().copied().enumerate() { let payer_2 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; let paid_2 = g.state().zone(Zone::hand(payer_2)).len() >= 2 && g.may_pay(payer_2, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(discard_cards(2)), &PAY_QUESTION)?;
@@ -30,6 +31,7 @@ for player in players_4 { g.lose_life(player, amount_4); }
 g.end_sentence();
 } else {
 let mut players_5: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_5.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut guard_5_0 = vec![false; players_5.len()];
 let mut each_9: Vec<Vec<ObjectId>> = vec![Vec::new(); players_5.len()]; let mut all_9: Vec<ObjectId> = Vec::new();
 let mut each_10: Vec<Vec<ObjectId>> = vec![Vec::new(); players_5.len()]; let mut all_10: Vec<ObjectId> = Vec::new();

@@ -14,8 +14,7 @@ let selected_1_player = { let q: &dyn Query = g; Some(asker.controller).expect("
 let objects_2 = { let q: &dyn Query = g; selected_1.clone() }; let moved_2 = { let order_2 = match objects_2.iter().all(|&o| g.state().obj(o).owner == asker.controller) { true => cantrip_mechanics::library::ask_library_order(g, asker.controller, asker.source, &objects_2, DestinationKind::LibraryBottom)?, false => objects_2.clone() }; g.put_into_library(&order_2, LibraryPlace::Bottom) };
 g.end_sentence();
 planned!("engine-no-perpetual-effects" => let objects_4: Vec<ObjectId> = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (q.chars(id).colors.has(q.words(asker.source).color(Color::Blue)) && q.chars(id).is(CardType::Creature))).collect::<Vec<ObjectId>>() };
-let kind_4_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_5) };
-for &object in &objects_4 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_4_0); });
+for &object in &objects_4 { let kind_4_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_5) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_4_0); });
 g.end_sentence();
  Ok(()) }
 

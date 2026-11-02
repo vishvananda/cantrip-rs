@@ -29,15 +29,13 @@ let selected_2_player = { let q: &dyn Query = g; Some(asker.controller).expect("
 g.end_sentence();
 if { let q: &dyn Query = g; ((selected_2.clone()).len() as i64) >= (1i64) } {
 planned!("engine-no-perpetual-effects" => let objects_4: Vec<ObjectId> = { let q: &dyn Query = g; (selected_2.clone()).first().copied().into_iter().collect::<Vec<ObjectId>>() };
-let kind_4_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::Pump((1i64) as i16, (0i64) as i16)) };
-for &object in &objects_4 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_4_0); });
+for &object in &objects_4 { let kind_4_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::Pump((1i64) as i16, (0i64) as i16)) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_4_0); });
 g.end_sentence();
 }
 g.end_sentence();
 if { let q: &dyn Query = g; ((selected_2.clone()).len() as i64) >= (1i64) } {
 planned!("engine-no-perpetual-effects" => let objects_6: Vec<ObjectId> = { let q: &dyn Query = g; q.state().chosen_object(q.linked(item)).into_iter().collect::<Vec<ObjectId>>() };
-let kind_6_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::Pump((1i64) as i16, (0i64) as i16)) };
-for &object in &objects_6 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_6_0); });
+for &object in &objects_6 { let kind_6_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::Pump((1i64) as i16, (0i64) as i16)) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_6_0); });
 g.end_sentence();
 }
 g.end_sentence();

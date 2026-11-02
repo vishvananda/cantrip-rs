@@ -1,10 +1,9 @@
 // Timothar, Baron of Bats
-// status: planned
-// requires: an exiled card read by an ability given to a token
+// status: ready
 // Ward—Discard a card.
 // Whenever another nontoken Vampire you control dies, you may pay {1} and exile it. If you do, create a 1/1 black Bat creature token with flying. It gains "When this token deals combat damage to a player, sacrifice it and return the exiled card to the battlefield tapped."
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && from.is(ZoneKind::Battlefield) && (!(Some(asker.source) == Some(id)) && (!(q.state().obj(id).token) && q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Vampire)) && Some(asker.controller) == Some(q.controller(id)))) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [new.0, u32::MAX]; if to.is(ZoneKind::Graveyard) && from.is(ZoneKind::Battlefield) && (!(Some(asker.source) == Some(id)) && (!(q.state().obj(id).token) && q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Vampire)) && Some(asker.controller) == Some(q.controller(id)))) { return Some(Fired { subject, data }); } }
  None }
 pub mod token_2 {
 #[allow(unused_imports)] use cantrip_api::*;
@@ -26,9 +25,9 @@ g.end_sentence();
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_9: Vec<ObjectId> = Vec::new();
 let mut hoisted_8: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-planned!("an-exiled-card-read-by-an-ability-given-to-a-token", PayCost, "cost" = "{\"parts\":[{\"Mana\":[{\"Generic\":1}]},{\"Move\":{\"destination\":\"Exile\",\"entry\":{\"counters\":[],\"states\":[],\"tapped\":false},\"face_down\":false,\"selections\":[{\"choose\":(),\"objects\":{\"args\":{\"args\":{\"index\":0,\"objects\":{\"args\":{\"objects\":{\"args\":{\"kind\":\"EventDestination\"},\"kind\":\"One\"},\"zone\":\"Graveyard\"},\"kind\":\"InZone\"}},\"kind\":\"Query\"},\"kind\":\"One\"}}]}}]}", "optional" = "true", "player" = { let q: &dyn Query = g; Some(asker.controller) });
+let payer_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let it_0: Option<ObjectId> = { let q: &dyn Query = g; ((Some(ObjectId(item.data[0])).filter(|o| *o != ObjectId::NONE).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Graveyard).collect::<Vec<ObjectId>>()).get(0).copied() }; let paid_0 = match it_0 { Some(o) => g.may_pay(payer_0, asker.source, o, Cost::NONE.and(Cost::mana(ManaCost { generic: 1, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })), &PAY_QUESTION)?, None => false }; let mut moved_0: Vec<ObjectId> = Vec::new(); if let (true, Some(o)) = (paid_0, it_0) { moved_0.push(g.exile(o)); }
 g.end_sentence();
-if { let q: &dyn Query = g; planned_value!("depends on an instruction with a gap", false => result_0) } {
+if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
 let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_1 = Vec::new();
 let count_1_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let def_1_0 = g.card_id(&token_2::CARD);
 for player in players_1 {
@@ -39,12 +38,14 @@ g.end_sentence();
 let objects_3 = { let q: &dyn Query = g; (created_1.clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_3 = { let q: &dyn Query = g; Some(asker.source) }; let duration_3 = Duration::Indefinite;
 let kind_3_0_0 = { let q: &dyn Query = g; EffectKind::AddAbility(AbilityRef::delayed({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, 0)) };
 if let Some(source) = source_3 { cantrip_api::instruction(g, |g| { for &object in &objects_3 { g.add_effect(source, object, kind_3_0_0, duration_3);  } }); }
+if source_3.is_some() { let exiled_3: Vec<ObjectId> = moved_0.clone(); for &object in &objects_3 { let given = g.state().effects.iter().rev().find_map(|e| match e.kind { EffectKind::AddAbility(a) if e.affected == object => Some((a.card, e.timestamp)), _ => None }); if let Some((card, stamp)) = given { let text = g.linked_card(card); g.link_exiled(&exiled_3, Linked { object, text, acquired: Acquired { by: AcquiredBy::Grant, stamp, part: 0 } }); } } }
 g.end_sentence();
 hoisted_8.extend(objects_3.clone());
 hoisted_9.extend(created_1.clone());
 }
 g.end_sentence();
  Ok(()) }
+static PAY_QUESTION: Question = Question::new("Pay", "pay {cost}?", "", "Pay {cost}", "Decline");
 
 pub static CARD: CardDef = CardDef { name: "Timothar, Baron of Bats", token_words: &[], oracle: true, cost: ManaCost { generic: 4, x: 0, symbols: [0, 0, 2, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Vampire,Subtype::Noble]), supertypes: Supertypes { basic: false, legendary: true, snow: false }, colors: None, power: Some(4), toughness: Some(4), loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[cantrip_mechanics::triggers::ward_discard("Ward—Discard a card."),triggered(when_asked(EventMask(EventMask::ZONE_CHANGE.0), ability_1_event), ability_1, "Whenever another nontoken Vampire you control dies, you may pay {1} and exile it. If you do, create a 1/1 black Bat creature token with flying. It gains \"When this token deals combat damage to a player, sacrifice it and return the exiled card to the battlefield tapped.\"").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[triggered(when_asked(EventMask(EventMask::DAMAGE.0), granted_4_event), granted_4, "When this token deals combat damage to a player, sacrifice it and return the exiled card to the battlefield tapped.").targets(&[])], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[&token_2::CARD];

@@ -15,9 +15,7 @@ let paid_1 = !picks_1.is_empty();
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
 planned!("engine-no-perpetual-effects" => let objects_3: Vec<ObjectId> = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() };
-let kind_3_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::Pump((3i64) as i16, (3i64) as i16)) };
-let kind_3_1 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::AddKeywords(Keywords::of(&[Keyword::Trample]))) };
-for &object in &objects_3 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_3_0); cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_3_1); });
+for &object in &objects_3 { let kind_3_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::Pump((3i64) as i16, (3i64) as i16)) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_3_0); let kind_3_1 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::AddKeywords(Keywords::of(&[Keyword::Trample]))) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_3_1); });
 g.end_sentence();
 }
 g.end_sentence();

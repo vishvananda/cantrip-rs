@@ -8,6 +8,7 @@
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_0.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut each_2 = vec![Default::default(); players_0.len()];
 let mut done_total_2: i64 = 0;
  for (index_0, bound_0) in players_0.iter().copied().enumerate() { let most_1 = { let q: &dyn Query = g; (3i64).max(0) as u32 }; let mut done_1: i64 = 0; for player in { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() } { let n = cantrip_mechanics::choose::number(g, player, asker.source, 0, most_1, "Draw")?; let before = g.history().drawn(player) as i64; g.draw(player, n); done_1 += g.history().drawn(player) as i64 - before; }

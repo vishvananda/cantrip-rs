@@ -1,6 +1,5 @@
 // Oko, Shadowmoor Scion // Oko, Lorwyn Liege
-// status: planned
-// requires: a choice of CreatureType outside its body
+// status: ready
 // At the beginning of your first main phase, you may pay {U}. If you do, transform Oko.
 // [−1]: Mill three cards. You may put a permanent card from among them into your hand.
 // [−3]: Create two 3/3 green Elk creature tokens.
@@ -92,7 +91,7 @@ g.end_sentence();
  Ok(()) }
 pub mod emblem_11 {
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); ((*so_far).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(affected)) && planned_value!("a choice of CreatureType outside its body", None::<Subtype> => q.state().chosen_subtype(q.linked_to(asker.source))).is_some_and(|chosen| (*so_far).has_subtype(chosen))) }
+#[allow(unused_variables)] fn ability_0_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); ((*so_far).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(affected)) && q.state().chosen_subtype(q.linked_to(asker.source)).is_some_and(|chosen| (*so_far).has_subtype(chosen))) }
 #[allow(unused_variables)] fn ability_0_apply_1(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); chars.keywords = chars.keywords.with(Keyword::Vigilance);
 chars.keywords = chars.keywords.with(Keyword::Hexproof); }
 #[allow(unused_variables)] fn ability_0_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); let (p, t) = ((3i64) as i16, (3i64) as i16); chars.power = chars.power.map(|v| v.saturating_add(p)); chars.toughness = chars.toughness.map(|v| v.saturating_add(t)); }
@@ -103,9 +102,8 @@ pub static EXTRA: &[&CardDef] = &[];
 }
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let player_10 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let chosen_10 = cantrip_mechanics::chosen_type::creature_type_now(g, player_10, asker.source)?;
-planned!("a-choice-of-creature-type-outside-its-body" => let by = { let q: &dyn Query = g; q.linked(item) }; g.remember_chosen(by, ChosenValue::Subtype(chosen_10)););
 g.end_sentence();
-for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { cantrip_mechanics::tokens::create_emblem(g, player, &emblem_11::CARD); }
+for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { cantrip_mechanics::tokens::create_emblem_choosing_subtype(g, player, &emblem_11::CARD, chosen_10); }
 g.end_sentence();
  Ok(()) }
 static PAY_QUESTION: Question = Question::new("Pay", "pay {cost}?", "", "Pay {cost}", "Decline");

@@ -1,7 +1,5 @@
 // The Last Agni Kai
 // status: planned
-// requires: numeric expression ExcessDamage
-// requires: object filter DealtExcessBy
 // requires: player rule for a while RetainMana
 // Target creature you control fights target creature an opponent controls. If the creature the opponent controls is dealt excess damage this way, add that much {R}.
 // Until end of turn, you don't lose unspent red mana as steps and phases end.
@@ -13,12 +11,12 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let t_1_raw = announced(g, item, 1, false); let t_1 = announced(g, item, 1, true);
 let first_0 = ({ let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied(); let second_0 = ({ let q: &dyn Query = g; (t_1_raw.get(0).copied().filter(|t| t_1.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied();
-if let (Some(first), Some(second)) = (first_0, second_0) { g.fight(first, second); }
+let mut excess_0: Vec<(Target, u32)> = Vec::new(); let recipients_0: Vec<Target> = second_0.map(Target::Object).into_iter().collect(); let since_0 = g.history().head() as usize; if let (Some(first), Some(second)) = (first_0, second_0) { g.fight(first, second); excess_0.extend(g.history().all()[since_0..].iter().filter_map(|r| match r.event { Event::Damage { source: s, target, recipient_excess, .. } if s == first || s == second => Some((target, recipient_excess)), _ => None })); }
 let happened_1: bool = ({ let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) }).is_some();
 g.end_sentence();
-if { let q: &dyn Query = g; t_1_raw.get(0).copied().and_then(|t: Target| t.object()).is_some_and(|candidate: ObjectId| planned_value!("object filter DealtExcessBy", false => result.excess_to(candidate) > 0)) } {
+if { let q: &dyn Query = g; t_1_raw.get(0).copied().and_then(|t: Target| t.object()).is_some_and(|candidate: ObjectId| excess_0.iter().any(|&(t, n)| t == Target::Object(candidate) && n > 0)) } {
 let mana_players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_3_0 = { let q: &dyn Query = g; (planned_value!("numeric expression ExcessDamage", 0i64 => i64::from(result.excess))).max(0) as u32 };
+let mana_3_0 = { let q: &dyn Query = g; (excess_0.iter().filter(|(t, _)| recipients_0.contains(t)).map(|(_, n)| i64::from(*n)).sum::<i64>()).max(0) as u32 };
 for player in mana_players_3 {
 g.add_mana(player, Mana::R, mana_3_0);}
 g.end_sentence();

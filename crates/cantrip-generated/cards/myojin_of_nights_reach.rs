@@ -12,6 +12,7 @@ let more = { let q: &dyn Query = g; (1i64).max(0) as i16 }; entering.counters[Co
 #[allow(unused_variables)] fn ability_1_0_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); chars.keywords = chars.keywords.with(Keyword::Indestructible); }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_1: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_1.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut gathered_2: Vec<ObjectId> = Vec::new();
  for (index_1, bound_0) in players_1.iter().copied().enumerate() { gathered_2.extend(g.state().zone(Zone::hand(bound_0)).to_vec());
     } 

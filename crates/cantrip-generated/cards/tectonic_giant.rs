@@ -1,6 +1,5 @@
 // Tectonic Giant
-// status: planned
-// requires: resolution cost with several parts
+// status: ready
 // Whenever this creature attacks or becomes the target of a spell an opponent controls, choose one —
 // • This creature deals 3 damage to each opponent.
 // • Exile the top two cards of your library. Choose one of them. Until the end of your next turn, you may play that card.
@@ -16,7 +15,7 @@ fn ability_0_mode_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 let objects_1 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((2i64).max(0) as usize).collect::<Vec<ObjectId>>() }; let moved_1 = g.exile_all(&objects_1);
 g.end_sentence();
 let selected_2_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_2_candidates = { let q: &dyn Query = g; moved_1.clone() }; let selected_2_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let selected_2 = { cantrip_mechanics::choose::select(g, selected_2_player, asker.source, Purpose::ChooseAsEnters, selected_2_candidates, cantrip_mechanics::select::Selection::of(selected_2_count, &[]))? };
-let paid_3 = planned_value!("resolution cost with several parts", false => cantrip_mechanics::effects::pay(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })))?);
+let paid_3 = true;
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_3 as i64) != 0) } {
 let cards_4_0 = { let q: &dyn Query = g; (selected_2.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_4_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_4_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_4_0 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::EndOfYourNextTurn, ..PlayGrant::CAST }); } } } });

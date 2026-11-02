@@ -28,6 +28,7 @@ hoisted_2.extend(created_0.clone());
 }
 g.end_sentence();
 let mut players_3: Vec<PlayerId> = { let q: &dyn Query = g; { let mut all = Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>(); let other = q.state().apnap().filter(|&bound_0: &PlayerId| (q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::LifeChange { player, delta } = event { let subject = Target::Player(*player); let data = [delta.unsigned_abs(), 0]; if *delta < 0 && Some(bound_0) == Some(*player) { return Some(Fired { subject, data }); } }  None }).map(|f: Fired| i64::from(f.data[0])).sum::<i64>()) >= (3i64)).collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all } };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_3.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut each_9: Vec<Vec<ObjectId>> = vec![Vec::new(); players_3.len()]; let mut all_9: Vec<ObjectId> = Vec::new();
 let mut each_10: Vec<Vec<ObjectId>> = vec![Vec::new(); players_3.len()]; let mut all_10: Vec<ObjectId> = Vec::new();
  for (index_3, bound_0) in players_3.iter().copied().enumerate() { let decider_4 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") };

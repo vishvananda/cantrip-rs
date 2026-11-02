@@ -1,6 +1,5 @@
 // Elder Brain
 // status: planned
-// requires: duration WhileAnyExiled
 // requires: play permission to PlayLand
 // Menace
 // Whenever this creature attacks a player, exile all cards from that player's hand, then they draw that many cards. You may play lands and cast spells from among the exiled cards for as long as they remain exiled. If you cast a spell this way, you may spend mana as though it were mana of any color to cast it.
@@ -13,7 +12,7 @@ g.end_sentence();
 let amount_1 = { let q: &dyn Query = g; (((objects_0.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).zone.kind() == ZoneKind::Hand).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; Some(PlayerId(item.data[1] as u8)).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_1 { g.draw(player, amount_1); }
 g.end_sentence();
-planned!("play-permission-to-play-land" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.add_player_effect(player, source, EffectKind::PlayerRule(PlayerRule::Play { zone: ZoneKind::Exile, cards: CardsOfRule::These({ let q: &dyn Query = g; moved_0.clone() }), grant: PlayGrant { lands: true, spells: false, ..PlayGrant::CAST } }), planned_value!("duration WhileAnyExiled", Duration::Indefinite => Duration::WhileAnyExiled({ let q: &dyn Query = g; moved_0.clone() }))); } });
+planned!("play-permission-to-play-land" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.add_player_effect(player, source, EffectKind::PlayerRule(PlayerRule::Play { zone: ZoneKind::Exile, cards: CardsOfRule::These({ let q: &dyn Query = g; moved_0.clone() }), grant: PlayGrant { lands: true, spells: false, ..PlayGrant::CAST } }), Duration::Indefinite); } });
 let cards_4_0 = { let q: &dyn Query = g; moved_0.clone() }; let players_4_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_4_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_4_0 { g.allow_play(card, player, PlayGrant { lands: false, expiry: Expiry::Never, instead: Some(ManaCost::ZERO), ..PlayGrant::CAST }); } } } });
 g.end_sentence();
  Ok(()) }

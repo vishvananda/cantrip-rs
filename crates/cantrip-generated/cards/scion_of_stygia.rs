@@ -1,5 +1,7 @@
 // Scion of Stygia
-// status: ready
+// status: planned
+// requires: continuous rule UntapStep
+// requires: duration DuringControllersNextUntapStep
 // Flash
 // Cone of Cold — When this creature enters, choose target creature an opponent controls, then roll a d20.
 // 1—9 | Tap that creature.
@@ -30,7 +32,8 @@ hoisted_4.extend({ let q: &dyn Query = g; turned_1.clone() });
 if { let q: &dyn Query = g; ((value_0) >= (10i64) && (value_0) <= (20i64)) } {
 let objects_5 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_5: Vec<ObjectId> = objects_5.iter().copied().filter(|&o| g.state().obj(o).tapped != true).collect(); g.tap_together(&turned_5);
 g.end_sentence();
-let objects_6 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; cantrip_api::instruction(g, |g| { for &object in &objects_6 { g.exert(object); } });
+let objects_6 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_6 = { let q: &dyn Query = g; Some(asker.source) }; let duration_6 = planned_value!("duration DuringControllersNextUntapStep", Duration::Indefinite => Duration::DuringItsControllersNextUntapStep);
+let kinds_6 = { let mut all = Vec::new(); for &object in &objects_6 { let kind = { let q: &dyn Query = g; planned_value!("continuous rule UntapStep", EffectKind::CantBlock => EffectKind::DoesntUntap) }; all.push((object, kind));  } all }; if let Some(source) = source_6 { cantrip_api::instruction(g, |g| { for &(object, kind) in &kinds_6 { g.add_effect(source, object, kind, duration_6); } }); }
 g.end_sentence();
 hoisted_7.extend(turned_5.clone());
 hoisted_8.extend(objects_5.clone());

@@ -18,6 +18,7 @@ let amount_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_0 = 
 for player in players_0 { g.draw(player, amount_0); }
 g.end_sentence();
 let mut players_1: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_1.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut each_14: Vec<Vec<ObjectId>> = vec![Vec::new(); players_1.len()]; let mut all_14: Vec<ObjectId> = Vec::new();
 let mut each_15: Vec<Vec<ObjectId>> = vec![Vec::new(); players_1.len()]; let mut all_15: Vec<ObjectId> = Vec::new();
 let mut each_16: Vec<Vec<ObjectId>> = vec![Vec::new(); players_1.len()]; let mut all_16: Vec<ObjectId> = Vec::new();

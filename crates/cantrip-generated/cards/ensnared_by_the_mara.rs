@@ -10,6 +10,7 @@ let mut hoisted_7: Vec<ObjectId> = Vec::new();
 let mut hoisted_6: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_0.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut each_13: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut all_13: Vec<ObjectId> = Vec::new();
 let mut each_14: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut all_14: Vec<ObjectId> = Vec::new();
 let mut each_15: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut all_15: Vec<ObjectId> = Vec::new();
@@ -22,7 +23,7 @@ let offered_2: Vec<u8> = [(0u8, true), (1u8, !{ let q: &dyn Query = g; (((Some(b
 let owner_3 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; let count_3 = { let q: &dyn Query = g; (1i64).max(0) as usize }; let (found_3, rest_3) = cantrip_mechanics::library::reveal_until_n(g, owner_3, count_3, &|q: &dyn Query, id: ObjectId| !(q.chars(id).is(CardType::Land))); let shown_3 = found_3.len() + rest_3.len(); let objects_3: Vec<ObjectId> = g.state().zone(Zone::library(owner_3)).iter().copied().take(shown_3).collect();
 let objects_4 = { let q: &dyn Query = g; objects_3.clone() }; let moved_4 = g.exile_all(&objects_4);
 g.end_sentence();
-let caster_5 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let mut pool_5: Vec<ObjectId> = { let q: &dyn Query = g; (((moved_4.clone()).into_iter().filter(|&id| !(q.chars(id).is(CardType::Land))).collect::<Vec<ObjectId>>()).get(0).copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let mut left_5: u32 = 1; let mut played_5: Vec<ObjectId> = Vec::new();
+let caster_5 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let mut pool_5: Vec<ObjectId> = { let q: &dyn Query = g; (((moved_4.clone()).into_iter().filter(|&id| (!(q.chars(id).is(CardType::Land)) && Some(bound_0) == Some(q.state().obj(id).owner))).collect::<Vec<ObjectId>>()).get(0).copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let mut left_5: u32 = 1; let mut played_5: Vec<ObjectId> = Vec::new();
 while left_5 > 0 {
 let mut open_5: Vec<ObjectId> = Vec::new(); for &c in &pool_5 { let ways = g.cast_ways_during_resolution_by(c, caster_5); if ways.iter().any(|w| true) { open_5.push(c); } }
 let picked_5 = if open_5.is_empty() { None } else if open_5.len() > 1 || (false && (!false || pool_5.len() > 1)) { cantrip_mechanics::choose::cards_from(g, caster_5, asker.source, Purpose::CastFree, pool_5.clone(), open_5.clone(), 1, true)?.first().copied() } else if !true || cantrip_mechanics::effects::ask_may(g, caster_5, open_5[0], Purpose::CastFree)? { Some(open_5[0]) } else { None };

@@ -17,9 +17,7 @@ let mut done_0: i64 = 0; let mut dealt_0: Vec<ObjectId> = Vec::new(); let mut hu
 g.end_sentence();
 if { let q: &dyn Query = g; (Some(asker.source).is_some_and(|candidate: ObjectId| q.state().obj(candidate).marks.saddled_turn == q.state().turn.number) && ((q.state().battlefield().iter().copied().filter(|&id| (dealt_0.contains(&id) && q.chars(id).is(CardType::Creature))).collect::<Vec<ObjectId>>()).len() as i64) > (0i64)) } {
 planned!("engine-no-perpetual-effects" => let objects_2: Vec<ObjectId> = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && dealt_0.contains(&id))).collect::<Vec<ObjectId>>() };
-let kind_2_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_3) };
-let kind_2_1 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_4) };
-for &object in &objects_2 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_2_0); cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_2_1); });
+for &object in &objects_2 { let kind_2_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_3) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_2_0); let kind_2_1 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_4) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_2_1); });
 g.end_sentence();
 }
 g.end_sentence();

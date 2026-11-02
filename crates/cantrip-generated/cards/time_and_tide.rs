@@ -1,16 +1,15 @@
 // Time and Tide
 // status: planned
 // requires: engine: no effect phases a permanent in
-// requires: operation Together
 // Simultaneously, all phased-out creatures phase in and all creatures with phasing phase out.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-together" => g.begin_simultaneous());
+planned!("depends-on-an-instruction-with-a-gap" => g.begin_simultaneous());
 for bound_4294967294 in { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>() } {
 planned!("engine-no-effect-phases-a-permanent-in" => if let Some(object) = ({ let q: &dyn Query = g; (Some(bound_4294967294).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied() { g.phase_in(&[object]); });
 }
 let objects_3 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && (q.chars(id).keywords.has(Keyword::Phasing)))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; g.phase_out(&objects_3);
-planned!("operation-together" => g.end_simultaneous());
+planned!("depends-on-an-instruction-with-a-gap" => g.end_simultaneous());
 g.end_sentence();
  Ok(()) }
 

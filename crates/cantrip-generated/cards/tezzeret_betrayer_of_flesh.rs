@@ -1,12 +1,11 @@
 // Tezzeret, Betrayer of Flesh
-// status: planned
-// requires: activation cost of abilities NthCast
+// status: ready
 // The first activated ability of an artifact you activate each turn costs {2} less to activate.
 // [+1]: Draw two cards. Then discard two cards unless you discard an artifact card.
 // [−2]: Target artifact becomes an artifact creature. If it isn't a Vehicle, it has base power and toughness 4/4.
 // [−6]: You get an emblem with "Whenever an artifact you control becomes tapped, draw a card."
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_0_rule(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, q.controller(source)); let Costed::Ability(permanent, ability, _) = costed else { return CostDelta::NONE; }; let def = q.activated_ability(ability); if player == asker.controller && planned_value!("activation cost of abilities NthCast", false => q.is_nth_activation(permanent, def, 1i64, |q: &dyn Query, asker: &Asker, permanent: ObjectId, def: Option<&ActivatedDef>| (def.is_some_and(|d| d.from == ZoneKind::Battlefield) && q.chars(permanent).is(CardType::Artifact)), Some(Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()), CastScope::Turn)) { CostDelta::less(2) } else { CostDelta::NONE } }
+#[allow(unused_variables)] fn ability_0_0_rule(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, q.controller(source)); let Costed::Ability(permanent, ability, _) = costed else { return CostDelta::NONE; }; let def = q.activated_ability(ability); if player == asker.controller && (|q: &dyn Query, asker: &Asker, permanent: ObjectId, def: Option<&ActivatedDef>| (def.is_some_and(|d| d.from == ZoneKind::Battlefield) && q.chars(permanent).is(CardType::Artifact)))(q, asker, permanent, def) && (q.history().this_turn().iter().filter(|r| matches!(r.event, Event::AbilityActivated { source, ability, player: p, .. } if (Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).contains(&p) && (|q: &dyn Query, asker: &Asker, permanent: ObjectId, def: Option<&ActivatedDef>| (def.is_some_and(|d| d.from == ZoneKind::Battlefield) && q.chars(permanent).is(CardType::Artifact)))(q, asker, source, q.activated_ability(ability)))).count() as i64) == (1i64) - 1 { CostDelta::less(2) } else { CostDelta::NONE } }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let amount_0 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_0 { g.draw(player, amount_0); }

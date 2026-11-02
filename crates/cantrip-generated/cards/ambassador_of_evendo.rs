@@ -17,8 +17,7 @@ let mut pool_0: Vec<ObjectId> = { let q: &dyn Query = g; ((Some(asker.controller
 let count_0 = { let q: &dyn Query = g; 1i64 };
 let mut random_0: Vec<ObjectId> = Vec::new(); for _ in 0..count_0 { let Some(one) = cantrip_mechanics::library::random_of(g, &pool_0) else { break }; pool_0.retain(|&o| o != one); random_0.push(one); }
 planned!("engine-no-perpetual-effects" => let objects_2: Vec<ObjectId> = { let q: &dyn Query = g; random_0.clone() };
-let kind_2_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::AddAbility(AbilityRef::delayed({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, 0))) };
-for &object in &objects_2 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_2_0); });
+for &object in &objects_2 { let kind_2_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::AddAbility(AbilityRef::delayed({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, 0))) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_2_0); });
 g.end_sentence();
  Ok(()) }
 

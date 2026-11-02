@@ -2,23 +2,24 @@
 // status: planned
 // requires: card type Vanguard
 // requires: layout Vanguard
-// requires: per-player CreateTokens
+// requires: per-player tokens entering attached
 // requires: tokens entering in a special state
 // {3}: For each opponent who controls a creature, create a token that's a copy of a card named Arrest and attach it to a creature that player controls chosen at random.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; { let mut all = Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>(); let other = q.state().apnap().filter(|&bound_0: &PlayerId| q.state().battlefield().iter().copied().filter(|&id| q.controller(id) == Some(bound_0).unwrap_or(PlayerId(u8::MAX)) && q.chars(id).is(CardType::Creature)).count() >= 1).collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all } };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_0.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut each_2: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut all_2: Vec<ObjectId> = Vec::new();
  for (index_0, bound_0) in players_0.iter().copied().enumerate() { let mut pool_1 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(bound_0) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }; let count_1 = { let q: &dyn Query = g; (1i64).max(0) as usize }; let mut picked_1: Vec<ObjectId> = Vec::new(); while picked_1.len() < count_1 && !pool_1.is_empty() { let at = g.choose_at_random(pool_1.len()); picked_1.push(pool_1.remove(at)); }
  each_2[index_0] = picked_1.clone(); all_2.extend(each_2[index_0].iter().copied());
    } 
 g.end_sentence();
-planned!("per-player-create-tokens" => g.begin_batch(););
+planned!("per-player-tokens-entering-attached" => g.begin_batch(););
 let mut each_4: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut all_4: Vec<ObjectId> = Vec::new();
  for (index_0, _) in players_0.iter().copied().enumerate() { let created_3: Vec<ObjectId> = planned_value!("tokens entering in a special state", Vec::<ObjectId>::new() => cantrip_mechanics::tokens::create(g, asker, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[({ let q: &dyn Query = g; (1i64).max(0) as u32 }, TokenRecipe::CopyNamed("Arrest", &[TokenCopyEffects::NoTokenCopyEffects]))], Arrival { tapped: false, counters: &[], states: &[ArrivalState::AttachedTo({ let q: &dyn Query = g; (each_2[index_0].clone()).get(0 as usize).copied() })] })?);
  each_4[index_0] = created_3.clone(); all_4.extend(each_4[index_0].iter().copied());
    } 
-planned!("per-player-create-tokens" => g.end_batch(););
+planned!("per-player-tokens-entering-attached" => g.end_batch(););
 g.end_sentence();
  Ok(()) }
 planned_item!("layout-vanguard" => variant: Some(Variant::Vanguard { hand: 0, life: 9 }));

@@ -18,10 +18,7 @@ let mut pool_3 = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().c
 let objects_4 = { let q: &dyn Query = g; picked_3.clone() }; let moved_4 = g.return_to_hand(&objects_4);
 g.end_sentence();
 planned!("engine-no-perpetual-effects" => let objects_6: Vec<ObjectId> = { let q: &dyn Query = g; (moved_4.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() };
-let kind_6_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::SetPt((1i64) as i16, (1i64) as i16)) };
-let kind_6_1 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::AddSubtype(q.words(asker.source).subtype(Subtype::Gnome))) };
-let kind_6_2 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::AddTypes(TypeSet::of(&[CardType::Creature]))) };
-for &object in &objects_6 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_6_0); cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_6_1); cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_6_2); });
+for &object in &objects_6 { let kind_6_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::SetPt((1i64) as i16, (1i64) as i16)) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_6_0); let kind_6_1 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::AddSubtype(q.words(asker.source).subtype(Subtype::Gnome))) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_6_1); let kind_6_2 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::AddTypes(TypeSet::of(&[CardType::Creature]))) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_6_2); });
 g.end_sentence();
 hoisted_7.extend(moved_4.clone());
 hoisted_8.extend(picked_3.clone());

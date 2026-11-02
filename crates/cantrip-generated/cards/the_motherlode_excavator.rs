@@ -1,6 +1,6 @@
 // The Motherlode, Excavator
 // status: planned
-// requires: engine: no resolving rule on an open set: Prohibit Block
+// requires: event object this trigger does not bind
 // When The Motherlode enters, choose target opponent. You get an amount of {E} (energy counters) equal to the number of nonbasic lands that player controls.
 // Whenever The Motherlode attacks, you may pay {E}{E}{E}{E}. When you do, destroy target nonbasic land defending player controls, and creatures that player controls without flying can't block this turn.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -21,7 +21,7 @@ fn reflexive_4(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let 
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let objects_5 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; let destroyed_5 = g.destroy_all(&objects_5);
 g.end_sentence();
-planned!("engine-no-resolving-rule-on-an-open-set-prohibit-block" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| (q.chars(id).is(CardType::Creature) && item.subject.object().and_then(|o: ObjectId| q.defending_player(o)) == Some(q.controller(id)) && !(q.chars(id).keywords.has(Keyword::Flying))), EffectKind::CantBlock, Duration::EndOfTurn); });
+planned!("event-object-this-trigger-does-not-bind", CreateContinuousEffect, "affected" = "{\"Objects\":{\"args\":{\"args\":[{\"args\":\"Creature\",\"kind\":\"CardType\"},{\"args\":{\"args\":{\"args\":{\"kind\":\"EventSubject\"},\"kind\":\"DefendingPlayerOf\"},\"kind\":\"One\"},\"kind\":\"ControlledBy\"},{\"args\":{\"args\":{\"kind\":\"Flying\"},\"kind\":\"HasKeyword\"},\"kind\":\"Not\"}],\"kind\":\"All\"},\"kind\":\"Battlefield\"}}", "changes" = "[{\"args\":{\"Prohibit\":{\"Block\":{\"kind\":\"Any\"}}},\"kind\":\"Rule\"}]", "duration" = "\"EndOfTurn\"", "evaluation" = "\"LiveObjects\"", "source" = { let q: &dyn Query = g; Some(asker.source) });
 g.end_sentence();
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

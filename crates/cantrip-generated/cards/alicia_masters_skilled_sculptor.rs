@@ -32,11 +32,12 @@ g.end_sentence();
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_2: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
-let mut each_4: Vec<Vec<ObjectId>> = vec![Vec::new(); players_2.len()]; let mut all_4: Vec<ObjectId> = Vec::new();
-g.one_instruction(&mut |g| { for (index_2, bound_0) in players_2.iter().copied().enumerate() { let objects_3 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(bound_0) == Some(q.state().obj(id).owner))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_3 = { let q: &dyn Query = g; Some(asker.source) }; let duration_3 = Duration::Indefinite;
-let kind_3_0_0 = { let q: &dyn Query = g; EffectKind::Control(Some(bound_0).expect("a reference that always names a player")) };
-if let Some(source) = source_3 { cantrip_api::instruction(g, |g| { for &object in &objects_3 { g.add_effect(source, object, kind_3_0_0, duration_3);  } }); }
- each_4[index_2] = objects_3.clone(); all_4.extend(each_4[index_2].iter().copied());
+let snap_3: Vec<Vec<ObjectId>> = players_2.iter().copied().map(|bound_0| { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(bound_0) == Some(q.state().obj(id).owner))).collect::<Vec<ObjectId>>() }).collect();
+let mut each_5: Vec<Vec<ObjectId>> = vec![Vec::new(); players_2.len()]; let mut all_5: Vec<ObjectId> = Vec::new();
+g.one_instruction(&mut |g| { for (index_2, bound_0) in players_2.iter().copied().enumerate() { let objects_4 = { let q: &dyn Query = g; (snap_3[index_2].clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_4 = { let q: &dyn Query = g; Some(asker.source) }; let duration_4 = Duration::Indefinite;
+let kind_4_0_0 = { let q: &dyn Query = g; EffectKind::Control(Some(bound_0).expect("a reference that always names a player")) };
+if let Some(source) = source_4 { cantrip_api::instruction(g, |g| { for &object in &objects_4 { g.add_effect(source, object, kind_4_0_0, duration_4);  } }); }
+ each_5[index_2] = objects_4.clone(); all_5.extend(each_5[index_2].iter().copied());
    } Ok(()) })?;
 g.end_sentence();
  Ok(()) }

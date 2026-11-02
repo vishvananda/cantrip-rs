@@ -1,7 +1,6 @@
 // Dinosaur Headdress // Paleontologist's Pick-Axe
 // status: planned
 // requires: ability AsEvent
-// requires: earlier objects Selected
 // requires: static change CopyOf
 // When this Equipment enters, attach it to target creature you control.
 // As this Equipment becomes attached to a creature, choose an exiled creature card used to craft this Equipment.
@@ -44,7 +43,6 @@ let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true
 let attachments_0 = { let q: &dyn Query = g; (item.subject.object().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let host_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()) }; if let Some(host) = host_0 { cantrip_api::instruction(g, |g| { for attachment in attachments_0 { g.attach(attachment, host); } }); }
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_2_copies(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { let source = asker.source; q.state().obj(asker.source).attached_to == Some(id) }
 #[allow(unused_variables)] fn ability_3_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id))))) }
 static ABILITY_3_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_3_target_0)];
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
@@ -54,7 +52,7 @@ g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
 planned_item!("ability-as-event" => as_events: AsEventDef { event: AsEvent::BecomesAttachedTo(|q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Creature)), object: |g: &mut dyn Game, asker: &Asker| { let q: &dyn Query = g; Some(asker.source) }, actions: &[AttachAction::ChooseAnExiledCardToCopy({ let q: &dyn Query = g; ((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (q.chars(id).is(CardType::Creature) && Some(asker.source).is_some_and(|o: ObjectId| cantrip_mechanics::craft::exiled_cards_used_to_craft(q, o).contains(&id)))).collect::<Vec<ObjectId>>() })] });
-planned_item!("static-change-copy-of" => statics: copy_of(ability_2_copies, |q: &dyn Query, asker: &Asker| (planned_value!("earlier objects Selected", Vec::<ObjectId>::new() => q.acted_on(asker, Acted::Selected))).first().copied(), StaticCopyEffects::NoStaticCopyEffects));
+planned_item!("static-change-copy-of", "(kind:Static,args:(kind:Ordinary,affected:Objects((kind:One,args:(kind:AttachedTo,args:(kind:Source)))),changes:[(kind:CopyOf,args:(object:(kind:Earlier,args:(what:Selected,by:None)),effects:(kind:Term,args:(family:\"StaticCopyEffects\",form:\"NoStaticCopyEffects\",operands:[]))))]))");
 
 pub static CARD: CardDef = CardDef { name: "Dinosaur Headdress", token_words: &[], oracle: true, cost: ManaCost::ZERO, has_cost: false, types: TypeSet::of(&[CardType::Artifact]), subtypes: SubtypeSet::of(&[Subtype::Equipment]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::ZONE_CHANGE.0), ability_0_event), ability_0, "When this Equipment enters, attach it to target creature you control.").targets(ABILITY_0_TARGETS),ability(Cost::NONE.and(Cost::mana(ManaCost { generic: 2, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })), ability_3, "Equip {2}").targets(ABILITY_3_TARGETS).equip().sorcery_speed()], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 }

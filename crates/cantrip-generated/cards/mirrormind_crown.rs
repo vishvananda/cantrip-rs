@@ -1,7 +1,6 @@
 // Mirrormind Crown
 // status: planned
 // requires: event change in the program of another event
-// requires: instruction ChooseOne
 // requires: replacement event FirstEachTurn
 // As long as this Equipment is attached to a creature, the first time you would create one or more tokens each turn, you may instead create that many tokens that are copies of equipped creature.
 // Equip {2}
@@ -10,7 +9,7 @@
  false }
 #[allow(unused_variables, unused_mut)] fn ability_0_0_apply(q: &dyn Query, asker: &Asker, proposal: &mut Proposal) { let seen = *proposal; if let Proposal::TokenCreation(seen) = &seen { let t = seen; let subject = Target::Player(t.controller); let data = [t.count, u32::MAX]; if let Proposal::TokenCreation(t) = proposal {  } } }
 #[allow(unused_variables, unused_mut)] fn ability_0_0_then_steps(g: &mut dyn Game, asker: &Asker, subject: Target, data: [u32; 2]) -> Result<(), Suspend> { let decider_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
-match planned_value!("instruction ChooseOne", 0u8 => cantrip_mechanics::choose::one_of(g, decider_1, asker.source, vec![Label::Card(card_1, 0), Label::Card(card_1, 1)])?) {
+match planned_value!("depends on an instruction with a gap", 0u8 => cantrip_mechanics::choose::one_of(g, decider_1, asker.source, vec![Label::Card(card_1, 0), Label::Card(card_1, 1)])?) {
 0 => {
 planned!("event-change-in-the-program-of-another-event" => g.change_event(|q, proposal| { if let Proposal::TokenCreation(t) = proposal { if let Some(object) = Some(asker.source).and_then(|o: ObjectId| q.state().obj(o).attached_to) { let values = q.copiable_values(object); t.token = values.card; t.copy = Some(values); }  } }););
 }

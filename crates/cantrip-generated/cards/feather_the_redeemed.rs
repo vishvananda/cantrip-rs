@@ -1,6 +1,5 @@
 // Feather, the Redeemed
 // status: planned
-// requires: object reference Affected
 // requires: operation EffectOn
 // Flying
 // Whenever you cast an instant or sorcery spell that targets a creature you control, exile that card instead of putting it into your graveyard as it resolves. If you do, return it to your hand at the beginning of the next end step.
@@ -14,7 +13,7 @@ g.end_sentence();
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_6: Vec<ObjectId> = Vec::new();
 let mut hoisted_5: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on(g, asker, EffectOn::Objects({ let q: &dyn Query = g; item.subject.object().into_iter().collect::<Vec<ObjectId>>() }), &[SpellEffect::AsResolves(|g: &mut dyn Game| -> Result<(), Suspend> { let objects_1 = { let q: &dyn Query = g; planned_value!("object reference Affected", None::<ObjectId> => asker.affected()).into_iter().collect::<Vec<ObjectId>>() }; let moved_1 = g.exile_all(&objects_1);
+planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on(g, asker, EffectOn::Objects({ let q: &dyn Query = g; item.subject.object().into_iter().collect::<Vec<ObjectId>>() }), &[SpellEffect::AsResolves(|g: &mut dyn Game, affected: ObjectId| -> Result<(), Suspend> { let objects_1 = { let q: &dyn Query = g; Some(affected).into_iter().collect::<Vec<ObjectId>>() }; let moved_1 = g.exile_all(&objects_1);
 g.end_sentence();
 { let mut about: Vec<ObjectId> = Vec::new(); about.extend({ let q: &dyn Query = g; (moved_1.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }); about.push(ObjectId::NONE);  if about.iter().any(|&o| o != ObjectId::NONE) { g.delayed_trigger_about(DelayedWhen::Step { step: Step::End, on_turn_of: None }, item.object, item.controller, AbilityRef::delayed(item.ability.card, 0), &about); } }
 g.end_sentence();

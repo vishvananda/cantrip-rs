@@ -2,7 +2,6 @@
 // status: planned
 // requires: engine: no Compleated
 // requires: engine: no snow or hybrid Phyrexian mana symbol
-// requires: target cardinality UpTo
 // requires: target with a divided amount
 // requires: target with a divided amount read as chosen
 // Compleated ({R/G/P} can be paid with {R}, {G}, or 2 life. If life was paid, this planeswalker enters with two fewer loyalty counters.)
@@ -35,7 +34,7 @@ let created_2 = g.create_tokens_worded(&tokens_2, false, None, words_2)?;
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_3_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Planeswalker)))) }
-static ABILITY_3_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_3_target_0).between(1, planned_value!("target cardinality UpTo", 1u32 => TargetSpec::read_as_chosen(|q: &dyn Query, asker: &Asker| ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0))).max().unwrap_or(0)).clamp(0, 4294967295) as u32)))];
+static ABILITY_3_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_3_target_0).between(1, cantrip_api::TargetSpec::ANY_NUMBER)];
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 cantrip_mechanics::damage_divided(g, item);

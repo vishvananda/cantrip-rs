@@ -1,12 +1,11 @@
 // Black Hole
 // status: planned
 // requires: numeric expression PlayerNumber AttractionsVisitedThisTurn
-// requires: target cardinality UpTo
 // Destroy target creature and up to X other target creatures, where X is the number of Attractions you've visited this turn.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
 #[allow(unused_variables)] fn ability_0_target_1(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((!(q.chosen_targets().get(0).copied().and_then(|t: Target| t.object()) == Some(id)) && q.chars(id).is(CardType::Creature)))) }
-static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0),target(ability_0_target_1).between(0, planned_value!("target cardinality UpTo", 1u32 => TargetSpec::read_as_chosen(|q: &dyn Query, asker: &Asker| (Some(asker.controller).map_or(0i64, |p: PlayerId| planned_value!("numeric expression PlayerNumber AttractionsVisitedThisTurn", 0i64 => q.player_number(p, PlayerNumber::AttractionsVisitedThisTurn)))).max(0) as u32)))];
+static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0),target(ability_0_target_1).between(0, planned_value!("depends on an instruction with a gap", 1u32 => TargetSpec::read_as_chosen(|q: &dyn Query, asker: &Asker| (Some(asker.controller).map_or(0i64, |p: PlayerId| planned_value!("numeric expression PlayerNumber AttractionsVisitedThisTurn", 0i64 => q.player_number(p, PlayerNumber::AttractionsVisitedThisTurn)))).max(0) as u32)))];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let t_1_raw = announced(g, item, 1, false); let t_1 = announced(g, item, 1, true);

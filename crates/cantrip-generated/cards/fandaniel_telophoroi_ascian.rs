@@ -13,6 +13,7 @@ g.end_sentence();
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_1: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_1.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut guard_1_0 = vec![false; players_1.len()];
 let mut gathered_2: Vec<(PlayerId, ObjectId)> = Vec::new();
  for (index_1, bound_0) in players_1.iter().copied().enumerate() { if true { guard_1_0[index_1] = true;

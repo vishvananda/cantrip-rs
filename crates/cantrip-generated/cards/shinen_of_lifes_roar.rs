@@ -1,6 +1,6 @@
 // Shinen of Life's Roar
 // status: planned
-// requires: engine: no resolving rule on an open set: RequireCombat Block
+// requires: engine: no resolving rule on an open set: RequireCombat Block beyond lasting rules
 // All creatures able to block this creature do so.
 // Channel — {2}{G}{G}, Discard this card: All creatures able to block target creature this turn do so.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -9,7 +9,7 @@
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-planned!("engine-no-resolving-rule-on-an-open-set-require-combat-block" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Creature), match t_0_raw.get(0).copied().and_then(|t: Target| t.object()) { Some(attacker) => EffectKind::MustBlockAttacker(attacker), None => EffectKind::Pump(0, 0) }, Duration::EndOfTurn); });
+planned!("engine-no-resolving-rule-on-an-open-set-require-combat-block-beyond-lasting-rules" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Creature), match t_0_raw.get(0).copied().and_then(|t: Target| t.object()) { Some(attacker) => EffectKind::MustBlockAttacker(attacker), None => EffectKind::Pump(0, 0) }, Duration::EndOfTurn); });
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

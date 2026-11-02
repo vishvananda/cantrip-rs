@@ -1,6 +1,5 @@
 // Hauken's Insight // Jacob Hauken, Inspector
 // status: planned
-// requires: a land played by what it is as a spell
 // requires: player rule SpecialAction
 // At the beginning of your upkeep, exile the top card of your library face down. You may look at that card for as long as it remains exiled.
 // Once during each of your turns, you may play a land or cast a spell from among the cards exiled with this permanent without paying its mana cost.
@@ -38,7 +37,15 @@ let cards_1_0 = { let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copie
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_0_applies(q: &dyn Query, asker: &Asker, player: PlayerId) -> bool { player == asker.controller }
-planned_item!("player-rule-special-action" => statics: player_rule(ability_1_0_applies, PlayerRule::SpecialAction { body: |g: &mut dyn Game, asker: &Asker| -> Result<(), Suspend> { let played_2: Vec<ObjectId> = planned_value!("a land played by what it is as a spell", Vec::<ObjectId>::new() => cantrip_mechanics::playing::play_each(g, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, { let q: &dyn Query = g; (((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && q.exiled_with(q.linked_to(asker)).contains(&id)).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| (q.chars(id).is(CardType::Land) || true)).collect::<Vec<ObjectId>>() }, CardPlayAction::Either, PlayCount::Exactly({ let q: &dyn Query = g; (1i64).max(0) as u32 }), PlayCost::Free, false, false, asker.source)?);
+planned_item!("player-rule-special-action" => statics: player_rule(ability_1_0_applies, PlayerRule::SpecialAction { body: |g: &mut dyn Game, asker: &Asker| -> Result<(), Suspend> { let caster_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let mut pool_2: Vec<ObjectId> = { let q: &dyn Query = g; (((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && q.exiled_with(q.linked_to(asker)).contains(&id)).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let mut left_2: u32 = 1; let mut played_2: Vec<ObjectId> = Vec::new();
+while left_2 > 0 {
+let mut open_2: Vec<ObjectId> = Vec::new(); for &c in &pool_2 { let ways = g.cast_ways_during_resolution_by(c, caster_2); if ways.iter().any(|w| true) || g.could_play_land_during_resolution(c) { open_2.push(c); } }
+let picked_2 = if open_2.is_empty() { None } else if open_2.len() > 1 || (true && (!false || pool_2.len() > 1)) { cantrip_mechanics::choose::cards_from(g, caster_2, asker.source, Purpose::CastFree, pool_2.clone(), open_2.clone(), 1, false)?.first().copied() } else if !false || cantrip_mechanics::effects::ask_may(g, caster_2, open_2[0], Purpose::CastFree)? { Some(open_2[0]) } else { None };
+let Some(card_2) = picked_2 else { break; };
+let ways_2: Vec<CastWay> = g.cast_ways_during_resolution_by(card_2, caster_2).into_iter().filter(|w| true).collect();
+let done_2 = if ways_2.is_empty() { g.play_land_during_resolution(card_2)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_2, card_2, ways_2)?.map(|w| w.way); g.cast_during_resolution_as(card_2, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(caster_2), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
+if done_2 { left_2 -= 1; played_2.push(g.state().obj(card_2).became.unwrap_or(card_2)); } else if true { break; } if done_2 || !(false && true) { pool_2.retain(|&c| c != card_2); }
+}
 g.end_sentence();
  Ok(()) }, cost: None, limit: Some(PlayLimit::EachTurn(1)), during: Some(|q: &dyn Query, asker: &Asker, player: PlayerId| player == asker.controller), instant_speed: false }));
 

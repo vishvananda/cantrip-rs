@@ -1,6 +1,5 @@
 // The Mind Stone
-// status: planned
-// requires: engine: no Harness
+// status: ready
 // Indestructible
 // {T}: Add {W}.
 // {5}{W}, {T}: Harness The Mind Stone. (Once harnessed, its ∞ ability is active.)
@@ -12,7 +11,7 @@ for player in mana_players_0 {
 g.add_mana(player, Mana::W, mana_0_0);}
  Ok(()) }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("engine-no-harness" => if let Some(object) = ({ let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied() { cantrip_mechanics::harness::harness(g, object); });
+if let Some(object) = ({ let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied() { if g.is_on_battlefield(object) && !g.state().effects.iter().any(|e| e.affected == object && e.kind == EffectKind::Harnessed) { g.add_effect(object, object, EffectKind::Harnessed, Duration::Indefinite); }; }
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_3_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((!(Some(asker.source) == Some(id)) && (!(q.chars(id).is(CardType::Land)) && Some(asker.controller) == Some(q.controller(id)))))) }

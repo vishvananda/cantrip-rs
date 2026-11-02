@@ -1,14 +1,9 @@
 // Sarpadian Empires, Vol. VII
-// status: planned
-// requires: a choice of Color outside its body
-// requires: a choice of ColorAndCreatureType
-// requires: a choice of CreatureType outside its body
-// requires: condition ValueChosen
-// requires: token of the chosen color
+// status: ready
 // As this artifact enters, choose white Citizen, blue Camarid, black Thrull, red Goblin, or green Saproling.
 // {3}, {T}: Create a 1/1 creature token of the chosen color and type.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); planned!("a-choice-of-color-and-creature-type" => cantrip_mechanics::choose::value(g, asker.source, { let q: &dyn Query = g; Target::Object(asker.source).object().map(|o: ObjectId| q.controller(o)).into_iter().collect::<Vec<PlayerId>>() }, ChoiceKind::ColorAndCreatureType, 1, &[ColorAndCreatureType::ColorAndCreatureType(Color::White, CreatureType::Citizen), ColorAndCreatureType::ColorAndCreatureType(Color::Blue, CreatureType::Camarid), ColorAndCreatureType::ColorAndCreatureType(Color::Black, CreatureType::Thrull), ColorAndCreatureType::ColorAndCreatureType(Color::Red, CreatureType::Goblin), ColorAndCreatureType::ColorAndCreatureType(Color::Green, CreatureType::Saproling)])?);
+#[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); cantrip_mechanics::choose::option_as_enters(g, entering, &CARD, 0..5)?; let chosen_0: (Color, Subtype) = [(Color::White, Subtype::Citizen), (Color::Blue, Subtype::Camarid), (Color::Black, Subtype::Thrull), (Color::Red, Subtype::Goblin), (Color::Green, Subtype::Saproling)][usize::from(entering.chosen_option.map_or(0, |chosen| chosen.index))]; entering.chosen_color = Some(chosen_0.0); entering.chosen_subtype = Some(chosen_0.1);
  Ok(()) }
 pub mod token_2 {
 #[allow(unused_imports)] use cantrip_api::*;
@@ -19,13 +14,14 @@ pub static EXTRA: &[&CardDef] = &[];
 }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_3: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-if { let q: &dyn Query = g; (planned_value!("condition ValueChosen", false => q.state().chosen_value(q.linked(item), ChoiceKind::Color).is_some()) && planned_value!("condition ValueChosen", false => q.state().chosen_value(q.linked(item), ChoiceKind::CreatureType).is_some())) } {
-let created_1: Vec<ObjectId> = planned_value!("token of the chosen color", Vec::<ObjectId>::new() => cantrip_mechanics::tokens::create(g, asker, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[({ let q: &dyn Query = g; (1i64).max(0) as u32 }, TokenRecipe::Filled(g.card_id(&token_2::CARD), TokenFill { color: Some({ let q: &dyn Query = g; planned_value!("a choice of Color outside its body", Color::White => q.state().chosen_color(q.linked(item)).expect("it chose one")) }), creature_type: Some({ let q: &dyn Query = g; planned_value!("a choice of CreatureType outside its body", Subtype::Plains => q.state().chosen_subtype(q.linked(item)).expect("it chose one")) }), power_toughness: None, abilities_of: None }))], Arrival { tapped: false, counters: &[], states: &[] })?);
+if { let q: &dyn Query = g; (q.state().chosen_color(q.linked(item)).is_some() && q.state().chosen_subtype(q.linked(item)).is_some()) } {
+let kind_1: Subtype = { let q: &dyn Query = g; q.state().chosen_subtype(q.linked(item)).expect("it chose one") };
+let values_1 = Copiable::of(g.card_id(&token_2::CARD)).colored(ColorSet::of({ let q: &dyn Query = g; q.state().chosen_color(q.linked(item)).expect("it chose one") })).with_subtype(kind_1).named(kind_1.name()); let mut created_1: Vec<ObjectId> = Vec::new(); let count_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { created_1.extend(g.create_token_copies_of(values_1, player, count_1)?); }
 g.end_sentence();
 hoisted_3.extend(created_1.clone());
 }
 g.end_sentence();
  Ok(()) }
 
-pub static CARD: CardDef = CardDef { name: "Sarpadian Empires, Vol. VII", token_words: &[], oracle: true, cost: ManaCost { generic: 3, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Artifact]), subtypes: SubtypeSet::of(&[Subtype::Book]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[ability(Cost::NONE.and(Cost::mana(ManaCost { generic: 3, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(Cost { tap: true, ..Cost::NONE }), ability_1, "{3}, {T}: Create a 1/1 creature token of the chosen color and type.").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: Some(ability_0_enters), modal: None, enchant: None, ..CardDef::BLANK };
+pub static CARD: CardDef = CardDef { name: "Sarpadian Empires, Vol. VII", token_words: &[], oracle: true, cost: ManaCost { generic: 3, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Artifact]), subtypes: SubtypeSet::of(&[Subtype::Book]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[ability(Cost::NONE.and(Cost::mana(ManaCost { generic: 3, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(Cost { tap: true, ..Cost::NONE }), ability_1, "{3}, {T}: Create a 1/1 creature token of the chosen color and type.").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: Some(ability_0_enters), modal: None, enchant: None, labels: &["white Citizen", "blue Camarid", "black Thrull", "red Goblin", "green Saproling"], ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[&token_2::CARD];

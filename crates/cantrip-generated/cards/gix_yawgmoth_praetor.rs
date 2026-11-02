@@ -1,7 +1,6 @@
 // Gix, Yawgmoth Praetor
 // status: planned
 // requires: discarding X cards as a cost
-// requires: duration WhileAnyExiled
 // requires: play permission to PlayLand
 // Whenever a creature deals combat damage to one of your opponents, its controller may pay 1 life. If they do, they draw a card.
 // {4}{B}{B}{B}, Discard X cards: Exile the top X cards of target opponent's library. You may play lands and cast spells from among cards exiled this way without paying their mana costs.
@@ -24,7 +23,7 @@ fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let objects_2 = { let q: &dyn Query = g; (((t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((i64::from(item.x)).max(0) as usize).collect::<Vec<ObjectId>>() }; let moved_2 = g.exile_all(&objects_2);
 g.end_sentence();
-planned!("play-permission-to-play-land" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.add_player_effect(player, source, EffectKind::PlayerRule(PlayerRule::Play { zone: ZoneKind::Exile, cards: CardsOfRule::These({ let q: &dyn Query = g; moved_2.clone() }), grant: PlayGrant { lands: true, spells: false, ..PlayGrant::CAST } }), planned_value!("duration WhileAnyExiled", Duration::Indefinite => Duration::WhileAnyExiled({ let q: &dyn Query = g; moved_2.clone() }))); } });
+planned!("play-permission-to-play-land" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.add_player_effect(player, source, EffectKind::PlayerRule(PlayerRule::Play { zone: ZoneKind::Exile, cards: CardsOfRule::These({ let q: &dyn Query = g; moved_2.clone() }), grant: PlayGrant { lands: true, spells: false, ..PlayGrant::CAST } }), Duration::Indefinite); } });
 let cards_5_0 = { let q: &dyn Query = g; moved_2.clone() }; let players_5_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_5_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_5_0 { g.allow_play(card, player, PlayGrant { lands: false, expiry: Expiry::Never, instead: Some(ManaCost::ZERO), ..PlayGrant::CAST }); } } } });
 g.end_sentence();
  Ok(()) }

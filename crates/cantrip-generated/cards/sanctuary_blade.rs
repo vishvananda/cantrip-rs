@@ -1,13 +1,12 @@
 // Sanctuary Blade
 // status: planned
-// requires: a choice of Color outside its body
 // requires: ability AsEvent
 // requires: engine: no protection from this quality
 // As this Equipment becomes attached to a creature, choose a color.
 // Equipped creature gets +2/+0 and has protection from the last chosen color.
 // Equip {3}
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_1_apply_1(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); planned_value!("engine: no protection from this quality", () => chars.protection_from.push(ProtectionQuality::Matching(|q, asker, id| planned_value!("a choice of Color outside its body", None::<Color> => q.state().chosen_color(q.linked_to(asker.source))).is_some_and(|chosen| q.chars(id).colors.has(chosen))))); }
+#[allow(unused_variables)] fn ability_1_apply_1(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); planned_value!("engine: no protection from this quality", () => chars.protection_from.push(ProtectionQuality::Matching(|q, asker, id| planned_value!("depends on an instruction with a gap", None::<Color> => q.state().chosen_color(q.linked_to(asker.source))).is_some_and(|chosen| q.chars(id).colors.has(chosen))))); }
 #[allow(unused_variables)] fn ability_1_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); let (p, t) = ((2i64) as i16, (0i64) as i16); chars.power = chars.power.map(|v| v.saturating_add(p)); chars.toughness = chars.toughness.map(|v| v.saturating_add(t)); }
 #[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id))))) }
 static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target_0)];

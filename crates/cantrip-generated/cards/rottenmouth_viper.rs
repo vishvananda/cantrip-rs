@@ -16,6 +16,7 @@ let had_1: Vec<_> = counters_1.iter().map(|c| g.state().obj(c.0).counters(c.1)).
 g.end_sentence();
 let mut runs_2: u32 = { let q: &dyn Query = g; ((item.subject.object().into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.state().obj(o).counters(CounterKind::Blight))).sum::<i64>()).max(0) as u32 }; while runs_2 > 0 { runs_2 -= 1; let mut again_2 = false;
 let mut players_3: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_3.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut guard_3_0 = vec![false; players_3.len()];
  for (index_3, bound_0) in players_3.iter().copied().enumerate() { planned!("ways-to-pay-chosen-for-every-time-first-then-all-paid-at-once", PayCost, "cost" = "{\"parts\":[{\"Choice\":[{\"parts\":[{\"Sacrifice\":{\"choose\":{\"Exactly\":{\"args\":1,\"kind\":\"Constant\"}},\"objects\":{\"args\":{\"args\":{\"args\":\"Land\",\"kind\":\"CardType\"},\"kind\":\"Not\"},\"kind\":\"Battlefield\"}}}]},{\"parts\":[{\"Discard\":{\"count\":{\"args\":1,\"kind\":\"Constant\"},\"filter\":{\"kind\":\"Any\"},\"random\":false}}]}]}]}", "optional" = "true", "player" = { let q: &dyn Query = g; planned_value!("object reference Bound", None::<ObjectId> => bound_0) });
     } 

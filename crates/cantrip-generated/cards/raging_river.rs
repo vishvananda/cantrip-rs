@@ -1,9 +1,7 @@
 // Raging River
 // status: planned
 // requires: a lasting block rule reading what its ability chose
-// requires: operation ChoosePile
-// requires: operation Piles
-// requires: per-player Piles
+// requires: a pile's name kept on its objects for a lasting rule
 // requires: player collection Scoped
 // Whenever one or more creatures you control attack, each defending player divides all creatures without flying they control into a "left" pile and a "right" pile. Then, for each attacking creature you control, choose "left" or "right." That creature can't be blocked this combat except by creatures with flying and creatures in a pile with the chosen label.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -11,13 +9,12 @@
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0).is_some_and(|p: PlayerId| (planned_value!("player collection Scoped", Vec::<PlayerId>::new() => q.players_in_scope(asker))).contains(&p))).collect::<Vec<PlayerId>>() };
-planned!("per-player-piles" => g.begin_batch(););
- for (index_0, bound_0) in players_0.iter().copied().enumerate() { planned!("operation-piles" => cantrip_mechanics::choose::into_piles(g, { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }, asker.source, { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && !(q.chars(id).keywords.has(Keyword::Flying)) && Some(bound_0) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }, None, &["Left", "Right"], None)?);
+let mut piles_0: Vec<(PlayerId, Vec<Vec<ObjectId>>, Option<usize>, Vec<PlayerId>)> = Vec::new();
+ for (index_0, bound_0) in players_0.iter().copied().enumerate() { planned!("a-pile-s-name-kept-on-its-objects-for-a-lasting-rule" => cantrip_mechanics::choose::into_piles(g, { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }, asker.source, { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && !(q.chars(id).keywords.has(Keyword::Flying)) && Some(bound_0) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }, None, &["Left", "Right"], None)?);
     } 
-planned!("per-player-piles" => g.end_batch(););
 g.end_sentence();
 for bound_0 in { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| ((q.state().attackers.iter().any(|a| a.id == id) || q.was_attacking(id)) && q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() } {
-planned!("operation-choose-pile" => cantrip_mechanics::choose::of_piles(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, asker.source, None, false, &["Left", "Right"], { let q: &dyn Query = g; Some(bound_0) }, None)?);
+planned!("a-pile-s-name-kept-on-its-objects-for-a-lasting-rule" => cantrip_mechanics::choose::of_piles(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, asker.source, None, false, &["Left", "Right"], { let q: &dyn Query = g; Some(bound_0) }, None)?);
 g.end_sentence();
 planned!("a-lasting-block-rule-reading-what-its-ability-chose", CreateContinuousEffect, "affected" = "{\"Objects\":{\"args\":{\"args\":0,\"kind\":\"Bound\"},\"kind\":\"One\"}}", "changes" = "[{\"args\":{\"Prohibit\":{\"BeBlocked\":{\"args\":{\"args\":[{\"args\":[{\"args\":\"Creature\",\"kind\":\"CardType\"},{\"args\":{\"kind\":\"Flying\"},\"kind\":\"HasKeyword\"}],\"kind\":\"All\"},{\"args\":[{\"args\":\"Creature\",\"kind\":\"CardType\"},{\"args\":{\"args\":0,\"kind\":\"Bound\"},\"kind\":\"InPile\"}],\"kind\":\"All\"}],\"kind\":\"Either\"},\"kind\":\"Not\"}}},\"kind\":\"Rule\"}]", "duration" = "\"EndOfCombat\"", "evaluation" = "\"LiveObjects\"", "source" = { let q: &dyn Query = g; Some(asker.source) });
 g.end_sentence();

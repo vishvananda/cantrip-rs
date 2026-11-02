@@ -1,14 +1,13 @@
 // Karplusan Minotaur
 // status: planned
 // requires: cumulative upkeep paid other than in mana or life
-// requires: operation CoinFlips
 // requires: targets chosen by another player
 // Cumulative upkeep—Flip a coin. (At the beginning of your upkeep, put an age counter on this permanent, then sacrifice it unless you pay its upkeep cost for each age counter on it.)
 // Whenever you win a coin flip, this creature deals 1 damage to any target.
 // Whenever you lose a coin flip, this creature deals 1 damage to any target of an opponent's choice.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0_payment(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-coin-flips" => cantrip_mechanics::coins::flips(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, Some({ let q: &dyn Query = g; (1i64).max(0) as u32 }), false, false, true)?);
+let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let times_0: Option<u32> = Some({ let q: &dyn Query = g; (1i64).max(0) as u32 }); let mut done_0: i64 = 0; let mut flips_0: u32 = 0; while times_0.map_or(true, |n| flips_0 < n) { flips_0 += 1; if g.flip_coin(player_0) { done_0 += 1; } else if false { break; } }
 g.end_sentence();
  Ok(()) }
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[cantrip_mechanics::targets::ANY];

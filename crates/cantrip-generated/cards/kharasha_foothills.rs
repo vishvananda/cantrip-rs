@@ -17,11 +17,12 @@ g.end_sentence();
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_6: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_0.sort_by_key(|p| order.iter().position(|o| o == p)); }
 planned!("per-player-instruction-with-several-steps" => g.begin_batch(););
 let mut each_7: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut all_7: Vec<ObjectId> = Vec::new();
- for (index_0, _) in players_0.iter().copied().enumerate() { let decider_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_1, asker.source, Purpose::Optional)? {
+ for (index_0, bound_0) in players_0.iter().copied().enumerate() { let decider_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_1, asker.source, Purpose::Optional)? {
 let original_2 = { let q: &dyn Query = g; item.subject.object() }; let values_2 = { let q: &dyn Query = g; original_2.map(|original: ObjectId| q.copiable_values(original)) }; let count_2 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let created_2 = match values_2 { Some(values) => g.create_token_copies_tapped(values, player_2, count_2, true)?, None => Vec::new() };
-let defender_2 = Target::Player({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }); g.enter_attacking(&created_2, defender_2);
+let defender_2 = Target::Player({ let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }); g.enter_attacking(&created_2, defender_2);
 g.end_sentence();
 { let mut about: Vec<ObjectId> = Vec::new(); about.extend({ let q: &dyn Query = g; created_2.clone() }); about.push(ObjectId::NONE);  if about.iter().any(|&o| o != ObjectId::NONE) { g.delayed_trigger_about(DelayedWhen::Step { step: Step::End, on_turn_of: None }, item.object, item.controller, AbilityRef::delayed(item.ability.card, 0), &about); } }
 g.end_sentence();

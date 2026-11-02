@@ -1,10 +1,9 @@
 // Experiment Kraj
-// status: planned
-// requires: the activated abilities of other permanents
+// status: ready
 // Experiment Kraj has all activated abilities of each other creature with a +1/+1 counter on it.
 // {T}: Put a +1/+1 counter on target creature.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); let ids = q.state().battlefield().iter().copied().filter(|&id| (!(Some(asker.source) == Some(id)) && (q.chars(id).is(CardType::Creature) && (i64::from(q.state().obj(id).counters(CounterKind::PlusOne))) > (0i64)))).collect::<Vec<ObjectId>>(); planned_value!("the activated abilities of other permanents", () => cantrip_mechanics::statics::grant_activated_abilities_of_permanents(q, &ids, chars)); }
+#[allow(unused_variables)] fn ability_0_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); let ids: Vec<ObjectId> = q.state().battlefield().iter().copied().filter(|&id| (!(Some(asker.source) == Some(id)) && (q.chars(id).is(CardType::Creature) && (i64::from(q.state().obj(id).counters(CounterKind::PlusOne))) > (0i64)))).collect::<Vec<ObjectId>>(); for id in ids { if id == source || !q.state().obj(id).zone.is(ZoneKind::Battlefield) { continue; } let other = q.chars(id); for r in other.abilities() { if matches!(q.cards().ability(r), AbilityDef::Activated(d) if !d.special_action && (true)) { if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) { chars.abilities[slot] = Some(r); } } } } }
 #[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

@@ -16,19 +16,20 @@ g.end_sentence();
  Ok(()) }
 fn ability_0_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_1: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
-let mut each_3: Vec<Vec<ObjectId>> = vec![Vec::new(); players_1.len()]; let mut all_3: Vec<ObjectId> = Vec::new();
-g.one_instruction(&mut |g| { for (index_1, bound_0) in players_1.iter().copied().enumerate() { let objects_2 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (true && Some(bound_0) == Some(q.state().obj(id).owner))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_2 = { let q: &dyn Query = g; Some(asker.source) }; let duration_2 = Duration::Indefinite;
-let kind_2_0_0 = { let q: &dyn Query = g; EffectKind::Control(Some(bound_0).expect("a reference that always names a player")) };
-if let Some(source) = source_2 { cantrip_api::instruction(g, |g| { for &object in &objects_2 { g.add_effect(source, object, kind_2_0_0, duration_2);  } }); }
- each_3[index_1] = objects_2.clone(); all_3.extend(each_3[index_1].iter().copied());
+let snap_2: Vec<Vec<ObjectId>> = players_1.iter().copied().map(|bound_0| { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (true && Some(bound_0) == Some(q.state().obj(id).owner))).collect::<Vec<ObjectId>>() }).collect();
+let mut each_4: Vec<Vec<ObjectId>> = vec![Vec::new(); players_1.len()]; let mut all_4: Vec<ObjectId> = Vec::new();
+g.one_instruction(&mut |g| { for (index_1, bound_0) in players_1.iter().copied().enumerate() { let objects_3 = { let q: &dyn Query = g; (snap_2[index_1].clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_3 = { let q: &dyn Query = g; Some(asker.source) }; let duration_3 = Duration::Indefinite;
+let kind_3_0_0 = { let q: &dyn Query = g; EffectKind::Control(Some(bound_0).expect("a reference that always names a player")) };
+if let Some(source) = source_3 { cantrip_api::instruction(g, |g| { for &object in &objects_3 { g.add_effect(source, object, kind_3_0_0, duration_3);  } }); }
+ each_4[index_1] = objects_3.clone(); all_4.extend(each_4[index_1].iter().copied());
    } Ok(()) })?;
 g.end_sentence();
  Ok(()) }
 fn ability_0_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let objects_4 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let moved_4 = g.exile_all(&objects_4);
+let objects_5 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let moved_5 = g.exile_all(&objects_5);
 g.end_sentence();
-let player_5 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
-let objects_5 = ({ let q: &dyn Query = g; ((moved_4.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Exile).collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_5 = { let mut moved: Vec<ObjectId> = Vec::new(); for &o in &objects_5 { let controller = player_5; let entered = g.put_onto_battlefield_transformed(o, controller, false)?; if g.is_on_battlefield(entered) { moved.push(entered); } } moved };
+let player_6 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
+let objects_6 = ({ let q: &dyn Query = g; ((moved_5.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Exile).collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_6 = { let mut moved: Vec<ObjectId> = Vec::new(); for &o in &objects_6 { let controller = player_6; let entered = g.put_onto_battlefield_transformed(o, controller, false)?; if g.is_on_battlefield(entered) { moved.push(entered); } } moved };
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

@@ -1,7 +1,6 @@
 // Season of Gathering
 // status: planned
 // requires: modes with a budget
-// requires: object filter ChosenFilter
 // Choose up to five {P} worth of modes. You may choose the same mode more than once.
 // {P} — Put a +1/+1 counter on a creature you control. It gains vigilance and trample until end of turn.
 // {P}{P} — Choose artifact or enchantment. Destroy all permanents of the chosen type.
@@ -23,7 +22,7 @@ g.end_sentence();
 fn ability_0_mode_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let player_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let chosen_3: CardType = [CardType::Artifact, CardType::Enchantment][usize::from(cantrip_mechanics::choose::option(g, player_3, asker.source, item.ability.card, 0..2)? - 0)];
 g.end_sentence();
-let objects_4 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| ((q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Battle) || q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Enchantment) || q.chars(id).is(CardType::Land) || q.chars(id).is(CardType::Planeswalker)) && planned_value!("object filter ChosenFilter", false => q.state().chosen_filter(asker.source).is_some_and(|f| f(q, asker, id))))).collect::<Vec<ObjectId>>() }; let destroyed_4 = g.destroy_all(&objects_4);
+let objects_4 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| ((q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Battle) || q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Enchantment) || q.chars(id).is(CardType::Land) || q.chars(id).is(CardType::Planeswalker)) && q.chars(id).is(chosen_3))).collect::<Vec<ObjectId>>() }; let destroyed_4 = g.destroy_all(&objects_4);
 g.end_sentence();
  Ok(()) }
 fn ability_0_mode_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

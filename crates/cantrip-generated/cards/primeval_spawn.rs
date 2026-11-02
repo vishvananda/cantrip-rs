@@ -1,6 +1,5 @@
 // Primeval Spawn
 // status: planned
-// requires: as-enters replacement of another event
 // requires: operation PlayWith
 // If this creature would enter and it wasn't cast or no mana was spent to cast it, exile it instead.
 // Vigilance, trample, lifelink

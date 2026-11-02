@@ -1,6 +1,5 @@
 // Shuriken
 // status: planned
-// requires: earlier objects Unattached
 // requires: engine: no cost unattaches what gave the ability
 // Equipped creature has "{T}, Unattach Shuriken: Shuriken deals 2 damage to target creature. That creature's controller gains control of Shuriken unless it was unattached from a Ninja."
 // Equip {2} ({2}: Attach to target creature you control. Equip only as a sorcery.)
@@ -12,7 +11,7 @@ let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let source_1 = { let q: &dyn Query = g; granter(q, item) }; let amount_1 = { let q: &dyn Query = g; (2i64).max(0) as u16 }; let recipients_1 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() }; if let Some(source) = source_1 { let batch: Vec<(ObjectId, Target, u16)> = recipients_1.iter().map(|t| (source, *t, amount_1)).collect(); g.damage_together(&batch); }
 g.end_sentence();
-if { let q: &dyn Query = g; !(((planned_value!("earlier objects Unattached", Vec::<ObjectId>::new() => q.acted_on(asker, Acted::Unattached))).into_iter().filter(|&id| q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Ninja))).count() as i64) >= (1i64)) } {
+if { let q: &dyn Query = g; !(((vec![asker.source]).into_iter().filter(|&id| q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Ninja))).count() as i64) >= (1i64)) } {
 let objects_2 = { let q: &dyn Query = g; (granter(q, item).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_2 = { let q: &dyn Query = g; Some(asker.source) }; let duration_2 = Duration::Indefinite;
 let kind_2_0_0 = { let q: &dyn Query = g; EffectKind::Control(t_0_raw.get(0).copied().and_then(|t: Target| t.object()).map(|o: ObjectId| q.controller(o)).expect("a reference that always names a player")) };
 if let Some(source) = source_2 { cantrip_api::instruction(g, |g| { for &object in &objects_2 { g.add_effect(source, object, kind_2_0_0, duration_2);  } }); }

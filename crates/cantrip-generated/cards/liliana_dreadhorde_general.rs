@@ -36,6 +36,7 @@ g.end_sentence();
  Ok(()) }
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_4: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_4.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut each_6: Vec<Vec<ObjectId>> = vec![Vec::new(); players_4.len()]; let mut all_6: Vec<ObjectId> = Vec::new();
  for (index_4, bound_0) in players_4.iter().copied().enumerate() { let player_5 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; let pool_5 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| Some(bound_0) == Some(q.controller(id))).collect::<Vec<ObjectId>>() }; let mut picked_5: Vec<ObjectId> = Vec::new();
 { let open = { let q: &dyn Query = g; pool_5.iter().copied().filter(|&id| q.chars(id).is(CardType::Artifact)).collect::<Vec<ObjectId>>() }; let one = cantrip_mechanics::choose::cards(g, player_5, asker.source, Purpose::Keep, open, 1, false)?; for o in one { if !picked_5.contains(&o) { picked_5.push(o); } } }

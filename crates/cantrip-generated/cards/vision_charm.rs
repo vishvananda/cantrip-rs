@@ -1,8 +1,6 @@
 // Vision Charm
 // status: planned
 // requires: engine: no resolving effect sets land types
-// requires: object filter NthChosen
-// requires: operation Together
 // Choose one —
 // • Target player mills four cards.
 // • Choose a land type and a basic land type. Each land of the first chosen type becomes the second chosen type until end of turn.
@@ -16,12 +14,10 @@ let amount_0 = { let q: &dyn Query = g; (4i64).max(0) as u32 }; let mills_0: Vec
 g.end_sentence();
  Ok(()) }
 fn ability_0_mode_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-together" => g.begin_simultaneous());
 let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let choices_2 = Subtype::ALL.into_iter().filter(|&kind| SubtypeSet::LAND_TYPES.has(kind)).collect::<Vec<Subtype>>(); let Answer::Subtype(chosen_2) = g.ask(player_2, RequestKind::ChooseSubtype { source: asker.source, choices: choices_2, purpose: WordUse::Chosen })? else { return Ok(()) };
 let player_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let Answer::Subtype(chosen_3) = g.ask(player_3, RequestKind::ChooseSubtype { source: asker.source, choices: vec![Subtype::Plains, Subtype::Island, Subtype::Swamp, Subtype::Mountain, Subtype::Forest], purpose: WordUse::Chosen })? else { return Ok(()) };
-planned!("operation-together" => g.end_simultaneous());
 g.end_sentence();
-let objects_4 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Land) && planned_value!("object filter NthChosen", false => q.nth_chosen_value(asker, 0).matches(id)))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_4 = { let q: &dyn Query = g; Some(asker.source) }; let duration_4 = Duration::EndOfTurn;
+let objects_4 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Land) && Some(chosen_2).is_some_and(|chosen| q.chars(id).has_subtype(chosen)))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_4 = { let q: &dyn Query = g; Some(asker.source) }; let duration_4 = Duration::EndOfTurn;
 let kind_4_0_0 = { let q: &dyn Query = g; planned_value!("engine: no resolving effect sets land types", EffectKind::Pump(0, 0) => EffectKind::SetLandType(q.nth_chosen_value(asker, 1).subtype())) };
 if let Some(source) = source_4 { cantrip_api::instruction(g, |g| { for &object in &objects_4 { g.add_effect(source, object, kind_4_0_0, duration_4);  } }); }
 g.end_sentence();

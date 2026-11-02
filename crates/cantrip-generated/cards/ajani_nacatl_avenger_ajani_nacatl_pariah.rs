@@ -1,6 +1,5 @@
 // Ajani, Nacatl Avenger // Ajani, Nacatl Pariah
-// status: planned
-// requires: one or more that die read as each in the data
+// status: ready
 // [+2]: Put a +1/+1 counter on each Cat you control.
 // [0]: Create a 2/1 white Cat Warrior creature token. When you do, if you control a red permanent other than Ajani, he deals damage equal to the number of creatures you control to any target.
 // [−4]: Each opponent chooses an artifact, a creature, an enchantment, and a planeswalker from among the nonland permanents they control, then sacrifices the rest.
@@ -25,9 +24,27 @@ tokens_0.extend(std::iter::repeat((def_0_0,player)).take(count_0_0 as usize));
 let created_0 = g.create_tokens_worded(&tokens_0, false, None, words_0)?;
 g.end_sentence();
  Ok(()) }
-planned_item!("one-or-more-that-die-read-as-each-in-the-data", "(kind:Triggered,args:(event:ZoneChange(objects:(kind:All,args:[(kind:Not,args:(kind:SameObject,args:(kind:Source))),(kind:All,args:[(kind:Subtype,args:Cat),(kind:ControlledBy,args:(kind:One,args:(kind:AbilityController)))])]),from:Some(Battlefield),to:Graveyard),intervening_if:None,limits:(per_turn:None,total:None),announcement:(targets:[],modes:None),body:(instructions:[(kind:Optional,args:(decider:(kind:AbilityController),body:(instructions:[(kind:Effect,args:(result:(0),operation:(kind:Move,args:(objects:(kind:One,args:(kind:Source)),destination:Exile,entry:(tapped:false,counters:[],states:[]),face_down:false)))),(kind:Effect,args:(result:(1),operation:(kind:Move,args:(objects:(kind:InZone,args:(objects:(kind:One,args:(kind:Result,args:(result:(0),phase:After,index:0))),zone:Exile)),destination:OwnersBattlefield,entry:(tapped:false,counters:[],states:[Transformed]),face_down:false))))])))])))");
+#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && from.is(ZoneKind::Battlefield) && (!(Some(asker.source) == Some(id)) && (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Cat)) && Some(asker.controller) == Some(q.controller(id)))) { return Some(Fired { subject, data }); } }
+ None }
+fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_8: Vec<ObjectId> = Vec::new();
+let mut hoisted_7: Vec<ObjectId> = Vec::new();
+let mut hoisted_6: Vec<ObjectId> = Vec::new();
+let mut hoisted_5: Vec<ObjectId> = Vec::new();
+let asker = &Asker::new(item.object, item.controller);
+let decider_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if g.state().obj(asker.source).became.is_none() && cantrip_mechanics::effects::ask_may(g, decider_2, asker.source, Purpose::Optional)? {
+let objects_3 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let moved_3 = g.exile_all(&objects_3);
+g.end_sentence();
+let objects_4 = ({ let q: &dyn Query = g; ((moved_3.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Exile).collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_4 = { let mut moved: Vec<ObjectId> = Vec::new(); for &o in &objects_4 { let controller = g.state().obj(o).owner; let entered = g.put_onto_battlefield_transformed(o, controller, false)?; if g.is_on_battlefield(entered) { moved.push(entered); } } moved };
+g.end_sentence();
+hoisted_5.extend(moved_3.clone());
+hoisted_6.extend(moved_4.clone());
+hoisted_7.extend({ let q: &dyn Query = g; objects_3.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() });
+hoisted_8.extend({ let q: &dyn Query = g; objects_4.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() });
+}
+g.end_sentence();
+ Ok(()) }
 
-pub static CARD: CardDef = CardDef { name: "Ajani, Nacatl Pariah", token_words: &[], oracle: true, cost: ManaCost { generic: 1, x: 0, symbols: [1, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Cat,Subtype::Warrior]), supertypes: Supertypes { basic: false, legendary: true, snow: false }, colors: None, power: Some(1), toughness: Some(2), loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::ZONE_CHANGE.0), ability_0_event), ability_0, "When Ajani enters, create a 2/1 white Cat Warrior creature token.").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, back: Some(&back::CARD), ..CardDef::BLANK };
+pub static CARD: CardDef = CardDef { name: "Ajani, Nacatl Pariah", token_words: &[], oracle: true, cost: ManaCost { generic: 1, x: 0, symbols: [1, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Cat,Subtype::Warrior]), supertypes: Supertypes { basic: false, legendary: true, snow: false }, colors: None, power: Some(1), toughness: Some(2), loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::ZONE_CHANGE.0), ability_0_event), ability_0, "When Ajani enters, create a 2/1 white Cat Warrior creature token.").targets(&[]),triggered(when_asked(EventMask(EventMask::ZONE_CHANGE.0), ability_1_event), ability_1, "Whenever one or more other Cats you control die, you may exile Ajani, then return him to the battlefield transformed under his owner's control.").targets(&[]).once_per_batch()], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, back: Some(&back::CARD), ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[&token_1::CARD,&back::token_2::CARD];
 pub mod back {
 #[allow(unused_imports)] use cantrip_api::*;
@@ -62,6 +79,7 @@ g.end_sentence();
  Ok(()) }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_6: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_6.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut each_8: Vec<Vec<ObjectId>> = vec![Vec::new(); players_6.len()]; let mut all_8: Vec<ObjectId> = Vec::new();
  for (index_6, bound_0) in players_6.iter().copied().enumerate() { let player_7 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; let pool_7 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| !(q.chars(id).is(CardType::Land))).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| Some(bound_0) == Some(q.controller(id))).collect::<Vec<ObjectId>>() }; let mut picked_7: Vec<ObjectId> = Vec::new();
 { let open = { let q: &dyn Query = g; pool_7.iter().copied().filter(|id| !picked_7.contains(id)).filter(|&id| q.chars(id).is(CardType::Artifact)).collect::<Vec<ObjectId>>() }; let one = cantrip_mechanics::choose::cards(g, player_7, asker.source, Purpose::Keep, open, 1, false)?; for o in one { if !picked_7.contains(&o) { picked_7.push(o); } } }

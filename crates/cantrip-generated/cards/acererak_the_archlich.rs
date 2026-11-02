@@ -25,6 +25,7 @@ pub static EXTRA: &[&CardDef] = &[];
 }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_2: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_2.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut each_5: Vec<Vec<ObjectId>> = vec![Vec::new(); players_2.len()]; let mut all_5: Vec<ObjectId> = Vec::new();
 let mut each_6: Vec<Vec<ObjectId>> = vec![Vec::new(); players_2.len()]; let mut all_6: Vec<ObjectId> = Vec::new();
 let mut each_7 = vec![Default::default(); players_2.len()];

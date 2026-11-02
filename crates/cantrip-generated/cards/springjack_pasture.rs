@@ -1,6 +1,5 @@
 // Springjack Pasture
 // status: planned
-// requires: numeric expression AnnouncedX
 // requires: sacrificing X permanents to activate an ability
 // {T}: Add {C}.
 // {4}, {T}: Create a 0/1 white Goat creature token.
@@ -28,11 +27,11 @@ let created_1 = g.create_tokens_worded(&tokens_1, false, None, words_1)?;
 g.end_sentence();
  Ok(()) }
 fn ability_2_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let mana_players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_3 = { let q: &dyn Query = g; (planned_value!("numeric expression AnnouncedX", 0i64 => i64::from(q.announced_x().unwrap_or(0)))).max(0) as u32 };
+let mana_3 = { let q: &dyn Query = g; (planned_value!("depends on an instruction with a gap", 0i64 => i64::from(q.obj(asker.source).x))).max(0) as u32 };
 for player in mana_players_3 {
 let color = chosen.expect("mana activation selected a color");
 g.add_mana(player, color.mana(), mana_3);}
-let amount_4 = { let q: &dyn Query = g; (planned_value!("numeric expression AnnouncedX", 0i64 => i64::from(q.announced_x().unwrap_or(0)))).clamp(0, 2147483647) as i32 }; let players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_4 = { let q: &dyn Query = g; (planned_value!("depends on an instruction with a gap", 0i64 => i64::from(q.obj(asker.source).x))).max(0) as i32 }; let players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_4 { g.gain_life(player, amount_4); }
  Ok(()) }
 #[allow(unused_variables)] fn ability_2_5(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Goat)) }

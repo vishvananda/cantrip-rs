@@ -1,7 +1,6 @@
 // Pulmonic Sliver
 // status: planned
 // requires: granted Replacement
-// requires: replacement destination OwnersLibraryTop
 // All Sliver creatures have flying.
 // All Slivers have "If this permanent would be put into a graveyard, you may put it on top of its owner's library instead."
 #[allow(unused_imports)] use cantrip_api::*;
@@ -11,7 +10,7 @@
 static INSTEAD_1: Question = Question::new("Instead", "", "If you don't, the event goes on as it was.", "Do this instead", "Don't");
 #[allow(unused_variables)] fn granted_0_applies(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool { if let Proposal::ZoneChange(z) = proposal { let id = z.object; let subject = Target::Object(id); let data = [u32::MAX; 2]; if z.to.is(ZoneKind::Graveyard) && z.from.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return true; } }
  false }
-#[allow(unused_variables, unused_mut)] fn granted_0_apply(q: &dyn Query, asker: &Asker, proposal: &mut Proposal) { let seen = *proposal; if let Proposal::ZoneChange(seen) = &seen { let z = seen; let id = z.object; let subject = Target::Object(id); let data = [u32::MAX; 2]; if let Proposal::ZoneChange(z) = proposal { z.to = Zone::library(q.state().obj(z.object).owner); planned_value!("replacement destination OwnersLibraryTop", () => z.library_end = Some(LibraryEnd::Top)); } } }
+#[allow(unused_variables, unused_mut)] fn granted_0_apply(q: &dyn Query, asker: &Asker, proposal: &mut Proposal) { let seen = *proposal; if let Proposal::ZoneChange(seen) = &seen { let z = seen; let id = z.object; let subject = Target::Object(id); let data = [u32::MAX; 2]; if let Proposal::ZoneChange(z) = proposal { z.to = Zone::library(q.state().obj(z.object).owner); z.shuffle = false; } } }
 #[allow(unused_variables)] fn ability_1_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); let card = { let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }; let _ = card; if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) { chars.abilities[slot] = Some(planned_value!("granted Replacement", AbilityRef::delayed({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, 0) => AbilityRef::granted_static({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, 0))); } }
 planned_item!("granted-replacement" => granted_rules: CardDef { keywords: Keywords::of(&[]), abilities: &[], statics: &[], replacements: &[replacement(ReplacementKind::ZoneChange, granted_0_applies, granted_0_apply, "If this permanent would be put into a graveyard, you may put it on top of its owner's library instead.").optional(&INSTEAD_1)], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], enters: None, ..CardDef::BLANK });
 

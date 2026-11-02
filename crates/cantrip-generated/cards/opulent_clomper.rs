@@ -1,8 +1,6 @@
 // Opulent Clomper
 // status: planned
-// requires: a choice of Color outside its body
 // requires: engine: no effect adds colors
-// requires: operation ChooseAtRandom
 // Vivid — Opulent Clomper's power and toughness are each equal to the number of colors among permanents you control.
 // At the beginning of your upkeep, if this creature isn't all colors, it becomes a random color that it isn't in addition to its other colors.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -11,10 +9,10 @@ fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.source).is_so
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::Upkeep) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-choose-at-random" => cantrip_mechanics::choose::at_random(g, asker.source, ChoiceKind::Color, &[ChoosableColor::NotColorAmoungPermanents({ let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() })])?);
+let held_1 = { let q: &dyn Query = g; ({ let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }).into_iter().fold(ColorSet::NONE, |set, o: ObjectId| ColorSet(set.0 | q.chars(o).colors.0)) }; let pool_1: Vec<Color> = Color::ALL.into_iter().filter(|&c| !held_1.has(c)).collect(); if pool_1.is_empty() { return Ok(()); } let chosen_1 = pool_1[g.choose_at_random(pool_1.len())];
 g.end_sentence();
 let objects_2 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_2 = { let q: &dyn Query = g; Some(asker.source) }; let duration_2 = Duration::Indefinite;
-let kind_2_0_0 = { let q: &dyn Query = g; planned_value!("engine: no effect adds colors", EffectKind::Pump(0, 0) => EffectKind::AddColors(ColorSet::of(planned_value!("a choice of Color outside its body", Color::White => q.state().chosen_color(q.linked(item)).expect("it chose one"))))) };
+let kind_2_0_0 = { let q: &dyn Query = g; planned_value!("engine: no effect adds colors", EffectKind::Pump(0, 0) => EffectKind::AddColors(ColorSet::of(chosen_1))) };
 if let Some(source) = source_2 { cantrip_api::instruction(g, |g| { for &object in &objects_2 { g.add_effect(source, object, kind_2_0_0, duration_2);  } }); }
 g.end_sentence();
  Ok(()) }

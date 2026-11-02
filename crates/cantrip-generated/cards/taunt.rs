@@ -1,14 +1,14 @@
 // Taunt
 // status: planned
 // requires: duration DuringNextTurn
-// requires: engine: no resolving rule on an open set: RequireCombat Attack
+// requires: engine: no resolving rule on an open set: RequireCombat Attack beyond lasting rules
 // During target player's next turn, creatures that player controls attack you if able.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Player(p) if true) }
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0)];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-planned!("engine-no-resolving-rule-on-an-open-set-require-combat-attack" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| (q.chars(id).is(CardType::Creature) && t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()) == Some(q.controller(id))), EffectKind::MustAttackAt(Target::Player(Some(asker.controller).expect("a reference that always names a player"))), planned_value!("duration DuringNextTurn", Duration::Indefinite => Duration::DuringNextTurn(Target { slot: Slot(0), index: 0 }))); });
+planned!("engine-no-resolving-rule-on-an-open-set-require-combat-attack-beyond-lasting-rules" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| (q.chars(id).is(CardType::Creature) && t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()) == Some(q.controller(id))), EffectKind::MustAttackAt(Target::Player(Some(asker.controller).expect("a reference that always names a player"))), planned_value!("duration DuringNextTurn", Duration::Indefinite => Duration::DuringNextTurn(Target { slot: Slot(0), index: 0 }))); });
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

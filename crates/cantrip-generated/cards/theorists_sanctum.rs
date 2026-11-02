@@ -1,12 +1,11 @@
 // Theorist's Sanctum
-// status: planned
-// requires: engine: behold outside the casting of a spell
+// status: ready
 // ({T}: Add {U}.)
 // As this land enters, you may behold a Jace. If you don't, this land enters tapped. (To behold a Jace, choose a Jace you control or reveal a Jace card from your hand.)
 // {2}{U}, {T}: Empower Jace 2.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn paid_behold_1(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Jace)) }
-#[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let payer_0 = { let q: &dyn Query = g; Target::Object(asker.source).object().map(|o: ObjectId| q.controller(o)).expect("a reference that always names a player") }; let paid_0 = g.may_pay(payer_0, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(planned_value!("engine: behold outside the casting of a spell", Cost::NONE => cantrip_mechanics::behold::cost_of(1, paid_behold_1, "Jace"))), &PAY_QUESTION)?;
+#[allow(unused_variables)] fn behold_1(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Jace)) }
+#[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let payer_0 = { let q: &dyn Query = g; Target::Object(asker.source).object().map(|o: ObjectId| q.controller(o)).expect("a reference that always names a player") }; let paid_0 = cantrip_mechanics::behold::as_enters(g, entering, behold_1, "Jace")?;
 if { let q: &dyn Query = g; !(((paid_0 as i64) != 0)) } {
 entering.tapped = true;
 }

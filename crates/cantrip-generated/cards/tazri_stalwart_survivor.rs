@@ -1,7 +1,6 @@
 // Tazri, Stalwart Survivor
 // status: planned
 // requires: mana spending predicate
-// requires: object filter HasActivatedAbility
 // Each creature you control has "{T}: Add one mana of any of this creature's colors. Spend this mana only to activate an ability of a creature. Activate only if this creature has another activated ability."
 // {W}{U}{B}{R}{G}, {T}: Mill five cards. Put all creature cards with activated abilities that aren't mana abilities from among the milled cards into your hand.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -9,7 +8,7 @@
 #[allow(dead_code, unused_variables)] fn mana_use_282(q: &dyn Query, asker: &Asker, spending: &Spending) -> bool { spending.purpose == SpendingFor::Activating && spending.source.is_some_and(|source| q.state().obj(source).zone.is(ZoneKind::Battlefield) && q.chars(source).is(CardType::Creature)) }
 #[allow(unused_variables)] fn granted_0_mana_colors(q: &dyn Query, asker: &Asker) -> ColorSet { (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().fold(ColorSet::NONE, |all: ColorSet, o: ObjectId| ColorSet(all.0 | q.chars(o).colors.0)) }
 fn granted_0_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(), Suspend> { if let Some(color) = chosen { g.add_restricted_mana(asker.controller, color.mana(), 1, planned_value!("mana spending predicate", ManaRestriction::ABILITIES => ManaRestriction::Rule(&ManaRule { spend: mana_use_282, spent: None }))); } Ok(()) }
-fn granted_0_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.source).is_some_and(|candidate: ObjectId| planned_value!("object filter HasActivatedAbility", false => q.card_of(candidate).activated.iter().any(|d| matches(d)))) }
+fn granted_0_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.source).is_some_and(|candidate: ObjectId| q.chars(candidate).abilities().filter(|&a| q.activated_ability(a).is_some_and(|d| !d.special_action)).count() > usize::from(candidate == asker.source)) }
 #[allow(unused_variables)] fn ability_0_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); let card = { let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }; let _ = card; if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) { chars.abilities[slot] = Some(AbilityRef::delayed({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, 0)); } }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let amount_1 = { let q: &dyn Query = g; (5i64).max(0) as u32 }; let mills_1: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_1)).collect(); let milled_1 = g.mill_together(&mills_1);

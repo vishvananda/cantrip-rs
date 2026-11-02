@@ -1,7 +1,5 @@
 // Lumbering Battlement
-// status: planned
-// requires: duration WhileOnBattlefield
-// requires: operation ReturnAfter
+// status: ready
 // Vigilance
 // When this creature enters, exile any number of other nontoken creatures you control until it leaves the battlefield.
 // This creature gets +2/+2 for each card exiled with it.
@@ -10,9 +8,7 @@
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let selected_0_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_0_candidates = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (!(item.subject.object() == Some(id)) && !(q.state().obj(id).token) && q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }; let selected_0_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AnyNumber }; let selected_0 = { cantrip_mechanics::choose::select(g, selected_0_player, asker.source, Purpose::Exile, selected_0_candidates, cantrip_mechanics::select::Selection::of(selected_0_count, &[]))? };
-let objects_1 = { let q: &dyn Query = g; selected_0.clone() }; let moved_1 = { let by = g.linked(item); g.exile_with(&objects_1, by, false) };
-let returning_2: Vec<ObjectId> = { let q: &dyn Query = g; moved_1.clone() };
-planned!("operation-return-after" => cantrip_mechanics::exile_until::return_when(g, asker.source, &returning_2, planned_value!("duration WhileOnBattlefield", Duration::Indefinite => Duration::WhileOnBattlefield(EventSubject))));
+let objects_1 = { let q: &dyn Query = g; selected_0.clone() }; let by_1 = g.linked(item); let moved_1 = g.exile_with(&objects_1, by_1, true);
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_2_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); let (p, t) = (((2i64 * (((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && q.exiled_with(q.linked_to(asker.source)).contains(&id)).collect::<Vec<ObjectId>>()).len() as i64)).clamp(-32768, 32767) as i16, ((2i64 * (((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && q.exiled_with(q.linked_to(asker.source)).contains(&id)).collect::<Vec<ObjectId>>()).len() as i64)).clamp(-32768, 32767) as i16); chars.power = chars.power.map(|v| v.saturating_add(p)); chars.toughness = chars.toughness.map(|v| v.saturating_add(t)); }

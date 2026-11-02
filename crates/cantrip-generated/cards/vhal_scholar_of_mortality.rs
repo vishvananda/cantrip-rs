@@ -1,13 +1,12 @@
 // Vhal, Scholar of Mortality
 // status: planned
-// requires: a target filter reading the amount its ability was told
 // requires: engine: no specialize event
 // When this creature specializes, remove all study counters from it. When you do, put target creature card with mana value less than or equal to the number of study counters removed this way from a graveyard onto the battlefield under your control.
 // {T}: Draw a card, then discard a card.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { None }
-#[allow(unused_variables)] fn reflexive_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && ((q.chars(id).is(CardType::Creature) && (i64::from(q.mana_value(id))) <= (planned_value!("a target filter reading the amount its ability was told", 0i64 => q.told_amount(asker)))))) }
-static REFLEXIVE_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(reflexive_2_target_0)];
+#[allow(unused_variables)] fn reflexive_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && ((q.chars(id).is(CardType::Creature)))) }
+static REFLEXIVE_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(reflexive_2_target_0).together(cantrip_mechanics::select::total_mana_value_at_most(TargetSpec::COUNTED))];
 fn reflexive_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let player_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };

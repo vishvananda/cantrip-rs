@@ -1,6 +1,5 @@
 // Foraging Wickermaw
-// status: planned
-// requires: continuous change ColorOfMana
+// status: ready
 // When this creature enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)
 // {1}: Add one mana of any color. This creature becomes that color until end of turn. Activate only once each turn.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -16,7 +15,7 @@ for player in mana_players_1 {
 let color = chosen.expect("mana activation selected a color");
 g.add_mana(player, color.mana(), mana_1);}
 let objects_2 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_2 = { let q: &dyn Query = g; Some(asker.source) }; let duration_2 = Duration::EndOfTurn;
-let kind_2_0_0 = { let q: &dyn Query = g; planned_value!("continuous change ColorOfMana", EffectKind::Pump(0, 0) => EffectKind::ColorOfMana(ChangeMode::Set, g.mana_added_by(asker))) };
+let kind_2_0_0 = { let q: &dyn Query = g; EffectKind::SetColors(ColorSet::of(chosen.expect("mana activation selected a color"))) };
 if let Some(source) = source_2 { cantrip_api::instruction(g, |g| { for &object in &objects_2 { g.add_effect(source, object, kind_2_0_0, duration_2);  } }); }
  Ok(()) }
 

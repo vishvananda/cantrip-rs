@@ -3,19 +3,18 @@
 // requires: engine: no effect empties a mana pool
 // requires: keyword action ActivateManaAbility
 // requires: mana production LostThisWay
-// requires: operation Together
 // Target player activates a mana ability of each land they control. Then that player loses all unspent mana and you add the mana lost this way.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Player(p) if true) }
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0)];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-planned!("operation-together" => g.begin_simultaneous());
+planned!("depends-on-an-instruction-with-a-gap" => g.begin_simultaneous());
 for bound_4294967294 in { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Land) && t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() } {
 planned!("keyword-action-activate-mana-ability" => if let Some(player) = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()) } { if let Some(object) = ({ let q: &dyn Query = g; (Some(bound_4294967294).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied() { cantrip_mechanics::mana::activate_mana_ability(g, player, object)?; }; });
 }
 planned!("engine-no-effect-empties-a-mana-pool" => if let Some(player) = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()) } { g.empty_mana_pool(player); });
-planned!("operation-together" => g.end_simultaneous());
+planned!("depends-on-an-instruction-with-a-gap" => g.end_simultaneous());
 g.end_sentence();
 planned!("mana-production-lost-this-way" => for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { cantrip_mechanics::mana::add_production(g, player, Production::LostThisWay(0), None, None)?; });
 g.end_sentence();

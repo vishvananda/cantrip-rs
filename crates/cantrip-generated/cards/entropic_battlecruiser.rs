@@ -28,6 +28,7 @@ g.end_sentence();
  None }
 fn granted_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_3: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_3.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut each_6: Vec<Vec<ObjectId>> = vec![Vec::new(); players_3.len()]; let mut all_6: Vec<ObjectId> = Vec::new();
 let mut each_7: Vec<Vec<ObjectId>> = vec![Vec::new(); players_3.len()]; let mut all_7: Vec<ObjectId> = Vec::new();
 let mut each_8 = vec![Default::default(); players_3.len()];

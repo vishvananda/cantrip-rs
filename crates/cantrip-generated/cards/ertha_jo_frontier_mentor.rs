@@ -1,6 +1,5 @@
 // Ertha Jo, Frontier Mentor
-// status: planned
-// requires: activated ability TargetsAny
+// status: ready
 // When Ertha Jo enters, create a 1/1 red Mercenary creature token with "{T}: Target creature you control gets +1/+0 until end of turn. Activate only as a sorcery."
 // Whenever you activate an ability that targets a creature or player, copy that ability. You may choose new targets for the copy.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -32,7 +31,7 @@ tokens_0.extend(std::iter::repeat((def_0_0,player)).take(count_0_0 as usize));
 let created_0 = g.create_tokens_worded(&tokens_0, false, None, words_0)?;
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::AbilityActivated { source, ability, player, .. } = event { let id = *source; let def = q.activated_ability(*ability); let subject = Target::Player(*player); let serial = match cantrip_mechanics::triggers::activated_ability_on_stack(q, event) { Some(Target::Ability(serial)) => serial, _ => 0 }; let data = [id.0, serial]; if def.is_some() && Some(asker.controller) == Some(*player) && (planned_value!("activated ability TargetsAny", false => q.activation_targets_any(id, |t: &Target| t.object().is_some_and(|o| (q.state().battlefield().iter().copied().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>()).contains(&o)))) || planned_value!("activated ability TargetsAny", false => q.activation_targets_any(id, |t: &Target| matches!(t, Target::Player(p) if (q.state().apnap().collect::<Vec<PlayerId>>()).contains(p))))) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::AbilityActivated { source, ability, player, .. } = event { let id = *source; let def = q.activated_ability(*ability); let subject = Target::Player(*player); let serial = match cantrip_mechanics::triggers::activated_ability_on_stack(q, event) { Some(Target::Ability(serial)) => serial, _ => 0 }; let data = [id.0, serial]; if def.is_some() && Some(asker.controller) == Some(*player) && (q.state().stack.iter().find(|i| serial != 0 && i.serial == serial && i.kind == StackKind::Activated).is_some_and(|i| q.state().targets(i).iter().any(|t: &Target| t.object().is_some_and(|o| (q.state().battlefield().iter().copied().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>()).contains(&o)))) || q.state().stack.iter().find(|i| serial != 0 && i.serial == serial && i.kind == StackKind::Activated).is_some_and(|i| q.state().targets(i).iter().any(|t: &Target| matches!(t, Target::Player(p) if (q.state().apnap().collect::<Vec<PlayerId>>()).contains(p))))) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let copier_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let t = Target::Ability(item.data[1]); g.copy_ability(t, copier_2, true)?;

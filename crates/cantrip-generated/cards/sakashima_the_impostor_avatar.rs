@@ -1,7 +1,6 @@
 // Sakashima the Impostor Avatar
 // status: planned
 // requires: card type Vanguard
-// requires: copy exception KeepName
 // requires: layout Vanguard
 // {2}: Choose a creature you control. It becomes a copy of target creature except for its name.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -12,7 +11,7 @@ let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true
 let selected_0_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_0_candidates = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }; let selected_0_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let selected_0 = { cantrip_mechanics::choose::select(g, selected_0_player, asker.source, Purpose::ChooseAsEnters, selected_0_candidates, cantrip_mechanics::select::Selection::of(selected_0_count, &[]))? };
 g.end_sentence();
 let objects_1 = { let q: &dyn Query = g; ((selected_0.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let duration_1 = Duration::Indefinite;
-let original_1 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; let values_1 = { let q: &dyn Query = g; original_1.first().copied().map(|original: ObjectId| planned_value!("copy exception KeepName", q.copiable_values(original) => q.copiable_values(original).keeping_name())) }; if let (Some(source), Some(values)) = (source_1, values_1) { cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.become_copy(source, object, values, duration_1); } }); }
+let original_1 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; let values_1 = { let q: &dyn Query = g; original_1.first().copied().map(|original: ObjectId| { let own = q.copiable_values(asker.source); q.copiable_values(original).named(own.name.unwrap_or(q.card(own.card).name)) }) }; if let (Some(source), Some(values)) = (source_1, values_1) { cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.become_copy(source, object, values, duration_1); } }); }
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

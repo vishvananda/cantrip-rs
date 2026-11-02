@@ -1,6 +1,6 @@
 // Null Chamber
 // status: planned
-// requires: static rule Prohibit BePlayed
+// requires: a CardName each player chose as it entered, read by another ability
 // requires: supertype World
 // As this enchantment enters, you and an opponent each choose a card name other than a basic land card name.
 // Spells with the chosen names can't be cast and lands with the chosen names can't be played.
@@ -16,10 +16,8 @@ entering.chosen_card = Some(chosen_2);
 each_chosen_2_who.push(bound_0);
    } 
  Ok(()) }
-#[allow(unused_variables)] fn ability_1_0_rule(q: &dyn Query, asker: &Asker, player: PlayerId, spell: ObjectId) -> bool { !(true && each_chosen_2.iter().any(|&chosen| cantrip_mechanics::library::object_has_name(q, spell, chosen))) }
-#[allow(unused_variables)] fn ability_2_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); ((*so_far).is(CardType::Land) && each_chosen_2.iter().any(|&chosen| !(*so_far).name.is_empty() && q.cards().get(chosen).name == (*so_far).name)) && { let o = q.state().obj(affected); !o.zone.is(ZoneKind::Battlefield) && !o.token && !o.card_copy } }
-#[allow(unused_variables)] fn ability_2_0_rule(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { let source = asker.source; (q.chars(id).is(CardType::Land) && each_chosen_2.iter().any(|&chosen| cantrip_mechanics::library::object_has_name(q, id, chosen))) && { let o = q.state().obj(id); !o.zone.is(ZoneKind::Battlefield) && !o.token && !o.card_copy } }
-planned_item!("static-rule-prohibit-be-played" => statics: object_rule(ability_2_0_rule, Rule::Cant(Action::BePlayed)));
+planned_item!("a-card-name-each-player-chose-as-it-entered-read-by-another-ability", "(kind:Static,args:(kind:Ordinary,affected:Objects((kind:Zone,args:(scope:Shared(Stack),kind:Spell,filter:(kind:Chosen,args:CardName)))),changes:[(kind:Rule,args:Prohibit(Cast))]))");
+planned_item!("a-card-name-each-player-chose-as-it-entered-read-by-another-ability", "(kind:Static,args:(kind:Ordinary,affected:Objects((kind:AnyZone,args:(kind:All,args:[(kind:CardType,args:Land),(kind:Chosen,args:CardName)]))),changes:[(kind:Rule,args:Prohibit(BePlayed))]))");
 
-pub static CARD: CardDef = CardDef { name: "Null Chamber", token_words: &[], oracle: true, cost: ManaCost { generic: 3, x: 0, symbols: [1, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Enchantment]), subtypes: SubtypeSet::of(&[]), supertypes: planned_value!("supertype World", Supertypes { basic: false, legendary: false, snow: false } => Supertypes { basic: false, legendary: false, snow: false, world: true }), colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: Some(ability_0_enters), modal: None, enchant: None, spell_rules: &[ability_1_0_rule], ..CardDef::BLANK };
+pub static CARD: CardDef = CardDef { name: "Null Chamber", token_words: &[], oracle: true, cost: ManaCost { generic: 3, x: 0, symbols: [1, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Enchantment]), subtypes: SubtypeSet::of(&[]), supertypes: planned_value!("supertype World", Supertypes { basic: false, legendary: false, snow: false } => Supertypes { basic: false, legendary: false, snow: false, world: true }), colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: Some(ability_0_enters), modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

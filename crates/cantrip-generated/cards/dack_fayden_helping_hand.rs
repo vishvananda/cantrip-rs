@@ -14,17 +14,20 @@ g.end_sentence();
 let objects_3 = { let q: &dyn Query = g; (moved_1.clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let duration_3 = Duration::Indefinite; for object in objects_3 { cantrip_mechanics::goad::goad_for(g, item, object, duration_3); }
 g.end_sentence();
 let mut players_4: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_4.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut each_6: Vec<Vec<ObjectId>> = vec![Vec::new(); players_4.len()]; let mut all_6: Vec<ObjectId> = Vec::new();
  for (index_4, _) in players_4.iter().copied().enumerate() { let selected_5_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_5_candidates = { let q: &dyn Query = g; moved_1.clone() }; let selected_5_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let selected_5 = { cantrip_mechanics::choose::select(g, selected_5_player, asker.source, Purpose::ChooseAsEnters, selected_5_candidates, cantrip_mechanics::select::Selection::of(selected_5_count, &[]))? };
  each_6[index_4] = selected_5.clone(); all_6.extend(each_6[index_4].iter().copied());
    } 
 g.end_sentence();
 let mut players_7: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
-let mut each_9: Vec<Vec<ObjectId>> = vec![Vec::new(); players_7.len()]; let mut all_9: Vec<ObjectId> = Vec::new();
-g.one_instruction(&mut |g| { for (index_7, bound_0) in players_7.iter().copied().enumerate() { let objects_8 = { let q: &dyn Query = g; (planned_value!("object reference Earlier", None::<ObjectId> => q.earlier_object(item, EarlierObjects::Selected, Some(bound_0))).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_8 = { let q: &dyn Query = g; Some(asker.source) }; let duration_8 = Duration::Indefinite;
-let kind_8_0_0 = { let q: &dyn Query = g; EffectKind::Control(Some(bound_0).expect("a reference that always names a player")) };
-if let Some(source) = source_8 { cantrip_api::instruction(g, |g| { for &object in &objects_8 { g.add_effect(source, object, kind_8_0_0, duration_8);  } }); }
- each_9[index_7] = objects_8.clone(); all_9.extend(each_9[index_7].iter().copied());
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_7.sort_by_key(|p| order.iter().position(|o| o == p)); }
+let snap_8: Vec<Vec<ObjectId>> = players_7.iter().copied().map(|bound_0| { let q: &dyn Query = g; planned_value!("object reference Earlier", None::<ObjectId> => q.earlier_object(item, EarlierObjects::Selected, Some(bound_0))).into_iter().collect::<Vec<ObjectId>>() }).collect();
+let mut each_10: Vec<Vec<ObjectId>> = vec![Vec::new(); players_7.len()]; let mut all_10: Vec<ObjectId> = Vec::new();
+g.one_instruction(&mut |g| { for (index_7, bound_0) in players_7.iter().copied().enumerate() { let objects_9 = { let q: &dyn Query = g; (snap_8[index_7].clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_9 = { let q: &dyn Query = g; Some(asker.source) }; let duration_9 = Duration::Indefinite;
+let kind_9_0_0 = { let q: &dyn Query = g; EffectKind::Control(Some(bound_0).expect("a reference that always names a player")) };
+if let Some(source) = source_9 { cantrip_api::instruction(g, |g| { for &object in &objects_9 { g.add_effect(source, object, kind_9_0_0, duration_9);  } }); }
+ each_10[index_7] = objects_9.clone(); all_10.extend(each_10[index_7].iter().copied());
    } Ok(()) })?;
 g.end_sentence();
  Ok(()) }

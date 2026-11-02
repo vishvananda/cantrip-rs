@@ -11,8 +11,7 @@ fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let chosen_0 = cantrip_mechanics::choose::option(g, player_0, asker.source, item.ability.card, 0..3)? - 0;
 g.end_sentence();
 planned!("engine-no-perpetual-effects" => let objects_2: Vec<ObjectId> = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() };
-let kind_2_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(match chosen_0 { 0 => EffectKind::AddKeywords(Keywords::of(&[Keyword::Menace])), 1 => EffectKind::AddKeywords(Keywords::of(&[Keyword::Lifelink])), _ => EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), }) };
-for &object in &objects_2 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_2_0); });
+for &object in &objects_2 { let kind_2_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(match chosen_0 { 0 => EffectKind::AddKeywords(Keywords::of(&[Keyword::Menace])), 1 => EffectKind::AddKeywords(Keywords::of(&[Keyword::Lifelink])), _ => EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), }) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_2_0); });
 g.end_sentence();
  Ok(()) }
 

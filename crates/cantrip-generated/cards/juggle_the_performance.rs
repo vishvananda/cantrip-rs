@@ -27,8 +27,7 @@ each_9[index_4] = conjured_6.clone(); all_9.extend(each_9[index_4].iter().copied
    } 
 g.end_sentence();
 planned!("engine-no-perpetual-effects" => let objects_11: Vec<ObjectId> = { let q: &dyn Query = g; ((q.state().apnap().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (planned_value!("earlier objects Conjured", Vec::<ObjectId>::new() => q.acted_on(asker, Acted::Conjured))).contains(&id)).collect::<Vec<ObjectId>>() };
-let kind_11_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::SpendAsThoughAnyType };
-for &object in &objects_11 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_11_0); });
+for &object in &objects_11 { let kind_11_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::SpendAsThoughAnyType }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_11_0); });
 g.end_sentence();
  Ok(()) }
 

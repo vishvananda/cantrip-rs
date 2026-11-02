@@ -1,6 +1,6 @@
 // Legion Loyalist
 // status: planned
-// requires: engine: no resolving rule on an open set: Prohibit BeBlocked
+// requires: engine: no resolving rule on an open set: Prohibit BeBlocked beyond lasting rules
 // Haste
 // Battalion — Whenever this creature and at least two other creatures attack, creatures you control gain first strike and trample until end of turn and can't be blocked by creature tokens this turn.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -13,7 +13,7 @@ let kind_0_0_0 = { let q: &dyn Query = g; EffectKind::AddKeywords(Keywords::of(&
 let kind_0_1_0 = { let q: &dyn Query = g; EffectKind::AddKeywords(Keywords::of(&[Keyword::Trample])) };
 if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &object in &objects_0 { g.add_effect(source, object, kind_0_0_0, duration_0); g.add_effect(source, object, kind_0_1_0, duration_0);  } }); }
 g.end_sentence();
-planned!("engine-no-resolving-rule-on-an-open-set-prohibit-be-blocked" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id))), EffectKind::BlockRestriction { card: { let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, index: 0 }, Duration::EndOfTurn); });
+planned!("engine-no-resolving-rule-on-an-open-set-prohibit-be-blocked-beyond-lasting-rules" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id))), EffectKind::BlockRestriction { card: { let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, index: 0 }, Duration::EndOfTurn); });
 g.end_sentence();
  Ok(()) }
 

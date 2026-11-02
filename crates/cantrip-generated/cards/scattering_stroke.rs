@@ -1,7 +1,5 @@
 // Scattering Stroke
 // status: planned
-// requires: delayed trigger at MainPhaseBegins
-// requires: engine: a delayed ability on an event keeps no list
 // requires: operation Clash
 // Counter target spell. Clash with an opponent. If you win, at the beginning of your next main phase, you may add an amount of {C} equal to that spell's mana value. (Each clashing player reveals the top card of their library, then puts that card on their choice of the top or bottom. A player wins if their card had a greater mana value.)
 #[allow(unused_imports)] use cantrip_api::*;
@@ -23,7 +21,7 @@ let objects_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.
 g.end_sentence();
 let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let opponents_1: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
 let won_1: bool = planned_value!("operation Clash", false => cantrip_mechanics::clash::clash(g, player_1, asker.source, opponents_1)?); if won_1 {
-planned!("engine-a-delayed-ability-on-an-event-keeps-no-list" => { let mut about: Vec<ObjectId> = Vec::new(); about.extend({ let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).into_iter().collect::<Vec<ObjectId>>() }); about.push(ObjectId::NONE);  { g.delayed_trigger_about(planned_value!("delayed trigger at MainPhaseBegins", DelayedWhen::Step { step: Step::PostcombatMain, on_turn_of: Some({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }) } => DelayedWhen::NextMainPhase { on_turn_of: Some({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }) }), item.object, item.controller, AbilityRef::delayed(item.ability.card, 0), &about); } });
+{ let mut about: Vec<ObjectId> = Vec::new(); about.extend({ let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).into_iter().collect::<Vec<ObjectId>>() }); about.push(ObjectId::NONE);  { g.delayed_trigger_about(DelayedWhen::Step { step: { let q: &dyn Query = g; let turn = q.state().turn; if turn.active == { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") } && (Step::PrecombatMain as u8..Step::PostcombatMain as u8).contains(&(turn.step() as u8)) { Step::PostcombatMain } else { Step::PrecombatMain } }, on_turn_of: Some({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }) }, item.object, item.controller, AbilityRef::delayed(item.ability.card, 0), &about); } }
 g.end_sentence();
 } else {
 g.end_sentence();

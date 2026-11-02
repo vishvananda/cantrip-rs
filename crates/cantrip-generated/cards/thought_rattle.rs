@@ -23,8 +23,7 @@ let mut pool_3 = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().c
 let objects_4 = { let q: &dyn Query = g; picked_3.clone() }; let moved_4 = g.return_to_hand_revealed(&objects_4);
 g.end_sentence();
 planned!("engine-no-perpetual-effects" => let objects_6: Vec<ObjectId> = { let q: &dyn Query = g; (moved_4.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() };
-let kind_6_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_7) };
-for &object in &objects_6 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_6_0); });
+for &object in &objects_6 { let kind_6_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_7) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_6_0); });
 g.end_sentence();
 hoisted_8.extend(moved_4.clone());
 hoisted_9.extend(picked_3.clone());

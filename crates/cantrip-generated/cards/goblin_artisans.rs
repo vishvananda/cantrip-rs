@@ -1,10 +1,8 @@
 // Goblin Artisans
-// status: planned
-// requires: object filter AbilityOf
-// requires: object filter TargetedBy
+// status: ready
 // {T}: Flip a coin. If you win the flip, draw a card. If you lose the flip, counter target artifact spell you control that isn't the target of an ability from another creature named Goblin Artisans.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Stack) && ((q.chars(id).is(CardType::Artifact) && Some(asker.controller) == Some(q.controller(id)) && !(planned_value!("object filter TargetedBy", false => q.targeted_by(id).into_iter().any(|by: ObjectId| planned_value!("object filter AbilityOf", false => q.source_of_ability(by).is_some_and(|id: ObjectId| (!(Some(asker.source) == Some(id)) && q.chars(id).name == "Goblin Artisans"))))))))) }
+#[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Stack) && ((q.chars(id).is(CardType::Artifact) && Some(asker.controller) == Some(q.controller(id)) && !(q.state().stack.iter().any(|e| q.state().targets(e).contains(&Target::Object(id)) && (e.kind != StackKind::Spell && (!(Some(asker.source) == Some(e.object)) && q.chars(e.object).name == "Goblin Artisans"))))))) }
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0)];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);

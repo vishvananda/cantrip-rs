@@ -1,7 +1,7 @@
 // Eumidian Wastewaker
 // status: planned
 // requires: engine: no Encore
-// requires: per-player instruction with several steps
+// requires: per-player choice among different actions, done at once
 // Whenever this creature attacks, you and defending player each discard a card or sacrifice a permanent. You draw a card for each land card put into a graveyard this way.
 // Encore {6}{B}{B} ({6}{B}{B}, Exile this card from your graveyard: For each opponent, create a token copy that attacks that opponent this turn if able. They gain haste. Sacrifice them at the beginning of the next end step. Activate only as a sorcery.)
 #[allow(unused_imports)] use cantrip_api::*;
@@ -13,7 +13,7 @@ let mut hoisted_4: Vec<ObjectId> = Vec::new();
 let mut hoisted_3: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; { let mut all: Vec<PlayerId> = Vec::new(); for p in Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() { if !all.contains(&p) { all.push(p); } } for p in item.subject.object().and_then(|o: ObjectId| q.defending_player(o)).into_iter().collect::<Vec<PlayerId>>() { if !all.contains(&p) { all.push(p); } } all } };
-planned!("per-player-instruction-with-several-steps" => g.begin_batch(););
+planned!("per-player-choice-among-different-actions-done-at-once" => g.begin_batch(););
 let mut each_8: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut all_8: Vec<ObjectId> = Vec::new();
 let mut each_9: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut all_9: Vec<ObjectId> = Vec::new();
 let mut each_10: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut all_10: Vec<ObjectId> = Vec::new();
@@ -41,7 +41,7 @@ each_9[index_0] = hoisted_6.clone(); all_9.extend(each_9[index_0].iter().copied(
 each_10[index_0] = { let q: &dyn Query = g; hoisted_4.clone() }; all_10.extend(each_10[index_0].iter().copied());
 each_11[index_0] = { let q: &dyn Query = g; hoisted_7.clone() }; all_11.extend(each_11[index_0].iter().copied());
    } 
-planned!("per-player-instruction-with-several-steps" => g.end_batch(););
+planned!("per-player-choice-among-different-actions-done-at-once" => g.end_batch(););
 g.end_sentence();
 let amount_12 = { let q: &dyn Query = g; ((all_9.clone()).into_iter().filter(|&id| q.chars(id).is(CardType::Land)).count() as i64).max(0) as u32 }; let players_12 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_12 { g.draw(player, amount_12); }

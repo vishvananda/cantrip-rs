@@ -1,15 +1,15 @@
 // Maximum Carnage
 // status: planned
 // requires: continuous rule RequireCombat Attack
-// requires: engine: no resolving rule on an open set: RequireCombat Attack
+// requires: engine: no resolving rule on an open set: RequireCombat Attack beyond lasting rules
 // (As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)
 // I — Until your next turn, each creature attacks each combat if able and attacks a player other than you if able.
 // II — Add {R}{R}{R}.
 // III — This Saga deals 5 damage to each opponent.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("engine-no-resolving-rule-on-an-open-set-require-combat-attack" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Creature), EffectKind::MustAttack, Duration::UntilNextTurnOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })); });
-planned!("engine-no-resolving-rule-on-an-open-set-require-combat-attack" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Creature), planned_value!("continuous rule RequireCombat Attack", EffectKind::CantBlock => EffectKind::Rule(Rule::Must(Action::Attack(|q: &dyn Query, asker: &Asker, defender: Target| (match defender { Target::Player(p) => ({ let other = Some(asker.controller); q.state().apnap().filter(|p| Some(*p) != other).collect::<Vec<PlayerId>>() }).contains(&p), Target::Object(id) => false && q.chars(id).is(CardType::Planeswalker) && ({ let other = Some(asker.controller); q.state().apnap().filter(|p| Some(*p) != other).collect::<Vec<PlayerId>>() }).contains(&q.controller(id)), _ => false })), Required::AtLeast(1i64)))), Duration::UntilNextTurnOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })); });
+planned!("engine-no-resolving-rule-on-an-open-set-require-combat-attack-beyond-lasting-rules" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Creature), EffectKind::MustAttack, Duration::UntilNextTurnOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })); });
+planned!("engine-no-resolving-rule-on-an-open-set-require-combat-attack-beyond-lasting-rules" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Creature), planned_value!("continuous rule RequireCombat Attack", EffectKind::CantBlock => EffectKind::Rule(Rule::Must(Action::Attack(|q: &dyn Query, asker: &Asker, defender: Target| (match defender { Target::Player(p) => ({ let other = Some(asker.controller); q.state().apnap().filter(|p| Some(*p) != other).collect::<Vec<PlayerId>>() }).contains(&p), Target::Object(id) => false && q.chars(id).is(CardType::Planeswalker) && ({ let other = Some(asker.controller); q.state().apnap().filter(|p| Some(*p) != other).collect::<Vec<PlayerId>>() }).contains(&q.controller(id)), _ => false })), Required::AtLeast(1i64)))), Duration::UntilNextTurnOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })); });
 g.end_sentence();
  Ok(()) }
 fn ability_0_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

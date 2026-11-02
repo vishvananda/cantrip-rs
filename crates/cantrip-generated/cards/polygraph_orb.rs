@@ -18,6 +18,7 @@ g.end_sentence();
 #[allow(unused_variables)] fn paid_9(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { q.chars(id).is(CardType::Creature) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_7: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_7.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut guard_7_0 = vec![false; players_7.len()];
 let mut each_10 = vec![Default::default(); players_7.len()];
  for (index_7, bound_0) in players_7.iter().copied().enumerate() { let payer_8 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; let paid_8 = g.may_pay(payer_8, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(discard_cards(1)).and(sacrifice(1, paid_9)), &PAY_QUESTION)?;

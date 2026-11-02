@@ -1,6 +1,6 @@
 // Mardu Siegebreaker
 // status: planned
-// requires: per-player CreateTokens
+// requires: per-player tapped token copies of several objects
 // requires: tapped token copies of several objects at once
 // Deathtouch, haste
 // When this creature enters, exile up to one other target creature you control until this creature leaves the battlefield.
@@ -25,10 +25,11 @@ g.end_sentence();
  Ok(()) }
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_1: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
-planned!("per-player-create-tokens" => g.begin_batch(););
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_1.sort_by_key(|p| order.iter().position(|o| o == p)); }
+planned!("per-player-tapped-token-copies-of-several-objects" => g.begin_batch(););
  for (index_1, _) in players_1.iter().copied().enumerate() { planned!("tapped-token-copies-of-several-objects-at-once", CreateTokens, "entry" = "{\"counters\":[],\"states\":[{\"Attacking\":{\"or_planeswalker\":false,\"player\":{\"args\":0,\"kind\":\"Bound\"}}}],\"tapped\":true}", "players" = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, "tokens" = "[{\"amount\":{\"args\":1,\"kind\":\"Constant\"},\"recipe\":{\"CopyEach\":{\"adjustments\":[{\"args\":{\"family\":\"TokenCopyEffects\",\"form\":\"NoTokenCopyEffects\",\"operands\":[]},\"kind\":\"Term\"}],\"objects\":{\"args\":{\"filter\":{\"args\":{\"kind\":\"Source\"},\"kind\":\"ExiledWith\"},\"kind\":\"Card\",\"scope\":{\"Shared\":\"Exile\"}},\"kind\":\"Zone\"}}},\"words\":\"CreatingEffect\"}]");
     } 
-planned!("per-player-create-tokens" => g.end_batch(););
+planned!("per-player-tapped-token-copies-of-several-objects" => g.end_batch(););
 g.end_sentence();
 { let mut about: Vec<ObjectId> = Vec::new(); about.extend({ let q: &dyn Query = g; planned_value!("depends on an instruction with a gap", Vec::<ObjectId>::new() => result_0) }); about.push(ObjectId::NONE);  { g.delayed_trigger_about(DelayedWhen::Step { step: Step::End, on_turn_of: Some({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }) }, item.object, item.controller, AbilityRef::delayed(item.ability.card, 0), &about); } }
 g.end_sentence();

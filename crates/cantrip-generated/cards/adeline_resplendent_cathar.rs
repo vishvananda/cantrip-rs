@@ -16,6 +16,7 @@ pub static EXTRA: &[&CardDef] = &[];
 }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_0.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut gathered_1: Vec<(CardId, PlayerId, Target)> = Vec::new();
  for (index_0, bound_0) in players_0.iter().copied().enumerate() { let def_2 = g.card_id(&token_3::CARD); let count_2 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let defender_2 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") };
 let candidates_2 = cantrip_mechanics::combat::player_or_their_planeswalkers(g, defender_2); for _ in 0..count_2 { if let Some(target) = cantrip_mechanics::combat::choose_among(g, player_2, asker.source, &candidates_2)? { gathered_1.push((def_2, player_2, target)); } }

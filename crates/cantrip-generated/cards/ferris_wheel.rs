@@ -3,10 +3,9 @@
 // requires: ability Visit
 // requires: duration UntilEvent
 // requires: keyword action with a duration of its own
-// requires: object filter History PhasedOutWith
 // Visit — Choose target creature that hasn't been phased out with this Attraction. That creature phases out until you roll a 3 or less while rolling to visit your Attractions.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_visit_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && !(planned_value!("object filter History PhasedOutWith", false => cantrip_mechanics::history::phased_out_with(q.history().all().iter(), id, Some(asker.source))))))) }
+#[allow(unused_variables)] fn ability_0_visit_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && !(q.history().all().iter().any(|r| matches!(r.event, Event::PhasedOut { permanent, .. } if permanent == id && matches!(r.cause, Cause::Ability { source, .. } if Some(asker.source) == Some(source)))))))) }
 static ABILITY_0_VISIT_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_visit_target_0)];
 fn ability_0_visit(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);

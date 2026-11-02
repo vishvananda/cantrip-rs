@@ -1,10 +1,9 @@
 // Kid Loki
-// status: planned
-// requires: object filter History CountersPutBy
+// status: ready
 // Each creature you control that you've put one or more +1/+1 counters on this turn has hexproof.
 // Whenever you draw your second card each turn, put a +1/+1 counter on Kid Loki.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); ((*so_far).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(affected)) && planned_value!("object filter History CountersPutBy", false => cantrip_mechanics::history::counters_put_by(q.history().this_turn().iter(), affected))) }
+#[allow(unused_variables)] fn ability_0_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); ((*so_far).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(affected)) && q.history().this_turn().iter().any(|r| matches!(r.event, Event::CountersPut { object, kind: put, amount, by, .. } if object == affected && put == CounterKind::PlusOne && amount > 0 && Some(asker.controller) == Some(by)))) }
 #[allow(unused_variables)] fn ability_0_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); chars.keywords = chars.keywords.with(Keyword::Hexproof); }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Drew { player, .. } = event { let subject = Target::Player(*player); let data = [0u32; 2]; if Some(asker.controller) == Some(*player) && (q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::Drew { player, .. } = event { let subject = Target::Player(*player); let data = [0u32; 2]; if Some(asker.controller) == Some(*player) { return Some(Fired { subject, data }); } }  None }).filter(|f: &Fired| f.subject == subject).count() as i64 + 1) == (2i64) { return Some(Fired { subject, data }); } }
  None }

@@ -1,18 +1,17 @@
 // Space Beleren
 // status: planned
 // requires: engine: no SpaceSculptor
-// requires: engine: no resolving rule on an open set: Prohibit BeBlocked
+// requires: engine: no resolving rule on an open set: Prohibit BeBlocked beyond lasting rules
 // requires: keyword action ChooseSector
 // requires: object filter InSector
-// requires: object reference Affected
 // Space sculptor (Space Beleren divides the battlefield into alpha, beta, and gamma sectors. If a creature isn't assigned to a sector, its controller assigns it to one. Opponents assign first.)
 // [+1]: Creatures in each sector can be blocked this turn only by creatures in the same sector.
 // [−1]: Put a +1/+1 counter on each creature in the sector of your choice.
 // [−5]: Destroy all creatures in the sector of your choice.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn block_rule_0(q: &dyn Query, source: ObjectId, blocker: ObjectId, attacker: ObjectId) -> bool { let asker = &Asker::new(source, q.controller(source)); !(attacker == source && !(planned_value!("object filter InSector", false => q.in_sector(asker, blocker, planned_value!("object reference Affected", None::<ObjectId> => asker.affected()))))) }
+#[allow(unused_variables)] fn block_rule_0(q: &dyn Query, source: ObjectId, blocker: ObjectId, attacker: ObjectId) -> bool { let asker = &Asker::new(source, q.controller(source)); !(attacker == source && !(planned_value!("object filter InSector", false => q.in_sector(asker, blocker, Some(attacker))))) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("engine-no-resolving-rule-on-an-open-set-prohibit-be-blocked" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Creature), EffectKind::BlockRestriction { card: { let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, index: 0 }, Duration::EndOfTurn); });
+planned!("engine-no-resolving-rule-on-an-open-set-prohibit-be-blocked-beyond-lasting-rules" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Creature), EffectKind::BlockRestriction { card: { let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, index: 0 }, Duration::EndOfTurn); });
 g.end_sentence();
  Ok(()) }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

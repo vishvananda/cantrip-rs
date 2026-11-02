@@ -1,17 +1,14 @@
 // Ravenous Vampire
-// status: planned
-// requires: a mandatory cost the card's "If you don't" is read after, in the data
+// status: ready
 // Flying
 // At the beginning of your upkeep, you may sacrifice a nonartifact creature. If you do, put a +1/+1 counter on this creature. If you don't, tap this creature.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::Upkeep) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
-fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_9: Vec<ObjectId> = Vec::new();
-let mut hoisted_8: Vec<ObjectId> = Vec::new();
-let mut hoisted_7: Vec<ObjectId> = Vec::new();
+fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_7: Vec<ObjectId> = Vec::new();
 let mut hoisted_6: Vec<ObjectId> = Vec::new();
 let mut hoisted_5: Vec<ObjectId> = Vec::new();
-let mut hoisted_4: Vec<ObjectId> = Vec::new();
+let mut hoisted_3: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let payer_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let (paid_0, after_0, before_0, picked_0): (bool, Vec<ObjectId>, Vec<ObjectId>, Vec<ObjectId>) = if true {
 let objects_1 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (!(q.chars(id).is(CardType::Artifact)) && q.chars(id).is(CardType::Creature))).collect::<Vec<ObjectId>>() }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut picks_1: Vec<(PlayerId, ObjectId)> = Vec::new();
@@ -21,19 +18,17 @@ let paid_1 = !picks_1.is_empty();
 (paid_1, { let q: &dyn Query = g; (sacrificed_1).clone() }, { let q: &dyn Query = g; (objects_1.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).clone() }, Vec::new()) } else { (false, Vec::new(), Vec::new(), Vec::new()) };
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
-planned!("a-mandatory-cost-the-card-s-if-you-don-t-is-read-after-in-the-data", PayCost, "cost" = "{\"parts\":[{\"PutCounters\":[{\"amount\":{\"args\":1,\"kind\":\"Constant\"},\"kind\":{\"PowerToughness\":[1,1]},\"recipients\":{\"args\":{\"args\":{\"kind\":\"Source\"},\"kind\":\"One\"},\"kind\":\"Objects\"},\"selection\":()}]}]}", "optional" = "false", "player" = { let q: &dyn Query = g; Some(asker.controller) });
+let mut counters_2: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
+let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_2.push((object, CounterKind::PlusOne, amount)); } }
+let had_2: Vec<_> = counters_2.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_2); let applied_2: Vec<ObjectId> = counters_2.iter().zip(had_2).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
-if { let q: &dyn Query = g; !(planned_value!("depends on an instruction with a gap", false => result_1)) } {
-let objects_3 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_3: Vec<ObjectId> = objects_3.iter().copied().filter(|&o| g.state().obj(o).tapped != true).collect(); g.tap_together(&turned_3);
+hoisted_3.extend(applied_2.clone());
+} else {
+let objects_4 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_4: Vec<ObjectId> = objects_4.iter().copied().filter(|&o| g.state().obj(o).tapped != true).collect(); g.tap_together(&turned_4);
 g.end_sentence();
-hoisted_4.extend(turned_3.clone());
-hoisted_5.extend(objects_3.clone());
-hoisted_6.extend({ let q: &dyn Query = g; turned_3.clone() });
-}
-g.end_sentence();
-hoisted_7.extend(hoisted_4.clone());
-hoisted_8.extend(hoisted_5.clone());
-hoisted_9.extend({ let q: &dyn Query = g; hoisted_6.clone() });
+hoisted_5.extend(turned_4.clone());
+hoisted_6.extend(objects_4.clone());
+hoisted_7.extend({ let q: &dyn Query = g; turned_4.clone() });
 }
 g.end_sentence();
  Ok(()) }

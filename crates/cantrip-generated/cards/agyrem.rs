@@ -3,7 +3,7 @@
 // requires: card type Plane
 // requires: continuous rule Prohibit Attack
 // requires: duration UntilEvent
-// requires: engine: no resolving rule on an open set: Prohibit Attack
+// requires: engine: no resolving rule on an open set: Prohibit Attack beyond lasting rules
 // requires: layout Planar
 // requires: subtype Ravnica
 // requires: trigger event Player ChaosEnsues
@@ -33,7 +33,7 @@ g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("engine-no-resolving-rule-on-an-open-set-prohibit-attack" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Creature), planned_value!("continuous rule Prohibit Attack", EffectKind::CantBlock => EffectKind::Rule(Rule::Cant(Action::Attack(|q: &dyn Query, asker: &Asker, defender: Target| (match defender { Target::Player(p) => (Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).contains(&p), Target::Object(id) => false && q.chars(id).is(CardType::Planeswalker) && (Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).contains(&q.controller(id)), _ => false }))))), planned_value!("duration UntilEvent", Duration::Indefinite => Duration::UntilEvent(Player { event: PlaneswalksAway, players: All, objects: None }))); });
+planned!("engine-no-resolving-rule-on-an-open-set-prohibit-attack-beyond-lasting-rules" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Creature), planned_value!("continuous rule Prohibit Attack", EffectKind::CantBlock => EffectKind::Rule(Rule::Cant(Action::Attack(|q: &dyn Query, asker: &Asker, defender: Target| (match defender { Target::Player(p) => (Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).contains(&p), Target::Object(id) => false && q.chars(id).is(CardType::Planeswalker) && (Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).contains(&q.controller(id)), _ => false }))))), planned_value!("duration UntilEvent", Duration::Indefinite => Duration::UntilEvent(Player { event: PlaneswalksAway, players: All, objects: None }))); });
 g.end_sentence();
  Ok(()) }
 fn about(q: &dyn Query, item: &StackItem, part: usize) -> Vec<ObjectId> { q.event_objects(item).split(|&id| id == ObjectId::NONE).nth(part).map_or_else(Vec::new, <[ObjectId]>::to_vec) }

@@ -1,6 +1,6 @@
 // Nicol Bolas, Dragon-God
 // status: planned
-// requires: per-player instruction with several steps
+// requires: per-player choice of what to exile, exiled together
 // requires: the loyalty abilities of other permanents
 // Nicol Bolas has all loyalty abilities of all other planeswalkers on the battlefield.
 // [+1]: You draw a card. Each opponent exiles a card from their hand or a permanent they control.
@@ -19,7 +19,8 @@ let amount_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_0 = 
 for player in players_0 { g.draw(player, amount_0); }
 g.end_sentence();
 let mut players_1: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
-planned!("per-player-instruction-with-several-steps" => g.begin_batch(););
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_1.sort_by_key(|p| order.iter().position(|o| o == p)); }
+planned!("per-player-choice-of-what-to-exile-exiled-together" => g.begin_batch(););
 let mut each_13: Vec<Vec<ObjectId>> = vec![Vec::new(); players_1.len()]; let mut all_13: Vec<ObjectId> = Vec::new();
 let mut each_14: Vec<Vec<ObjectId>> = vec![Vec::new(); players_1.len()]; let mut all_14: Vec<ObjectId> = Vec::new();
 let mut each_15: Vec<Vec<ObjectId>> = vec![Vec::new(); players_1.len()]; let mut all_15: Vec<ObjectId> = Vec::new();
@@ -53,7 +54,7 @@ each_16[index_1] = hoisted_10.clone(); all_16.extend(each_16[index_1].iter().cop
 each_17[index_1] = { let q: &dyn Query = g; hoisted_7.clone() }; all_17.extend(each_17[index_1].iter().copied());
 each_18[index_1] = { let q: &dyn Query = g; hoisted_12.clone() }; all_18.extend(each_18[index_1].iter().copied());
    } 
-planned!("per-player-instruction-with-several-steps" => g.end_batch(););
+planned!("per-player-choice-of-what-to-exile-exiled-together" => g.end_batch(););
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Planeswalker)))) }
@@ -65,6 +66,7 @@ g.end_sentence();
  Ok(()) }
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_20: Vec<PlayerId> = { let q: &dyn Query = g; { let mut all = Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>(); let other = q.state().apnap().filter(|&bound_0: &PlayerId| !(q.state().battlefield().iter().copied().filter(|&id| q.controller(id) == Some(bound_0).unwrap_or(PlayerId(u8::MAX)) && (q.chars(id).supertypes.legendary && (q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Planeswalker)))).count() >= 1)).collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all } };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_20.sort_by_key(|p| order.iter().position(|o| o == p)); }
  for (index_20, bound_0) in players_20.iter().copied().enumerate() { { let player = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; g.lose_game(player); if g.state().is_over() { return Ok(()); }; }
     } 
 g.end_sentence();

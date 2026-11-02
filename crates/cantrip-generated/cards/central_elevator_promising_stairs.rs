@@ -1,6 +1,5 @@
 // Central Elevator // Promising Stairs
-// status: planned
-// requires: distinct UnlockedDoorNames
+// status: ready
 // When you unlock this door, search your library for a Room card that doesn't have the same name as a Room you control, reveal it, put it into your hand, then shuffle.
 // (You may cast either half. That door unlocks on the battlefield. As a sorcery, you may pay the mana cost of a locked door to unlock it.)
 // At the beginning of your upkeep, surveil 1. You win the game if there are eight or more different names among unlocked doors of Rooms you control.
@@ -30,7 +29,7 @@ pub mod right {
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let amount_0 = { let q: &dyn Query = g; (1i64).max(0) as usize }; let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; cantrip_mechanics::surveil(g, player_0, asker.source, amount_0)?;
 g.end_sentence();
-if { let q: &dyn Query = g; (planned_value!("distinct UnlockedDoorNames", 0i64 => cantrip_mechanics::rooms::unlocked_door_names(q, &q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Room)) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()))) >= (8i64) } {
+if { let q: &dyn Query = g; ({ let mut seen: Vec<&'static str> = Vec::new(); for id in q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Room)) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() { for name in cantrip_mechanics::library::object_names(q, id) { if !seen.contains(&name) { seen.push(name); } } } seen.len() as i64 }) >= (8i64) } {
 { let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; g.win_game(player); if g.state().is_over() { return Ok(()); }; }
 g.end_sentence();
 }

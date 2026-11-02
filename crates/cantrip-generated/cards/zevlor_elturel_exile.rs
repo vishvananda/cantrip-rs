@@ -2,7 +2,6 @@
 // status: planned
 // requires: new targets EachPlayer
 // requires: operation CopyOnStack
-// requires: player reference SoleTargetOf
 // Haste
 // {2}, {T}: When you next cast an instant or sorcery spell that targets only a single opponent or a single permanent an opponent controls this turn, for each other opponent, choose that player or a permanent they control, copy that spell, and the copy targets the chosen player or permanent.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -10,7 +9,7 @@
  None }
 fn watch_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 if { let q: &dyn Query = g; item.subject.object().is_some_and(|candidate: ObjectId| (q.state().stack.iter().find(|i| i.object == candidate).is_some_and(|i| { let chosen = q.state().targets(i); !chosen.is_empty() && chosen.iter().all(|t| *t == chosen[0]) }) && q.state().stack.iter().find(|i| i.kind == StackKind::Spell && i.object == candidate).is_some_and(|i| q.state().targets(i).iter().any(|t| matches!(t, Target::Player(p) if (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(p)))))) } {
-planned!("operation-copy-on-stack" => if let Some(spell) = { let q: &dyn Query = g; item.subject.object() } { cantrip_mechanics::copy::on_stack(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, spell, { let q: &dyn Query = g; (1i64).max(0) as u32 }, planned_value!("new targets EachPlayer", NewTargets::EachLegal => NewTargets::EachPlayer({ let q: &dyn Query = g; { let mut all = Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>(); let other = { let other = planned_value!("player reference SoleTargetOf", None::<PlayerId> => item.subject.object().and_then(|o: ObjectId| q.sole_target_player(o))); q.state().apnap().filter(|p| Some(*p) != other).collect::<Vec<PlayerId>>() }; all.retain(|p: &PlayerId| other.contains(p)); all } })))?; });
+planned!("operation-copy-on-stack" => if let Some(spell) = { let q: &dyn Query = g; item.subject.object() } { cantrip_mechanics::copy::on_stack(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, spell, { let q: &dyn Query = g; (1i64).max(0) as u32 }, planned_value!("new targets EachPlayer", NewTargets::EachLegal => NewTargets::EachPlayer({ let q: &dyn Query = g; { let mut all = Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>(); let other = { let other = item.subject.object().and_then(|spell: ObjectId| { let state = q.state(); let item = state.stack.iter().find(|i| i.kind == StackKind::Spell && i.object == spell).or_else(|| state.left_stack(spell))?; let mut chosen = state.targets(item).iter(); let Target::Player(first) = *chosen.next()? else { return None }; match chosen.any(|t| *t != Target::Player(first)) { true => None, false => Some(first) } }); q.state().apnap().filter(|p| Some(*p) != other).collect::<Vec<PlayerId>>() }; all.retain(|p: &PlayerId| other.contains(p)); all } })))?; });
 g.end_sentence();
 }
 g.end_sentence();

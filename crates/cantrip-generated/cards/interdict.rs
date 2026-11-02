@@ -1,7 +1,5 @@
 // Interdict
-// status: planned
-// requires: a spell or ability on the stack read as an object
-// requires: object reference SourceOf
+// status: ready
 // Counter target activated ability from an artifact, creature, enchantment, or land. That permanent's activated abilities can't be activated this turn. (Mana abilities can't be targeted.)
 // Draw a card.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -11,7 +9,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let items_0: Vec<(ObjectId, usize)> = t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).into_iter().collect::<Vec<Target>>().into_iter().filter_map(|t| { let stack = &g.state().stack; stack.iter().position(|e| (match t { Target::Object(id) => e.kind == StackKind::Spell && e.object == id, Target::Ability(serial) => e.kind != StackKind::Spell && e.serial == serial, _ => false })).map(|at| (stack[at].object, at)) }).collect(); g.counter_items(&items_0);
 g.end_sentence();
-let objects_1 = { let q: &dyn Query = g; (planned_value!("object reference SourceOf", None::<ObjectId> => planned_value!("a spell or ability on the stack read as an object", None::<ObjectId> => q.stack_item_object(t_0_raw.get(0).copied())).and_then(|o: ObjectId| q.ability_source(o))).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let duration_1 = Duration::EndOfTurn;
+let objects_1 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().and_then(|t: Target| match t { Target::Ability(serial) => { let s = q.state(); s.stack.iter().find(|e| e.kind == StackKind::Activated && e.serial == serial).or_else(|| s.left_ability(serial)).map(|e| e.object) } _ => None }).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let duration_1 = Duration::EndOfTurn;
 let kind_1_0_0 = { let q: &dyn Query = g; EffectKind::CantActivateAbilities };
 if let Some(source) = source_1 { cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.add_effect(source, object, kind_1_0_0, duration_1);  } }); }
 g.end_sentence();

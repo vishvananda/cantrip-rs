@@ -1,6 +1,7 @@
 // Crystal Spray
 // status: planned
-// requires: a text change's duration given to one of its options, in the data
+// requires: instruction ChooseOne
+// requires: operation ChangeSpell
 // Change the text of target spell or permanent by replacing all instances of one color word with another or one basic land type with another until end of turn.
 // Draw a card.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -10,12 +11,54 @@
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0)];
 fn ability_0_mode_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-planned!("a-text-change-s-duration-given-to-one-of-its-options-in-the-data", ChooseOne, "decider" = { let q: &dyn Query = g; Some(asker.controller) }, "offered" = "()", "options" = "[{\"instructions\":[{\"args\":{\"operation\":{\"args\":{\"actor\":{\"args\":{\"kind\":\"AbilityController\"},\"kind\":\"One\"},\"count\":2,\"kind\":\"ColorWord\",\"options\":[]},\"kind\":\"ChooseValue\"},\"result\":0},\"kind\":\"Effect\"},{\"args\":{\"operation\":{\"args\":{\"changes\":[{\"args\":{\"changes\":[{\"args\":{\"from\":{\"args\":{\"family\":\"ColorWord\",\"form\":\"TheFirstChosenColorWord\"},\"kind\":\"Vocabulary\"},\"to\":{\"args\":{\"family\":\"ColorWord\",\"form\":\"TheSecondChosenColorWord\"},\"kind\":\"Vocabulary\"}},\"kind\":\"ReplaceWord\"}],\"until\":\"EndOfTurn\"},\"kind\":\"Continuing\"}],\"subject\":{\"One\":{\"args\":{\"index\":0,\"slot\":0},\"kind\":\"Target\"}}},\"kind\":\"ChangeSpell\"},\"result\":1},\"kind\":\"Effect\"},{\"args\":{\"operation\":{\"args\":{\"amount\":{\"args\":1,\"kind\":\"Constant\"},\"players\":{\"args\":{\"kind\":\"AbilityController\"},\"kind\":\"One\"}},\"kind\":\"Draw\"},\"result\":2},\"kind\":\"Effect\"}]},{\"instructions\":[{\"args\":{\"operation\":{\"args\":{\"actor\":{\"args\":{\"kind\":\"AbilityController\"},\"kind\":\"One\"},\"count\":2,\"kind\":\"BasicLandType\",\"options\":[]},\"kind\":\"ChooseValue\"},\"result\":3},\"kind\":\"Effect\"},{\"args\":{\"operation\":{\"args\":{\"changes\":[{\"args\":{\"from\":{\"args\":{\"family\":\"LandTypeWord\",\"form\":\"TheFirstChosenLandType\"},\"kind\":\"Vocabulary\"},\"to\":{\"args\":{\"family\":\"LandTypeWord\",\"form\":\"TheSecondChosenLandType\"},\"kind\":\"Vocabulary\"}},\"kind\":\"ReplaceWord\"}],\"subject\":{\"One\":{\"args\":{\"index\":0,\"slot\":0},\"kind\":\"Target\"}}},\"kind\":\"ChangeSpell\"},\"result\":4},\"kind\":\"Effect\"}]}]");
+let decider_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
+match planned_value!("instruction ChooseOne", 0u8 => cantrip_mechanics::choose::one_of(g, decider_0, asker.source, vec![Label::Card(card_0, 0), Label::Card(card_0, 1)])?) {
+0 => {
+let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let words_1 = cantrip_mechanics::text_change::color_word(g, player_1, asker.source)?;
+g.end_sentence();
+planned!("operation-change-spell" => if let Some(spell) = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) } { cantrip_mechanics::spell_changes::change(g, asker, spell, &[SpellChange::Continuing(&[SpellChange::Effect(EffectKind::ChangeText { from: words_1.0, to: words_1.1 })], Duration::EndOfTurn)]); });
+g.end_sentence();
+}
+_ => {
+let player_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let words_3 = cantrip_mechanics::text_change::basic_land_type(g, player_3, asker.source)?;
+g.end_sentence();
+planned!("operation-change-spell" => if let Some(spell) = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) } { cantrip_mechanics::spell_changes::change(g, asker, spell, &[SpellChange::Continuing(&[SpellChange::Effect(EffectKind::ChangeText { from: words_3.0, to: words_3.1 })], Duration::EndOfTurn)]); });
+g.end_sentence();
+}
+}
+g.end_sentence();
+let amount_5 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_5 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+for player in players_5 { g.draw(player, amount_5); }
 g.end_sentence();
  Ok(()) }
-fn ability_0_mode_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
+fn ability_0_mode_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_12: Vec<ObjectId> = Vec::new();
+let mut hoisted_9: Vec<ObjectId> = Vec::new();
+let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-planned!("a-text-change-s-duration-given-to-one-of-its-options-in-the-data", ChooseOne, "decider" = { let q: &dyn Query = g; Some(asker.controller) }, "offered" = "()", "options" = "[{\"instructions\":[{\"args\":{\"operation\":{\"args\":{\"actor\":{\"args\":{\"kind\":\"AbilityController\"},\"kind\":\"One\"},\"count\":2,\"kind\":\"ColorWord\",\"options\":[]},\"kind\":\"ChooseValue\"},\"result\":0},\"kind\":\"Effect\"},{\"args\":{\"operation\":{\"args\":{\"affected\":{\"Objects\":{\"args\":{\"args\":{\"index\":0,\"slot\":0},\"kind\":\"Target\"},\"kind\":\"One\"}},\"changes\":[{\"args\":{\"from\":{\"args\":{\"family\":\"ColorWord\",\"form\":\"TheFirstChosenColorWord\"},\"kind\":\"Vocabulary\"},\"to\":{\"args\":{\"family\":\"ColorWord\",\"form\":\"TheSecondChosenColorWord\"},\"kind\":\"Vocabulary\"}},\"kind\":\"ReplaceWord\"}],\"duration\":\"Indefinite\",\"evaluation\":\"Snapshot\",\"source\":{\"kind\":\"Source\"}},\"kind\":\"CreateContinuousEffect\"},\"result\":1},\"kind\":\"Effect\"}]},{\"instructions\":[{\"args\":{\"operation\":{\"args\":{\"actor\":{\"args\":{\"kind\":\"AbilityController\"},\"kind\":\"One\"},\"count\":2,\"kind\":\"BasicLandType\",\"options\":[]},\"kind\":\"ChooseValue\"},\"result\":2},\"kind\":\"Effect\"},{\"args\":{\"operation\":{\"args\":{\"affected\":{\"Objects\":{\"args\":{\"args\":{\"index\":0,\"slot\":0},\"kind\":\"Target\"},\"kind\":\"One\"}},\"changes\":[{\"args\":{\"from\":{\"args\":{\"family\":\"LandTypeWord\",\"form\":\"TheFirstChosenLandType\"},\"kind\":\"Vocabulary\"},\"to\":{\"args\":{\"family\":\"LandTypeWord\",\"form\":\"TheSecondChosenLandType\"},\"kind\":\"Vocabulary\"}},\"kind\":\"ReplaceWord\"}],\"duration\":\"EndOfTurn\",\"evaluation\":\"Snapshot\",\"source\":{\"kind\":\"Source\"}},\"kind\":\"CreateContinuousEffect\"},\"result\":3},\"kind\":\"Effect\"},{\"args\":{\"operation\":{\"args\":{\"amount\":{\"args\":1,\"kind\":\"Constant\"},\"players\":{\"args\":{\"kind\":\"AbilityController\"},\"kind\":\"One\"}},\"kind\":\"Draw\"},\"result\":4},\"kind\":\"Effect\"}]}]");
+let decider_6 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
+match planned_value!("instruction ChooseOne", 0u8 => cantrip_mechanics::choose::one_of(g, decider_6, asker.source, vec![Label::Card(card_6, 0), Label::Card(card_6, 1)])?) {
+0 => {
+let player_7 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let words_7 = cantrip_mechanics::text_change::color_word(g, player_7, asker.source)?;
+g.end_sentence();
+let objects_8 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_8 = { let q: &dyn Query = g; Some(asker.source) }; let duration_8 = Duration::EndOfTurn;
+let kind_8_0_0 = { let q: &dyn Query = g; EffectKind::ChangeText { from: words_7.0, to: words_7.1 } };
+if let Some(source) = source_8 { cantrip_api::instruction(g, |g| { for &object in &objects_8 { g.add_effect(source, object, kind_8_0_0, duration_8);  } }); }
+g.end_sentence();
+hoisted_9.extend(objects_8.clone());
+}
+_ => {
+let player_10 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let words_10 = cantrip_mechanics::text_change::basic_land_type(g, player_10, asker.source)?;
+g.end_sentence();
+let objects_11 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_11 = { let q: &dyn Query = g; Some(asker.source) }; let duration_11 = Duration::EndOfTurn;
+let kind_11_0_0 = { let q: &dyn Query = g; EffectKind::ChangeText { from: words_10.0, to: words_10.1 } };
+if let Some(source) = source_11 { cantrip_api::instruction(g, |g| { for &object in &objects_11 { g.add_effect(source, object, kind_11_0_0, duration_11);  } }); }
+g.end_sentence();
+hoisted_12.extend(objects_11.clone());
+}
+}
+g.end_sentence();
+let amount_13 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_13 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+for player in players_13 { g.draw(player, amount_13); }
 g.end_sentence();
  Ok(()) }
 fn ability_0_implied(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller); let chosen = (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == 0).map(|i| g.state().target(item, i)).next().unwrap_or(Target::None);

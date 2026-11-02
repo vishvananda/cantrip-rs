@@ -27,8 +27,7 @@ let duplicated_5 = { let q: &dyn Query = g; ((item.subject.object().into_iter().
 let count_5: u32 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let mut conjured_5: Vec<ObjectId> = Vec::new(); for player in { let q: &dyn Query = g; Some(chosen_4).into_iter().collect::<Vec<PlayerId>>() } { conjured_5.extend(planned_value!("operation Conjure", Vec::<ObjectId>::new() => cantrip_mechanics::conjure::conjure(g, player, player, asker.source, Conjured::DuplicateOf(&duplicated_5), count_5, ConjureTo::Hand)?)); }
 g.end_sentence();
 planned!("engine-no-perpetual-effects" => let objects_7: Vec<ObjectId> = { let q: &dyn Query = g; (conjured_5.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() };
-let kind_7_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::SpendAsThoughAnyType };
-for &object in &objects_7 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_7_0); });
+for &object in &objects_7 { let kind_7_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::SpendAsThoughAnyType }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_7_0); });
 g.end_sentence();
  Ok(()) }
 

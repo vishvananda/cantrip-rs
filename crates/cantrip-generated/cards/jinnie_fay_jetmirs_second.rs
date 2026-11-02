@@ -1,7 +1,6 @@
 // Jinnie Fay, Jetmir's Second
 // status: planned
 // requires: event change in the program of another event
-// requires: instruction ChooseOne
 // requires: replacement of token creation with other tokens
 // If you would create one or more tokens, you may instead create that many 2/2 green Cat creature tokens with haste or that many 3/1 green Dog creature tokens with vigilance.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -23,7 +22,7 @@ pub static EXTRA: &[&CardDef] = &[];
 
 }
 #[allow(unused_variables, unused_mut)] fn ability_0_then_steps(g: &mut dyn Game, asker: &Asker, subject: Target, data: [u32; 2]) -> Result<(), Suspend> { let decider_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
-match planned_value!("instruction ChooseOne", 0u8 => cantrip_mechanics::choose::one_of(g, decider_1, asker.source, vec![Label::Card(card_1, 0), Label::Card(card_1, 1), Label::Card(card_1, 2)])?) {
+match planned_value!("depends on an instruction with a gap", 0u8 => cantrip_mechanics::choose::one_of(g, decider_1, asker.source, vec![Label::Card(card_1, 0), Label::Card(card_1, 1), Label::Card(card_1, 2)])?) {
 0 => {
 planned!("event-change-in-the-program-of-another-event" => g.change_event(|q, proposal| { if let Proposal::TokenCreation(t) = proposal { let each = t.count; t.count = t.count.saturating_mul(0); planned_value!("replacement of token creation with other tokens", () => t.also(q.card_id(&token_3::CARD), (i64::from(data[0])).max(0) as u32, q.words(asker.source))); } }););
 }

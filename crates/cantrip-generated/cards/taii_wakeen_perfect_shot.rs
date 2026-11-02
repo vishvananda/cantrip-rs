@@ -1,6 +1,6 @@
 // Taii Wakeen, Perfect Shot
 // status: planned
-// requires: numeric expression AnnouncedX
+// requires: the X of the ability that made a replacement effect
 // Whenever a source you control deals noncombat damage to a creature equal to that creature's toughness, draw a card.
 // {X}, {T}: If a source you control would deal noncombat damage to a permanent or player this turn, it deals that much damage plus X instead.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -13,7 +13,7 @@ g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn made_2_applies(q: &dyn Query, asker: &Asker, affected: ObjectId, proposal: &Proposal) -> bool { if let Proposal::Damage(e) = proposal { let (source, target, amount, combat) = (e.source, &e.target, e.amount, e.combat); let subject = *target; let data = [u32::from(amount), source.0]; if !combat && true && Some(asker.controller) == Some(q.controller(source)) && match *target { Target::Object(o) => true, Target::Player(p) => true, _ => false } { return true; } }
  false }
-#[allow(unused_variables, unused_mut)] fn made_2_apply(q: &dyn Query, asker: &Asker, affected: ObjectId, proposal: &mut Proposal) { let seen = *proposal; if let Proposal::Damage(seen) = &seen { let e = seen; let (source, target, amount, combat) = (e.source, &e.target, e.amount, e.combat); let subject = *target; let data = [u32::from(amount), source.0]; if let Proposal::Damage(e) = proposal { e.amount = ((i64::from(data[0]) + planned_value!("numeric expression AnnouncedX", 0i64 => i64::from(q.announced_x().unwrap_or(0))))).clamp(0, 65535) as u16; } } }
+#[allow(unused_variables, unused_mut)] fn made_2_apply(q: &dyn Query, asker: &Asker, affected: ObjectId, proposal: &mut Proposal) { let seen = *proposal; if let Proposal::Damage(seen) = &seen { let e = seen; let (source, target, amount, combat) = (e.source, &e.target, e.amount, e.combat); let subject = *target; let data = [u32::from(amount), source.0]; if let Proposal::Damage(e) = proposal { e.amount = ((i64::from(data[0]) + planned_value!("the X of the ability that made a replacement effect", 0i64 => i64::from(q.announced_x().unwrap_or(0))))).clamp(0, 65535) as u16; } } }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 {  let to = Some(Target::None); let about = to.and_then(|to: Target| to.object()).or(Some(item.object)); if let (Some(to), Some(about)) = (to, about) { let _ = (to, about); g.add_player_effect(item.controller, item.object, EffectKind::ReplacementRule { card: item.ability.card, index: 0 }, Duration::EndOfTurn); } }
 g.end_sentence();

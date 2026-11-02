@@ -1,27 +1,19 @@
 // Worldpurge
 // status: planned
 // requires: engine: no effect empties a mana pool
-// requires: per-player ChangeZone
 // Return all permanents to their owners' hands. Each player chooses up to seven cards in their hand, then shuffles the rest into their library. Each player loses all unspent mana.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let objects_0 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| true).collect::<Vec<ObjectId>>() }; let moved_0 = g.return_to_hand(&objects_0);
 g.end_sentence();
 let mut players_1: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
-planned!("per-player-change-zone" => g.begin_batch(););
-let mut each_6: Vec<Vec<ObjectId>> = vec![Vec::new(); players_1.len()]; let mut all_6: Vec<ObjectId> = Vec::new();
-let mut each_7: Vec<Vec<ObjectId>> = vec![Vec::new(); players_1.len()]; let mut all_7: Vec<ObjectId> = Vec::new();
-let mut each_8: Vec<Vec<ObjectId>> = vec![Vec::new(); players_1.len()]; let mut all_8: Vec<ObjectId> = Vec::new();
- for (index_1, bound_0) in players_1.iter().copied().enumerate() { let selected_3_player = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; let selected_3_candidates = { let q: &dyn Query = g; ((Some(bound_0).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>() }; let selected_3_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((7i64).max(0) as u32) }; let selected_3 = { cantrip_mechanics::choose::select(g, selected_3_player, asker.source, Purpose::Choose, selected_3_candidates, cantrip_mechanics::select::Selection::of(selected_3_count, &[]))? };
-let objects_5 = { let q: &dyn Query = g; { let without: Vec<ObjectId> = selected_3.clone(); (((Some(bound_0).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().filter(|id| !without.contains(id)).collect::<Vec<ObjectId>>() } }; let moved_5 = g.put_into_library(&objects_5, LibraryPlace::ShuffledIn);
- each_6[index_1] = selected_3.clone(); all_6.extend(each_6[index_1].iter().copied());
-each_7[index_1] = moved_5.clone(); all_7.extend(each_7[index_1].iter().copied());
-each_8[index_1] = { let q: &dyn Query = g; objects_5.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() }; all_8.extend(each_8[index_1].iter().copied());
-   } 
-planned!("per-player-change-zone" => g.end_batch(););
+let mut gathered_2: Vec<ObjectId> = Vec::new();
+ for (index_1, bound_0) in players_1.iter().copied().enumerate() { let all_3: Vec<ObjectId> = { let q: &dyn Query = g; ((Some(bound_0).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>() }; let count_3 = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((7i64).max(0) as u32) }; let kept_3 = cantrip_mechanics::choose::select(g, bound_0, asker.source, Purpose::Keep, all_3.clone(), cantrip_mechanics::select::Selection::of(count_3, &[]))?; gathered_2.extend(all_3.iter().copied().filter(|o| !kept_3.contains(o)));
+    } 
+let objects_4 = { let q: &dyn Query = g; gathered_2.clone() }; let moved_4 = g.put_into_library(&objects_4, LibraryPlace::ShuffledIn);
 g.end_sentence();
-let mut players_9: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
- for (index_9, bound_0) in players_9.iter().copied().enumerate() { planned!("engine-no-effect-empties-a-mana-pool" => { let player = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; g.empty_mana_pool(player); });
+let mut players_5: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
+ for (index_5, bound_0) in players_5.iter().copied().enumerate() { planned!("engine-no-effect-empties-a-mana-pool" => { let player = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; g.empty_mana_pool(player); });
     } 
 g.end_sentence();
  Ok(()) }

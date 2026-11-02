@@ -1,6 +1,5 @@
 // Genesis of the Daleks
 // status: planned
-// requires: history measure Property
 // requires: villainous choice
 // (As this Saga enters and after your draw step, add a lore counter. Sacrifice after IV.)
 // I, II, III — Create a 3/3 black Dalek artifact creature token with menace for each lore counter on Genesis of the Daleks.
@@ -66,7 +65,7 @@ let offered_7: Vec<u8> = [(0u8, true), (1u8, true)].into_iter().filter(|option| 
 0 => {
 let objects_8 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Dalek)) && q.chars(id).is(CardType::Creature))).collect::<Vec<ObjectId>>() }; let destroyed_8 = g.destroy_all(&objects_8);
 g.end_sentence();
-let amount_9 = { let q: &dyn Query = g; (planned_value!("history measure Property", 0i64 => cantrip_mechanics::history::aggregate(q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && from.is(ZoneKind::Battlefield) && q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Dalek)) { return Some(Fired { subject, data }); } }  None }), Property::Power, Aggregation::Sum))).clamp(0, 2147483647) as i32 }; let players_9 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+let amount_9 = { let q: &dyn Query = g; (q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && from.is(ZoneKind::Battlefield) && q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Dalek)) { return Some(Fired { subject, data }); } }  None }).filter_map(|f: Fired| f.subject.object()).map(|id: ObjectId| i64::from(q.chars(id).power.unwrap_or(0))).sum::<i64>()).clamp(0, 2147483647) as i32 }; let players_9 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
 for player in players_9 { g.lose_life(player, amount_9); }
 g.end_sentence();
 hoisted_10.extend(destroyed_8.clone());

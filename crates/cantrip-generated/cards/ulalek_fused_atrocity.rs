@@ -1,6 +1,6 @@
 // Ulalek, Fused Atrocity
 // status: planned
-// requires: object filter OnStack
+// requires: copies of each of several abilities on the stack
 // Devoid (This card has no color.)
 // Whenever you cast an Eldrazi spell, you may pay {C}{C}. If you do, copy all spells you control, then copy all other activated and triggered abilities you control. You may choose new targets for the copies. (Mana abilities can't be copied.)
 #[allow(unused_imports)] use cantrip_api::*;
@@ -13,7 +13,7 @@ g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
 let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let mut open_1: Vec<ObjectId> = { let q: &dyn Query = g; q.state().stack.iter().filter(|i| i.kind == StackKind::Spell).map(|i| i.object).filter(|&id| (q.state().stack.iter().find(|i| i.object == id).is_some_and(|i| i.kind == StackKind::Spell) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }; while let Some(&first) = open_1.first() { let spell = if open_1.iter().all(|&o| o == first) { Some(first) } else { let mut distinct = open_1.clone(); distinct.sort(); distinct.dedup(); cantrip_mechanics::choose::card(g, player_1, asker.source, Purpose::CopyWhich, distinct)? }; let Some(spell) = spell else { break; }; if let Some(at) = open_1.iter().position(|&o| o == spell) { open_1.remove(at); } g.copy_spell(spell, player_1, true)?; }
 g.end_sentence();
-let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let mut open_2: Vec<ObjectId> = { let q: &dyn Query = g; q.state().stack.iter().filter(|i| i.kind == StackKind::Spell).map(|i| i.object).filter(|&id| (!(planned_value!("object filter OnStack", false => q.stack_item(id).is_some_and(|i| i.is(StackTrait::ThisAbility)))) && (planned_value!("object filter OnStack", false => q.stack_item(id).is_some_and(|i| i.is(StackTrait::Activated))) || planned_value!("object filter OnStack", false => q.stack_item(id).is_some_and(|i| i.is(StackTrait::Triggered)))) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }; while let Some(&first) = open_2.first() { let spell = if open_2.iter().all(|&o| o == first) { Some(first) } else { let mut distinct = open_2.clone(); distinct.sort(); distinct.dedup(); cantrip_mechanics::choose::card(g, player_2, asker.source, Purpose::CopyWhich, distinct)? }; let Some(spell) = spell else { break; }; if let Some(at) = open_2.iter().position(|&o| o == spell) { open_2.remove(at); } g.copy_spell(spell, player_2, true)?; }
+planned!("copies-of-each-of-several-abilities-on-the-stack", CopyEach, "actor" = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, "objects" = "{\"args\":[{\"args\":{\"args\":\"ThisAbility\",\"kind\":\"OnStack\"},\"kind\":\"Not\"},{\"args\":[{\"args\":\"Activated\",\"kind\":\"OnStack\"},{\"args\":\"Triggered\",\"kind\":\"OnStack\"}],\"kind\":\"Either\"},{\"args\":{\"args\":{\"kind\":\"AbilityController\"},\"kind\":\"One\"},\"kind\":\"ControlledBy\"}],\"kind\":\"All\"}", "targets" = "\"May\"");
 g.end_sentence();
 }
 g.end_sentence();

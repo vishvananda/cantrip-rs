@@ -4,7 +4,6 @@
 // requires: engine: no effect empties a mana pool
 // requires: keyword action ActivateManaAbility
 // requires: numeric expression Game
-// requires: operation Together
 // Whenever this creature attacks and isn't blocked, you may have defending player activate a mana ability of each land they control and lose all unspent mana. If you do, this creature assigns no combat damage this turn and at the beginning of your next main phase this turn, you add an amount of {C} equal to the amount of mana that player lost this way.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Unblocked { attacker, .. } = event { let id = *attacker; let subject = Target::Object(id); let data = [u32::MAX, u32::MAX]; if Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
@@ -22,12 +21,12 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mu
 let asker = &Asker::new(item.object, item.controller);
 let payer_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
 let paid_0 = cantrip_mechanics::effects::ask_may(g, payer_0, asker.source, Purpose::Optional)?; if paid_0 {
-if let Some(present_7_0) = { let q: &dyn Query = g; item.subject.object().and_then(|o: ObjectId| q.defending_player(o)) } { if let Some(present_8_1) = { let q: &dyn Query = g; item.subject.object().and_then(|o: ObjectId| q.defending_player(o)) } { planned!("operation-together" => g.begin_simultaneous());
+if let Some(present_7_0) = { let q: &dyn Query = g; item.subject.object().and_then(|o: ObjectId| q.defending_player(o)) } { if let Some(present_8_1) = { let q: &dyn Query = g; item.subject.object().and_then(|o: ObjectId| q.defending_player(o)) } { planned!("depends-on-an-instruction-with-a-gap" => g.begin_simultaneous());
 for bound_4294967290 in { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Land) && item.subject.object().and_then(|o: ObjectId| q.defending_player(o)) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() } {
 planned!("keyword-action-activate-mana-ability" => { let player = { let q: &dyn Query = g; present_7_0 }; if let Some(object) = ({ let q: &dyn Query = g; (Some(bound_4294967290).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied() { cantrip_mechanics::mana::activate_mana_ability(g, player, object)?; }; });
 }
 planned!("engine-no-effect-empties-a-mana-pool" => { let player = { let q: &dyn Query = g; present_8_1 }; g.empty_mana_pool(player); });
-planned!("operation-together" => g.end_simultaneous());
+planned!("depends-on-an-instruction-with-a-gap" => g.end_simultaneous());
  } }
 g.end_sentence();
 }

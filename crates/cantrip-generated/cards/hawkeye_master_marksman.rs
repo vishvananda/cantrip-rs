@@ -1,6 +1,5 @@
 // Hawkeye, Master Marksman
-// status: planned
-// requires: mode count that is not a constant
+// status: ready
 // Reach, first strike
 // Trick Arrows — Whenever Hawkeye becomes tapped, you may pay {1} up to three times. When you do, choose up to that many —
 // • Net — Target creature can't block this turn.
@@ -32,7 +31,7 @@ let amount_6 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_6 = 
 for player in players_6 { g.draw(player, amount_6); }
 g.end_sentence();
  Ok(()) }
-static REFLEXIVE_2_MODES: ModalDef = planned_value!("mode count that is not a constant", modes(&[mode(reflexive_2_mode_0, "Net — Target creature can't block this turn.").targets(REFLEXIVE_2_MODE_0_TARGETS),mode(reflexive_2_mode_1, "Explosive — Hawkeye deals 2 damage to target player.").targets(REFLEXIVE_2_MODE_1_TARGETS),mode(reflexive_2_mode_2, "Boomerang — Discard a card, then draw a card.").targets(&[])]).choose(1, 1) => modes(&[mode(reflexive_2_mode_0, "Net — Target creature can't block this turn.").targets(REFLEXIVE_2_MODE_0_TARGETS),mode(reflexive_2_mode_1, "Explosive — Hawkeye deals 2 damage to target player.").targets(REFLEXIVE_2_MODE_1_TARGETS),mode(reflexive_2_mode_2, "Boomerang — Discard a card, then draw a card.").targets(&[])]).choose_counted(|q: &dyn Query, asker: &Asker| 0i64, |q: &dyn Query, asker: &Asker| q.told_amount(asker)));
+static REFLEXIVE_2_MODES: ModalDef = modes(&[mode(reflexive_2_mode_0, "Net — Target creature can't block this turn.").targets(REFLEXIVE_2_MODE_0_TARGETS),mode(reflexive_2_mode_1, "Explosive — Hawkeye deals 2 damage to target player.").targets(REFLEXIVE_2_MODE_1_TARGETS),mode(reflexive_2_mode_2, "Boomerang — Discard a card, then draw a card.").targets(&[])]).up_to_that_many();
 fn reflexive_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
  Ok(()) }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

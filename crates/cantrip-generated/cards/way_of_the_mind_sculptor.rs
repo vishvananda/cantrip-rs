@@ -1,7 +1,5 @@
 // Way of the Mind Sculptor
-// status: planned
-// requires: numeric expression CountersPaid
-// requires: the ability an event is about
+// status: ready
 // When Way of the Mind Sculptor enters, empower Jace 5. (Put five loyalty counters on a Jace token you control. If you don't control one, first create a blue Jace planeswalker token with "[−1]: Surveil 1" and "[−3]: Draw a card.")
 // Whenever you activate a loyalty ability, if you removed two or more loyalty counters to activate it, draw a card.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -11,9 +9,9 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 { let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let amount = { let q: &dyn Query = g; (5i64).max(0) as i16 }; cantrip_mechanics::empower::jace(g, player, asker.source, amount)?; }
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::AbilityActivated { source, ability, player, .. } = event { let id = *source; let def = q.activated_ability(*ability); let subject = Target::Player(*player); let serial = match cantrip_mechanics::triggers::activated_ability_on_stack(q, event) { Some(Target::Ability(serial)) => serial, _ => 0 }; let data = [id.0, serial]; if def.is_some() && Some(asker.controller) == Some(*player) && def.is_some_and(|d| d.is_loyalty_ability()) && (planned_value!("numeric expression CountersPaid", 0i64 => planned_value!("the ability an event is about", None::<ObjectId> => q.ability_on_stack(Target::Ability(data[1]))).map_or(0i64, |o: ObjectId| q.counters_paid(o, CounterKind::Loyalty)))) >= (2i64) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::AbilityActivated { source, ability, player, .. } = event { let id = *source; let def = q.activated_ability(*ability); let subject = Target::Player(*player); let serial = match cantrip_mechanics::triggers::activated_ability_on_stack(q, event) { Some(Target::Ability(serial)) => serial, _ => 0 }; let data = [id.0, serial]; if def.is_some() && Some(asker.controller) == Some(*player) && def.is_some_and(|d| d.is_loyalty_ability()) && (q.state().stack.iter().find(|i| Target::Ability(i.serial) == Target::Ability(data[1])).map_or(i64::MAX, |i| match q.activated_ability(i.ability).and_then(|d| d.cost.loyalty) { Some(cost) if cost == LOYALTY_MINUS_X => i64::from(i.x), Some(cost) => (-i64::from(cost)).max(0), None => 0 })) >= (2i64) { return Some(Fired { subject, data }); } }
  None }
-fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller); if !{ let q: &dyn Query = g; (planned_value!("numeric expression CountersPaid", 0i64 => planned_value!("the ability an event is about", None::<ObjectId> => q.ability_on_stack(Target::Ability(item.data[1]))).map_or(0i64, |o: ObjectId| q.counters_paid(o, CounterKind::Loyalty)))) >= (2i64) } { return Ok(()); } let asker = &Asker::new(item.object, item.controller);
+fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller); if !{ let q: &dyn Query = g; (q.state().stack.iter().find(|i| Target::Ability(i.serial) == Target::Ability(item.data[1])).map_or(i64::MAX, |i| match q.activated_ability(i.ability).and_then(|d| d.cost.loyalty) { Some(cost) if cost == LOYALTY_MINUS_X => i64::from(i.x), Some(cost) => (-i64::from(cost)).max(0), None => 0 })) >= (2i64) } { return Ok(()); } let asker = &Asker::new(item.object, item.controller);
 let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_1 { g.draw(player, amount_1); }
 g.end_sentence();

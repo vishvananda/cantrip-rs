@@ -1,7 +1,6 @@
 // Tahngarth, First Mate
 // status: planned
 // requires: operation ChangeCombat
-// requires: operation ChooseDefender
 // Tahngarth can't be blocked by more than one creature.
 // Whenever an opponent attacks with one or more creatures, if Tahngarth is tapped, you may have that opponent gain control of Tahngarth until end of combat. If you do, choose a player or planeswalker that opponent is attacking. Tahngarth is attacking that player or planeswalker.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -16,9 +15,9 @@ let objects_1 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect
 let kind_1_0_0 = { let q: &dyn Query = g; EffectKind::Control(Some(PlayerId(item.data[0] as u8)).expect("a reference that always names a player")) };
 if let Some(source) = source_1 { cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.add_effect(source, object, kind_1_0_0, duration_1);  } }); }
 g.end_sentence();
-planned!("operation-choose-defender" => cantrip_mechanics::combat::choose_defender(g, asker.source, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, { let q: &dyn Query = g; Some(PlayerId(item.data[0] as u8)).expect("a reference that always names a player") })?);
+let chooser_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let attacker_2 = { let q: &dyn Query = g; Some(PlayerId(item.data[0] as u8)).expect("a reference that always names a player") }; let candidates_2: Vec<Target> = { let q: &dyn Query = g; let mut seen: Vec<Target> = Vec::new(); for a in q.state().attackers.iter() { let attacked = match a.target { Target::Player(_) => true, Target::Object(o) => q.chars(o).is(CardType::Planeswalker), _ => false }; if attacked && q.controller(a.id) == attacker_2 && !seen.contains(&a.target) { seen.push(a.target); } } seen }; let defender_2: Option<Target> = cantrip_mechanics::combat::choose_among(g, chooser_2, asker.source, &candidates_2)?;
 g.end_sentence();
-planned!("operation-change-combat" => cantrip_mechanics::combat::change(g, asker, CombatChange::AssignAttack { objects: { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }, to: { let q: &dyn Query = g; (planned_value!("depends on an instruction with a gap", Vec::<ObjectId>::new() => result_1)).get(0 as usize).copied() } })?);
+planned!("operation-change-combat" => cantrip_mechanics::combat::change(g, asker, CombatChange::AssignAttack { objects: { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }, to: "Object(Result { result: ResultId(1), phase: After, index: 0 })" })?);
 g.end_sentence();
 hoisted_4.extend(objects_1.clone());
 }

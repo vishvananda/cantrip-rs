@@ -1,12 +1,11 @@
 // Tam, the Possibility
-// status: planned
-// requires: distinct PlaneswalkerTypes
+// status: ready
 // Planeswalker spells you cast cost {1} less to cast.
 // {W}{U}{B}{R}{G}, {T}: Proliferate X times, where X is the number of planeswalker types among planeswalkers you control. (To proliferate, choose any number of permanents and/or players, then give each another counter of each kind already there.)
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_0_rule(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, q.controller(source)); let Costed::Spell(spell) = costed else { return CostDelta::NONE; }; if player == asker.controller && q.chars(spell).is(CardType::Planeswalker) { CostDelta::less((1i64) as u8) } else { CostDelta::NONE } }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-{ let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let times = { let q: &dyn Query = g; (planned_value!("distinct PlaneswalkerTypes", 0i64 => { let mut seen = SubtypeSet::NONE; for id in q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Planeswalker) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() { for kind in q.chars(id).subtypes.iter().filter(|kind| kind.is_planeswalker_type()) { seen = seen.with(kind); } } seen.iter().count() as i64 })).clamp(0, 255) as u32 }; for _ in 0..times { g.proliferate(player, asker.source)?; }; }
+{ let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let times = { let q: &dyn Query = g; ({ let mut seen = SubtypeSet::NONE; for id in q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Planeswalker) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() { for kind in q.chars(id).subtypes.iter().filter(|kind| kind.card_types().has(CardType::Planeswalker)) { seen = seen.with(kind); } } seen.iter().count() as i64 }).clamp(0, 255) as u32 }; for _ in 0..times { g.proliferate(player, asker.source)?; }; }
 g.end_sentence();
  Ok(()) }
 

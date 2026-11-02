@@ -9,6 +9,8 @@ license.workspace = true
 [features]
 # Compile every card, not the sample: twenty minutes.
 all = []
+# Compile the planned cards (planned.txt) with the code their holes hold, to type-check what they propose.
+proposals = []
 
 [dependencies]
 cantrip-api.workspace = true

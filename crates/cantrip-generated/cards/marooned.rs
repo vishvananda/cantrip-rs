@@ -1,6 +1,5 @@
 // Marooned
-// status: planned
-// requires: static rule Prohibit BeBeamedUp
+// status: ready
 // Enchant artifact or creature
 // When this Aura enters, you may pay {3}. If you do, tap enchanted permanent.
 // Enchanted permanent doesn't untap during its controller's untap step and can't be beamed up.
@@ -25,8 +24,8 @@ g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_2_0_rule(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { q.state().obj(asker.source).attached_to == Some(id) }
 #[allow(unused_variables)] fn ability_2_1_rule(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { let source = asker.source; q.state().obj(asker.source).attached_to == Some(id) }
+#[allow(unused_variables)] fn ability_2_1_rule_ban(q: &dyn Query, asker: &Asker, player: PlayerId, costing: CostFor, payment: CostPayment) -> bool { matches!(payment, CostPayment::BeamUp(permanent) if ability_2_1_rule(q, asker, permanent)) }
 static PAY_QUESTION: Question = Question::new("Pay", "pay {cost}?", "", "Pay {cost}", "Decline");
-planned_item!("static-rule-prohibit-be-beamed-up" => statics: object_rule(ability_2_1_rule, Rule::Cant(Action::BeBeamedUp)));
 
-pub static CARD: CardDef = CardDef { name: "Marooned", token_words: &[], oracle: true, cost: ManaCost { generic: 0, x: 0, symbols: [0, 1, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Enchantment]), subtypes: SubtypeSet::of(&[Subtype::Aura]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::ZONE_CHANGE.0), ability_1_event), ability_1, "When this Aura enters, you may pay {3}. If you do, tap enchanted permanent.").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[ability_2_0_rule], delayed: &[], enters: None, modal: None, enchant: Some(target(ability_0_enchant)), ..CardDef::BLANK };
+pub static CARD: CardDef = CardDef { name: "Marooned", token_words: &[], oracle: true, cost: ManaCost { generic: 0, x: 0, symbols: [0, 1, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Enchantment]), subtypes: SubtypeSet::of(&[Subtype::Aura]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::ZONE_CHANGE.0), ability_1_event), ability_1, "When this Aura enters, you may pay {3}. If you do, tap enchanted permanent.").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[ability_2_0_rule], delayed: &[], enters: None, modal: None, enchant: Some(target(ability_0_enchant)), cost_bans: &[ability_2_1_rule_ban], ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

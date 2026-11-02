@@ -1,6 +1,5 @@
 // Volt-Charged Berserker // Voltaic Visionary
-// status: planned
-// requires: a card played from among those exiled with an object
+// status: ready
 // This creature can't block.
 // {T}: This creature deals 2 damage to you. Exile the top card of your library. You may play that card this turn. Activate only as a sorcery.
 // When you play a card exiled with this creature, transform this creature.
@@ -13,8 +12,8 @@ g.end_sentence();
 let cards_2_0 = { let q: &dyn Query = g; (moved_1.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_2_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_2_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_2_0 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::EndOfTurn, ..PlayGrant::CAST }); } } } });
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && true && cast_at(q, event, id).is_some_and(|cast| cast.from == ZoneKind::Exile) && planned_value!("a card played from among those exiled with an object", false => Some(asker.source).is_some_and(|by: ObjectId| q.was_exiled_with(id, by))) { return Some(Fired { subject, data }); } }
-if let Event::ZoneChange { new, from, to, reason: ZoneReason::PlayLand, .. } = event { let id = *new; let player = q.controller(id); let subject = Target::Object(id); let data = [u32::from(player.0), 0]; if to.is(ZoneKind::Battlefield) && Some(asker.controller) == Some(player) && true && from.is(ZoneKind::Exile) && planned_value!("a card played from among those exiled with an object", false => Some(asker.source).is_some_and(|by: ObjectId| q.was_exiled_with(id, by))) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && true && cast_at(q, event, id).is_some_and(|cast| cast.from == ZoneKind::Exile) && q.history().all().iter().rev().find_map(|r| match r.event { Event::ZoneChange { old, new, from, .. } if new == id && from.is(ZoneKind::Exile) => Some(old), _ => None }).is_some_and(|old: ObjectId| q.state().obj(old).exiled.is_some_and(|l| l.is_by_in(q.state(), q.linked_to(asker)))) { return Some(Fired { subject, data }); } }
+if let Event::ZoneChange { old, new, from, to, reason: ZoneReason::PlayLand, .. } = event { let id = *new; let player = q.controller(id); let subject = Target::Object(id); let data = [u32::from(player.0), 0]; if to.is(ZoneKind::Battlefield) && Some(asker.controller) == Some(player) && true && from.is(ZoneKind::Exile) && { let old = *old; q.state().obj(old).exiled.is_some_and(|l| l.is_by_in(q.state(), q.linked_to(asker))) } { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 if let Some(object) = ({ let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied() { g.transform_by(object, item)?; }

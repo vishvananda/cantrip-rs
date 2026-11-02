@@ -18,6 +18,7 @@ let amount_2 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let players_2 = 
 for player in players_2 { g.draw(player, amount_2); }
 g.end_sentence();
 let mut players_3: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+{ let order: Vec<PlayerId> = g.state().apnap().collect(); players_3.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut guard_3_0 = vec![false; players_3.len()];
  for (index_3, bound_0) in players_3.iter().copied().enumerate() { if cantrip_mechanics::effects::ask_may(g, bound_0, asker.source, Purpose::Optional)? { guard_3_0[index_3] = true;
 let amount_4 = { let q: &dyn Query = g; (1i64).max(0) as usize }; let player_4 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; cantrip_mechanics::scry(g, player_4, asker.source, amount_4)?;
