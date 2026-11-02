@@ -23,7 +23,7 @@ hoisted_6.extend({ let q: &dyn Query = g; objects_4.iter().copied().filter(|&o| 
 if paid_3 { paid_1 = true; who_1 = Some(bound_1000002); break; } }
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_1 as i64) != 0) } {
-let source_7 = { let q: &dyn Query = g; Some(asker.source) }; let amount_7 = { let q: &dyn Query = g; ((hoisted_5.clone()).into_iter().next().map_or(0i64, |id: ObjectId| i64::from(q.mana_value(id)))).clamp(0, 65535) as u16 }; let recipients_7 = { let q: &dyn Query = g; (who_1.into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() }; if let Some(source) = source_7 { let batch: Vec<(ObjectId, Target, u16)> = recipients_7.iter().map(|t| (source, *t, amount_7)).collect(); g.damage_together(&batch); }
+let source_7 = { let q: &dyn Query = g; Some(asker.source) }; let amount_7 = { let q: &dyn Query = g; ((hoisted_5.clone()).into_iter().next().map_or(0i64, |id: ObjectId| i64::from(q.mana_value(id)))).min(u16::MAX.into()) as u16 }; let recipients_7 = { let q: &dyn Query = g; (who_1.into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() }; if let Some(source) = source_7 { let batch: Vec<(ObjectId, Target, u16)> = recipients_7.iter().map(|t| (source, *t, amount_7)).collect(); g.damage_together(&batch); }
 g.end_sentence();
 } else {
 let objects_8 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((1i64).max(0) as usize).collect::<Vec<ObjectId>>() }; let moved_8 = g.return_to_hand_revealed(&objects_8);

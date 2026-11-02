@@ -5,7 +5,7 @@
 // This creature enters with X +1/+0 counters on it.
 // At the beginning of the end step, sacrifice this creature.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables, unused_mut)] fn ability_2_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let more = { let q: &dyn Query = g; (i64::from(entering.x)).clamp(0, 32767) as i16 }; entering.counters[planned_value!("power/toughness counter other than ±1/±1", CounterKind::PlusOne => CounterKind::Plus1Plus0) as usize] = entering.counters[planned_value!("power/toughness counter other than ±1/±1", CounterKind::PlusOne => CounterKind::Plus1Plus0) as usize].saturating_add(more);
+#[allow(unused_variables, unused_mut)] fn ability_2_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let more = { let q: &dyn Query = g; (i64::from(entering.x)).min(i16::MAX.into()) as i16 }; entering.counters[planned_value!("power/toughness counter other than ±1/±1", CounterKind::PlusOne => CounterKind::Plus1Plus0) as usize] = entering.counters[planned_value!("power/toughness counter other than ±1/±1", CounterKind::PlusOne => CounterKind::Plus1Plus0) as usize].saturating_add(more);
  Ok(()) }
 #[allow(unused_variables)] fn ability_3_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::End) && true { return Some(Fired { subject, data }); } }
  None }

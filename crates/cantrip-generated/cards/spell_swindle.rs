@@ -23,7 +23,7 @@ let objects_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.
 let countered_1: Vec<ObjectId> = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }.into_iter().filter_map(|o: ObjectId| g.state().obj(o).became).collect();
 g.end_sentence();
 let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_2 = Vec::new();
-let count_2_0 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().and_then(|t: Target| t.object()).map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o)))).max(0) as u32 }; let def_2_0 = g.card_id(&token_3::CARD);
+let count_2_0 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().and_then(|t: Target| t.object()).map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o)))) as u32 }; let def_2_0 = g.card_id(&token_3::CARD);
 for player in players_2 {
 tokens_2.extend(std::iter::repeat((def_2_0,player)).take(count_2_0 as usize));
 } let words_2 = Words::NONE;

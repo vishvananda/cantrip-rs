@@ -11,7 +11,7 @@
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mana_players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_1_0 = { let q: &dyn Query = g; ((2i64 * q.event_objects(item).len() as i64)).clamp(0, 4294967295) as u32 };
+let mana_1_0 = { let q: &dyn Query = g; ((2i64 * q.event_objects(item).len() as i64)).min(u32::MAX.into()) as u32 };
 for player in mana_players_1 {
 g.add_mana(player, Mana::G, mana_1_0);}
 g.end_sentence();

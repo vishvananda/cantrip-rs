@@ -7,7 +7,7 @@
 #[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); entering.tapped = true;
  Ok(()) }
 fn ability_1_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let mana_players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_1 = { let q: &dyn Query = g; (i64::from(q.obj(asker.source).x)).clamp(0, 255) as u8 };
+let mana_1 = { let q: &dyn Query = g; (i64::from(q.obj(asker.source).x)).min(u8::MAX.into()) as u8 };
 for player in mana_players_1 {
 if mana_1 > 0 { let colors = cantrip_mechanics::choose_colors(g, player, asker.source, ColorSet(31), mana_1)?;
 for color in colors { g.add_mana(player, color.mana(), 1); }

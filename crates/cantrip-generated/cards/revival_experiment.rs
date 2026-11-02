@@ -7,7 +7,7 @@ let chooser_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a refere
 let types_0 = cantrip_mechanics::targets::PERMANENT_CARD_TYPES.to_vec(); for t in types_0 { let eligible: Vec<ObjectId> = pool_0.iter().copied().filter(|&c| !picked_0.contains(&c) && g.chars(c).is(t)).collect(); if eligible.is_empty() { continue; } picked_0.extend(cantrip_mechanics::choose::cards_from(g, chooser_0, asker.source, Purpose::PutOntoBattlefield, pool_0.clone(), eligible, 1, true)?); }
 let objects_1 = ({ let q: &dyn Query = g; picked_0.clone() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_1 = { let rows_1: Vec<(ObjectId, PlayerId, bool)> = objects_1.iter().map(|&o| (o, g.state().obj(o).owner, false)).collect(); let came_1 = g.put_all_onto_battlefield_as(&rows_1)?; came_1.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
 g.end_sentence();
-let amount_2 = { let q: &dyn Query = g; ((3i64 * (moved_1.clone()).len() as i64)).clamp(0, 2147483647) as i32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_2 = { let q: &dyn Query = g; ((3i64 * (moved_1.clone()).len() as i64)).min(i32::MAX.into()) as i32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_2 { g.lose_life(player, amount_2); }
 g.end_sentence();
 let objects_3 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let moved_3 = g.exile_all(&objects_3);

@@ -13,7 +13,7 @@ let objects_1 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.
 g.end_sentence();
 }
 g.end_sentence();
-let amount_2 = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as i32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_2 = { let q: &dyn Query = g; (i64::from(item.x)) as i32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_2 { g.gain_life(player, amount_2); }
 g.end_sentence();
  Ok(()) }

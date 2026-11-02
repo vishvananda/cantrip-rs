@@ -6,7 +6,7 @@
 // You gain 3 life plus an additional 3 life for each additional {1}{G} you paid.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_0 = { let q: &dyn Query = g; ((3i64 + (3i64 * planned_value!("numeric expression AdditionalCostPaid", 0i64 => q.additional_cost_paid(asker, &[ManaSymbol::ManaCostGeneric(1), ManaSymbol::ManaCostG]))))).clamp(0, 2147483647) as i32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_0 = { let q: &dyn Query = g; ((3i64 + (3i64 * planned_value!("numeric expression AdditionalCostPaid", 0i64 => q.additional_cost_paid(asker, &[ManaSymbol::ManaCostGeneric(1), ManaSymbol::ManaCostG]))))).min(i32::MAX.into()) as i32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_0 { g.gain_life(player, amount_0); }
 g.end_sentence();
  Ok(()) }

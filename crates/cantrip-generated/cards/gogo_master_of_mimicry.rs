@@ -7,7 +7,7 @@
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0)];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let runs_0: u32 = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as u32 };
+let runs_0: u32 = { let q: &dyn Query = g; (i64::from(item.x)) as u32 };
 let copier_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if let Some(t) = (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).into_iter().collect::<Vec<Target>>()).first().copied() { for _ in 0..runs_0 { match t { Target::Object(spell) => { g.copy_spell(spell, copier_0, true)?; } t => { g.copy_ability(t, copier_0, true)?; } } } }
 g.end_sentence();
  Ok(()) }

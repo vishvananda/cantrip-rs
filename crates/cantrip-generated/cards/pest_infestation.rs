@@ -2,7 +2,7 @@
 // status: ready
 // Destroy up to X target artifacts and/or enchantments. Create twice X 1/1 black and green Pest creature tokens with "When this token dies, you gain 1 life."
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_0_up_to_most(q: &dyn Query, source: ObjectId, chooser: PlayerId, x: u32) -> usize { let asker = &Asker::new(source, chooser); (i64::from(x)).max(0) as u32 as usize }
+#[allow(unused_variables)] fn ability_0_0_up_to_most(q: &dyn Query, source: ObjectId, chooser: PlayerId, x: u32) -> usize { let asker = &Asker::new(source, chooser); (i64::from(x)) as u32 as usize }
 fn ability_0_0_up_to(q: &dyn Query, choice: &Choice, x: u32) -> Verdict { let most = ability_0_0_up_to_most(q, choice.source, choice.chooser, x); Verdict { complete: choice.selected.len() <= most, addable: Bits::new(choice.candidates.len(), choice.selected.len() < most) } }
 fn largest_ability_0_0_up_to(q: &dyn Query, choice: &Choice, x: u32) -> Vec<ObjectId> { choice.candidates.iter().copied().take(ability_0_0_up_to_most(q, choice.source, choice.chooser, x)).collect() }
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Enchantment)))) }
@@ -26,7 +26,7 @@ let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true
 let objects_0 = { let q: &dyn Query = g; t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>() }; let destroyed_0 = g.destroy_all(&objects_0);
 g.end_sentence();
 let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_1 = Vec::new();
-let count_1_0 = { let q: &dyn Query = g; ((2i64 * i64::from(item.x))).max(0) as u32 }; let def_1_0 = g.card_id(&token_2::CARD);
+let count_1_0 = { let q: &dyn Query = g; ((2i64 * i64::from(item.x))) as u32 }; let def_1_0 = g.card_id(&token_2::CARD);
 for player in players_1 {
 tokens_1.extend(std::iter::repeat((def_1_0,player)).take(count_1_0 as usize));
 } let words_1 = g.words(asker.source);

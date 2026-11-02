@@ -12,7 +12,7 @@ let objects_0 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied(
 let kind_0_0_0 = { let q: &dyn Query = g; EffectKind::Pump(((-1i64 * i64::from(item.x))).clamp(-32768, 32767) as i16, ((-1i64 * i64::from(item.x))).clamp(-32768, 32767) as i16) };
 if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &object in &objects_0 { g.add_effect(source, object, kind_0_0_0, duration_0);  } }); }
 g.end_sentence();
-let amount_1 = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as i32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_1 = { let q: &dyn Query = g; (i64::from(item.x)) as i32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_1 { g.lose_life(player, amount_1); }
 g.end_sentence();
  Ok(()) }

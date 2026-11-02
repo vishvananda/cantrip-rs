@@ -34,7 +34,7 @@ let mut gathered_2: Vec<ObjectId> = Vec::new();
 let objects_4 = { let q: &dyn Query = g; gathered_2.clone() }; let moved_4 = g.exile_all(&objects_4);
 g.end_sentence();
 let players_5 = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }; let mut tokens_5 = Vec::new();
-let count_5_0 = { let q: &dyn Query = g; ((objects_4.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }; let def_5_0 = g.card_id(&token_6::CARD);
+let count_5_0 = { let q: &dyn Query = g; ((objects_4.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).len() as i64) as u32 }; let def_5_0 = g.card_id(&token_6::CARD);
 for player in players_5 {
 tokens_5.extend(std::iter::repeat((def_5_0,player)).take(count_5_0 as usize));
 } let words_5 = g.words(asker.source);

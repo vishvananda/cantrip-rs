@@ -10,7 +10,7 @@ let objects_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.
 g.end_sentence();
 let chosen_2: u32 = { let pool = [1u32, 2u32, 3u32]; pool[g.choose_at_random(pool.len())] };
 g.end_sentence();
-let amount_3 = { let q: &dyn Query = g; (i64::from(chosen_2)).max(0) as u32 }; let mills_3: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).map(|o: ObjectId| q.controller(o)).into_iter().collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_3)).collect(); let milled_3 = g.mill_together(&mills_3);
+let amount_3 = { let q: &dyn Query = g; (i64::from(chosen_2)) as u32 }; let mills_3: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).map(|o: ObjectId| q.controller(o)).into_iter().collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_3)).collect(); let milled_3 = g.mill_together(&mills_3);
 g.end_sentence();
 let owner_4 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).map(|o: ObjectId| q.controller(o)).expect("a reference that always names a player") }; let count_4 = { let q: &dyn Query = g; (1i64).max(0) as usize }; let (found_4, rest_4) = cantrip_mechanics::library::reveal_until_n(g, owner_4, count_4, &|q: &dyn Query, id: ObjectId| (!(q.chars(id).is(CardType::Land)) && !(t_0_raw.get(0).copied().and_then(|t: Target| t.object()).is_some_and(|o: ObjectId| cantrip_mechanics::same_name(q, id, o))))); let shown_4 = found_4.len() + rest_4.len(); let objects_4: Vec<ObjectId> = g.state().zone(Zone::library(owner_4)).iter().copied().take(shown_4).collect();
 let objects_5 = { let q: &dyn Query = g; objects_4.clone() }; let moved_5 = g.exile_all(&objects_5);

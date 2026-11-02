@@ -34,7 +34,7 @@ g.end_sentence();
  Ok(()) }
 fn ability_2_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let Some(chosen_2) = chosen else { return Ok(()) };
 let mana_players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_4_0 = { let q: &dyn Query = g; ({ let mut seen = Vec::new(); for id in q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() { let value = q.chars(id).power; if !seen.contains(&value) { seen.push(value); } } seen.len() as i64 }).max(0) as u32 };
+let mana_4_0 = { let q: &dyn Query = g; ({ let mut seen = Vec::new(); for id in q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() { let value = q.chars(id).power; if !seen.contains(&value) { seen.push(value); } } seen.len() as i64 }) as u32 };
 for player in mana_players_4 {
 if let Some(color) = { let q: &dyn Query = g; Some(chosen_2) } { g.add_mana(player, color.mana(), mana_4_0); }
 }

@@ -9,7 +9,7 @@ let kind_0_0_0 = { let q: &dyn Query = g; EffectKind::Pump(((-1i64 * (2i64 * i64
 if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &object in &objects_0 { g.add_effect(source, object, kind_0_0_0, duration_0);  } }); }
 g.end_sentence();
 let mut counters_1: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-planned!("rad-counters" => let amount = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as u32 }; for player in { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() } { cantrip_mechanics::rad::give(g, player, amount); });
+planned!("rad-counters" => let amount = { let q: &dyn Query = g; (i64::from(item.x)) as u32 }; for player in { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() } { cantrip_mechanics::rad::give(g, player, amount); });
 let had_1: Vec<_> = counters_1.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_1); let applied_1: Vec<ObjectId> = counters_1.iter().zip(had_1).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
  Ok(()) }

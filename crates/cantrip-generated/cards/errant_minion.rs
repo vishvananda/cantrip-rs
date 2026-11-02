@@ -10,7 +10,7 @@
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut done_0: i64 = 0; for player in { let q: &dyn Query = g; item.subject.player().into_iter().collect::<Vec<PlayerId>>() } { done_0 += { i64::from(g.may_pay_x(player, asker.source, asker.source, cost("{X}"), &PAY_QUESTION)?.unwrap_or(0)) }; }
 g.end_sentence();
-planned!("operation-deal-damage-with" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { cantrip_mechanics::damage::partly_prevented(g, source, &{ let q: &dyn Query = g; (item.subject.player().into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() }, { let q: &dyn Query = g; (2i64).max(0) as u16 }, { let q: &dyn Query = g; ((done_0 as i64)).clamp(0, 65535) as u16 }); });
+planned!("operation-deal-damage-with" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { cantrip_mechanics::damage::partly_prevented(g, source, &{ let q: &dyn Query = g; (item.subject.player().into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() }, { let q: &dyn Query = g; (2i64).max(0) as u16 }, { let q: &dyn Query = g; ((done_0 as i64)).min(u16::MAX.into()) as u16 }); });
 g.end_sentence();
  Ok(()) }
 static PAY_QUESTION: Question = Question::new("Pay", "pay {cost}?", "", "Pay {cost}", "Decline");

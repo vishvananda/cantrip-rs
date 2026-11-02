@@ -32,7 +32,7 @@ pub static EXTRA: &[&CardDef] = &[];
 }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let players_7 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_7 = Vec::new();
-let count_7_0 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Equipment)) && q.state().obj(id).attached_to.is_some_and(|host| Some(asker.source) == Some(host)))).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }; let def_7_0 = g.card_id(&token_8::CARD);
+let count_7_0 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Equipment)) && q.state().obj(id).attached_to.is_some_and(|host| Some(asker.source) == Some(host)))).collect::<Vec<ObjectId>>()).len() as i64) as u32 }; let def_7_0 = g.card_id(&token_8::CARD);
 for player in players_7 {
 tokens_7.extend(std::iter::repeat((def_7_0,player)).take(count_7_0 as usize));
 } let words_7 = g.words(asker.source);

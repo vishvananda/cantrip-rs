@@ -31,7 +31,7 @@ let objects_1_0 = { let q: &dyn Query = g; Some(asker.source).into_iter().collec
 let amount_1_0 = i16::MAX; cantrip_api::instruction(g, |g| { for object in objects_1_0 { removed_1 += i64::from(g.remove_counters(object, CounterKind::Charge, amount_1_0)); } });
 g.end_sentence();
 let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_2 = Vec::new();
-let count_2_0 = { let q: &dyn Query = g; ((removed_1 as i64)).max(0) as u32 }; let def_2_0 = g.card_id(&token_3::CARD);
+let count_2_0 = { let q: &dyn Query = g; ((removed_1 as i64)) as u32 }; let def_2_0 = g.card_id(&token_3::CARD);
 for player in players_2 {
 tokens_2.extend(std::iter::repeat((def_2_0,player)).take(count_2_0 as usize));
 } let words_2 = g.words(asker.source);

@@ -11,7 +11,7 @@ g.add_mana(player, Mana::C, mana_0_0);}
  Ok(()) }
 #[allow(unused_variables)] fn ability_2_stage_0_0_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); (((Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.state().obj(o).counters(CounterKind::Charge))).sum::<i64>()) >= (20i64)) && (source == affected) }
 fn granted_1_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let mana_players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_2 = { let q: &dyn Query = g; ((Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.state().obj(o).counters(CounterKind::Charge))).sum::<i64>()).max(0) as u32 };
+let mana_2 = { let q: &dyn Query = g; ((Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.state().obj(o).counters(CounterKind::Charge))).sum::<i64>()) as u32 };
 for player in mana_players_2 {
 let color = chosen.expect("mana activation selected a color");
 g.add_mana(player, color.mana(), mana_2);}

@@ -16,7 +16,7 @@ pub static EXTRA: &[&CardDef] = &[];
 }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_0 = Vec::new();
-let count_0_0 = { let q: &dyn Query = g; (Some(asker.controller).map_or(0i64, |p: PlayerId| q.history().select(EventQuery::kind(EventMask::ZONE_CHANGE).to(ZoneKind::Graveyard).this_turn()).filter(|r| matches!(r.event, Event::ZoneChange { new, to, .. } if to == Zone::graveyard(p) && !q.obj(new).token && cantrip_mechanics::targets::is_permanent_card(&q.chars(new)))).count() as i64)).max(0) as u32 }; let def_0_0 = g.card_id(&token_1::CARD);
+let count_0_0 = { let q: &dyn Query = g; (Some(asker.controller).map_or(0i64, |p: PlayerId| q.history().select(EventQuery::kind(EventMask::ZONE_CHANGE).to(ZoneKind::Graveyard).this_turn()).filter(|r| matches!(r.event, Event::ZoneChange { new, to, .. } if to == Zone::graveyard(p) && !q.obj(new).token && cantrip_mechanics::targets::is_permanent_card(&q.chars(new)))).count() as i64)) as u32 }; let def_0_0 = g.card_id(&token_1::CARD);
 for player in players_0 {
 tokens_0.extend(std::iter::repeat((def_0_0,player)).take(count_0_0 as usize));
 } let words_0 = g.words(asker.source);

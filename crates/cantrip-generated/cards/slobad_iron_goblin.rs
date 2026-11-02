@@ -3,7 +3,7 @@
 // {T}, Sacrifice an artifact: Add an amount of {R} equal to the sacrificed artifact's mana value. Spend this mana only to cast artifact spells or activate abilities of artifacts.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let mana_players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_0_0 = { let q: &dyn Query = g; ((q.events().iter().rev().find_map(|r| match r.event { Event::ZoneChange { old, from, part: false, .. } if from.is(ZoneKind::Battlefield) => Some(old), _ => None }).into_iter().collect::<Vec<ObjectId>>()).get(0).copied().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o)))).max(0) as u32 };
+let mana_0_0 = { let q: &dyn Query = g; ((q.events().iter().rev().find_map(|r| match r.event { Event::ZoneChange { old, from, part: false, .. } if from.is(ZoneKind::Battlefield) => Some(old), _ => None }).into_iter().collect::<Vec<ObjectId>>()).get(0).copied().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o)))) as u32 };
 for player in mana_players_0 {
 g.add_restricted_mana(player, Mana::R, mana_0_0, ManaRestriction::ARTIFACT_SPELLS_OR_ABILITIES_OF_ARTIFACTS);}
  Ok(()) }

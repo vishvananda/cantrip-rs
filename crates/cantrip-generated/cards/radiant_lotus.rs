@@ -10,7 +10,7 @@ let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let Answer::Colors(colors_0) = g.ask(player_0, RequestKind::ChooseColors { source: asker.source, choices: ColorSet(31), count: 1, purpose: ColorUse::Any })? else { return Ok(()) }; let chosen_0 = colors_0[0];
 g.end_sentence();
 let mana_players_2 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() };
-let mana_2_0 = { let q: &dyn Query = g; ((3i64 * (q.cost_objects(item).to_vec()).len() as i64)).clamp(0, 4294967295) as u32 };
+let mana_2_0 = { let q: &dyn Query = g; ((3i64 * (q.cost_objects(item).to_vec()).len() as i64)).min(u32::MAX.into()) as u32 };
 for player in mana_players_2 {
 if let Some(color) = { let q: &dyn Query = g; Some(chosen_0) } { g.add_mana(player, color.mana(), mana_2_0); }
 }

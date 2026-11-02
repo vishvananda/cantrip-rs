@@ -52,7 +52,7 @@ each_6[index_0] = paid_1;
    } 
 g.end_sentence();
 let players_7 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_7 = Vec::new();
-let count_7_0 = { let q: &dyn Query = g; ((q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0).and_then(|p: PlayerId| players_0.iter().position(|&next| next == p)).is_some_and(|at| (each_6[at] as i64) != 0)).collect::<Vec<PlayerId>>()).len() as i64).max(0) as u32 }; let def_7_0 = g.card_id(&token_8::CARD);
+let count_7_0 = { let q: &dyn Query = g; ((q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0).and_then(|p: PlayerId| players_0.iter().position(|&next| next == p)).is_some_and(|at| (each_6[at] as i64) != 0)).collect::<Vec<PlayerId>>()).len() as i64) as u32 }; let def_7_0 = g.card_id(&token_8::CARD);
 for player in players_7 {
 tokens_7.extend(std::iter::repeat((def_7_0,player)).take(count_7_0 as usize));
 } let words_7 = Words::NONE;

@@ -12,11 +12,11 @@ let objects_0 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0
 let kind_0_0_0 = { let q: &dyn Query = g; EffectKind::Pump(((-1i64 * i64::from(item.x))).clamp(-32768, 32767) as i16, ((-1i64 * i64::from(item.x))).clamp(-32768, 32767) as i16) };
 if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &object in &objects_0 { g.add_effect(source, object, kind_0_0_0, duration_0);  } }); }
 g.end_sentence();
-let amount_1 = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as i32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_1 = { let q: &dyn Query = g; (i64::from(item.x)) as i32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_1 { g.gain_life(player, amount_1); }
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_0_mode_1_0_up_to_most(q: &dyn Query, source: ObjectId, chooser: PlayerId, x: u32) -> usize { let asker = &Asker::new(source, chooser); ((2i64 * i64::from(x))).clamp(0, 4294967295) as u32 as usize }
+#[allow(unused_variables)] fn ability_0_mode_1_0_up_to_most(q: &dyn Query, source: ObjectId, chooser: PlayerId, x: u32) -> usize { let asker = &Asker::new(source, chooser); ((2i64 * i64::from(x))).min(u32::MAX.into()) as u32 as usize }
 fn ability_0_mode_1_0_up_to(q: &dyn Query, choice: &Choice, x: u32) -> Verdict { let most = ability_0_mode_1_0_up_to_most(q, choice.source, choice.chooser, x); Verdict { complete: choice.selected.len() <= most, addable: Bits::new(choice.candidates.len(), choice.selected.len() < most) } }
 fn largest_ability_0_mode_1_0_up_to(q: &dyn Query, choice: &Choice, x: u32) -> Vec<ObjectId> { choice.candidates.iter().copied().take(ability_0_mode_1_0_up_to_most(q, choice.source, choice.chooser, x)).collect() }
 #[allow(unused_variables)] fn ability_0_mode_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && (true)) }

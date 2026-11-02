@@ -24,7 +24,7 @@ let mut gathered_1: Vec<(ObjectId, Target, u16)> = Vec::new();
 let done_1: i64 = g.damage_together(&gathered_1).iter().map(|&n| i64::from(n)).sum();
 g.end_sentence();
 let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_3 = Vec::new();
-let count_3_0 = { let q: &dyn Query = g; ((done_1 as i64)).max(0) as u32 }; let def_3_0 = g.card_id(&token_4::CARD);
+let count_3_0 = { let q: &dyn Query = g; ((done_1 as i64)) as u32 }; let def_3_0 = g.card_id(&token_4::CARD);
 for player in players_3 {
 tokens_3.extend(std::iter::repeat((def_3_0,player)).take(count_3_0 as usize));
 } let words_3 = Words::NONE;

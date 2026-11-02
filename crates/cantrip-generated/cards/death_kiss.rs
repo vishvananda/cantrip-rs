@@ -13,7 +13,7 @@ let kinds_0 = { let mut all = Vec::new(); for &object in &objects_0 { let kind =
 g.end_sentence();
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_1 = { let q: &dyn Query = g; (i64::from(item.x)).clamp(0, 32767) as i16 }; g.monstrosity(asker.source, amount_1);
+let amount_1 = { let q: &dyn Query = g; (i64::from(item.x)).min(i16::MAX.into()) as i16 }; g.monstrosity(asker.source, amount_1);
 g.end_sentence();
  Ok(()) }
 planned_item!("the-x-of-the-monstrosity-a-becomes-monstrous-trigger-reads", "(kind:Triggered,args:(event:Object(event:BecomesMonstrous,objects:(kind:SameObject,args:(kind:Source))),intervening_if:None,limits:(per_turn:None,total:None),announcement:(targets:[(slot:(0),kind:Object((kind:Permanent,zones:[Battlefield])),count:UpTo((kind:AnnouncedX)),filter:(kind:All,args:[(kind:CardType,args:Creature),(kind:ControlledBy,args:(kind:OpponentsOf,args:(kind:AbilityController)))]),players:None,distribute:None,constraints:[],chooser:None)],modes:None),body:(instructions:[(kind:Effect,args:(result:(0),operation:(kind:KeywordEach,args:(actor:(kind:One,args:(kind:AbilityController)),action:Goad,objects:(kind:Targets,args:(0)),until:None))))])))");

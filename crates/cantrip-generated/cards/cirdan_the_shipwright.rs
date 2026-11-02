@@ -19,7 +19,7 @@ g.end_sentence();
 planned!("operation-reveal-choices" => cantrip_mechanics::secret::reveal_choices(g, asker.source, ChoiceKind::Player));
 g.end_sentence();
 let mut players_3: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0).is_some_and(|player: PlayerId| planned_value!("player state ReceivedAVote", false => g.votes().received(player)))).collect::<Vec<PlayerId>>() };
- for (index_3, bound_0) in players_3.iter().copied().enumerate() { let amount_4 = { let q: &dyn Query = g; (planned_value!("numeric expression Votes", 0i64 => g.votes().count(Player))).max(0) as u32 }; let players_4 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
+ for (index_3, bound_0) in players_3.iter().copied().enumerate() { let amount_4 = { let q: &dyn Query = g; (planned_value!("numeric expression Votes", 0i64 => g.votes().count(Player))) as u32 }; let players_4 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_4 { g.draw(player, amount_4); }
     } 
 g.end_sentence();

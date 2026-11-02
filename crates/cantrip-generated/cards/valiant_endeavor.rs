@@ -17,7 +17,7 @@ g.end_sentence();
 let objects_1 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && q.chars(id).power.is_some_and(|v| (i64::from(v)) >= (planned_value!("numeric expression DieResultAt", 0i64 => g.last_roll(asker.controller).dice[0]))))).collect::<Vec<ObjectId>>() }; let destroyed_1 = g.destroy_all(&objects_1);
 g.end_sentence();
 let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_2 = Vec::new();
-let count_2_0 = { let q: &dyn Query = g; (planned_value!("numeric expression DieResultAt", 0i64 => g.last_roll(asker.controller).dice[1])).max(0) as u32 }; let def_2_0 = g.card_id(&token_3::CARD);
+let count_2_0 = { let q: &dyn Query = g; (planned_value!("numeric expression DieResultAt", 0i64 => g.last_roll(asker.controller).dice[1])) as u32 }; let def_2_0 = g.card_id(&token_3::CARD);
 for player in players_2 {
 tokens_2.extend(std::iter::repeat((def_2_0,player)).take(count_2_0 as usize));
 } let words_2 = g.words(asker.source);

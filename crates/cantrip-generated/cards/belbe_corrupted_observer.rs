@@ -6,7 +6,7 @@
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mana_players_1 = { let q: &dyn Query = g; Some(q.state().turn.active).into_iter().collect::<Vec<PlayerId>>() };
-let mana_1_0 = { let q: &dyn Query = g; ((({ let mut all = Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>(); let other = q.state().apnap().filter(|&bound_0: &PlayerId| (q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::LifeChange { player, delta } = event { let subject = Target::Player(*player); let data = [delta.unsigned_abs(), 0]; if *delta < 0 && Some(bound_0) == Some(*player) { return Some(Fired { subject, data }); } }  None }).count() as i64) >= (1i64)).collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all }).len() as i64 * 2i64)).clamp(0, 4294967295) as u32 };
+let mana_1_0 = { let q: &dyn Query = g; ((({ let mut all = Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>(); let other = q.state().apnap().filter(|&bound_0: &PlayerId| (q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::LifeChange { player, delta } = event { let subject = Target::Player(*player); let data = [delta.unsigned_abs(), 0]; if *delta < 0 && Some(bound_0) == Some(*player) { return Some(Fired { subject, data }); } }  None }).count() as i64) >= (1i64)).collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all }).len() as i64 * 2i64)).min(u32::MAX.into()) as u32 };
 for player in mana_players_1 {
 g.add_mana(player, Mana::C, mana_1_0);}
 g.end_sentence();

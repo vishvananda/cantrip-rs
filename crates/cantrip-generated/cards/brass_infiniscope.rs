@@ -8,7 +8,7 @@ fn watch_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let aske
 let amount_3 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_3 { g.draw(player, amount_3); }
 g.end_sentence();
-let amount_4 = { let q: &dyn Query = g; ((item.subject.object().map_or(0i64, |o: ObjectId| i64::from(q.state().obj(o).x))).div_euclid(2)).max(0) as i32 }; let players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_4 = { let q: &dyn Query = g; ((item.subject.object().map_or(0i64, |o: ObjectId| i64::from(q.state().obj(o).x))).div_euclid(2)) as i32 }; let players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_4 { g.gain_life(player, amount_4); }
 g.end_sentence();
  Ok(()) }

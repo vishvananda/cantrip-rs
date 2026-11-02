@@ -13,7 +13,7 @@ pub static EXTRA: &[&CardDef] = &[];
 
 }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_0 = { let q: &dyn Query = g; (item.subject.object().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o)))).clamp(0, 32767) as i16 }; let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let army_0: Vec<ObjectId> = cantrip_mechanics::amass::amass_army(g, player_0, asker.source, &token_1::CARD, Subtype::Orc, amount_0)?.into_iter().collect();
+let amount_0 = { let q: &dyn Query = g; (item.subject.object().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o)))).min(i16::MAX.into()) as i16 }; let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let army_0: Vec<ObjectId> = cantrip_mechanics::amass::amass_army(g, player_0, asker.source, &token_1::CARD, Subtype::Orc, amount_0)?.into_iter().collect();
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); (((*so_far).has_subtype(q.words(asker.source).subtype(Subtype::Goblin)) || (*so_far).has_subtype(q.words(asker.source).subtype(Subtype::Orc))) && Some(asker.controller) == Some(q.controller(affected))) }

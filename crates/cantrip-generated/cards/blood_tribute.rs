@@ -11,7 +11,7 @@ let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true
 let amount_1 = { let q: &dyn Query = g; ((t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).map_or(0i64, |p: PlayerId| i64::from(q.state().player(p).life))).saturating_add(1).div_euclid(2)).max(0) as i32 }; let players_1 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() };
 let mut done_1: i64 = 0; for player in players_1 { let before = i64::from(g.state().player(player).life); g.lose_life(player, amount_1); done_1 += (i64::from(g.state().player(player).life) - before).abs(); }
 g.end_sentence();
-let amount_2 = { let q: &dyn Query = g; ((done_1 as i64)).clamp(0, 2147483647) as i32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_2 = { let q: &dyn Query = g; ((done_1 as i64)).min(i32::MAX.into()) as i32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_2 { g.gain_life(player, amount_2); }
 g.end_sentence();
  Ok(()) }

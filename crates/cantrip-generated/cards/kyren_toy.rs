@@ -11,7 +11,7 @@ let had_0: Vec<_> = counters_0.iter().map(|c| g.state().obj(c.0).counters(c.1)).
 g.end_sentence();
  Ok(()) }
 fn ability_1_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let mana_players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_1_0 = { let q: &dyn Query = g; ((planned_value!("removing X counters to activate a mana ability", 0i64 => i64::from(q.obj(asker.source).x)) + 1i64)).max(0) as u32 };
+let mana_1_0 = { let q: &dyn Query = g; ((planned_value!("removing X counters to activate a mana ability", 0i64 => i64::from(q.obj(asker.source).x)) + 1i64)) as u32 };
 for player in mana_players_1 {
 g.add_mana(player, Mana::C, mana_1_0);}
  Ok(()) }

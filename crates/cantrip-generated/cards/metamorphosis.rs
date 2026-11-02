@@ -6,7 +6,7 @@
 #[allow(unused_variables)] fn ability_0_0(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { q.chars(id).is(CardType::Creature) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mana_players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_2 = { let q: &dyn Query = g; ((1i64 + ({ let records = q.history().all(); let spell = q.history().original_spell(item.object); records.iter().rposition(|r| matches!(r.event, Event::Cast(c) if c.spell == spell)).map_or_else(Vec::new, |cast| records[..cast].iter().rev().filter_map(|r| match r.event { Event::ZoneChange { old, from, reason: ZoneReason::Sacrifice, .. } if from.is(ZoneKind::Battlefield) => Some(old), _ => None }).take(1).collect::<Vec<ObjectId>>()) }).get(0).copied().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o))))).max(0) as u32 };
+let mana_2 = { let q: &dyn Query = g; ((1i64 + ({ let records = q.history().all(); let spell = q.history().original_spell(item.object); records.iter().rposition(|r| matches!(r.event, Event::Cast(c) if c.spell == spell)).map_or_else(Vec::new, |cast| records[..cast].iter().rev().filter_map(|r| match r.event { Event::ZoneChange { old, from, reason: ZoneReason::Sacrifice, .. } if from.is(ZoneKind::Battlefield) => Some(old), _ => None }).take(1).collect::<Vec<ObjectId>>()) }).get(0).copied().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o))))) as u32 };
 for player in mana_players_2 {
 if mana_2 > 0 { let colors = cantrip_mechanics::choose_colors(g, player, asker.source, ColorSet(31), 1)?;
 g.add_restricted_mana(player, colors[0].mana(), mana_2, ManaRestriction::CREATURE_SPELLS);}

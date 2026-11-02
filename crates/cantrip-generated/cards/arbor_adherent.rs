@@ -10,7 +10,7 @@ let color = chosen.expect("mana activation selected a color");
 g.add_mana(player, color.mana(), mana_0);}
  Ok(()) }
 fn ability_1_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let mana_players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_1 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (!(Some(asker.source) == Some(id)) && q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.chars(o).toughness.unwrap_or(0))).max().unwrap_or(0)).clamp(0, 4294967295) as u32 };
+let mana_1 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (!(Some(asker.source) == Some(id)) && q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().filter_map(|o: ObjectId| q.chars(o).toughness).map(i64::from).max().unwrap_or(0)).clamp(0, 4294967295) as u32 };
 for player in mana_players_1 {
 let color = chosen.expect("mana activation selected a color");
 g.add_mana(player, color.mana(), mana_1);}

@@ -6,7 +6,7 @@
 #[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); entering.tapped = true;
  Ok(()) }
 fn ability_1_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let mana_players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_1 = { let q: &dyn Query = g; ({ let those: Vec<ObjectId> = q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>(); those.iter().flat_map(|&a| q.chars(a).subtypes.iter().filter(|s| s.card_types().has(CardType::Creature)).collect::<Vec<Subtype>>()).map(|s| those.iter().filter(|&&b| q.chars(b).has_subtype(s)).count()).max().unwrap_or(0) as i64 }).max(0) as u32 };
+let mana_1 = { let q: &dyn Query = g; ({ let those: Vec<ObjectId> = q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>(); those.iter().flat_map(|&a| q.chars(a).subtypes.iter().filter(|s| s.card_types().has(CardType::Creature)).collect::<Vec<Subtype>>()).map(|s| those.iter().filter(|&&b| q.chars(b).has_subtype(s)).count()).max().unwrap_or(0) as i64 }) as u32 };
 for player in mana_players_1 {
 let color = chosen.expect("mana activation selected a color");
 g.add_mana(player, color.mana(), mana_1);}

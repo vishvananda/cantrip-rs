@@ -11,11 +11,11 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_0 = Vec::new(); for player in players_0 { cards_0.extend(g.state().zone(Zone::hand(player)).to_vec()); } let discarded_0 = g.discard_together(&cards_0);
 g.end_sentence();
 let mana_players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_2_0 = { let q: &dyn Query = g; ((discarded_0.clone()).len() as i64).max(0) as u32 };
+let mana_2_0 = { let q: &dyn Query = g; ((discarded_0.clone()).len() as i64) as u32 };
 for player in mana_players_2 {
 g.add_mana(player, Mana::R, mana_2_0);}
 g.end_sentence();
-let amount_3 = { let q: &dyn Query = g; (((discarded_0.clone()).len() as i64 + 1i64)).clamp(0, 4294967295) as u32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_3 = { let q: &dyn Query = g; (((discarded_0.clone()).len() as i64 + 1i64)).min(u32::MAX.into()) as u32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_3 { g.draw(player, amount_3); }
 g.end_sentence();
 let mut players_4: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };

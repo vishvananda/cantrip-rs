@@ -3,7 +3,7 @@
 // Convoke (Your creatures can help cast this spell. Each creature you tap while casting this spell pays for {1} or one mana of that creature's color.)
 // Prevent all damage that would be dealt by creatures this turn. You gain life equal to the damage prevented this way.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables, unused_mut)] fn made_1_then_steps(g: &mut dyn Game, asker: &Asker, affected: ObjectId, subject: Target, data: [u32; 2], done_prevented: u16) -> Result<(), Suspend> { let amount_2 = { let q: &dyn Query = g; ((done_prevented as i64)).clamp(0, 2147483647) as i32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+#[allow(unused_variables, unused_mut)] fn made_1_then_steps(g: &mut dyn Game, asker: &Asker, affected: ObjectId, subject: Target, data: [u32; 2], done_prevented: u16) -> Result<(), Suspend> { let amount_2 = { let q: &dyn Query = g; ((done_prevented as i64)).min(i32::MAX.into()) as i32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_2 { g.gain_life(player, amount_2); }
  Ok(()) }
 #[allow(unused_variables, dead_code)] fn made_1_then(g: &mut dyn Game, asker: &Asker, affected: ObjectId, parts: &[Prevented]) { let Some(first) = parts.first() else { return }; let prevented = Prevented::total(parts).min(u16::MAX.into()) as u16; let e = &Prevented { amount: prevented, ..*first }; let q: &dyn Query = g; let (source, target, amount, combat) = (e.source, &e.target, e.amount, e.combat); let subject = *target; let data = [u32::from(amount), source.0]; let _ = made_1_then_steps(g, asker, affected, subject, data, prevented); }

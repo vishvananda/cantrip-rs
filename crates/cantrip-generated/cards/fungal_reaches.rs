@@ -17,7 +17,7 @@ let had_1: Vec<_> = counters_1.iter().map(|c| g.state().obj(c.0).counters(c.1)).
 g.end_sentence();
  Ok(()) }
 fn ability_2_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let mana_players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_2 = { let q: &dyn Query = g; (planned_value!("removing X counters to activate a mana ability", 0i64 => i64::from(q.obj(asker.source).x))).clamp(0, 255) as u8 };
+let mana_2 = { let q: &dyn Query = g; (planned_value!("removing X counters to activate a mana ability", 0i64 => i64::from(q.obj(asker.source).x))).min(u8::MAX.into()) as u8 };
 for player in mana_players_2 {
 if mana_2 > 0 { let colors = cantrip_mechanics::choose_colors(g, player, asker.source, ColorSet(24), mana_2)?;
 for color in colors { g.add_mana(player, color.mana(), 1); }

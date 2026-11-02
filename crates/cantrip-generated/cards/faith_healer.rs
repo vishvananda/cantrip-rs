@@ -3,7 +3,7 @@
 // Sacrifice an enchantment: You gain life equal to the sacrificed enchantment's mana value.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_0 = { let q: &dyn Query = g; ((q.cost_objects(item).to_vec()).get(0).copied().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o)))).max(0) as i32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_0 = { let q: &dyn Query = g; ((q.cost_objects(item).to_vec()).get(0).copied().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o)))) as i32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_0 { g.gain_life(player, amount_0); }
 g.end_sentence();
  Ok(()) }

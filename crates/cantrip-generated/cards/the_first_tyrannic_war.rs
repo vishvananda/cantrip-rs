@@ -5,7 +5,7 @@
 // II, III — Double the number of each kind of counter on target creature you control.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn arrival_2_applies(q: &dyn Query, asker: &Asker, affected: ObjectId, proposal: &Proposal) -> bool { matches!(proposal, Proposal::ZoneChange(z) if z.object == affected && z.to.is(ZoneKind::Battlefield)) && q.mana_cost(affected).x > 0 }
-#[allow(unused_variables)] fn arrival_2_apply(q: &dyn Query, asker: &Asker, affected: ObjectId, proposal: &mut Proposal) { if let Proposal::ZoneChange(z) = proposal { z.counters[CounterKind::PlusOne as usize] += ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Land) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64).clamp(0, 32767) as i16; } }
+#[allow(unused_variables)] fn arrival_2_apply(q: &dyn Query, asker: &Asker, affected: ObjectId, proposal: &mut Proposal) { if let Proposal::ZoneChange(z) = proposal { z.counters[CounterKind::PlusOne as usize] += ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Land) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64).min(i16::MAX.into()) as i16; } }
 fn ability_0_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_5: Vec<ObjectId> = Vec::new();
 let mut hoisted_4: Vec<ObjectId> = Vec::new();
 let mut hoisted_3: Vec<ObjectId> = Vec::new();

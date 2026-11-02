@@ -32,17 +32,17 @@ hoisted_2.extend(objects_1.clone());
 }
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
-let amount_3 = { let q: &dyn Query = g; (i64::from(item.data[0])).max(0) as u32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_3 = { let q: &dyn Query = g; (i64::from(item.data[0])) as u32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_3 { g.draw(player, amount_3); }
 g.end_sentence();
 let players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_4 = Vec::new();
-let count_4_0 = { let q: &dyn Query = g; (i64::from(item.data[0])).max(0) as u32 }; let def_4_0 = g.card_id(&token_5::CARD);
+let count_4_0 = { let q: &dyn Query = g; (i64::from(item.data[0])) as u32 }; let def_4_0 = g.card_id(&token_5::CARD);
 for player in players_4 {
 tokens_4.extend(std::iter::repeat((def_4_0,player)).take(count_4_0 as usize));
 } let words_4 = Words::NONE;
 let created_4 = g.create_tokens_worded(&tokens_4, true, None, words_4)?;
 g.end_sentence();
-let amount_6 = { let q: &dyn Query = g; (i64::from(item.data[0])).clamp(0, 2147483647) as i32 }; let players_6 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_6 = { let q: &dyn Query = g; (i64::from(item.data[0])).min(i32::MAX.into()) as i32 }; let players_6 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_6 { g.lose_life(player, amount_6); }
 g.end_sentence();
 hoisted_7.extend(created_4.clone());

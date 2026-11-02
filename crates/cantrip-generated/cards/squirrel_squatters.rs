@@ -22,7 +22,7 @@ pub static EXTRA: &[&CardDef] = &[];
 }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_1 = Vec::new();
-let count_1_0 = { let q: &dyn Query = g; (Some(asker.controller).map_or(0i64, |p: PlayerId| planned_value!("numeric expression PlayerNumber AttractionsVisitedThisTurn", 0i64 => q.player_number(p, PlayerNumber::AttractionsVisitedThisTurn)))).max(0) as u32 }; let def_1_0 = g.card_id(&token_2::CARD);
+let count_1_0 = { let q: &dyn Query = g; (Some(asker.controller).map_or(0i64, |p: PlayerId| planned_value!("numeric expression PlayerNumber AttractionsVisitedThisTurn", 0i64 => q.player_number(p, PlayerNumber::AttractionsVisitedThisTurn)))) as u32 }; let def_1_0 = g.card_id(&token_2::CARD);
 for player in players_1 {
 tokens_1.extend(std::iter::repeat((def_1_0,player)).take(count_1_0 as usize));
 } let words_1 = g.words(asker.source);

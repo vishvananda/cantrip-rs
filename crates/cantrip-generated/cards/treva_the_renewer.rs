@@ -11,7 +11,7 @@ g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
 let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let Answer::Colors(colors_1) = g.ask(player_1, RequestKind::ChooseColors { source: asker.source, choices: ColorSet(31), count: 1, purpose: ColorUse::Any })? else { return Ok(()) }; let chosen_1 = colors_1[0];
 g.end_sentence();
-let amount_2 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| Some(chosen_1).is_some_and(|chosen| q.chars(id).colors.has(chosen))).collect::<Vec<ObjectId>>()).len() as i64).clamp(0, 2147483647) as i32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_2 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| Some(chosen_1).is_some_and(|chosen| q.chars(id).colors.has(chosen))).collect::<Vec<ObjectId>>()).len() as i64).min(i32::MAX.into()) as i32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_2 { g.gain_life(player, amount_2); }
 g.end_sentence();
 }

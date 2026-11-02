@@ -42,7 +42,7 @@ static WATCH_5_TARGETS: &[cantrip_api::TargetSpec] = &[target(watch_5_target_0)]
  None }
 fn watch_5(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let source_6 = { let q: &dyn Query = g; Some(ObjectId(item.data[1])).filter(|o| *o != ObjectId::NONE) }; let amount_6 = { let q: &dyn Query = g; (i64::from(item.data[0])).clamp(0, 65535) as u16 }; let recipients_6 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() }; if let Some(source) = source_6 { let batch: Vec<(ObjectId, Target, u16)> = recipients_6.iter().map(|t| (source, *t, amount_6)).collect(); g.damage_together(&batch); }
+let source_6 = { let q: &dyn Query = g; Some(ObjectId(item.data[1])).filter(|o| *o != ObjectId::NONE) }; let amount_6 = { let q: &dyn Query = g; (i64::from(item.data[0])).min(u16::MAX.into()) as u16 }; let recipients_6 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() }; if let Some(source) = source_6 { let batch: Vec<(ObjectId, Target, u16)> = recipients_6.iter().map(|t| (source, *t, amount_6)).collect(); g.damage_together(&batch); }
 g.end_sentence();
  Ok(()) }
 fn ability_0_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

@@ -37,7 +37,7 @@ hoisted_10.extend({ let q: &dyn Query = g; objects_3.iter().copied().filter(|&o|
 if !again_0 { break; } }
 g.end_sentence();
 let players_11 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_11 = Vec::new();
-let count_11_0 = { let q: &dyn Query = g; (((hoisted_7.clone()).into_iter().filter(|&id| !(q.chars(id).is(CardType::Land))).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }; let def_11_0 = g.card_id(&token_12::CARD);
+let count_11_0 = { let q: &dyn Query = g; (((hoisted_7.clone()).into_iter().filter(|&id| !(q.chars(id).is(CardType::Land))).collect::<Vec<ObjectId>>()).len() as i64) as u32 }; let def_11_0 = g.card_id(&token_12::CARD);
 for player in players_11 {
 tokens_11.extend(std::iter::repeat((def_11_0,player)).take(count_11_0 as usize));
 } let words_11 = g.words(asker.source);

@@ -14,7 +14,7 @@ done_total_2 += done_1;
 each_3[index_0] = done_1;
    } 
 g.end_sentence();
-let amount_4 = { let q: &dyn Query = g; ((done_total_2 as i64)).max(0) as u32 }; let mills_4: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_4)).collect(); let milled_4 = g.mill_together(&mills_4);
+let amount_4 = { let q: &dyn Query = g; ((done_total_2 as i64)) as u32 }; let mills_4: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_4)).collect(); let milled_4 = g.mill_together(&mills_4);
 g.end_sentence();
  Ok(()) }
 static PAY_QUESTION: Question = Question::new("Pay", "pay {cost}?", "", "Pay {cost}", "Decline");

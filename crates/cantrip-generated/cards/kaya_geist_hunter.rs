@@ -35,7 +35,7 @@ fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let objects_4 = { let q: &dyn Query = g; ((q.state().apnap().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>() }; let moved_4 = g.exile_all(&objects_4);
 g.end_sentence();
 let players_5 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_5 = Vec::new();
-let count_5_0 = { let q: &dyn Query = g; ((objects_4.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }; let def_5_0 = g.card_id(&token_6::CARD);
+let count_5_0 = { let q: &dyn Query = g; ((objects_4.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).len() as i64) as u32 }; let def_5_0 = g.card_id(&token_6::CARD);
 for player in players_5 {
 tokens_5.extend(std::iter::repeat((def_5_0,player)).take(count_5_0 as usize));
 } let words_5 = g.words(asker.source);

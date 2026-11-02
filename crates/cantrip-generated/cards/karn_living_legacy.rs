@@ -23,7 +23,7 @@ g.end_sentence();
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut done_2: i64 = 0; for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { done_2 += { i64::from(g.may_pay_x(player, asker.source, asker.source, cost("{X}"), &PAY_QUESTION)?.unwrap_or(0)) }; }
 g.end_sentence();
-let player_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let depth_3 = { let q: &dyn Query = g; ((done_2 as i64)).max(0) as usize };  let taken_3 = cantrip_mechanics::library::look_at_top(g, player_3, asker.source, depth_3, (1, 1), false, |_| true, cantrip_mechanics::library::Rest::BottomRandom)?;
+let player_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let depth_3 = { let q: &dyn Query = g; ((done_2 as i64)) as usize };  let taken_3 = cantrip_mechanics::library::look_at_top(g, player_3, asker.source, depth_3, (1, 1), false, |_| true, cantrip_mechanics::library::Rest::BottomRandom)?;
 g.end_sentence();
  Ok(()) }
 pub mod emblem_4 {

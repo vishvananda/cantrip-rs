@@ -47,7 +47,7 @@ hoisted_10.extend({ let q: &dyn Query = g; discarded_8.clone() });
 }
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_7 as i64) != 0) } {
-let amount_11 = { let q: &dyn Query = g; (Some(asker.source).map_or(0i64, |o: ObjectId| planned_value!("intensity", 0i64 => i64::from(q.state().obj(o).intensity)))).max(0) as u32 }; let players_11 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_11 = { let q: &dyn Query = g; (Some(asker.source).map_or(0i64, |o: ObjectId| planned_value!("intensity", 0i64 => i64::from(q.state().obj(o).intensity)))) as u32 }; let players_11 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_11 { g.draw(player, amount_11); }
 g.end_sentence();
 }

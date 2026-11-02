@@ -9,7 +9,7 @@ let objects_1 = { let q: &dyn Query = g; found_0.clone() }; let mut owners_1: Ve
 let objects_2 = { let q: &dyn Query = g; found_0.clone() }; let moved_2 = g.return_to_hand_revealed(&objects_2);
 for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.shuffle(player); }
 g.end_sentence();
-let amount_4 = { let q: &dyn Query = g; (planned_value!("engine: snow mana told apart as a spell is paid for", 0i64 => Some(asker.source).map_or(0, |o: ObjectId| q.history().mana_spent_to_cast(o).filter(|(source, _)| *source != ObjectId::NONE && q.chars(*source).supertypes.snow).map(|(_, mana)| i64::from(mana.total())).sum::<i64>()))).clamp(0, 2147483647) as i32 }; let players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_4 = { let q: &dyn Query = g; (planned_value!("engine: snow mana told apart as a spell is paid for", 0i64 => Some(asker.source).map_or(0, |o: ObjectId| q.history().mana_spent_to_cast(o).filter(|(source, _)| *source != ObjectId::NONE && q.chars(*source).supertypes.snow).map(|(_, mana)| i64::from(mana.total())).sum::<i64>()))).min(i32::MAX.into()) as i32 }; let players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_4 { g.gain_life(player, amount_4); }
 g.end_sentence();
  Ok(()) }

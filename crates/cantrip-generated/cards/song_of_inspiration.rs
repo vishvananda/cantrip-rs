@@ -23,7 +23,7 @@ hoisted_3.extend({ let q: &dyn Query = g; objects_1.iter().copied().filter(|&o| 
 if { let q: &dyn Query = g; ((value_0).saturating_add((t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.mana_value(o))).sum::<i64>())) >= (15i64) } {
 let objects_4 = { let q: &dyn Query = g; t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>() }; let moved_4 = g.return_to_hand(&objects_4);
 g.end_sentence();
-let amount_5 = { let q: &dyn Query = g; ((t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.mana_value(o))).sum::<i64>()).clamp(0, 2147483647) as i32 }; let players_5 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_5 = { let q: &dyn Query = g; ((t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.mana_value(o))).sum::<i64>()).min(i32::MAX.into()) as i32 }; let players_5 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_5 { g.gain_life(player, amount_5); }
 g.end_sentence();
 hoisted_6.extend(moved_4.clone());

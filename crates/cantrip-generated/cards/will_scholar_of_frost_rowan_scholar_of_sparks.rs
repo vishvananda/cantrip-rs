@@ -78,7 +78,7 @@ let objects_2 = { let q: &dyn Query = g; t_0.iter().filter_map(|t| t.object()).c
 g.end_sentence();
 let mut players_3: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
 let mut gathered_4: Vec<(CardId, PlayerId)> = Vec::new();
- for (index_3, bound_0) in players_3.iter().copied().enumerate() { let def_5 = g.card_id(&token_6::CARD); let count_5 = { let q: &dyn Query = g; (((objects_2.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| Some(bound_0) == Some(q.controller(id))).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }; let player_5 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; gathered_4.extend(std::iter::repeat((def_5, player_5)).take(count_5 as usize));
+ for (index_3, bound_0) in players_3.iter().copied().enumerate() { let def_5 = g.card_id(&token_6::CARD); let count_5 = { let q: &dyn Query = g; (((objects_2.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| Some(bound_0) == Some(q.controller(id))).collect::<Vec<ObjectId>>()).len() as i64) as u32 }; let player_5 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; gathered_4.extend(std::iter::repeat((def_5, player_5)).take(count_5 as usize));
     } 
 let words_4 = g.words(asker.source); let created_4 = g.create_tokens_worded(&gathered_4, false, None, words_4)?;
 g.end_sentence();

@@ -33,7 +33,7 @@ let kind_7_0_0 = { let q: &dyn Query = g; EffectKind::AddAbility(planned_value!(
 if let Some(source) = source_7 { cantrip_api::instruction(g, |g| { for &object in &objects_7 { g.add_effect(source, object, kind_7_0_0, duration_7);  } }); }
 g.end_sentence();
 let mut counters_9: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; (planned_value!("numeric expression Votes", 0i64 => g.votes().count(Word))).clamp(0, 32767) as i16 }; for t in { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_9.push((object, CounterKind::PlusOne, amount)); } }
+let amount = { let q: &dyn Query = g; (planned_value!("numeric expression Votes", 0i64 => g.votes().count(Word))).min(i16::MAX.into()) as i16 }; for t in { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_9.push((object, CounterKind::PlusOne, amount)); } }
 let had_9: Vec<_> = counters_9.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_9); let applied_9: Vec<ObjectId> = counters_9.iter().zip(had_9).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
  Ok(()) }

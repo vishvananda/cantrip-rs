@@ -12,12 +12,12 @@ pub static EXTRA: &[&CardDef] = &[];
 
 }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_0 = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as u32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_0 = { let q: &dyn Query = g; (i64::from(item.x)) as u32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_0 { g.draw(player, amount_0); }
 g.end_sentence();
-let count_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let power_1 = { let q: &dyn Query = g; (i64::from(item.x)).clamp(0, 32767) as i16 }; let toughness_1 = { let q: &dyn Query = g; (i64::from(item.x)).clamp(0, 32767) as i16 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut values_1 = Copiable::of(g.card_id(&token_2::CARD)).sized(power_1, toughness_1); values_1.words = g.words(asker.source); let mut created_1: Vec<ObjectId> = Vec::new(); for player in players_1 { created_1.extend(g.create_token_copies_tapped(values_1, player, count_1, false)?); }
+let count_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let power_1 = { let q: &dyn Query = g; (i64::from(item.x)).min(i16::MAX.into()) as i16 }; let toughness_1 = { let q: &dyn Query = g; (i64::from(item.x)).min(i16::MAX.into()) as i16 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut values_1 = Copiable::of(g.card_id(&token_2::CARD)).sized(power_1, toughness_1); values_1.words = g.words(asker.source); let mut created_1: Vec<ObjectId> = Vec::new(); for player in players_1 { created_1.extend(g.create_token_copies_tapped(values_1, player, count_1, false)?); }
 g.end_sentence();
-let amount_3 = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as i32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for player in players_3 { g.set_life_total(player, amount_3); }
+let amount_3 = { let q: &dyn Query = g; (i64::from(item.x)) as i32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for player in players_3 { g.set_life_total(player, amount_3); }
 g.end_sentence();
 let players_4_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_4_0 { g.add_player_effect(asker.controller, source, EffectKind::CantGainLife(player), Duration::Indefinite); } }
 g.end_sentence();

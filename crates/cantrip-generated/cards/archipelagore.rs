@@ -5,7 +5,7 @@
 // Mutate {5}{U} (If you cast this spell for its mutate cost, put it over or under target non-Human creature you own. They mutate into the creature on top plus all abilities from under it.)
 // Whenever this creature mutates, tap up to X target creatures, where X is the number of times this creature has mutated. Those creatures don't untap during their controller's next untap step.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_1_0_count(q: &dyn Query, asker: &Asker) -> u16 { (Some(asker.source).map_or(0i64, |o: ObjectId| cantrip_mechanics::mutate::times_mutated(q, o) as i64)).clamp(0, 65535) as u16 }
+#[allow(unused_variables)] fn ability_1_0_count(q: &dyn Query, asker: &Asker) -> u16 { (Some(asker.source).map_or(0i64, |o: ObjectId| cantrip_mechanics::mutate::times_mutated(q, o) as i64)).min(u16::MAX.into()) as u16 }
 #[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0).between(0, TargetSpec::COUNTED)];
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Mutated { permanent, .. } = event { let id = *permanent; let subject = Target::Object(id); let data = [u32::MAX, u32::MAX]; if Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }

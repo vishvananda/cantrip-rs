@@ -24,7 +24,7 @@ each_6[index_0] = { let q: &dyn Query = g; cards_3.iter().copied().filter(|&o| q
    } 
 planned!("per-player-manifest" => g.end_batch(););
 g.end_sentence();
-let amount_7 = { let q: &dyn Query = g; ((all_5.clone()).into_iter().count() as i64).max(0) as u32 }; let players_7 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_7 = { let q: &dyn Query = g; ((all_5.clone()).into_iter().count() as i64) as u32 }; let players_7 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_7 { g.draw(player, amount_7); }
 g.end_sentence();
  Ok(()) }

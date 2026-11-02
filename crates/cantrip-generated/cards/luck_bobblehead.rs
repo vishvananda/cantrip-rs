@@ -25,10 +25,10 @@ pub static EXTRA: &[&CardDef] = &[];
 
 }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_1 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Bobblehead)) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }; let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let value_1: i64 = planned_value!("keyword action RollDie(6) with an amount", 0i64 => cantrip_mechanics::dice::roll_several(g, player_1, 6, amount_1)?.total());
+let amount_1 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Bobblehead)) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64) as u32 }; let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let value_1: i64 = planned_value!("keyword action RollDie(6) with an amount", 0i64 => cantrip_mechanics::dice::roll_several(g, player_1, 6, amount_1)?.total());
 g.end_sentence();
 let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_2 = Vec::new();
-let count_2_0 = { let q: &dyn Query = g; (planned_value!("numeric expression Dice", 0i64 => g.last_roll(asker.controller).matching(Comparison::SameParity, 0i64))).max(0) as u32 }; let def_2_0 = g.card_id(&token_3::CARD);
+let count_2_0 = { let q: &dyn Query = g; (planned_value!("numeric expression Dice", 0i64 => g.last_roll(asker.controller).matching(Comparison::SameParity, 0i64))) as u32 }; let def_2_0 = g.card_id(&token_3::CARD);
 for player in players_2 {
 tokens_2.extend(std::iter::repeat((def_2_0,player)).take(count_2_0 as usize));
 } let words_2 = Words::NONE;

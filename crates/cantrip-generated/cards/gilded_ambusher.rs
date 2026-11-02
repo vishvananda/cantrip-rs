@@ -20,7 +20,7 @@ let mut each_7: Vec<Vec<ObjectId>> = vec![Vec::new(); players_3.len()]; let mut 
 g.end_sentence();
 let objects_8 = { let q: &dyn Query = g; { let mut all: Vec<ObjectId> = Vec::new(); for id in all_5.clone() { if !all.contains(&id) { all.push(id); } } for id in all_7.clone() { if !all.contains(&id) { all.push(id); } } all } }; let moved_8 = g.exile_all(&objects_8);
 g.end_sentence();
-let source_9 = { let q: &dyn Query = g; Some(asker.source) }; let amount_9 = { let q: &dyn Query = g; ((moved_8.clone()).into_iter().map(|o: ObjectId| i64::from(q.mana_value(o))).sum::<i64>()).clamp(0, 65535) as u16 }; let recipients_9 = { let q: &dyn Query = g; (Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() }; if let Some(source) = source_9 { let batch: Vec<(ObjectId, Target, u16)> = recipients_9.iter().map(|t| (source, *t, amount_9)).collect(); g.damage_together(&batch); }
+let source_9 = { let q: &dyn Query = g; Some(asker.source) }; let amount_9 = { let q: &dyn Query = g; ((moved_8.clone()).into_iter().map(|o: ObjectId| i64::from(q.mana_value(o))).sum::<i64>()).min(u16::MAX.into()) as u16 }; let recipients_9 = { let q: &dyn Query = g; (Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() }; if let Some(source) = source_9 { let batch: Vec<(ObjectId, Target, u16)> = recipients_9.iter().map(|t| (source, *t, amount_9)).collect(); g.damage_together(&batch); }
 g.end_sentence();
  Ok(()) }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_11: Vec<ObjectId> = Vec::new();

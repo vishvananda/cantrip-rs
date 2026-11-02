@@ -20,7 +20,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let amount_0 = { let q: &dyn Query = g; (10i64).max(0) as u32 }; let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let discovered_0: Vec<ObjectId> = planned_value!("the card a discover found", { cantrip_mechanics::discover::discover(g, player_0, amount_0)?; Vec::<ObjectId>::new() } => cantrip_mechanics::discover::discover_card(g, player_0, amount_0)?.into_iter().collect::<Vec<ObjectId>>());
 g.end_sentence();
 let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_1 = Vec::new();
-let count_1_0 = { let q: &dyn Query = g; ((10i64).saturating_sub((discovered_0.clone()).into_iter().map(|o: ObjectId| i64::from(q.mana_value(o))).sum::<i64>())).clamp(0, 4294967295) as u32 }; let def_1_0 = g.card_id(&token_2::CARD);
+let count_1_0 = { let q: &dyn Query = g; ((10i64 - (discovered_0.clone()).into_iter().map(|o: ObjectId| i64::from(q.mana_value(o))).sum::<i64>())).max(0) as u32 }; let def_1_0 = g.card_id(&token_2::CARD);
 for player in players_1 {
 tokens_1.extend(std::iter::repeat((def_1_0,player)).take(count_1_0 as usize));
 } let words_1 = Words::NONE;

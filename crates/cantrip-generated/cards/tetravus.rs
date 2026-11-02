@@ -26,7 +26,7 @@ let payer_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a referenc
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_1 as i64) != 0) } {
 let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_2 = Vec::new();
-let count_2_0 = { let q: &dyn Query = g; (planned_value!("numeric expression PaidCountersRemoved", 0i64 => i64::from(q.counters_paid(item)))).max(0) as u32 }; let def_2_0 = g.card_id(&token_3::CARD);
+let count_2_0 = { let q: &dyn Query = g; (planned_value!("numeric expression PaidCountersRemoved", 0i64 => i64::from(q.counters_paid(item)))) as u32 }; let def_2_0 = g.card_id(&token_3::CARD);
 for player in players_2 {
 tokens_2.extend(std::iter::repeat((def_2_0,player)).take(count_2_0 as usize));
 } let words_2 = g.words(asker.source);
@@ -48,7 +48,7 @@ let paid_6 = moved_6.clone().iter().any(|&o| g.obj(o).zone.is(ZoneKind::Exile));
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_5 as i64) != 0) } {
 let mut counters_8: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; ((before_5.clone()).len() as i64).clamp(0, 32767) as i16 }; for t in { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_8.push((object, CounterKind::PlusOne, amount)); } }
+let amount = { let q: &dyn Query = g; ((before_5.clone()).len() as i64).min(i16::MAX.into()) as i16 }; for t in { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_8.push((object, CounterKind::PlusOne, amount)); } }
 let had_8: Vec<_> = counters_8.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_8); let applied_8: Vec<ObjectId> = counters_8.iter().zip(had_8).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
 hoisted_9.extend(applied_8.clone());

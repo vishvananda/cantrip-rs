@@ -24,7 +24,7 @@ tokens_0.extend(std::iter::repeat((def_0_0,player)).take(count_0_0 as usize));
 } let words_0 = g.words(asker.source);
 let created_0 = g.create_tokens_worded(&tokens_0, false, None, words_0)?;
 g.end_sentence();
-let sources_2 = { let q: &dyn Query = g; created_0.clone() }; let mut batch_2: Vec<(ObjectId, Target, u16)> = Vec::new(); for &source in &sources_2 { let amount = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Hamster)) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64).clamp(0, 65535) as u16 }; for t in { let q: &dyn Query = g; t_0.clone() } { batch_2.push((source, t, amount)); } } let dealt_2 = g.damage_together(&batch_2); let done_2: i64 = dealt_2.iter().map(|&n| i64::from(n)).sum();
+let sources_2 = { let q: &dyn Query = g; created_0.clone() }; let mut batch_2: Vec<(ObjectId, Target, u16)> = Vec::new(); for &source in &sources_2 { let amount = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Hamster)) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64).min(u16::MAX.into()) as u16 }; for t in { let q: &dyn Query = g; t_0.clone() } { batch_2.push((source, t, amount)); } } let dealt_2 = g.damage_together(&batch_2); let done_2: i64 = dealt_2.iter().map(|&n| i64::from(n)).sum();
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

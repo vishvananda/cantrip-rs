@@ -5,7 +5,7 @@
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables, unused_mut)] fn ability_0_then_steps(g: &mut dyn Game, asker: &Asker, subject: Target, data: [u32; 2]) -> Result<(), Suspend> { let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; subject.player().into_iter().collect::<Vec<PlayerId>>() };
 let mut gathered_1: Vec<(PlayerId, u32)> = Vec::new();
- for (index_0, bound_9000) in players_0.iter().copied().enumerate() { gathered_1.push((bound_9000, { let q: &dyn Query = g; ((2i64 * i64::from(data[0]))).clamp(0, 4294967295) as u32 }));
+ for (index_0, bound_9000) in players_0.iter().copied().enumerate() { gathered_1.push((bound_9000, { let q: &dyn Query = g; ((2i64 * i64::from(data[0]))).min(u32::MAX.into()) as u32 }));
     } 
 let milled_1 = g.mill_together(&gathered_1);
  Ok(()) }

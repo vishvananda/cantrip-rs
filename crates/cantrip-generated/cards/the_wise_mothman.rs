@@ -16,7 +16,7 @@ let had_0: Vec<_> = counters_0.iter().map(|c| g.state().obj(c.0).counters(c.1)).
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
-static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target_0).between(0, planned_value!("depends on an instruction with a gap", 1u32 => TargetSpec::read_as_chosen(|q: &dyn Query, asker: &Asker| (planned_value!("event value in a target filter beyond its subject", 0i64 => q.event_total_at(asker))).max(0) as u32)))];
+static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target_0).between(0, planned_value!("depends on an instruction with a gap", 1u32 => TargetSpec::read_as_chosen(|q: &dyn Query, asker: &Asker| (planned_value!("event value in a target filter beyond its subject", 0i64 => q.event_total_at(asker))) as u32)))];
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, reason: ZoneReason::Mill, .. } = event { let id = *old; let player = q.state().obj(id).owner; let subject = Target::Object(id); let data = [new.0, u32::from(player.0)]; if from.is(ZoneKind::Library) && true && !(q.chars(id).is(CardType::Land)) { return Some(Fired { subject, data }); } }
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

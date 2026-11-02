@@ -32,7 +32,7 @@ let mut gathered_4: Vec<ObjectId> = Vec::new();
 let cards_6 = { let q: &dyn Query = g; gathered_4.clone() }; let discarded_6 = g.discard_together(&cards_6);
 g.end_sentence();
 let mut players_7: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
- for (index_7, bound_0) in players_7.iter().copied().enumerate() { let amount_8 = { let q: &dyn Query = g; (((discarded_6.clone()).into_iter().filter(|&o| Some(q.state().obj(o).owner) == Some(bound_0)).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }; let players_8 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
+ for (index_7, bound_0) in players_7.iter().copied().enumerate() { let amount_8 = { let q: &dyn Query = g; (((discarded_6.clone()).into_iter().filter(|&o| Some(q.state().obj(o).owner) == Some(bound_0)).collect::<Vec<ObjectId>>()).len() as i64) as u32 }; let players_8 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_8 { g.draw(player, amount_8); }
     } 
 g.end_sentence();

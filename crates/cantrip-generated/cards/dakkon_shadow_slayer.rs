@@ -5,7 +5,7 @@
 // [−3]: Exile target creature.
 // [−6]: You may put an artifact card from your hand or graveyard onto the battlefield.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let more = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Land) && Target::Object(asker.source).object().map(|o: ObjectId| q.controller(o)) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64).clamp(0, 32767) as i16 }; entering.counters[CounterKind::Loyalty as usize] = entering.counters[CounterKind::Loyalty as usize].saturating_add(more);
+#[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let more = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Land) && Target::Object(asker.source).object().map(|o: ObjectId| q.controller(o)) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64).min(i16::MAX.into()) as i16 }; entering.counters[CounterKind::Loyalty as usize] = entering.counters[CounterKind::Loyalty as usize].saturating_add(more);
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let amount_1 = { let q: &dyn Query = g; (2i64).max(0) as usize }; let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; cantrip_mechanics::surveil(g, player_1, asker.source, amount_1)?;

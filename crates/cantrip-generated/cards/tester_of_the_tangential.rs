@@ -11,7 +11,7 @@
 static REFLEXIVE_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(reflexive_2_target_0)];
 fn reflexive_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let amount_3: i16 = { let q: &dyn Query = g; (i64::from(q.state().left_stack(item.object).map_or(0, |made| made.x))).clamp(0, 32767) as i16 };
+let amount_3: i16 = { let q: &dyn Query = g; (i64::from(q.state().left_stack(item.object).map_or(0, |made| made.x))).min(i16::MAX.into()) as i16 };
 let mut done_3: i64 = 0; let actor_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let sources_3 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let to_3: Option<ObjectId> = ({ let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied(); if let Some(to) = to_3 { for from in sources_3 { for kind in [CounterKind::PlusOne] { let amount = amount_3; done_3 += i64::from(g.move_counters(from, to, kind, amount)); } } }
 g.end_sentence();
  Ok(()) }

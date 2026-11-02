@@ -22,7 +22,7 @@ let created_0 = g.create_tokens_worded(&tokens_0, true, None, words_0)?;
 g.end_sentence();
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let depth_2 = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as usize };  let taken_2 = cantrip_mechanics::library::look_at_top(g, player_2, asker.source, depth_2, (2, 2), false, |_| true, cantrip_mechanics::library::Rest::BottomRandom)?;
+let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let depth_2 = { let q: &dyn Query = g; (i64::from(item.x)) as usize };  let taken_2 = cantrip_mechanics::library::look_at_top(g, player_2, asker.source, depth_2, (2, 2), false, |_| true, cantrip_mechanics::library::Rest::BottomRandom)?;
 g.end_sentence();
  Ok(()) }
 

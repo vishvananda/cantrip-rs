@@ -7,7 +7,7 @@
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[cantrip_mechanics::targets::ANY.between(0, cantrip_api::TargetSpec::ANY_NUMBER)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let source_0 = { let q: &dyn Query = g; Some(asker.source) }; let targets_0 = { let q: &dyn Query = g; t_0.clone() }; let amount_0: u16 = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as u16 }; if let Some(source) = source_0 { let shares = (targets_0.len() as u16).max(1); let share = amount_0 / shares; let batch: Vec<(ObjectId, Target, u16)> = targets_0.iter().map(|&t| (source, t, share)).collect(); g.damage_together(&batch); }
+let source_0 = { let q: &dyn Query = g; Some(asker.source) }; let targets_0 = { let q: &dyn Query = g; t_0.clone() }; let amount_0: u16 = { let q: &dyn Query = g; (i64::from(item.x)) as u16 }; if let Some(source) = source_0 { let shares = (targets_0.len() as u16).max(1); let share = amount_0 / shares; let batch: Vec<(ObjectId, Target, u16)> = targets_0.iter().map(|&t| (source, t, share)).collect(); g.damage_together(&batch); }
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

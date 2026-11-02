@@ -5,7 +5,7 @@
 // Partner (You can have two commanders if both have partner.)
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let depth_0 = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as usize }; cantrip_mechanics::library::look_at_top_take_one_rest_to_graveyard(g, player_0, asker.source, depth_0)?;
+let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let depth_0 = { let q: &dyn Query = g; (i64::from(item.x)) as usize }; cantrip_mechanics::library::look_at_top_take_one_rest_to_graveyard(g, player_0, asker.source, depth_0)?;
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_0_1(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { (!(q.state().obj(id).tapped) && q.chars(id).is(CardType::Artifact) && Some(asker.controller) == Some(q.controller(id))) }

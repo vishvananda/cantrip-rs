@@ -8,7 +8,7 @@
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_5: Vec<ObjectId> = Vec::new();
 let mut hoisted_4: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-let amount_0 = { let q: &dyn Query = g; (i64::from(item.data[0])).max(0) as u32 }; let mills_0: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_0)).collect(); let milled_0 = g.mill_together(&mills_0);
+let amount_0 = { let q: &dyn Query = g; (i64::from(item.data[0])) as u32 }; let mills_0: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_0)).collect(); let milled_0 = g.mill_together(&mills_0);
 g.end_sentence();
 {
 let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let pool_2 = { let q: &dyn Query = g; (milled_0.clone()).into_iter().filter(|&id| (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Saga)) || q.chars(id).is(CardType::Land))).collect::<Vec<ObjectId>>() }; let mut picked_2: Vec<ObjectId> = Vec::new();

@@ -10,7 +10,7 @@
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut counters_0: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-planned!("rad-counters" => let amount = { let q: &dyn Query = g; (i64::from(item.data[0])).max(0) as u32 }; for player in { let q: &dyn Query = g; Some(PlayerId(item.data[1] as u8)).into_iter().collect::<Vec<PlayerId>>() } { cantrip_mechanics::rad::give(g, player, amount); });
+planned!("rad-counters" => let amount = { let q: &dyn Query = g; (i64::from(item.data[0])) as u32 }; for player in { let q: &dyn Query = g; Some(PlayerId(item.data[1] as u8)).into_iter().collect::<Vec<PlayerId>>() } { cantrip_mechanics::rad::give(g, player, amount); });
 let had_0: Vec<_> = counters_0.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_0); let applied_0: Vec<ObjectId> = counters_0.iter().zip(had_0).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
  Ok(()) }

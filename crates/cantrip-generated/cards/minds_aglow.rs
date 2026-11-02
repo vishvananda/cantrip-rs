@@ -14,7 +14,7 @@ done_total_2 += done_1;
 each_3[index_0] = done_1;
    } 
 g.end_sentence();
-let amount_4 = { let q: &dyn Query = g; ((done_total_2 as i64)).max(0) as u32 }; let players_4 = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
+let amount_4 = { let q: &dyn Query = g; ((done_total_2 as i64)) as u32 }; let players_4 = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
 for player in players_4 { g.draw(player, amount_4); }
 g.end_sentence();
  Ok(()) }

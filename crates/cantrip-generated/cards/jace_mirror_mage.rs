@@ -24,7 +24,7 @@ let objects_3 = { let q: &dyn Query = g; drawn_2.clone() }; let mut owners_3: Ve
 g.end_sentence();
 let mut removed_4: i64 = 0;
 let objects_4_0 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() };
-let amount_4_0 = { let q: &dyn Query = g; ((drawn_2.clone()).get(0).copied().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o)))).clamp(0, 32767) as i16 }; cantrip_api::instruction(g, |g| { for object in objects_4_0 { removed_4 += i64::from(g.remove_counters(object, CounterKind::Loyalty, amount_4_0)); } });
+let amount_4_0 = { let q: &dyn Query = g; ((drawn_2.clone()).get(0).copied().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o)))).min(i16::MAX.into()) as i16 }; cantrip_api::instruction(g, |g| { for object in objects_4_0 { removed_4 += i64::from(g.remove_counters(object, CounterKind::Loyalty, amount_4_0)); } });
 g.end_sentence();
  Ok(()) }
 

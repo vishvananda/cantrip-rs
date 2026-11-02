@@ -22,7 +22,7 @@ let mut removed_1: i64 = 0;
 let objects_1_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() };
 cantrip_api::instruction(g, |g| { for object in objects_1_0 { removed_1 += CounterKind::ALL.iter().map(|k| i64::from(g.state().obj(object).counters(*k))).sum::<i64>(); cantrip_mechanics::effects::remove_all_counters(g, object); } });
 g.end_sentence();
-let amount_2 = { let q: &dyn Query = g; ((removed_1 as i64)).max(0) as u32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_2 = { let q: &dyn Query = g; ((removed_1 as i64)) as u32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_2 { g.draw(player, amount_2); }
 g.end_sentence();
  Ok(()) }

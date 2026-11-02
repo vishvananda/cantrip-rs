@@ -11,7 +11,7 @@ let mut gathered_1: Vec<ObjectId> = Vec::new();
     } 
 let cards_3 = { let q: &dyn Query = g; gathered_1.clone() }; let discarded_3 = g.discard_together(&cards_3);
 g.end_sentence();
-let amount_4 = { let q: &dyn Query = g; (planned_value!("numeric expression Game", 0i64 => q.game_value(item, GameValue::MostDiscardedThisWay))).max(0) as u32 }; let players_4 = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
+let amount_4 = { let q: &dyn Query = g; (planned_value!("numeric expression Game", 0i64 => q.game_value(item, GameValue::MostDiscardedThisWay))) as u32 }; let players_4 = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
 for player in players_4 { g.draw(player, amount_4); }
 g.end_sentence();
 cantrip_mechanics::cipher::encode(g, item)?;

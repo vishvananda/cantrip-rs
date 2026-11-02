@@ -6,9 +6,9 @@
 // {X}, Return a creature you control with mana value X to its owner's hand: Draw a number of cards chosen at random between 0 and X. X can't be 0.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let chosen_1: u32 = { let least = { let q: &dyn Query = g; (0i64).max(0) as u32 }; let most = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as u32 }; least + g.choose_at_random((most.saturating_sub(least) + 1) as usize) as u32 };
+let chosen_1: u32 = { let least = { let q: &dyn Query = g; (0i64).max(0) as u32 }; let most = { let q: &dyn Query = g; (i64::from(item.x)) as u32 }; least + g.choose_at_random((most.saturating_sub(least) + 1) as usize) as u32 };
 g.end_sentence();
-let amount_2 = { let q: &dyn Query = g; (i64::from(chosen_1)).max(0) as u32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_2 = { let q: &dyn Query = g; (i64::from(chosen_1)) as u32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_2 { g.draw(player, amount_2); }
 g.end_sentence();
  Ok(()) }

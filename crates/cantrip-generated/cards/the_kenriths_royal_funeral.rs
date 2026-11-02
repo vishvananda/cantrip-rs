@@ -11,10 +11,10 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let objects_0 = { let q: &dyn Query = g; t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>() }; let moved_0 = { let by = g.linked(item); g.exile_with(&objects_0, by, false) };
 g.end_sentence();
-let amount_1 = { let q: &dyn Query = g; ((moved_0.clone()).into_iter().map(|o: ObjectId| i64::from(q.mana_value(o))).max().unwrap_or(0)).clamp(0, 4294967295) as u32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_1 = { let q: &dyn Query = g; ((moved_0.clone()).into_iter().map(|o: ObjectId| i64::from(q.mana_value(o))).max().unwrap_or(0)).min(u32::MAX.into()) as u32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_1 { g.draw(player, amount_1); }
 g.end_sentence();
-let amount_2 = { let q: &dyn Query = g; ((moved_0.clone()).into_iter().map(|o: ObjectId| i64::from(q.mana_value(o))).max().unwrap_or(0)).clamp(0, 2147483647) as i32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_2 = { let q: &dyn Query = g; ((moved_0.clone()).into_iter().map(|o: ObjectId| i64::from(q.mana_value(o))).max().unwrap_or(0)).min(i32::MAX.into()) as i32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_2 { g.lose_life(player, amount_2); }
 g.end_sentence();
  Ok(()) }

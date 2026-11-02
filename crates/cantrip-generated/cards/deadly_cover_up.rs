@@ -25,7 +25,7 @@ let mut found_4: Vec<ObjectId> = Vec::new();
 let objects_6 = { let q: &dyn Query = g; carried_5_0.clone() }; let moved_6 = g.exile_all(&objects_6);
 for player in { let q: &dyn Query = g; (moved_2.clone()).get(0 as usize).copied().map(|o: ObjectId| q.state().obj(o).owner).into_iter().collect::<Vec<PlayerId>>() } { g.shuffle(player); }
 g.end_sentence();
-let amount_8 = { let q: &dyn Query = g; (((objects_6.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).zone.kind() == ZoneKind::Hand).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }; let players_8 = { let q: &dyn Query = g; (moved_6.clone()).get(0 as usize).copied().map(|o: ObjectId| q.state().obj(o).owner).into_iter().collect::<Vec<PlayerId>>() };
+let amount_8 = { let q: &dyn Query = g; (((objects_6.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).zone.kind() == ZoneKind::Hand).collect::<Vec<ObjectId>>()).len() as i64) as u32 }; let players_8 = { let q: &dyn Query = g; (moved_6.clone()).get(0 as usize).copied().map(|o: ObjectId| q.state().obj(o).owner).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_8 { g.draw(player, amount_8); }
 g.end_sentence();
 hoisted_9.extend(moved_2.clone());

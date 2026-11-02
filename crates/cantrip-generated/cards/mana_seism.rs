@@ -8,7 +8,7 @@ let count_0 = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AnyNumb
 let sacrificed_0 = g.sacrifice_each(&picks_0);
 g.end_sentence();
 let mana_players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_2_0 = { let q: &dyn Query = g; ((objects_0.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 };
+let mana_2_0 = { let q: &dyn Query = g; ((objects_0.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).len() as i64) as u32 };
 for player in mana_players_2 {
 g.add_mana(player, Mana::C, mana_2_0);}
 g.end_sentence();

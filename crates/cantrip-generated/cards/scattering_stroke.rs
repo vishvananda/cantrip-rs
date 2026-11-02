@@ -8,7 +8,7 @@ static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target
 fn delayed_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let decider_4 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_4, asker.source, Purpose::Optional)? {
 let mana_players_6 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_6_0 = { let q: &dyn Query = g; (about(q, item, 0).first().copied().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o)))).max(0) as u32 };
+let mana_6_0 = { let q: &dyn Query = g; (about(q, item, 0).first().copied().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o)))) as u32 };
 for player in mana_players_6 {
 g.add_mana(player, Mana::C, mana_6_0);}
 g.end_sentence();

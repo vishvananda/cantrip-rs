@@ -8,7 +8,7 @@
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mana_players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_1 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| ((q.state().attackers.iter().any(|a| a.id == id) || q.was_attacking(id)) && q.chars(id).is(CardType::Creature))).collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0))).sum::<i64>()).clamp(0, 255) as u8 };
+let mana_1 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| ((q.state().attackers.iter().any(|a| a.id == id) || q.was_attacking(id)) && q.chars(id).is(CardType::Creature))).collect::<Vec<ObjectId>>()).into_iter().filter_map(|o: ObjectId| q.chars(o).power).map(i64::from).sum::<i64>()).clamp(0, 255) as u8 };
 for player in mana_players_1 {
 if mana_1 > 0 { let colors = cantrip_mechanics::choose_colors(g, player, asker.source, ColorSet(31), mana_1)?;
 for color in colors { g.add_restricted_mana(player, color.mana(), 1, planned_value!("engine: mana spent by what it may pay for", ManaRestriction::ABILITIES => ManaRestriction::AllOf(&[planned_value!("engine: mana spent by what it may pay for", ManaRestriction::ABILITIES => ManaRestriction::SpellsMatching(|q, asker, spell| true)), planned_value!("engine: mana spent by what it may pay for", ManaRestriction::ABILITIES => ManaRestriction::Lasts(Duration::EndOfTurn))]))); }

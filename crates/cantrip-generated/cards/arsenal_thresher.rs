@@ -7,7 +7,7 @@ let selected_2_player = { let q: &dyn Query = g; Target::Object(asker.source).ob
 let revealer_1 = { let q: &dyn Query = g; Target::Object(asker.source).object().map(|o: ObjectId| q.controller(o)).expect("a reference that always names a player") }; g.reveal(revealer_1, &selected_2); let paid_1 = !selected_2.is_empty();
 (paid_1, Vec::new(), Vec::new(), { let q: &dyn Query = g; (selected_2).clone() }) } else { (false, Vec::new(), Vec::new(), Vec::new()) };
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
-let more = { let q: &dyn Query = g; ((picked_0.clone()).len() as i64).clamp(0, 32767) as i16 }; entering.counters[CounterKind::PlusOne as usize] = entering.counters[CounterKind::PlusOne as usize].saturating_add(more);
+let more = { let q: &dyn Query = g; ((picked_0.clone()).len() as i64).min(i16::MAX.into()) as i16 }; entering.counters[CounterKind::PlusOne as usize] = entering.counters[CounterKind::PlusOne as usize].saturating_add(more);
 }
  Ok(()) }
 

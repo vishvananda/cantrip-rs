@@ -22,7 +22,7 @@ fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let Answer::Colors(colors_1) = g.ask(player_1, RequestKind::ChooseColors { source: asker.source, choices: ColorSet(31), count: 1, purpose: ColorUse::Any })? else { return Ok(()) }; let chosen_1 = colors_1[0];
 g.end_sentence();
 let mana_players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_3_0 = { let q: &dyn Query = g; (Some(asker.controller).zip(Some(chosen_1)).map_or(0i64, |(p, color): (PlayerId, Color)| i64::from(cantrip_mechanics::devotion::devotion(q, p, color)))).max(0) as u32 };
+let mana_3_0 = { let q: &dyn Query = g; (Some(asker.controller).zip(Some(chosen_1)).map_or(0i64, |(p, color): (PlayerId, Color)| i64::from(cantrip_mechanics::devotion::devotion(q, p, color)))) as u32 };
 for player in mana_players_3 {
 if let Some(color) = { let q: &dyn Query = g; Some(chosen_1) } { g.add_mana(player, color.mana(), mana_3_0); }
 }

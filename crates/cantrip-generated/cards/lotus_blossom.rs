@@ -17,7 +17,7 @@ hoisted_2.extend(applied_1.clone());
 g.end_sentence();
  Ok(()) }
 fn ability_1_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let mana_players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_3 = { let q: &dyn Query = g; ((Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.state().obj(o).counters(CounterKind::Petal))).sum::<i64>()).max(0) as u32 };
+let mana_3 = { let q: &dyn Query = g; ((Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.state().obj(o).counters(CounterKind::Petal))).sum::<i64>()) as u32 };
 for player in mana_players_3 {
 let color = chosen.expect("mana activation selected a color");
 g.add_mana(player, color.mana(), mana_3);}

@@ -10,7 +10,7 @@ let mut removed_0: i64 = 0;
 let objects_0_0 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() };
 let amount_0_0 = i16::MAX; cantrip_api::instruction(g, |g| { for object in objects_0_0 { removed_0 += i64::from(g.remove_counters(object, CounterKind::Study, amount_0_0)); } });
 g.end_sentence();
-let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let depth_1 = { let q: &dyn Query = g; ((removed_0 as i64)).max(0) as usize };  let taken_1 = cantrip_mechanics::library::look_at_top(g, player_1, asker.source, depth_1, (1, 1), false, |_| true, cantrip_mechanics::library::Rest::BottomRandom)?;
+let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let depth_1 = { let q: &dyn Query = g; ((removed_0 as i64)) as usize };  let taken_1 = cantrip_mechanics::library::look_at_top(g, player_1, asker.source, depth_1, (1, 1), false, |_| true, cantrip_mechanics::library::Rest::BottomRandom)?;
 g.end_sentence();
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

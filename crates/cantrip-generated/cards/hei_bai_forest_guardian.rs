@@ -24,7 +24,7 @@ pub static EXTRA: &[&CardDef] = &[];
 }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_4 = Vec::new();
-let count_4_0 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).supertypes.legendary && q.chars(id).is(CardType::Enchantment) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }; let def_4_0 = g.card_id(&token_5::CARD);
+let count_4_0 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).supertypes.legendary && q.chars(id).is(CardType::Enchantment) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64) as u32 }; let def_4_0 = g.card_id(&token_5::CARD);
 for player in players_4 {
 tokens_4.extend(std::iter::repeat((def_4_0,player)).take(count_4_0 as usize));
 } let words_4 = g.words(asker.source);

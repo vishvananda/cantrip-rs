@@ -10,14 +10,14 @@ let mut gathered_1: Vec<ObjectId> = Vec::new();
     } 
 let objects_3 = { let q: &dyn Query = g; gathered_1.clone() }; let moved_3 = g.put_into_library(&objects_3, LibraryPlace::ShuffledIn);
 g.end_sentence();
-let amount_4 = { let q: &dyn Query = g; ((objects_3.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }; let players_4 = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
+let amount_4 = { let q: &dyn Query = g; ((objects_3.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).len() as i64) as u32 }; let players_4 = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
 for player in players_4 { g.draw(player, amount_4); }
 g.end_sentence();
 if { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Artifact) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64) >= (3i64) } {
 let mut players_5: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
 { let order: Vec<PlayerId> = g.state().apnap().collect(); players_5.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut gathered_6: Vec<(ObjectId, Target, u16)> = Vec::new();
- for (index_5, bound_0) in players_5.iter().copied().enumerate() { let source_7 = { let q: &dyn Query = g; Some(asker.source) }; let amount_7 = { let q: &dyn Query = g; (q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::Drew { player, .. } = event { let subject = Target::Player(*player); let data = [0u32; 2]; if Some(bound_0) == Some(*player) { return Some(Fired { subject, data }); } }  None }).count() as i64).clamp(0, 65535) as u16 }; if let Some(source) = source_7 { for t in { let q: &dyn Query = g; (Some(bound_0).into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() } { gathered_6.push((source, t, amount_7)); } }
+ for (index_5, bound_0) in players_5.iter().copied().enumerate() { let source_7 = { let q: &dyn Query = g; Some(asker.source) }; let amount_7 = { let q: &dyn Query = g; (q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::Drew { player, .. } = event { let subject = Target::Player(*player); let data = [0u32; 2]; if Some(bound_0) == Some(*player) { return Some(Fired { subject, data }); } }  None }).count() as i64).min(u16::MAX.into()) as u16 }; if let Some(source) = source_7 { for t in { let q: &dyn Query = g; (Some(bound_0).into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() } { gathered_6.push((source, t, amount_7)); } }
     } 
 g.damage_together(&gathered_6);
 g.end_sentence();

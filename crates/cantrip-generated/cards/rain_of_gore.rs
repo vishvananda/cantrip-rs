@@ -3,7 +3,7 @@
 // requires: replacement of GainLifeByEffect
 // If a spell or ability would cause its controller to gain life, that player loses that much life instead.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables, unused_mut)] fn ability_0_then_steps(g: &mut dyn Game, asker: &Asker, subject: Target, data: [u32; 2]) -> Result<(), Suspend> { let amount_0 = { let q: &dyn Query = g; (i64::from(data[0])).clamp(0, 2147483647) as i32 }; let players_0 = { let q: &dyn Query = g; subject.player().into_iter().collect::<Vec<PlayerId>>() };
+#[allow(unused_variables, unused_mut)] fn ability_0_then_steps(g: &mut dyn Game, asker: &Asker, subject: Target, data: [u32; 2]) -> Result<(), Suspend> { let amount_0 = { let q: &dyn Query = g; (i64::from(data[0])).min(i32::MAX.into()) as i32 }; let players_0 = { let q: &dyn Query = g; subject.player().into_iter().collect::<Vec<PlayerId>>() };
 for player in players_0 { g.lose_life(player, amount_0); }
  Ok(()) }
 planned_item!("replacement-of-gain-life-by-effect" => callbacks: #[allow(unused_variables)] fn ability_0_applies(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool { if let Proposal::EffectLifeGain(p) = proposal { let amount = p.count; let subject = Target::Player(p.player); let data = [p.count, u32::MAX]; if true { return true; } }

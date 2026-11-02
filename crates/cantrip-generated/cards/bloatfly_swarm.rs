@@ -10,9 +10,9 @@
  Ok(()) }
 #[allow(unused_variables, unused_mut)] fn ability_2_0_then_steps(g: &mut dyn Game, asker: &Asker, subject: Target, data: [u32; 2], done_prevented: u16) -> Result<(), Suspend> { let mut removed_1: i64 = 0;
 let objects_1_0 = { let q: &dyn Query = g; subject.object().into_iter().collect::<Vec<ObjectId>>() };
-let amount_1_0 = { let q: &dyn Query = g; ((done_prevented as i64)).clamp(0, 32767) as i16 }; cantrip_api::instruction(g, |g| { for object in objects_1_0 { removed_1 += i64::from(g.remove_counters(object, CounterKind::PlusOne, amount_1_0)); } });
+let amount_1_0 = { let q: &dyn Query = g; ((done_prevented as i64)).min(i16::MAX.into()) as i16 }; cantrip_api::instruction(g, |g| { for object in objects_1_0 { removed_1 += i64::from(g.remove_counters(object, CounterKind::PlusOne, amount_1_0)); } });
 let mut counters_2: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-planned!("rad-counters" => let amount = { let q: &dyn Query = g; ((removed_1 as i64)).max(0) as u32 }; for player in { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() } { cantrip_mechanics::rad::give(g, player, amount); });
+planned!("rad-counters" => let amount = { let q: &dyn Query = g; ((removed_1 as i64)) as u32 }; for player in { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() } { cantrip_mechanics::rad::give(g, player, amount); });
 let had_2: Vec<_> = counters_2.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_2); let applied_2: Vec<ObjectId> = counters_2.iter().zip(had_2).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
  Ok(()) }
 #[allow(unused_variables, dead_code)] fn ability_2_0_then(g: &mut dyn Game, asker: &Asker, parts: &[Prevented]) { let Some(first) = parts.first() else { return }; let prevented = Prevented::total(parts).min(u16::MAX.into()) as u16; let e = &Prevented { amount: prevented, ..*first }; let q: &dyn Query = g; let (source, target, amount, combat) = (e.source, &e.target, e.amount, e.combat); let subject = *target; let data = [u32::from(amount), source.0]; let _ = ability_2_0_then_steps(g, asker, subject, data, prevented); }

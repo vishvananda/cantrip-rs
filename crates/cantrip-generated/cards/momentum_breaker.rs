@@ -15,7 +15,7 @@ let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1: V
 g.end_sentence();
  Ok(()) }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_2 = { let q: &dyn Query = g; (Some(asker.controller).map_or(0i64, |p: PlayerId| i64::from(q.state().player(p).speed.unwrap_or(0)))).clamp(0, 2147483647) as i32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_2 = { let q: &dyn Query = g; (Some(asker.controller).map_or(0i64, |p: PlayerId| i64::from(q.state().player(p).speed.unwrap_or(0)))).min(i32::MAX.into()) as i32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_2 { g.gain_life(player, amount_2); }
 g.end_sentence();
  Ok(()) }

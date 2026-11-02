@@ -40,7 +40,7 @@ g.end_sentence();
 hoisted_6.extend(drawn_0.clone());
 hoisted_7.extend(hoisted_4.clone());
 } else {
-let amount_8 = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as u32 }; let players_8 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_8 = { let q: &dyn Query = g; (i64::from(item.x)) as u32 }; let players_8 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_8 { g.draw(player, amount_8); }
 g.end_sentence();
 }

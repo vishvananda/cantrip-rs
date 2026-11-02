@@ -14,7 +14,7 @@ g.end_sentence();
 let selected_1_player = { let q: &dyn Query = g; Some(chosen_0).expect("a reference that always names a player") }; let selected_1_candidates = { let q: &dyn Query = g; ((Some(chosen_0).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>() }; let selected_1_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AnyNumber }; let selected_1 = { cantrip_mechanics::choose::select(g, selected_1_player, asker.source, Purpose::Discard, selected_1_candidates, cantrip_mechanics::select::Selection::of(selected_1_count, &[]))? };
 let cards_2 = { let q: &dyn Query = g; selected_1.clone() }; let discarded_2 = g.discard_together(&cards_2);
 g.end_sentence();
-let amount_3 = { let q: &dyn Query = g; ((discarded_2.clone()).len() as i64).max(0) as u32 }; let players_3 = { let q: &dyn Query = g; Some(chosen_0).into_iter().collect::<Vec<PlayerId>>() };
+let amount_3 = { let q: &dyn Query = g; ((discarded_2.clone()).len() as i64) as u32 }; let players_3 = { let q: &dyn Query = g; Some(chosen_0).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_3 { g.draw(player, amount_3); }
 g.end_sentence();
 hoisted_4.extend(discarded_2.clone());

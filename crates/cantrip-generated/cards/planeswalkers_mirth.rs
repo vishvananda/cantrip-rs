@@ -10,7 +10,7 @@ let player_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Tar
 let count_0 = { let q: &dyn Query = g; (1i64).max(0) as usize }; let mut shown_0: Vec<ObjectId> = Vec::new(); while shown_0.len() < count_0 && !pool_0.is_empty() { let at = g.choose_at_random(pool_0.len()); shown_0.push(pool_0.remove(at)); }
 g.reveal(player_0, &shown_0);
 g.end_sentence();
-let amount_1 = { let q: &dyn Query = g; ((shown_0.clone()).get(0).copied().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o)))).max(0) as i32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_1 = { let q: &dyn Query = g; ((shown_0.clone()).get(0).copied().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o)))) as i32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_1 { g.gain_life(player, amount_1); }
 g.end_sentence();
  Ok(()) }

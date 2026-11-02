@@ -23,7 +23,7 @@ let mut gathered_1: Vec<(PlayerId, ObjectId)> = Vec::new();
 let sacrificed_1 = g.sacrifice_each(&gathered_1);
 g.end_sentence();
 let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_3 = Vec::new();
-let count_3_0 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }; let def_3_0 = g.card_id(&token_4::CARD);
+let count_3_0 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64) as u32 }; let def_3_0 = g.card_id(&token_4::CARD);
 for player in players_3 {
 tokens_3.extend(std::iter::repeat((def_3_0,player)).take(count_3_0 as usize));
 } let words_3 = Words::NONE;

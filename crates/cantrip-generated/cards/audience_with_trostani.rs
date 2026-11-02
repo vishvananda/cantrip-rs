@@ -17,7 +17,7 @@ tokens_0.extend(std::iter::repeat((def_0_0,player)).take(count_0_0 as usize));
 } let words_0 = g.words(asker.source);
 let created_0 = g.create_tokens_worded(&tokens_0, false, None, words_0)?;
 g.end_sentence();
-let amount_2 = { let q: &dyn Query = g; ({ let mut seen = Vec::new(); for id in q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && q.state().obj(id).token && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() { let value = q.chars(id).name; if !seen.contains(&value) { seen.push(value); } } seen.len() as i64 }).max(0) as u32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_2 = { let q: &dyn Query = g; ({ let mut seen = Vec::new(); for id in q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && q.state().obj(id).token && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() { let value = q.chars(id).name; if !seen.contains(&value) { seen.push(value); } } seen.len() as i64 }) as u32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_2 { g.draw(player, amount_2); }
 g.end_sentence();
  Ok(()) }

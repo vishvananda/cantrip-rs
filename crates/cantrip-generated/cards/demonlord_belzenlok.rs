@@ -29,7 +29,7 @@ hoisted_8.extend({ let q: &dyn Query = g; objects_2.iter().copied().filter(|&o| 
 hoisted_9.extend({ let q: &dyn Query = g; objects_3.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() });
 if !again_0 { break; } }
 g.end_sentence();
-let source_10 = { let q: &dyn Query = g; Some(asker.source) }; let amount_10 = { let q: &dyn Query = g; ((1i64 * (hoisted_6.clone()).len() as i64)).clamp(0, 65535) as u16 }; let recipients_10 = { let q: &dyn Query = g; (Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() }; if let Some(source) = source_10 { let batch: Vec<(ObjectId, Target, u16)> = recipients_10.iter().map(|t| (source, *t, amount_10)).collect(); g.damage_together(&batch); }
+let source_10 = { let q: &dyn Query = g; Some(asker.source) }; let amount_10 = { let q: &dyn Query = g; ((1i64 * (hoisted_6.clone()).len() as i64)).min(u16::MAX.into()) as u16 }; let recipients_10 = { let q: &dyn Query = g; (Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() }; if let Some(source) = source_10 { let batch: Vec<(ObjectId, Target, u16)> = recipients_10.iter().map(|t| (source, *t, amount_10)).collect(); g.damage_together(&batch); }
 g.end_sentence();
  Ok(()) }
 

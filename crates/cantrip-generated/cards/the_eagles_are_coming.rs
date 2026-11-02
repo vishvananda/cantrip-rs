@@ -17,7 +17,7 @@ pub static EXTRA: &[&CardDef] = &[];
 }
 fn delayed_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_3 = Vec::new();
-let count_3_0 = { let q: &dyn Query = g; ((about(q, item, 0)).len() as i64).max(0) as u32 }; let def_3_0 = g.card_id(&token_4::CARD);
+let count_3_0 = { let q: &dyn Query = g; ((about(q, item, 0)).len() as i64) as u32 }; let def_3_0 = g.card_id(&token_4::CARD);
 for player in players_3 {
 tokens_3.extend(std::iter::repeat((def_3_0,player)).take(count_3_0 as usize));
 } let words_3 = g.words(asker.source);
@@ -42,7 +42,7 @@ pub static EXTRA: &[&CardDef] = &[];
 }
 fn delayed_7(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let players_8 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_8 = Vec::new();
-let count_8_0 = { let q: &dyn Query = g; ((about(q, item, 0)).len() as i64).max(0) as u32 }; let def_8_0 = g.card_id(&token_9::CARD);
+let count_8_0 = { let q: &dyn Query = g; ((about(q, item, 0)).len() as i64) as u32 }; let def_8_0 = g.card_id(&token_9::CARD);
 for player in players_8 {
 tokens_8.extend(std::iter::repeat((def_8_0,player)).take(count_8_0 as usize));
 } let words_8 = g.words(asker.source);

@@ -9,7 +9,7 @@ let amount_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_0 = 
 for player in players_0 { g.draw(player, amount_0); }
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_2_0_count(q: &dyn Query, asker: &Asker) -> u16 { (q.state().stack.iter().chain(q.state().left_stack.iter()).rev().find(|i| i.kind == StackKind::Activated && q.obj(i.object).became == Some(asker.source)).map_or(0i64, |i| i64::from(i.x))).clamp(0, 65535) as u16 }
+#[allow(unused_variables)] fn ability_2_0_count(q: &dyn Query, asker: &Asker) -> u16 { (q.state().stack.iter().chain(q.state().left_stack.iter()).rev().find(|i| i.kind == StackKind::Activated && q.obj(i.object).became == Some(asker.source)).map_or(0i64, |i| i64::from(i.x))).min(u16::MAX.into()) as u16 }
 #[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Artifact))) }
 static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target_0).between(0, TargetSpec::COUNTED)];
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Cycled { card, player } = event { let id = *card; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && true && id == asker.source { return Some(Fired { subject, data }); } }

@@ -5,7 +5,7 @@
 #[allow(unused_variables)] fn watch_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && (q.chars(id).is(CardType::Instant) || q.chars(id).is(CardType::Sorcery)) { return Some(Fired { subject, data }); } }
  None }
 fn watch_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let runs_2: u32 = { let q: &dyn Query = g; (i64::from(q.state().left_stack(item.object).map_or(0, |made| made.x))).max(0) as u32 };
+let runs_2: u32 = { let q: &dyn Query = g; (i64::from(q.state().left_stack(item.object).map_or(0, |made| made.x))) as u32 };
 let copier_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let spell_2: Option<ObjectId> = ({ let q: &dyn Query = g; (item.subject.object().into_iter().collect::<Vec<ObjectId>>()) }).first().copied();
 if let Some(spell) = spell_2 { for _ in 0..runs_2 { g.copy_spell(spell, copier_2, true)?; } }
 g.end_sentence();

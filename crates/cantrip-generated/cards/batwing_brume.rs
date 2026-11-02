@@ -12,7 +12,7 @@ g.end_sentence();
 g.end_sentence();
 if { let q: &dyn Query = g; Some(asker.source).is_some_and(|candidate: ObjectId| ((Some(candidate).map_or(0, |o: ObjectId| { let spent = q.obj(o).spent; [Mana::B].into_iter().map(|mana| i64::from(spent.get(mana))).sum::<i64>() })) >= (1i64))) } {
 let mut players_2: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
- for (index_2, bound_0) in players_2.iter().copied().enumerate() { let amount_3 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| ((q.state().attackers.iter().any(|a| a.id == id) || q.was_attacking(id)) && q.chars(id).is(CardType::Creature) && Some(bound_0) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64).clamp(0, 2147483647) as i32 }; let players_3 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
+ for (index_2, bound_0) in players_2.iter().copied().enumerate() { let amount_3 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| ((q.state().attackers.iter().any(|a| a.id == id) || q.was_attacking(id)) && q.chars(id).is(CardType::Creature) && Some(bound_0) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64).min(i32::MAX.into()) as i32 }; let players_3 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_3 { g.lose_life(player, amount_3); }
     } 
 g.end_sentence();

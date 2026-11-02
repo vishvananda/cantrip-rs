@@ -11,7 +11,7 @@ let mut hoisted_5: Vec<ObjectId> = Vec::new();
 let mut hoisted_4: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let player_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.player()).expect("a reference that always names a player") }; let most_0 = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as u32 }; let mut milled_0: Vec<ObjectId> = Vec::new(); while (milled_0.len() as u32) < most_0 { let one = g.mill(player_0, 1); if one.is_empty() { break; } let found = { let q: &dyn Query = g; one.iter().copied().any(|id| q.chars(id).is(CardType::Creature)) }; milled_0.extend(one); if found { break; } }
+let player_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.player()).expect("a reference that always names a player") }; let most_0 = { let q: &dyn Query = g; (i64::from(item.x)) as u32 }; let mut milled_0: Vec<ObjectId> = Vec::new(); while (milled_0.len() as u32) < most_0 { let one = g.mill(player_0, 1); if one.is_empty() { break; } let found = { let q: &dyn Query = g; one.iter().copied().any(|id| q.chars(id).is(CardType::Creature)) }; milled_0.extend(one); if found { break; } }
 g.end_sentence();
 if { let q: &dyn Query = g; (((milled_0.clone()).into_iter().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>()).len() as i64) >= (1i64) } {
 let objects_1 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut picks_1: Vec<(PlayerId, ObjectId)> = Vec::new();

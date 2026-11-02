@@ -16,7 +16,7 @@ fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let mut players_1: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().filter(|&p| t_0.iter().any(|t| t.player() == Some(p))).collect::<Vec<PlayerId>>() };
 let mut gathered_2: Vec<(PlayerId, u32)> = Vec::new();
- for (index_1, bound_0) in players_1.iter().copied().enumerate() { gathered_2.push((bound_0, { let q: &dyn Query = g; ((((q.state().apnap().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && Some(bound_0) == Some(q.state().obj(id).owner))).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }));
+ for (index_1, bound_0) in players_1.iter().copied().enumerate() { gathered_2.push((bound_0, { let q: &dyn Query = g; ((((q.state().apnap().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && Some(bound_0) == Some(q.state().obj(id).owner))).collect::<Vec<ObjectId>>()).len() as i64) as u32 }));
     } 
 let milled_2 = g.mill_together(&gathered_2);
 g.end_sentence();

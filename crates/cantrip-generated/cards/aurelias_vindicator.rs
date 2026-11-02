@@ -5,7 +5,7 @@
 // When this creature is turned face up, exile up to X other target creatures from the battlefield and/or creature cards from graveyards.
 // When this creature leaves the battlefield, return the exiled cards to their owners' hands.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_4_0_count(q: &dyn Query, asker: &Asker) -> u16 { (Some(asker.source).map_or(0i64, |o: ObjectId| i64::from(q.state().obj(o).x))).max(0) as u16 }
+#[allow(unused_variables)] fn ability_4_0_count(q: &dyn Query, asker: &Asker) -> u16 { (Some(asker.source).map_or(0i64, |o: ObjectId| i64::from(q.state().obj(o).x))) as u16 }
 #[allow(unused_variables)] fn ability_4_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { (matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((!(q.event_subject().object() == Some(id)) && q.chars(id).is(CardType::Creature))))) || (matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && (q.chars(id).is(CardType::Creature)))) }
 static ABILITY_4_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_4_target_0).between(0, TargetSpec::COUNTED)];
 #[allow(unused_variables)] fn ability_4_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::TurnedFaceUp { permanent, .. } = event { let id = *permanent; let subject = Target::Object(id); let data = [u32::MAX, u32::MAX]; if Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }

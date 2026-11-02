@@ -22,10 +22,10 @@ let created_1 = g.create_tokens_worded(&tokens_1, false, None, words_1)?;
 g.end_sentence();
 let player_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let candidates_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }; let Some(chosen_3) = cantrip_mechanics::choose::player(g, player_3, asker.source, candidates_3, "Choose", 0)? else { return Ok(()) };
 g.end_sentence();
-let amount_4 = { let q: &dyn Query = g; ((2i64 * (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64)).clamp(0, 2147483647) as i32 }; let players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_4 = { let q: &dyn Query = g; ((2i64 * (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64)).min(i32::MAX.into()) as i32 }; let players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_4 { g.gain_life(player, amount_4); }
 g.end_sentence();
-let amount_5 = { let q: &dyn Query = g; ((2i64 * (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(chosen_3) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64)).clamp(0, 2147483647) as i32 }; let players_5 = { let q: &dyn Query = g; Some(chosen_3).into_iter().collect::<Vec<PlayerId>>() };
+let amount_5 = { let q: &dyn Query = g; ((2i64 * (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(chosen_3) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64)).min(i32::MAX.into()) as i32 }; let players_5 = { let q: &dyn Query = g; Some(chosen_3).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_5 { g.gain_life(player, amount_5); }
 g.end_sentence();
  Ok(()) }

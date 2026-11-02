@@ -15,7 +15,7 @@ let mut hoisted_6: Vec<ObjectId> = Vec::new();
 let mut hoisted_5: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let payer_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let (paid_0, after_0, before_0, picked_0): (bool, Vec<ObjectId>, Vec<ObjectId>, Vec<ObjectId>) = if cantrip_mechanics::effects::ask_may(g, payer_0, asker.source, Purpose::Optional)? {
-let amount_2 = { let q: &dyn Query = g; (i64::from(item.data[0])).max(0) as u32 }; let mills_2: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_2)).collect(); let milled_2 = g.mill_together(&mills_2);
+let amount_2 = { let q: &dyn Query = g; (i64::from(item.data[0])) as u32 }; let mills_2: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_2)).collect(); let milled_2 = g.mill_together(&mills_2);
 let paid_1 = true;
 (paid_1, { let q: &dyn Query = g; (milled_2).clone() }, { let q: &dyn Query = g; (milled_2.clone()).clone() }, Vec::new()) } else { (false, Vec::new(), Vec::new(), Vec::new()) };
 g.end_sentence();

@@ -4,7 +4,7 @@
 // Flying
 // When this creature enters, up to X target creatures gain flying until end of turn, where X is the number of times this creature was kicked.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_2_0_count(q: &dyn Query, asker: &Asker) -> u16 { (Some(asker.source).map_or(0i64, |o: ObjectId| (i64::from(q.state().obj(o).kicked) + if q.card(q.state().obj(o).card).kicker.is_some() { i64::from(q.state().obj(o).paid) } else { 0 }))).clamp(0, 65535) as u16 }
+#[allow(unused_variables)] fn ability_2_0_count(q: &dyn Query, asker: &Asker) -> u16 { (Some(asker.source).map_or(0i64, |o: ObjectId| (i64::from(q.state().obj(o).kicked) + if q.card(q.state().obj(o).card).kicker.is_some() { i64::from(q.state().obj(o).paid) } else { 0 }))).min(u16::MAX.into()) as u16 }
 #[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
 static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target_0).between(0, TargetSpec::COUNTED)];
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }

@@ -36,7 +36,7 @@ let selected_5_player = { let q: &dyn Query = g; Some(asker.controller).expect("
 let objects_6 = { let q: &dyn Query = g; selected_5.clone() }; let mut owners_6: Vec<PlayerId> = objects_6.iter().map(|o| g.state().obj(*o).owner).collect(); owners_6.dedup(); for owner in owners_6 { let cards: Vec<ObjectId> = objects_6.iter().copied().filter(|o| g.state().obj(*o).owner == owner).collect(); g.reveal(owner, &cards); }
 g.end_sentence();
 let players_7 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_7 = Vec::new();
-let count_7_0 = { let q: &dyn Query = g; ({ let those: Vec<ObjectId> = objects_6.clone(); those.iter().filter(|&&a| those.iter().any(|&b| b != a && q.mana_value(a) == q.mana_value(b))).count() as i64 }).max(0) as u32 }; let def_7_0 = g.card_id(&token_8::CARD);
+let count_7_0 = { let q: &dyn Query = g; ({ let those: Vec<ObjectId> = objects_6.clone(); those.iter().filter(|&&a| those.iter().any(|&b| b != a && q.mana_value(a) == q.mana_value(b))).count() as i64 }) as u32 }; let def_7_0 = g.card_id(&token_8::CARD);
 for player in players_7 {
 tokens_7.extend(std::iter::repeat((def_7_0,player)).take(count_7_0 as usize));
 } let words_7 = Words::NONE;

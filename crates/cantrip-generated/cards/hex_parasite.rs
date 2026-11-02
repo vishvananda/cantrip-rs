@@ -8,7 +8,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let mut removed_0: i64 = 0;
 let objects_0_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() };
-let player_0_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; for object in objects_0_0 { removed_0 += i64::from(g.remove_counters_up_to(player_0_0, asker.source, object, { let q: &dyn Query = g; (i64::from(item.x)).clamp(0, 255) as u8 })?); }
+let player_0_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; for object in objects_0_0 { removed_0 += i64::from(g.remove_counters_up_to(player_0_0, asker.source, object, { let q: &dyn Query = g; (i64::from(item.x)).min(u8::MAX.into()) as u8 })?); }
 g.end_sentence();
 let objects_1 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let duration_1 = Duration::EndOfTurn;
 let kind_1_0_0 = { let q: &dyn Query = g; EffectKind::Pump(((removed_0 as i64)).clamp(-32768, 32767) as i16, ((0i64 * (removed_0 as i64))) as i16) };

@@ -19,7 +19,7 @@ gathered_3.extend({ let q: &dyn Query = g; ((Some(bound_0).into_iter().collect::
 let objects_5 = { let q: &dyn Query = g; gathered_3.clone() }; let moved_5 = g.exile_all(&objects_5);
 g.end_sentence();
  for (index_2, bound_0) in players_2.iter().copied().enumerate() { if guard_2_0[index_2] {
-let amount_6 = { let q: &dyn Query = g; ((done_1 as i64)).max(0) as u32 }; let players_6 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
+let amount_6 = { let q: &dyn Query = g; ((done_1 as i64)) as u32 }; let players_6 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_6 { g.draw(player, amount_6); }
    }
  } 

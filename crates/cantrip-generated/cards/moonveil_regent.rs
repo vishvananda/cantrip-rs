@@ -18,7 +18,7 @@ hoisted_3.extend({ let q: &dyn Query = g; discarded_1.clone() });
 }
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
-let amount_4 = { let q: &dyn Query = g; (item.subject.object().map_or(0i64, |o: ObjectId| q.chars(o).colors.iter().count() as i64)).max(0) as u32 }; let players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_4 = { let q: &dyn Query = g; (item.subject.object().map_or(0i64, |o: ObjectId| q.chars(o).colors.iter().count() as i64)) as u32 }; let players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_4 { g.draw(player, amount_4); }
 g.end_sentence();
 }
@@ -29,7 +29,7 @@ static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[cantrip_mechanics::targ
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let source_5 = { let q: &dyn Query = g; item.subject.object() }; let amount_5 = { let q: &dyn Query = g; ({ let mut seen = ColorSet::NONE; for id in q.state().battlefield().iter().copied().filter(|&id| Some(asker.controller) == Some(q.controller(id))).collect::<Vec<ObjectId>>() { for color in q.chars(id).colors.iter() { seen = seen.with(color); } } seen.iter().count() as i64 }).clamp(0, 65535) as u16 }; let recipients_5 = { let q: &dyn Query = g; t_0.clone() }; if let Some(source) = source_5 { let batch: Vec<(ObjectId, Target, u16)> = recipients_5.iter().map(|t| (source, *t, amount_5)).collect(); g.damage_together(&batch); }
+let source_5 = { let q: &dyn Query = g; item.subject.object() }; let amount_5 = { let q: &dyn Query = g; ({ let mut seen = ColorSet::NONE; for id in q.state().battlefield().iter().copied().filter(|&id| Some(asker.controller) == Some(q.controller(id))).collect::<Vec<ObjectId>>() { for color in q.chars(id).colors.iter() { seen = seen.with(color); } } seen.iter().count() as i64 }).min(u16::MAX.into()) as u16 }; let recipients_5 = { let q: &dyn Query = g; t_0.clone() }; if let Some(source) = source_5 { let batch: Vec<(ObjectId, Target, u16)> = recipients_5.iter().map(|t| (source, *t, amount_5)).collect(); g.damage_together(&batch); }
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

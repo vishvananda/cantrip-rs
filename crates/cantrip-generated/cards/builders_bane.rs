@@ -10,7 +10,7 @@ let objects_0 = { let q: &dyn Query = g; t_0.iter().filter_map(|t| t.object()).c
 g.end_sentence();
 let mut players_1: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
 let mut gathered_2: Vec<(ObjectId, Target, u16)> = Vec::new();
- for (index_1, bound_0) in players_1.iter().copied().enumerate() { let source_3 = { let q: &dyn Query = g; Some(asker.source) }; let amount_3 = { let q: &dyn Query = g; (((objects_0.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| ((q.chars(id).is(CardType::Artifact) && Some(bound_0) == Some(q.controller(id))) && true)).collect::<Vec<ObjectId>>()).len() as i64).clamp(0, 65535) as u16 }; if let Some(source) = source_3 { for t in { let q: &dyn Query = g; (Some(bound_0).into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() } { gathered_2.push((source, t, amount_3)); } }
+ for (index_1, bound_0) in players_1.iter().copied().enumerate() { let source_3 = { let q: &dyn Query = g; Some(asker.source) }; let amount_3 = { let q: &dyn Query = g; (((objects_0.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| ((q.chars(id).is(CardType::Artifact) && Some(bound_0) == Some(q.controller(id))) && true)).collect::<Vec<ObjectId>>()).len() as i64).min(u16::MAX.into()) as u16 }; if let Some(source) = source_3 { for t in { let q: &dyn Query = g; (Some(bound_0).into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() } { gathered_2.push((source, t, amount_3)); } }
     } 
 g.damage_together(&gathered_2);
 g.end_sentence();

@@ -10,7 +10,7 @@ pub static EXTRA: &[&CardDef] = &[];
 
 }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_0 = { let q: &dyn Query = g; (i64::from(item.x)).clamp(0, 32767) as i16 }; let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let army_0: Vec<ObjectId> = cantrip_mechanics::amass::amass_army(g, player_0, asker.source, &token_1::CARD, Subtype::Orc, amount_0)?.into_iter().collect();
+let amount_0 = { let q: &dyn Query = g; (i64::from(item.x)).min(i16::MAX.into()) as i16 }; let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let army_0: Vec<ObjectId> = cantrip_mechanics::amass::amass_army(g, player_0, asker.source, &token_1::CARD, Subtype::Orc, amount_0)?.into_iter().collect();
 g.end_sentence();
 let objects_2 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| ((q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Goblin)) || q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Orc))) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_2 = { let q: &dyn Query = g; Some(asker.source) }; let duration_2 = Duration::EndOfTurn;
 let kind_2_0_0 = { let q: &dyn Query = g; EffectKind::AddKeywords(Keywords::of(&[Keyword::DoubleStrike])) };

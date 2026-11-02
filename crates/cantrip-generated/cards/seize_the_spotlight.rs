@@ -40,11 +40,11 @@ let objects_9 = { let q: &dyn Query = g; (planned_value!("depends on an instruct
 let kind_9_0_0 = { let q: &dyn Query = g; EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])) };
 if let Some(source) = source_9 { cantrip_api::instruction(g, |g| { for &object in &objects_9 { g.add_effect(source, object, kind_9_0_0, duration_9);  } }); }
 g.end_sentence();
-let amount_10 = { let q: &dyn Query = g; ((q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => g.votes().voted(option))).collect::<Vec<PlayerId>>()).len() as i64).max(0) as u32 }; let players_10 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_10 = { let q: &dyn Query = g; ((q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => g.votes().voted(option))).collect::<Vec<PlayerId>>()).len() as i64) as u32 }; let players_10 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_10 { g.draw(player, amount_10); }
 g.end_sentence();
 let players_11 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_11 = Vec::new();
-let count_11_0 = { let q: &dyn Query = g; ((q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => g.votes().voted(option))).collect::<Vec<PlayerId>>()).len() as i64).max(0) as u32 }; let def_11_0 = g.card_id(&token_12::CARD);
+let count_11_0 = { let q: &dyn Query = g; ((q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => g.votes().voted(option))).collect::<Vec<PlayerId>>()).len() as i64) as u32 }; let def_11_0 = g.card_id(&token_12::CARD);
 for player in players_11 {
 tokens_11.extend(std::iter::repeat((def_11_0,player)).take(count_11_0 as usize));
 } let words_11 = Words::NONE;

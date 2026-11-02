@@ -14,7 +14,7 @@ pub static EXTRA: &[&CardDef] = &[];
 }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_0 = Vec::new();
-let count_0_0 = { let q: &dyn Query = g; (Some(asker.controller).map_or(0, |player: PlayerId| { let creatures: Vec<ObjectId> = q.state().battlefield().iter().copied().filter(|&id| q.controller(id) == player && q.chars(id).is(CardType::Creature)).collect(); (0u8..16).map(|roles: u8| creatures.iter().filter(|&&id| [Subtype::Cleric, Subtype::Rogue, Subtype::Warrior, Subtype::Wizard].iter().enumerate().any(|(i, &role)| (roles >> i) & 1 == 1 && q.chars(id).has_subtype(role))).count() as i64 + 4 - i64::from(roles.count_ones())).min().unwrap_or(0) })).max(0) as u32 }; let def_0_0 = g.card_id(&token_1::CARD);
+let count_0_0 = { let q: &dyn Query = g; (Some(asker.controller).map_or(0, |player: PlayerId| { let creatures: Vec<ObjectId> = q.state().battlefield().iter().copied().filter(|&id| q.controller(id) == player && q.chars(id).is(CardType::Creature)).collect(); (0u8..16).map(|roles: u8| creatures.iter().filter(|&&id| [Subtype::Cleric, Subtype::Rogue, Subtype::Warrior, Subtype::Wizard].iter().enumerate().any(|(i, &role)| (roles >> i) & 1 == 1 && q.chars(id).has_subtype(role))).count() as i64 + 4 - i64::from(roles.count_ones())).min().unwrap_or(0) })) as u32 }; let def_0_0 = g.card_id(&token_1::CARD);
 for player in players_0 {
 tokens_0.extend(std::iter::repeat((def_0_0,player)).take(count_0_0 as usize));
 } let words_0 = g.words(asker.source);

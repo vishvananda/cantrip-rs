@@ -14,7 +14,7 @@ let decider_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a refere
 let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let objects_1 = { let q: &dyn Query = g; item.subject.object().into_iter().collect::<Vec<ObjectId>>() };
 planned!("operation-put-sticker" => cantrip_mechanics::stickers::name_sticker(g, player_1, asker.source, &objects_1)?);
 g.end_sentence();
-let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let depth_2 = { let q: &dyn Query = g; (planned_value!("stickers", 0i64 => cantrip_mechanics::stickers::measure(q, &Vec::<ObjectId>::new(), StickerMeasure::UniqueVowels))).max(0) as usize };  let taken_2 = cantrip_mechanics::library::look_at_top(g, player_2, asker.source, depth_2, (1, 1), false, |_| true, cantrip_mechanics::library::Rest::BottomChosen)?;
+let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let depth_2 = { let q: &dyn Query = g; (planned_value!("stickers", 0i64 => cantrip_mechanics::stickers::measure(q, &Vec::<ObjectId>::new(), StickerMeasure::UniqueVowels))) as usize };  let taken_2 = cantrip_mechanics::library::look_at_top(g, player_2, asker.source, depth_2, (1, 1), false, |_| true, cantrip_mechanics::library::Rest::BottomChosen)?;
 g.end_sentence();
 hoisted_3.extend(taken_2.clone());
 hoisted_4.extend(taken_2.clone());

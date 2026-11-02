@@ -8,12 +8,12 @@
 #[allow(unused_variables)] fn ability_0_0_rule(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, q.controller(source)); let Costed::Spell(spell) = costed else { return CostDelta::NONE; }; if player == asker.controller && q.chars(spell).colors.has(q.words(asker.source).color(Color::Blue)) { CostDelta::less((1i64) as u8) } else { CostDelta::NONE } }
 #[allow(unused_variables, unused_mut)] fn ability_1_then_steps(g: &mut dyn Game, asker: &Asker, subject: Target, data: [u32; 2]) -> Result<(), Suspend> { let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; subject.player().into_iter().collect::<Vec<PlayerId>>() };
 let mut gathered_1: Vec<(PlayerId, u32)> = Vec::new();
- for (index_0, bound_9000) in players_0.iter().copied().enumerate() { gathered_1.push((bound_9000, { let q: &dyn Query = g; ((i64::from(data[0]) + 4i64)).clamp(0, 4294967295) as u32 }));
+ for (index_0, bound_9000) in players_0.iter().copied().enumerate() { gathered_1.push((bound_9000, { let q: &dyn Query = g; ((i64::from(data[0]) + 4i64)).min(u32::MAX.into()) as u32 }));
     } 
 let milled_1 = g.mill_together(&gathered_1);
  Ok(()) }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_3 = { let q: &dyn Query = g; ((((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }; let mills_3: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_3)).collect(); let milled_3 = g.mill_together(&mills_3);
+let amount_3 = { let q: &dyn Query = g; ((((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).len() as i64) as u32 }; let mills_3: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_3)).collect(); let milled_3 = g.mill_together(&mills_3);
 g.end_sentence();
  Ok(()) }
 planned_item!("replacement-of-mill" => callbacks: #[allow(unused_variables)] fn ability_1_applies(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool { if let Proposal::Mill(p) = proposal { let amount = p.count; let subject = Target::Player(p.player); let data = [p.count, u32::MAX]; if (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&p.player) { return true; } }

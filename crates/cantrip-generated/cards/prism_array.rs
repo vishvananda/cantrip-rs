@@ -4,7 +4,7 @@
 // Remove a crystal counter from this enchantment: Tap target creature.
 // {W}{U}{B}{R}{G}: Scry 3.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let more = { let q: &dyn Query = g; (Target::Object(asker.source).object().map_or(0, |o: ObjectId| { let spent = q.obj(o).spent; [Mana::W, Mana::U, Mana::B, Mana::R, Mana::G, Mana::C].into_iter().filter(|mana| *mana != Mana::C).filter(|mana| spent.get(*mana) > 0).count() as i64 })).clamp(0, 32767) as i16 }; entering.counters[CounterKind::Crystal as usize] = entering.counters[CounterKind::Crystal as usize].saturating_add(more);
+#[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let more = { let q: &dyn Query = g; (Target::Object(asker.source).object().map_or(0, |o: ObjectId| { let spent = q.obj(o).spent; [Mana::W, Mana::U, Mana::B, Mana::R, Mana::G, Mana::C].into_iter().filter(|mana| *mana != Mana::C).filter(|mana| spent.get(*mana) > 0).count() as i64 })).min(i16::MAX.into()) as i16 }; entering.counters[CounterKind::Crystal as usize] = entering.counters[CounterKind::Crystal as usize].saturating_add(more);
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];

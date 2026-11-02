@@ -73,7 +73,7 @@ let paid_4 = !picks_4.is_empty();
 (paid_4, { let q: &dyn Query = g; (sacrificed_4).clone() }, { let q: &dyn Query = g; (objects_4.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).clone() }, Vec::new()) } else { (false, Vec::new(), Vec::new(), Vec::new()) };
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_3 as i64) != 0) } {
-let amount_5 = { let q: &dyn Query = g; ((before_3.clone()).len() as i64).max(0) as u32 }; let players_5 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_5 = { let q: &dyn Query = g; ((before_3.clone()).len() as i64) as u32 }; let players_5 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_5 { g.draw(player, amount_5); }
 g.end_sentence();
 }

@@ -26,7 +26,7 @@ pub mod flipped {
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::TappedForMana { permanent, player, produced } = event { let id = *permanent; let subject = Target::Object(id); let data = [u32::from(player.0), Mana::ALL.iter().filter(|&&m| produced.get(m) > 0).fold(0u32, |types, &m| types | 1 << m as u32)]; if (q.chars(id).is(CardType::Land) && Some(asker.controller) == Some(q.controller(id))) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-for _ in 0..({ let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (!(item.subject.object() == Some(id)) && q.chars(id).is(CardType::Land) && Some(asker.controller) == Some(q.controller(id)) && item.subject.object().is_some_and(|o: ObjectId| cantrip_mechanics::same_name(q, id, o)))).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }) {
+for _ in 0..({ let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (!(item.subject.object() == Some(id)) && q.chars(id).is(CardType::Land) && Some(asker.controller) == Some(q.controller(id)) && item.subject.object().is_some_and(|o: ObjectId| cantrip_mechanics::same_name(q, id, o)))).collect::<Vec<ObjectId>>()).len() as i64) as u32 }) {
 if item.data[1] != 0 { cantrip_mechanics::mana::add_one_mana_of_any_type_that_land_produced(g, item)?; }
 }
 g.end_sentence();

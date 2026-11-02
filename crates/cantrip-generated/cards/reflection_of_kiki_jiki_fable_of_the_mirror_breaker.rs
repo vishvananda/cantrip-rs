@@ -59,7 +59,7 @@ hoisted_6.extend(selected_3.clone());
 hoisted_7.extend({ let q: &dyn Query = g; discarded_4.clone() });
 }
 g.end_sentence();
-let amount_8 = { let q: &dyn Query = g; ((hoisted_7.clone()).len() as i64).max(0) as u32 }; let players_8 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_8 = { let q: &dyn Query = g; ((hoisted_7.clone()).len() as i64) as u32 }; let players_8 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_8 { g.draw(player, amount_8); }
 g.end_sentence();
  Ok(()) }

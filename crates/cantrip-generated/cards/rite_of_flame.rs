@@ -9,7 +9,7 @@ for player in mana_players_1 {
 g.add_mana(player, Mana::R, mana_1_0);}
 g.end_sentence();
 let mana_players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_3_0 = { let q: &dyn Query = g; ((((q.state().apnap().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && q.chars(id).name == "Rite of Flame").collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 };
+let mana_3_0 = { let q: &dyn Query = g; ((((q.state().apnap().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && q.chars(id).name == "Rite of Flame").collect::<Vec<ObjectId>>()).len() as i64) as u32 };
 for player in mana_players_3 {
 g.add_mana(player, Mana::R, mana_3_0);}
 g.end_sentence();

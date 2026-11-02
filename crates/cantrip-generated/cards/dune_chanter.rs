@@ -20,7 +20,7 @@ g.add_mana(player, color.mana(), mana_1);}
 fn ability_4(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let amount_2 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let mills_2: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_2)).collect(); let milled_2 = g.mill_together(&mills_2);
 g.end_sentence();
-let amount_3 = { let q: &dyn Query = g; (((milled_2.clone()).into_iter().filter(|&id| q.chars(id).is(CardType::Land)).collect::<Vec<ObjectId>>()).len() as i64).clamp(0, 2147483647) as i32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_3 = { let q: &dyn Query = g; (((milled_2.clone()).into_iter().filter(|&id| q.chars(id).is(CardType::Land)).collect::<Vec<ObjectId>>()).len() as i64).min(i32::MAX.into()) as i32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_3 { g.gain_life(player, amount_3); }
 g.end_sentence();
  Ok(()) }

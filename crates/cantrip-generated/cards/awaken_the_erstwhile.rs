@@ -18,7 +18,7 @@ let cards_3 = { let q: &dyn Query = g; gathered_1.clone() }; let discarded_3 = g
 g.end_sentence();
 let mut players_4: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
 let mut gathered_5: Vec<(CardId, PlayerId)> = Vec::new();
- for (index_4, bound_0) in players_4.iter().copied().enumerate() { let def_6 = g.card_id(&token_7::CARD); let count_6 = { let q: &dyn Query = g; (((discarded_3.clone()).into_iter().filter(|&o| Some(q.state().obj(o).owner) == Some(bound_0)).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }; let player_6 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; gathered_5.extend(std::iter::repeat((def_6, player_6)).take(count_6 as usize));
+ for (index_4, bound_0) in players_4.iter().copied().enumerate() { let def_6 = g.card_id(&token_7::CARD); let count_6 = { let q: &dyn Query = g; (((discarded_3.clone()).into_iter().filter(|&o| Some(q.state().obj(o).owner) == Some(bound_0)).collect::<Vec<ObjectId>>()).len() as i64) as u32 }; let player_6 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; gathered_5.extend(std::iter::repeat((def_6, player_6)).take(count_6 as usize));
     } 
 let words_5 = g.words(asker.source); let created_5 = g.create_tokens_worded(&gathered_5, false, None, words_5)?;
 g.end_sentence();

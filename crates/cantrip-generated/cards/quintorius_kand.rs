@@ -41,7 +41,7 @@ let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true
 let objects_5 = { let q: &dyn Query = g; t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>() }; let moved_5 = g.exile_all(&objects_5);
 g.end_sentence();
 let mana_players_7 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_7_0 = { let q: &dyn Query = g; ((objects_5.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 };
+let mana_7_0 = { let q: &dyn Query = g; ((objects_5.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).len() as i64) as u32 };
 for player in mana_players_7 {
 g.add_mana(player, Mana::R, mana_7_0);}
 g.end_sentence();

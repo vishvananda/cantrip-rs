@@ -14,13 +14,13 @@ let kind_0_0_0 = { let q: &dyn Query = g; EffectKind::Control(Some(PlayerId(item
 if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &object in &objects_0 { g.add_effect(source, object, kind_0_0_0, duration_0);  } }); }
 g.end_sentence();
 let mut players_1: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
- for (index_1, bound_0) in players_1.iter().copied().enumerate() { let amount_2 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (Some(bound_0) == Some(q.controller(id)) && ({ let other = Some(bound_0); q.state().apnap().filter(|p| Some(*p) != other).collect::<Vec<PlayerId>>() }).contains(&q.state().obj(id).owner))).collect::<Vec<ObjectId>>()).len() as i64).clamp(0, 2147483647) as i32 }; let players_2 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
+ for (index_1, bound_0) in players_1.iter().copied().enumerate() { let amount_2 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (Some(bound_0) == Some(q.controller(id)) && ({ let other = Some(bound_0); q.state().apnap().filter(|p| Some(*p) != other).collect::<Vec<PlayerId>>() }).contains(&q.state().obj(id).owner))).collect::<Vec<ObjectId>>()).len() as i64).min(i32::MAX.into()) as i32 }; let players_2 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_2 { g.lose_life(player, amount_2); }
     } 
 g.end_sentence();
 let mut players_3: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
 let mut gathered_4: Vec<ObjectId> = Vec::new();
- for (index_3, bound_0) in players_3.iter().copied().enumerate() { let amount_5 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (Some(bound_0) == Some(q.controller(id)) && ({ let other = Some(bound_0); q.state().apnap().filter(|p| Some(*p) != other).collect::<Vec<PlayerId>>() }).contains(&q.state().obj(id).owner))).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }; gathered_4.extend(cantrip_mechanics::choose_from_hand(g, bound_0, asker.source, amount_5)?);
+ for (index_3, bound_0) in players_3.iter().copied().enumerate() { let amount_5 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (Some(bound_0) == Some(q.controller(id)) && ({ let other = Some(bound_0); q.state().apnap().filter(|p| Some(*p) != other).collect::<Vec<PlayerId>>() }).contains(&q.state().obj(id).owner))).collect::<Vec<ObjectId>>()).len() as i64) as u32 }; gathered_4.extend(cantrip_mechanics::choose_from_hand(g, bound_0, asker.source, amount_5)?);
     } 
 let cards_6 = { let q: &dyn Query = g; gathered_4.clone() }; let discarded_6 = g.discard_together(&cards_6);
 g.end_sentence();

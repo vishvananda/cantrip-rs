@@ -4,7 +4,7 @@
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn paid_3(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { !(q.chars(id).is(CardType::Land)) }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let mut runs_0: u32 = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as u32 }; while runs_0 > 0 { runs_0 -= 1; let mut again_0 = false;
+let mut runs_0: u32 = { let q: &dyn Query = g; (i64::from(item.x)) as u32 }; while runs_0 > 0 { runs_0 -= 1; let mut again_0 = false;
 let mut players_1: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
 { let order: Vec<PlayerId> = g.state().apnap().collect(); players_1.sort_by_key(|p| order.iter().position(|o| o == p)); }
 let mut guard_1_0 = vec![false; players_1.len()];

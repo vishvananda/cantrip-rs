@@ -52,7 +52,7 @@ tokens_7.extend(std::iter::repeat((def_7_0,player)).take(count_7_0 as usize));
 } let words_7 = g.words(asker.source);
 let created_7 = g.create_tokens_worded(&tokens_7, false, None, words_7)?;
 g.end_sentence();
-let mut runs_9: u32 = { let q: &dyn Query = g; ((q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0).and_then(|p: PlayerId| players_3.iter().position(|&next| next == p)).is_some_and(|at| (each_5[at] as i64) != 0)).collect::<Vec<PlayerId>>()).len() as i64).max(0) as u32 }; while runs_9 > 0 { runs_9 -= 1; let mut again_9 = false;
+let mut runs_9: u32 = { let q: &dyn Query = g; ((q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0).and_then(|p: PlayerId| players_3.iter().position(|&next| next == p)).is_some_and(|at| (each_5[at] as i64) != 0)).collect::<Vec<PlayerId>>()).len() as i64) as u32 }; while runs_9 > 0 { runs_9 -= 1; let mut again_9 = false;
 let amount_10 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_10 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_10 { g.draw(player, amount_10); }
 g.end_sentence();

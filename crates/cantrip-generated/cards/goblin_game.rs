@@ -18,7 +18,7 @@ g.end_sentence();
 planned!("operation-reveal-choices" => cantrip_mechanics::secret::reveal_choices(g, asker.source, ChoiceKind::Number));
 g.end_sentence();
 let mut players_4: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
- for (index_4, bound_0) in players_4.iter().copied().enumerate() { let amount_5 = { let q: &dyn Query = g; (Some(bound_0).map_or(0i64, |p: PlayerId| planned_value!("numeric expression PlayerNumber ChosenNumber", 0i64 => q.player_number(p, PlayerNumber::ChosenNumber)))).clamp(0, 2147483647) as i32 }; let players_5 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
+ for (index_4, bound_0) in players_4.iter().copied().enumerate() { let amount_5 = { let q: &dyn Query = g; (Some(bound_0).map_or(0i64, |p: PlayerId| planned_value!("numeric expression PlayerNumber ChosenNumber", 0i64 => q.player_number(p, PlayerNumber::ChosenNumber)))).min(i32::MAX.into()) as i32 }; let players_5 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_5 { g.lose_life(player, amount_5); }
     } 
 g.end_sentence();

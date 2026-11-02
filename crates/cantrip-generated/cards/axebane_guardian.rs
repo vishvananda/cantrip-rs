@@ -4,7 +4,7 @@
 // {T}: Add X mana in any combination of colors, where X is the number of creatures you control with defender.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_1_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let mana_players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_0 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)) && q.chars(id).keywords.has(Keyword::Defender))).collect::<Vec<ObjectId>>()).len() as i64).clamp(0, 255) as u8 };
+let mana_0 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)) && q.chars(id).keywords.has(Keyword::Defender))).collect::<Vec<ObjectId>>()).len() as i64).min(u8::MAX.into()) as u8 };
 for player in mana_players_0 {
 if mana_0 > 0 { let colors = cantrip_mechanics::choose_colors(g, player, asker.source, ColorSet(31), mana_0)?;
 for color in colors { g.add_mana(player, color.mana(), 1); }

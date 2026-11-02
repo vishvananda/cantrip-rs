@@ -17,7 +17,7 @@ let amount_1_0 = { let q: &dyn Query = g; (1i64).max(0) as i16 }; cantrip_api::i
 g.end_sentence();
  Ok(()) }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let object_2 = { let q: &dyn Query = g; Some(asker.source) }; let amount_2 = { let q: &dyn Query = g; (i64::from(item.x)).clamp(0, 32767) as i16 }; let cap_2 = { let q: &dyn Query = g; (7i64).max(0) as i16 }; if let Some(object) = object_2 { let room = cap_2.saturating_sub(g.state().obj(object).counters(planned_value!("power/toughness counter other than ±1/±1", CounterKind::PlusOne => CounterKind::Plus1Plus0))).max(0); g.add_counters(object, planned_value!("power/toughness counter other than ±1/±1", CounterKind::PlusOne => CounterKind::Plus1Plus0), amount_2.min(room)); }
+let object_2 = { let q: &dyn Query = g; Some(asker.source) }; let amount_2 = { let q: &dyn Query = g; (i64::from(item.x)).min(i16::MAX.into()) as i16 }; let cap_2 = { let q: &dyn Query = g; (7i64).max(0) as i16 }; if let Some(object) = object_2 { let room = cap_2.saturating_sub(g.state().obj(object).counters(planned_value!("power/toughness counter other than ±1/±1", CounterKind::PlusOne => CounterKind::Plus1Plus0))).max(0); g.add_counters(object, planned_value!("power/toughness counter other than ±1/±1", CounterKind::PlusOne => CounterKind::Plus1Plus0), amount_2.min(room)); }
 g.end_sentence();
  Ok(()) }
 fn ability_2_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.controller).is_some_and(|player: PlayerId| q.state().turn.active == player && q.state().turn.step() == Step::Upkeep) }

@@ -5,7 +5,7 @@
 // When Polukranos becomes monstrous, it deals X damage divided as you choose among any number of target creatures your opponents control. Each of those creatures deals damage equal to its power to Polukranos.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_0 = { let q: &dyn Query = g; (i64::from(item.x)).clamp(0, 32767) as i16 }; g.monstrosity(asker.source, amount_0);
+let amount_0 = { let q: &dyn Query = g; (i64::from(item.x)).min(i16::MAX.into()) as i16 }; g.monstrosity(asker.source, amount_0);
 g.end_sentence();
  Ok(()) }
 planned_item!("target-with-a-divided-amount-of-an-x-it-can-t-read", "(kind:Triggered,args:(event:Object(event:BecomesMonstrous,objects:(kind:SameObject,args:(kind:Source))),intervening_if:None,limits:(per_turn:None,total:None),announcement:(targets:[(slot:(0),kind:Object((kind:Permanent,zones:[Battlefield])),count:UpTo((kind:AnnouncedX)),filter:(kind:All,args:[(kind:CardType,args:Creature),(kind:ControlledBy,args:(kind:OpponentsOf,args:(kind:AbilityController)))]),players:None,distribute:Some((kind:AnnouncedX)),constraints:[],chooser:None)],modes:None),body:(instructions:[(kind:Effect,args:(result:(0),operation:(kind:DealDamage,args:(source:(kind:EventSubject),recipients:(kind:Objects,args:(kind:Targets,args:(0))),amount:(kind:DistributedShare,args:(0)),preventable:true)))),(kind:Effect,args:(result:(1),operation:(kind:DealDamageFromEach,args:(sources:(kind:Targets,args:(0)),recipients:(kind:Objects,args:(kind:One,args:(kind:Source))),amount:(kind:ObjectProperty,args:(object:(kind:Affected),property:Power,information:CurrentOrLastKnown))))))])))");

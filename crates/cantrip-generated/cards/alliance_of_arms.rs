@@ -22,7 +22,7 @@ each_3[index_0] = done_1;
    } 
 g.end_sentence();
 let players_4 = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }; let mut tokens_4 = Vec::new();
-let count_4_0 = { let q: &dyn Query = g; ((done_total_2 as i64)).max(0) as u32 }; let def_4_0 = g.card_id(&token_5::CARD);
+let count_4_0 = { let q: &dyn Query = g; ((done_total_2 as i64)) as u32 }; let def_4_0 = g.card_id(&token_5::CARD);
 for player in players_4 {
 tokens_4.extend(std::iter::repeat((def_4_0,player)).take(count_4_0 as usize));
 } let words_4 = g.words(asker.source);

@@ -8,7 +8,7 @@ let mut hoisted_7: Vec<ObjectId> = Vec::new();
 let mut hoisted_6: Vec<ObjectId> = Vec::new();
 let mut hoisted_5: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-let mut runs_0: u32 = { let q: &dyn Query = g; ((1i64 + i64::from(item.x))).max(0) as u32 }; while runs_0 > 0 { runs_0 -= 1; let mut again_0 = false;
+let mut runs_0: u32 = { let q: &dyn Query = g; ((1i64 + i64::from(item.x))) as u32 }; while runs_0 > 0 { runs_0 -= 1; let mut again_0 = false;
 let selected_1_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_1_candidates = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }; let selected_1_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AnyNumber }; let selected_1 = { cantrip_mechanics::choose::select(g, selected_1_player, asker.source, Purpose::Exile, selected_1_candidates, cantrip_mechanics::select::Selection::of(selected_1_count, &[]))? };
 let objects_2 = { let q: &dyn Query = g; selected_1.clone() }; let moved_2 = g.exile_all(&objects_2);
 g.end_sentence();

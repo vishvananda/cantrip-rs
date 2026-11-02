@@ -33,7 +33,7 @@ g.end_sentence();
 { let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let times = { let q: &dyn Query = g; (planned_value!("numeric expression Votes", 0i64 => g.votes().count(Word))).clamp(0, 255) as u32 }; for _ in 0..times { cantrip_mechanics::tokens::investigate(g, player)?; }; }
 g.end_sentence();
 let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_3 = Vec::new();
-let count_3_0 = { let q: &dyn Query = g; (planned_value!("numeric expression Votes", 0i64 => g.votes().count(Word))).max(0) as u32 }; let def_3_0 = g.card_id(&token_4::CARD);
+let count_3_0 = { let q: &dyn Query = g; (planned_value!("numeric expression Votes", 0i64 => g.votes().count(Word))) as u32 }; let def_3_0 = g.card_id(&token_4::CARD);
 for player in players_3 {
 tokens_3.extend(std::iter::repeat((def_3_0,player)).take(count_3_0 as usize));
 } let words_3 = Words::NONE;

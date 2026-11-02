@@ -3,7 +3,7 @@
 // requires: prevention of part of the damage made at resolution
 // {T}, Sacrifice this artifact: The next time a source of your choice would deal damage to you this turn, prevent half that damage, rounded down.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables, dead_code)] fn made_2_amount(q: &dyn Query, asker: &Asker, affected: ObjectId, e: &cantrip_api::DamageEvent) -> u16 { let (source, target, amount, combat) = (e.source, &e.target, e.amount, e.combat); let subject = *target; let data = [u32::from(amount), source.0]; ((i64::from(data[0])).div_euclid(2)).clamp(0, 65535) as u16 }
+#[allow(unused_variables, dead_code)] fn made_2_amount(q: &dyn Query, asker: &Asker, affected: ObjectId, e: &cantrip_api::DamageEvent) -> u16 { let (source, target, amount, combat) = (e.source, &e.target, e.amount, e.combat); let subject = *target; let data = [u32::from(amount), source.0]; ((i64::from(data[0])).div_euclid(2)).min(u16::MAX.into()) as u16 }
 #[allow(unused_variables)] fn made_2_applies(q: &dyn Query, asker: &Asker, affected: ObjectId, e: &cantrip_api::DamageEvent) -> bool { { let (source, target, amount, combat) = (e.source, &e.target, e.amount, e.combat); let subject = *target; let data = [u32::from(amount), source.0]; if true && cantrip_mechanics::prevention::by_chosen_source(q, affected, e) && true && true { return true; } }
  false }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

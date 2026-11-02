@@ -9,7 +9,7 @@ for player in mana_players_0 {
 g.add_mana(player, Mana::C, mana_0_0);}
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let depth_1 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Artifact) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64).max(0) as usize };  let taken_1 = cantrip_mechanics::library::look_at_top(g, player_1, asker.source, depth_1, (1, 1), false, |_| true, cantrip_mechanics::library::Rest::BottomRandom)?;
+let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let depth_1 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Artifact) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64) as usize };  let taken_1 = cantrip_mechanics::library::look_at_top(g, player_1, asker.source, depth_1, (1, 1), false, |_| true, cantrip_mechanics::library::Rest::BottomRandom)?;
 g.end_sentence();
  Ok(()) }
 

@@ -30,7 +30,7 @@ fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let objects_3 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((1i64).max(0) as usize).collect::<Vec<ObjectId>>() }; let moved_3 = g.exile_all(&objects_3);
 g.end_sentence();
 let players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_4 = Vec::new();
-let count_4_0 = { let q: &dyn Query = g; ((moved_3.clone()).into_iter().map(|o: ObjectId| i64::from(q.mana_value(o))).sum::<i64>()).clamp(0, 4294967295) as u32 }; let def_4_0 = g.card_id(&token_5::CARD);
+let count_4_0 = { let q: &dyn Query = g; ((moved_3.clone()).into_iter().map(|o: ObjectId| i64::from(q.mana_value(o))).sum::<i64>()).min(u32::MAX.into()) as u32 }; let def_4_0 = g.card_id(&token_5::CARD);
 for player in players_4 {
 tokens_4.extend(std::iter::repeat((def_4_0,player)).take(count_4_0 as usize));
 } let words_4 = g.words(asker.source);

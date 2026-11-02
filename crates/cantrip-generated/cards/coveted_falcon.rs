@@ -28,7 +28,7 @@ let objects_1 = { let q: &dyn Query = g; (t_1.iter().filter_map(|t| t.object()).
 let kind_1_0_0 = { let q: &dyn Query = g; EffectKind::Control(t_0_raw.get(0).copied().and_then(|t: Target| t.player()).expect("a reference that always names a player")) };
 if let Some(source) = source_1 { cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.add_effect(source, object, kind_1_0_0, duration_1);  } }); }
 g.end_sentence();
-let amount_2 = { let q: &dyn Query = g; ((objects_1.clone()).len() as i64).max(0) as u32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_2 = { let q: &dyn Query = g; ((objects_1.clone()).len() as i64) as u32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_2 { g.draw(player, amount_2); }
 g.end_sentence();
  Ok(()) }

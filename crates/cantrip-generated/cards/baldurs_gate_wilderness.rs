@@ -203,7 +203,7 @@ fn ability_17_room(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { 
 let objects_34 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((4i64).max(0) as usize).collect::<Vec<ObjectId>>() }; let mut owners_34: Vec<PlayerId> = objects_34.iter().map(|o| g.state().obj(*o).owner).collect(); owners_34.dedup(); for owner in owners_34 { let cards: Vec<ObjectId> = objects_34.iter().copied().filter(|o| g.state().obj(*o).owner == owner).collect(); g.reveal(owner, &cards); }
 let objects_35 = { let q: &dyn Query = g; (objects_34.clone()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Library).collect::<Vec<ObjectId>>() }; let moved_35 = g.return_to_hand_revealed(&objects_35);
 g.end_sentence();
-let amount_36 = { let q: &dyn Query = g; ((objects_34.clone()).into_iter().map(|o: ObjectId| i64::from(q.mana_value(o))).sum::<i64>()).clamp(0, 2147483647) as i32 }; let players_36 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+let amount_36 = { let q: &dyn Query = g; ((objects_34.clone()).into_iter().map(|o: ObjectId| i64::from(q.mana_value(o))).sum::<i64>()).min(i32::MAX.into()) as i32 }; let players_36 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
 for player in players_36 { g.lose_life(player, amount_36); }
 g.end_sentence();
  Ok(()) }

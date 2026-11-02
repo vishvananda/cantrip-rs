@@ -12,13 +12,13 @@ let player_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Tar
 g.end_sentence();
 let payer_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
 let paid_1 = cantrip_mechanics::effects::ask_may(g, payer_1, asker.source, Purpose::Optional)?; if paid_1 {
-let amount_2 = { let q: &dyn Query = g; (i64::from(chosen_0)).clamp(0, 2147483647) as i32 }; let players_2 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() };
+let amount_2 = { let q: &dyn Query = g; (i64::from(chosen_0)).min(i32::MAX.into()) as i32 }; let players_2 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_2 { g.lose_life(player, amount_2); }
 g.end_sentence();
 }
 g.end_sentence();
 if { let q: &dyn Query = g; !(((paid_1 as i64) != 0)) } {
-let objects_3 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| true).collect::<Vec<ObjectId>>() }; let keep_3 = { let q: &dyn Query = g; (i64::from(chosen_0)).max(0) as u32 }; let mut picks_3: Vec<(PlayerId, ObjectId)> = Vec::new(); for player in { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() } { let own: Vec<ObjectId> = objects_3.iter().copied().filter(|&o| g.controller(o) == player).collect(); if own.len() as u32 <= keep_3 { continue; } let kept = if keep_3 == 0 { Vec::new() } else { cantrip_mechanics::choose::select(g, player, asker.source, Purpose::Keep, own.clone(), cantrip_mechanics::select::Selection::of(cantrip_mechanics::select::Count::AsManyAsCan(keep_3), &[]))? }; for o in own { if !kept.contains(&o) && g.can_sacrifice(player, o) { picks_3.push((player, o)); } } } let sacrificed_3 = g.sacrifice_each(&picks_3);
+let objects_3 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| true).collect::<Vec<ObjectId>>() }; let keep_3 = { let q: &dyn Query = g; (i64::from(chosen_0)) as u32 }; let mut picks_3: Vec<(PlayerId, ObjectId)> = Vec::new(); for player in { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() } { let own: Vec<ObjectId> = objects_3.iter().copied().filter(|&o| g.controller(o) == player).collect(); if own.len() as u32 <= keep_3 { continue; } let kept = if keep_3 == 0 { Vec::new() } else { cantrip_mechanics::choose::select(g, player, asker.source, Purpose::Keep, own.clone(), cantrip_mechanics::select::Selection::of(cantrip_mechanics::select::Count::AsManyAsCan(keep_3), &[]))? }; for o in own { if !kept.contains(&o) && g.can_sacrifice(player, o) { picks_3.push((player, o)); } } } let sacrificed_3 = g.sacrifice_each(&picks_3);
 g.end_sentence();
 hoisted_4.extend(sacrificed_3.clone());
 hoisted_5.extend({ let q: &dyn Query = g; objects_3.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() });

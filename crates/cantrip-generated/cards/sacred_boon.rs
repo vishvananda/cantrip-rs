@@ -9,7 +9,7 @@
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0)];
 fn delayed_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut counters_4: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; (planned_value!("damage prevented by an effect of this ability", 0i64 => q.told_amount(asker))).clamp(0, 32767) as i16 }; for t in { let q: &dyn Query = g; (planned_value!("target reference", None::<ObjectId> => item.remembered_target(0, 0)).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_4.push((object, planned_value!("power/toughness counter other than ±1/±1", CounterKind::PlusOne => CounterKind::Plus0Plus1), amount)); } }
+let amount = { let q: &dyn Query = g; (planned_value!("damage prevented by an effect of this ability", 0i64 => q.told_amount(asker))).min(i16::MAX.into()) as i16 }; for t in { let q: &dyn Query = g; (planned_value!("target reference", None::<ObjectId> => item.remembered_target(0, 0)).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_4.push((object, planned_value!("power/toughness counter other than ±1/±1", CounterKind::PlusOne => CounterKind::Plus0Plus1), amount)); } }
 let had_4: Vec<_> = counters_4.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_4); let applied_4: Vec<ObjectId> = counters_4.iter().zip(had_4).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
  Ok(()) }

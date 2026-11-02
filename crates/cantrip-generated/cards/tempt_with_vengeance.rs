@@ -26,7 +26,7 @@ pub static EXTRA: &[&CardDef] = &[];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_6: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_0 = Vec::new();
-let count_0_0 = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as u32 }; let def_0_0 = g.card_id(&token_1::CARD);
+let count_0_0 = { let q: &dyn Query = g; (i64::from(item.x)) as u32 }; let def_0_0 = g.card_id(&token_1::CARD);
 for player in players_0 {
 tokens_0.extend(std::iter::repeat((def_0_0,player)).take(count_0_0 as usize));
 } let words_0 = g.words(asker.source);
@@ -39,7 +39,7 @@ let mut each_8 = vec![Default::default(); players_2.len()];
  for (index_2, bound_0) in players_2.iter().copied().enumerate() { let payer_3 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") };
 let paid_3 = cantrip_mechanics::effects::ask_may(g, payer_3, asker.source, Purpose::Optional)?; if paid_3 {
 let players_4 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_4 = Vec::new();
-let count_4_0 = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as u32 }; let def_4_0 = g.card_id(&token_5::CARD);
+let count_4_0 = { let q: &dyn Query = g; (i64::from(item.x)) as u32 }; let def_4_0 = g.card_id(&token_5::CARD);
 for player in players_4 {
 tokens_4.extend(std::iter::repeat((def_4_0,player)).take(count_4_0 as usize));
 } let words_4 = g.words(asker.source);
@@ -52,7 +52,7 @@ each_8[index_2] = paid_3;
    } 
 g.end_sentence();
 let players_9 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_9 = Vec::new();
-let count_9_0 = { let q: &dyn Query = g; ((i64::from(item.x) * (q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0).and_then(|p: PlayerId| players_2.iter().position(|&next| next == p)).is_some_and(|at| (each_8[at] as i64) != 0)).collect::<Vec<PlayerId>>()).len() as i64)).clamp(0, 4294967295) as u32 }; let def_9_0 = g.card_id(&token_10::CARD);
+let count_9_0 = { let q: &dyn Query = g; ((i64::from(item.x) * (q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0).and_then(|p: PlayerId| players_2.iter().position(|&next| next == p)).is_some_and(|at| (each_8[at] as i64) != 0)).collect::<Vec<PlayerId>>()).len() as i64)).min(u32::MAX.into()) as u32 }; let def_9_0 = g.card_id(&token_10::CARD);
 for player in players_9 {
 tokens_9.extend(std::iter::repeat((def_9_0,player)).take(count_9_0 as usize));
 } let words_9 = g.words(asker.source);

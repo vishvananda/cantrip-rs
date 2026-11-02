@@ -14,10 +14,10 @@ g.end_sentence();
 loop { let mut again_1 = false;
 let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let flip_2 = g.flip_coin(player_2);
 if { let q: &dyn Query = g; flip_2 } {
-let amount_3 = { let q: &dyn Query = g; (planned_value!("numeric expression Game", 0i64 => q.game_value(item, GameValue::Stake))).clamp(0, 2147483647) as i32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_3 = { let q: &dyn Query = g; (planned_value!("numeric expression Game", 0i64 => q.game_value(item, GameValue::Stake))).min(i32::MAX.into()) as i32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_3 { g.gain_life(player, amount_3); }
 g.end_sentence();
-let amount_4 = { let q: &dyn Query = g; (planned_value!("numeric expression Game", 0i64 => q.game_value(item, GameValue::Stake))).clamp(0, 2147483647) as i32 }; let players_4 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() };
+let amount_4 = { let q: &dyn Query = g; (planned_value!("numeric expression Game", 0i64 => q.game_value(item, GameValue::Stake))).min(i32::MAX.into()) as i32 }; let players_4 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_4 { g.lose_life(player, amount_4); }
 g.end_sentence();
 planned!("keyword-action-double-stake" => { let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; cantrip_mechanics::stakes::double_stake(g, player, asker.source)?; });
@@ -28,10 +28,10 @@ g.end_sentence();
 }
 g.end_sentence();
 } else {
-let amount_8 = { let q: &dyn Query = g; (planned_value!("numeric expression Game", 0i64 => q.game_value(item, GameValue::Stake))).clamp(0, 2147483647) as i32 }; let players_8 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_8 = { let q: &dyn Query = g; (planned_value!("numeric expression Game", 0i64 => q.game_value(item, GameValue::Stake))).min(i32::MAX.into()) as i32 }; let players_8 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_8 { g.lose_life(player, amount_8); }
 g.end_sentence();
-let amount_9 = { let q: &dyn Query = g; (planned_value!("numeric expression Game", 0i64 => q.game_value(item, GameValue::Stake))).clamp(0, 2147483647) as i32 }; let players_9 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() };
+let amount_9 = { let q: &dyn Query = g; (planned_value!("numeric expression Game", 0i64 => q.game_value(item, GameValue::Stake))).min(i32::MAX.into()) as i32 }; let players_9 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_9 { g.gain_life(player, amount_9); }
 g.end_sentence();
 planned!("keyword-action-double-stake" => { let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; cantrip_mechanics::stakes::double_stake(g, player, asker.source)?; });

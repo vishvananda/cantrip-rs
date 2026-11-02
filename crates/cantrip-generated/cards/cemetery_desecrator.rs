@@ -14,7 +14,7 @@ fn reflexive_3_mode_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let mut removed_4: i64 = 0;
 let objects_4_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() };
-let player_4_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let most_4_0: u32 = { let q: &dyn Query = g; (item.subject.object().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o)))).max(0) as u32 }; for object in objects_4_0.iter().copied() { for _ in 0..most_4_0 { let Some(kind) = g.choose_counter_kind(player_4_0, asker.source, object)? else { break }; removed_4 += i64::from(g.remove_counters(object, kind, 1)); } }
+let player_4_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let most_4_0: u32 = { let q: &dyn Query = g; (item.subject.object().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o)))) as u32 }; for object in objects_4_0.iter().copied() { for _ in 0..most_4_0 { let Some(kind) = g.choose_counter_kind(player_4_0, asker.source, object)? else { break }; removed_4 += i64::from(g.remove_counters(object, kind, 1)); } }
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn reflexive_3_mode_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&q.controller(id))))) }

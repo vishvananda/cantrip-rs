@@ -6,7 +6,7 @@
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let runs_0: u32 = { let q: &dyn Query = g; ({ let mut seen = Vec::new(); for id in q.state().battlefield().iter().copied().filter(|&id| Some(asker.controller) == Some(q.controller(id))).collect::<Vec<ObjectId>>() { for kind in CounterKind::ALL { if q.state().obj(id).counters(kind) > 0 && !seen.contains(&kind) { seen.push(kind); } } } seen.len() as i64 }).max(0) as u32 };
+let runs_0: u32 = { let q: &dyn Query = g; ({ let mut seen = Vec::new(); for id in q.state().battlefield().iter().copied().filter(|&id| Some(asker.controller) == Some(q.controller(id))).collect::<Vec<ObjectId>>() { for kind in CounterKind::ALL { if q.state().obj(id).counters(kind) > 0 && !seen.contains(&kind) { seen.push(kind); } } } seen.len() as i64 }) as u32 };
 let copier_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let spell_0: Option<ObjectId> = ({ let q: &dyn Query = g; (item.subject.object().into_iter().collect::<Vec<ObjectId>>()) }).first().copied();
 if let Some(spell) = spell_0 { for _ in 0..runs_0 { g.copy_spell(spell, copier_0, true)?; } }
 g.end_sentence();

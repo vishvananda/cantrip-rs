@@ -7,7 +7,7 @@
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let runs_0 = { let q: &dyn Query = g; (3i64).max(0) as u32 }; for _ in 0..runs_0 {
-{ let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let amount = { let q: &dyn Query = g; (item.subject.object().map_or(0i64, |o: ObjectId| i64::from(q.state().obj(o).x))).clamp(0, 32767) as i16 }; cantrip_mechanics::tokens::incubate(g, player, amount)?; }
+{ let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let amount = { let q: &dyn Query = g; (item.subject.object().map_or(0i64, |o: ObjectId| i64::from(q.state().obj(o).x))).min(i16::MAX.into()) as i16 }; cantrip_mechanics::tokens::incubate(g, player, amount)?; }
 }
 g.end_sentence();
  Ok(()) }

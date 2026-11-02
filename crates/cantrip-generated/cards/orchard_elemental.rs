@@ -11,10 +11,10 @@ let voters_0: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).in
 planned!("operation-vote" => cantrip_mechanics::vote::ballot(g, asker.source, &voters_0, cantrip_mechanics::vote::Ballot::Words(&["Sprout", "Harvest"]), false)?);
 g.end_sentence();
 let mut counters_1: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; ((2i64 * planned_value!("numeric expression Votes", 0i64 => g.votes().count(Word)))).clamp(0, 32767) as i16 }; for t in { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, CounterKind::PlusOne, amount)); } }
+let amount = { let q: &dyn Query = g; ((2i64 * planned_value!("numeric expression Votes", 0i64 => g.votes().count(Word)))).min(i16::MAX.into()) as i16 }; for t in { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, CounterKind::PlusOne, amount)); } }
 let had_1: Vec<_> = counters_1.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_1); let applied_1: Vec<ObjectId> = counters_1.iter().zip(had_1).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
-let amount_2 = { let q: &dyn Query = g; ((3i64 * planned_value!("numeric expression Votes", 0i64 => g.votes().count(Word)))).clamp(0, 2147483647) as i32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_2 = { let q: &dyn Query = g; ((3i64 * planned_value!("numeric expression Votes", 0i64 => g.votes().count(Word)))).min(i32::MAX.into()) as i32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_2 { g.gain_life(player, amount_2); }
 g.end_sentence();
  Ok(()) }

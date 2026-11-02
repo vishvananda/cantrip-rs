@@ -15,7 +15,7 @@ pub static EXTRA: &[&CardDef] = &[];
 
 }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let count_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let def_0 = g.card_id(&token_1::CARD); let words_0 = g.words(asker.source); let counters_0 = [(CounterKind::PlusOne, { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64).clamp(0, 32767) as i16 })]; let created_0 = g.create_tokens_with_counters(def_0, player_0, count_0, false, &counters_0, words_0)?;
+let count_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let def_0 = g.card_id(&token_1::CARD); let words_0 = g.words(asker.source); let counters_0 = [(CounterKind::PlusOne, { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64).min(i16::MAX.into()) as i16 })]; let created_0 = g.create_tokens_with_counters(def_0, player_0, count_0, false, &counters_0, words_0)?;
 g.end_sentence();
  Ok(()) }
 

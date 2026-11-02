@@ -29,7 +29,7 @@ fn ability_0_modular(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Su
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let amount_0: i16 = { let q: &dyn Query = g; (i64::from(item.x)).clamp(0, 32767) as i16 };
+let amount_0: i16 = { let q: &dyn Query = g; (i64::from(item.x)).min(i16::MAX.into()) as i16 };
 let mut done_0: i64 = 0; let actor_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let sources_0 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let to_0: Option<ObjectId> = ({ let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied(); if let Some(to) = to_0 { for from in sources_0 { for kind in [CounterKind::PlusOne] { let amount = amount_0; done_0 += i64::from(g.move_counters(from, to, kind, amount)); } } }
 g.end_sentence();
 let objects_1 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let duration_1 = Duration::EndOfTurn;

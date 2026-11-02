@@ -18,7 +18,7 @@ hoisted_2.extend(applied_1.clone());
 g.end_sentence();
  Ok(()) }
 fn ability_1_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let mana_players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_3 = { let q: &dyn Query = g; (planned_value!("removing X counters to activate a mana ability", 0i64 => i64::from(q.obj(asker.source).x))).max(0) as u32 };
+let mana_3 = { let q: &dyn Query = g; (planned_value!("removing X counters to activate a mana ability", 0i64 => i64::from(q.obj(asker.source).x))) as u32 };
 for player in mana_players_3 {
 let color = chosen.expect("mana activation selected a color");
 g.add_mana(player, color.mana(), mana_3);}

@@ -12,7 +12,7 @@
  None }
 fn delayed_11(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mana_players_13 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_13_0 = { let q: &dyn Query = g; (planned_value!("numeric expression Game", 0i64 => q.game_value(item, GameValue::ManaLostThisWay))).max(0) as u32 };
+let mana_13_0 = { let q: &dyn Query = g; (planned_value!("numeric expression Game", 0i64 => q.game_value(item, GameValue::ManaLostThisWay))) as u32 };
 for player in mana_players_13 {
 g.add_mana(player, Mana::C, mana_13_0);}
 g.end_sentence();

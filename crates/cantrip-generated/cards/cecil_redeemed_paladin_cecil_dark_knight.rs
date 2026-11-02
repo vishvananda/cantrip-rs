@@ -11,7 +11,7 @@ fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mu
 let mut hoisted_4: Vec<ObjectId> = Vec::new();
 let mut hoisted_3: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-let amount_0 = { let q: &dyn Query = g; (i64::from(item.data[0])).clamp(0, 2147483647) as i32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_0 = { let q: &dyn Query = g; (i64::from(item.data[0])).min(i32::MAX.into()) as i32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_0 { g.lose_life(player, amount_0); }
 g.end_sentence();
 if { let q: &dyn Query = g; (Some(asker.controller).map_or(0i64, |p: PlayerId| i64::from(q.state().player(p).life))) <= ((Some(asker.controller).map_or(0, |player: PlayerId| i64::from(q.state().player(player).starting_life))).div_euclid(2)) } {

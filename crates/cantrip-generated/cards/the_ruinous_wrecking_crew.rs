@@ -7,7 +7,7 @@
 // • Destroy target token.
 // • Each player sacrifices a creature of their choice.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let more = { let q: &dyn Query = g; (i64::from(entering.x)).clamp(0, 32767) as i16 }; entering.counters[CounterKind::PlusOne as usize] = entering.counters[CounterKind::PlusOne as usize].saturating_add(more);
+#[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let more = { let q: &dyn Query = g; (i64::from(entering.x)).min(i16::MAX.into()) as i16 }; entering.counters[CounterKind::PlusOne as usize] = entering.counters[CounterKind::PlusOne as usize].saturating_add(more);
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
@@ -39,7 +39,7 @@ let count_5 = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyA
 let sacrificed_5 = g.sacrifice_each(&picks_5);
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_1_count(q: &dyn Query, asker: &Asker) -> u16 { (Some(asker.source).map_or(0i64, |o: ObjectId| i64::from(q.state().obj(o).x))).max(0) as u16 }
+#[allow(unused_variables)] fn ability_1_count(q: &dyn Query, asker: &Asker) -> u16 { (Some(asker.source).map_or(0i64, |o: ObjectId| i64::from(q.state().obj(o).x))) as u16 }
 static ABILITY_1_MODES: ModalDef = modes(&[mode(ability_1_mode_0, "Discard a card, then draw a card.").targets(&[]),mode(ability_1_mode_1, "Target opponent loses 2 life.").targets(ABILITY_1_MODE_1_TARGETS),mode(ability_1_mode_2, "Destroy target token.").targets(ABILITY_1_MODE_2_TARGETS),mode(ability_1_mode_3, "Each player sacrifices a creature of their choice.").targets(&[])]).up_to_that_many();
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
 

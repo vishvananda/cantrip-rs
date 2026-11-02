@@ -15,7 +15,7 @@ pub static CARD: CardDef = CardDef { name: token!(Squirrel).name, token_words: t
 pub static EXTRA: &[&CardDef] = &[];
 
 }
-#[allow(unused_variables, unused_mut)] fn ability_1_apply(q: &dyn Query, asker: &Asker, proposal: &mut Proposal) { let seen = *proposal; if let Proposal::TokenCreation(seen) = &seen { let t = seen; let subject = Target::Player(t.controller); let data = [t.count, u32::MAX]; if let Proposal::TokenCreation(t) = proposal { let each = t.count; t.count = t.count.saturating_mul(1); planned_value!("replacement of token creation with other tokens", () => t.also(q.card_id(&token_0::CARD), (i64::from(data[0])).max(0) as u32, q.words(asker.source))); } } }
+#[allow(unused_variables, unused_mut)] fn ability_1_apply(q: &dyn Query, asker: &Asker, proposal: &mut Proposal) { let seen = *proposal; if let Proposal::TokenCreation(seen) = &seen { let t = seen; let subject = Target::Player(t.controller); let data = [t.count, u32::MAX]; if let Proposal::TokenCreation(t) = proposal { let each = t.count; t.count = t.count.saturating_mul(1); planned_value!("replacement of token creation with other tokens", () => t.also(q.card_id(&token_0::CARD), (i64::from(data[0])) as u32, q.words(asker.source))); } } }
 #[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
 static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target_0)];
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

@@ -30,7 +30,7 @@ let mut joined_8: Vec<ObjectId> = Vec::new();
 joined_8.extend(hoisted_2.clone());
 joined_8.extend(hoisted_5.clone());
 g.end_sentence();
-let amount_9 = { let q: &dyn Query = g; ((2i64 * ((joined_7.clone()).into_iter().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>()).len() as i64)).clamp(0, 2147483647) as i32 }; let players_9 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_9 = { let q: &dyn Query = g; ((2i64 * ((joined_7.clone()).into_iter().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>()).len() as i64)).min(i32::MAX.into()) as i32 }; let players_9 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_9 { g.lose_life(player, amount_9); }
 g.end_sentence();
  Ok(()) }

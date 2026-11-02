@@ -4,7 +4,7 @@
 // When this creature becomes monstrous, create X X/X green Hydra creature tokens.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_0 = { let q: &dyn Query = g; (i64::from(item.x)).clamp(0, 32767) as i16 }; g.monstrosity(asker.source, amount_0);
+let amount_0 = { let q: &dyn Query = g; (i64::from(item.x)).min(i16::MAX.into()) as i16 }; g.monstrosity(asker.source, amount_0);
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Monstrous { permanent } = event { let id = *permanent; let subject = Target::Object(id); let data = [u32::MAX, u32::MAX]; if Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
@@ -17,7 +17,7 @@ pub static EXTRA: &[&CardDef] = &[];
 
 }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let count_1 = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as u32 }; let power_1 = { let q: &dyn Query = g; (i64::from(item.x)).clamp(0, 32767) as i16 }; let toughness_1 = { let q: &dyn Query = g; (i64::from(item.x)).clamp(0, 32767) as i16 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut values_1 = Copiable::of(g.card_id(&token_2::CARD)).sized(power_1, toughness_1); values_1.words = g.words(asker.source); let mut created_1: Vec<ObjectId> = Vec::new(); for player in players_1 { created_1.extend(g.create_token_copies_tapped(values_1, player, count_1, false)?); }
+let count_1 = { let q: &dyn Query = g; (i64::from(item.x)) as u32 }; let power_1 = { let q: &dyn Query = g; (i64::from(item.x)).min(i16::MAX.into()) as i16 }; let toughness_1 = { let q: &dyn Query = g; (i64::from(item.x)).min(i16::MAX.into()) as i16 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut values_1 = Copiable::of(g.card_id(&token_2::CARD)).sized(power_1, toughness_1); values_1.words = g.words(asker.source); let mut created_1: Vec<ObjectId> = Vec::new(); for player in players_1 { created_1.extend(g.create_token_copies_tapped(values_1, player, count_1, false)?); }
 g.end_sentence();
  Ok(()) }
 

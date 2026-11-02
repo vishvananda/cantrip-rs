@@ -8,7 +8,7 @@
 let more = { let q: &dyn Query = g; (1i64).max(0) as i16 }; entering.counters[CounterKind::Time as usize] = entering.counters[CounterKind::Time as usize].saturating_add(more);
  Ok(()) }
 fn ability_1_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let mana_players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_2_0 = { let q: &dyn Query = g; ((Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.state().obj(o).counters(CounterKind::Time))).sum::<i64>()).max(0) as u32 };
+let mana_2_0 = { let q: &dyn Query = g; ((Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.state().obj(o).counters(CounterKind::Time))).sum::<i64>()) as u32 };
 for player in mana_players_2 {
 g.add_mana(player, Mana::C, mana_2_0);}
  Ok(()) }

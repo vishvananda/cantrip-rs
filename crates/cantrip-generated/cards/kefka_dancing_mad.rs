@@ -28,7 +28,7 @@ if done_4 { left_4 -= 1; played_4.push(g.state().obj(card_4).became.unwrap_or(ca
 }
 g.end_sentence();
 let mut players_5: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| (((q.state().zone(Zone::STACK).to_vec()).into_iter().filter(|&id| true && ((played_4.clone()).contains(&id) && Some(bound_0) == Some(q.state().obj(id).owner))).collect::<Vec<ObjectId>>()).len() as i64) >= (1i64)).collect::<Vec<PlayerId>>() };
- for (index_5, bound_0) in players_5.iter().copied().enumerate() { let amount_6 = { let q: &dyn Query = g; (((q.state().zone(Zone::STACK).to_vec()).into_iter().filter(|&id| true && ((played_4.clone()).contains(&id) && Some(bound_0) == Some(q.state().obj(id).owner))).collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.mana_value(o))).sum::<i64>()).clamp(0, 2147483647) as i32 }; let players_6 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
+ for (index_5, bound_0) in players_5.iter().copied().enumerate() { let amount_6 = { let q: &dyn Query = g; (((q.state().zone(Zone::STACK).to_vec()).into_iter().filter(|&id| true && ((played_4.clone()).contains(&id) && Some(bound_0) == Some(q.state().obj(id).owner))).collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.mana_value(o))).sum::<i64>()).min(i32::MAX.into()) as i32 }; let players_6 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_6 { g.lose_life(player, amount_6); }
     } 
 g.end_sentence();

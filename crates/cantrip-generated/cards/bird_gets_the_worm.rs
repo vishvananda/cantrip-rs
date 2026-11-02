@@ -12,7 +12,7 @@ let decider_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a refere
 let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let objects_1 = { let q: &dyn Query = g; item.subject.object().into_iter().collect::<Vec<ObjectId>>() };
 planned!("operation-put-sticker" => cantrip_mechanics::stickers::name_sticker(g, player_1, asker.source, &objects_1)?);
 g.end_sentence();
-let amount_2 = { let q: &dyn Query = g; (planned_value!("stickers", 0i64 => cantrip_mechanics::stickers::measure(q, &Vec::<ObjectId>::new(), StickerMeasure::UniqueVowels))).clamp(0, 2147483647) as i32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_2 = { let q: &dyn Query = g; (planned_value!("stickers", 0i64 => cantrip_mechanics::stickers::measure(q, &Vec::<ObjectId>::new(), StickerMeasure::UniqueVowels))).min(i32::MAX.into()) as i32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_2 { g.gain_life(player, amount_2); }
 g.end_sentence();
 }

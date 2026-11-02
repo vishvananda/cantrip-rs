@@ -9,7 +9,7 @@
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut removed_0: i64 = 0;
 let among_0_0 = { let q: &dyn Query = g; ((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && ((q.state().obj(id).zone.is(ZoneKind::Exile) && q.state().obj(id).counters(CounterKind::Time) > 0 && q.card(q.state().obj(id).card).suspend.is_some()) && Some(asker.controller) == Some(q.state().obj(id).owner))).collect::<Vec<ObjectId>>() }; let chooser_0_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let count_0_0 = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let objects_0_0 = cantrip_mechanics::choose::select(g, chooser_0_0, asker.source, Purpose::Choose, among_0_0, cantrip_mechanics::select::Selection::of(count_0_0, &[]))?;
-let amount_0_0 = { let q: &dyn Query = g; (i64::from(item.data[0])).clamp(0, 32767) as i16 }; cantrip_api::instruction(g, |g| { for object in objects_0_0 { removed_0 += i64::from(g.remove_counters(object, CounterKind::Time, amount_0_0)); } });
+let amount_0_0 = { let q: &dyn Query = g; (i64::from(item.data[0])).min(i16::MAX.into()) as i16 }; cantrip_api::instruction(g, |g| { for object in objects_0_0 { removed_0 += i64::from(g.remove_counters(object, CounterKind::Time, amount_0_0)); } });
 g.end_sentence();
  Ok(()) }
 

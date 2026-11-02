@@ -38,7 +38,7 @@ g.end_sentence();
 if { let q: &dyn Query = g; ((done_6 as i64)) >= (1i64) } {
 for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.shuffle(player); }
 g.end_sentence();
-let objects_8 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take(((done_6 as i64)).max(0) as usize).collect::<Vec<ObjectId>>() }; let moved_8 = g.exile_all(&objects_8);
+let objects_8 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take(((done_6 as i64)) as usize).collect::<Vec<ObjectId>>() }; let moved_8 = g.exile_all(&objects_8);
 g.end_sentence();
 let caster_9 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let mut pool_9: Vec<ObjectId> = { let q: &dyn Query = g; (moved_8.clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let mut left_9: u32 = 1; let mut played_9: Vec<ObjectId> = Vec::new();
 while left_9 > 0 {

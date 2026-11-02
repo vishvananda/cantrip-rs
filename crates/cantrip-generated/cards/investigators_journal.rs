@@ -4,7 +4,7 @@
 // {2}, {T}, Remove a suspect counter from this artifact: Draw a card.
 // {2}, Sacrifice this artifact: Draw a card.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let more = { let q: &dyn Query = g; ((q.state().apnap().collect::<Vec<PlayerId>>()).into_iter().map(|p: PlayerId| q.state().battlefield().iter().copied().filter(|&id| q.controller(id) == p && q.chars(id).is(CardType::Creature)).count() as i64).max().unwrap_or(0)).clamp(0, 32767) as i16 }; entering.counters[CounterKind::Suspect as usize] = entering.counters[CounterKind::Suspect as usize].saturating_add(more);
+#[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let more = { let q: &dyn Query = g; ((q.state().apnap().collect::<Vec<PlayerId>>()).into_iter().map(|p: PlayerId| q.state().battlefield().iter().copied().filter(|&id| q.controller(id) == p && q.chars(id).is(CardType::Creature)).count() as i64).max().unwrap_or(0)).min(i16::MAX.into()) as i16 }; entering.counters[CounterKind::Suspect as usize] = entering.counters[CounterKind::Suspect as usize].saturating_add(more);
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };

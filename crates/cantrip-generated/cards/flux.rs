@@ -13,7 +13,7 @@ g.end_sentence();
 let cards_3 = { let q: &dyn Query = g; all_2.clone() }; let discarded_3 = g.discard_together(&cards_3);
 g.end_sentence();
 let mut players_4: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
- for (index_4, bound_0) in players_4.iter().copied().enumerate() { let amount_5 = { let q: &dyn Query = g; (((discarded_3.clone()).into_iter().filter(|&o| Some(q.state().obj(o).owner) == Some(bound_0)).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }; let players_5 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
+ for (index_4, bound_0) in players_4.iter().copied().enumerate() { let amount_5 = { let q: &dyn Query = g; (((discarded_3.clone()).into_iter().filter(|&o| Some(q.state().obj(o).owner) == Some(bound_0)).collect::<Vec<ObjectId>>()).len() as i64) as u32 }; let players_5 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_5 { g.draw(player, amount_5); }
     } 
 g.end_sentence();

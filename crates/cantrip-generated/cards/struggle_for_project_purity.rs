@@ -14,7 +14,7 @@ let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1 = 
 let drawing_1: Vec<PlayerId> = players_1.into_iter().collect(); let players_1: Vec<PlayerId> = g.state().apnap().filter(|p| drawing_1.contains(p)).collect();
 let mut done_1: i64 = 0; let mut drawn_1: Vec<ObjectId> = Vec::new(); for player in players_1 { let before = g.history().drawn(player) as i64; let held = g.state().zone(Zone::hand(player)).to_vec(); g.draw(player, amount_1); done_1 += g.history().drawn(player) as i64 - before; drawn_1.extend(g.state().zone(Zone::hand(player)).iter().copied().filter(|c| !held.contains(c))); }
 g.end_sentence();
-let amount_2 = { let q: &dyn Query = g; ((done_1 as i64)).max(0) as u32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_2 = { let q: &dyn Query = g; ((done_1 as i64)) as u32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_2 { g.draw(player, amount_2); }
 g.end_sentence();
  Ok(()) }
@@ -22,7 +22,7 @@ g.end_sentence();
  None }
 fn ability_2_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut counters_3: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-planned!("rad-counters" => let amount = { let q: &dyn Query = g; ((2i64 * q.event_objects(item).len() as i64)).clamp(0, 4294967295) as u32 }; for player in { let q: &dyn Query = g; Some(PlayerId(item.data[0] as u8)).into_iter().collect::<Vec<PlayerId>>() } { cantrip_mechanics::rad::give(g, player, amount); });
+planned!("rad-counters" => let amount = { let q: &dyn Query = g; ((2i64 * q.event_objects(item).len() as i64)).min(u32::MAX.into()) as u32 }; for player in { let q: &dyn Query = g; Some(PlayerId(item.data[0] as u8)).into_iter().collect::<Vec<PlayerId>>() } { cantrip_mechanics::rad::give(g, player, amount); });
 let had_3: Vec<_> = counters_3.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_3); let applied_3: Vec<ObjectId> = counters_3.iter().zip(had_3).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
  Ok(()) }

@@ -10,7 +10,7 @@ g.add_mana(player, Mana::C, mana_0_0);}
  Ok(()) }
 fn ability_1_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let Some(chosen_1) = chosen else { return Ok(()) };
 let mana_players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_3_0 = { let q: &dyn Query = g; (Some(asker.controller).zip(Some(chosen_1)).map_or(0i64, |(p, color): (PlayerId, Color)| i64::from(cantrip_mechanics::devotion::devotion(q, p, color)))).max(0) as u32 };
+let mana_3_0 = { let q: &dyn Query = g; (Some(asker.controller).zip(Some(chosen_1)).map_or(0i64, |(p, color): (PlayerId, Color)| i64::from(cantrip_mechanics::devotion::devotion(q, p, color)))) as u32 };
 for player in mana_players_3 {
 if let Some(color) = { let q: &dyn Query = g; Some(chosen_1) } { g.add_mana(player, color.mana(), mana_3_0); }
 }

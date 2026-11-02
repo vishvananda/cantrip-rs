@@ -16,7 +16,7 @@ let happened_1: bool = ({ let q: &dyn Query = g; t_0_raw.get(0).copied().and_the
 g.end_sentence();
 if { let q: &dyn Query = g; t_1_raw.get(0).copied().and_then(|t: Target| t.object()).is_some_and(|candidate: ObjectId| excess_0.iter().any(|&(t, n)| t == Target::Object(candidate) && n > 0)) } {
 let mana_players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_3_0 = { let q: &dyn Query = g; (excess_0.iter().filter(|(t, _)| recipients_0.contains(t)).map(|(_, n)| i64::from(*n)).sum::<i64>()).max(0) as u32 };
+let mana_3_0 = { let q: &dyn Query = g; (excess_0.iter().filter(|(t, _)| recipients_0.contains(t)).map(|(_, n)| i64::from(*n)).sum::<i64>()) as u32 };
 for player in mana_players_3 {
 g.add_mana(player, Mana::R, mana_3_0);}
 g.end_sentence();

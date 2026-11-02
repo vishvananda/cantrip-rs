@@ -23,7 +23,7 @@ hoisted_4.extend(created_3.clone());
 each_6[index_1] = paid_2;
    } 
 g.end_sentence();
-let original_7 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()) }; let count_7 = { let q: &dyn Query = g; ((q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0).and_then(|p: PlayerId| players_1.iter().position(|&next| next == p)).is_some_and(|at| (each_6[at] as i64) != 0)).collect::<Vec<PlayerId>>()).len() as i64).max(0) as u32 }; let player_7 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let created_7 = match original_7 { Some(original) => g.create_token_copies(original, player_7, count_7)?, None => Vec::new() };
+let original_7 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()) }; let count_7 = { let q: &dyn Query = g; ((q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0).and_then(|p: PlayerId| players_1.iter().position(|&next| next == p)).is_some_and(|at| (each_6[at] as i64) != 0)).collect::<Vec<PlayerId>>()).len() as i64) as u32 }; let player_7 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let created_7 = match original_7 { Some(original) => g.create_token_copies(original, player_7, count_7)?, None => Vec::new() };
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

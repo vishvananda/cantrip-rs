@@ -9,7 +9,7 @@ static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let mut batch_1: Vec<(ObjectId, Target, u16)> = Vec::new();
-let amount_1_0 = { let q: &dyn Query = g; (q.state().chosen_number(q.linked(item)).map_or(0i64, i64::from)).clamp(0, 65535) as u16 }; if let Some(source) = source_1 { for t in { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { batch_1.push((source, t, amount_1_0)); } }
+let amount_1_0 = { let q: &dyn Query = g; (q.state().chosen_number(q.linked(item)).map_or(0i64, i64::from)).min(u16::MAX.into()) as u16 }; if let Some(source) = source_1 { for t in { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { batch_1.push((source, t, amount_1_0)); } }
 let amount_1_1 = { let q: &dyn Query = g; ((5i64 - q.state().chosen_number(q.linked(item)).map_or(0i64, i64::from))).max(0) as u16 }; if let Some(source) = source_1 { for t in { let q: &dyn Query = g; (t_0_raw.get(0).copied().and_then(|t: Target| t.object()).map(|o: ObjectId| q.controller(o)).into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() } { batch_1.push((source, t, amount_1_1)); } }
 g.damage_together(&batch_1);
 g.end_sentence();

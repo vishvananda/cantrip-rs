@@ -22,7 +22,7 @@ g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_0_2(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { (!(q.state().obj(id).tapped) && q.chars(id).is(CardType::Artifact) && Some(asker.controller) == Some(q.controller(id))) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let player_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let depth_3 = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as usize };  let taken_3 = cantrip_mechanics::library::look_at_top(g, player_3, asker.source, depth_3, (0, 1), true, |c| c.is(CardType::Artifact), cantrip_mechanics::library::Rest::BottomRandom)?;
+let player_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let depth_3 = { let q: &dyn Query = g; (i64::from(item.x)) as usize };  let taken_3 = cantrip_mechanics::library::look_at_top(g, player_3, asker.source, depth_3, (0, 1), true, |c| c.is(CardType::Artifact), cantrip_mechanics::library::Rest::BottomRandom)?;
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_4(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { (!(q.state().obj(id).tapped) && q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id))) }

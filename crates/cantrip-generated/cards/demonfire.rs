@@ -13,10 +13,10 @@ fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mu
 let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 if { let q: &dyn Query = g; ((((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).len() as i64) == (0i64) } {
-planned!("operation-deal-damage" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { cantrip_mechanics::damage::unpreventable(g, source, &{ let q: &dyn Query = g; t_0.clone() }, { let q: &dyn Query = g; (i64::from(item.x)).max(0) as u16 }); });
+planned!("operation-deal-damage" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { cantrip_mechanics::damage::unpreventable(g, source, &{ let q: &dyn Query = g; t_0.clone() }, { let q: &dyn Query = g; (i64::from(item.x)) as u16 }); });
 g.end_sentence();
 } else {
-let mut done_1: i64 = 0; let mut dealt_1: Vec<ObjectId> = Vec::new(); let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let amount_1 = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as u16 }; let recipients_1 = { let q: &dyn Query = g; t_0.clone() }; if let Some(source) = source_1 { let batch: Vec<(ObjectId, Target, u16)> = recipients_1.iter().map(|t| (source, *t, amount_1)).collect(); let dealt = g.damage_together(&batch); done_1 += dealt.iter().map(|&n| i64::from(n)).sum::<i64>(); dealt_1.extend(batch.iter().zip(&dealt).filter(|(_, n)| **n > 0).filter_map(|(d, _)| d.1.object())); }
+let mut done_1: i64 = 0; let mut dealt_1: Vec<ObjectId> = Vec::new(); let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let amount_1 = { let q: &dyn Query = g; (i64::from(item.x)) as u16 }; let recipients_1 = { let q: &dyn Query = g; t_0.clone() }; if let Some(source) = source_1 { let batch: Vec<(ObjectId, Target, u16)> = recipients_1.iter().map(|t| (source, *t, amount_1)).collect(); let dealt = g.damage_together(&batch); done_1 += dealt.iter().map(|&n| i64::from(n)).sum::<i64>(); dealt_1.extend(batch.iter().zip(&dealt).filter(|(_, n)| **n > 0).filter_map(|(d, _)| d.1.object())); }
 g.end_sentence();
 hoisted_2.extend(dealt_1.clone());
 }

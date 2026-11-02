@@ -21,7 +21,7 @@ pub static EXTRA: &[&CardDef] = &[];
 
 }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_2 = { let q: &dyn Query = g; (i64::from(item.x)).clamp(0, 32767) as i16 }; let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let army_2: Vec<ObjectId> = cantrip_mechanics::amass::amass_army(g, player_2, asker.source, &token_3::CARD, Subtype::Orc, amount_2)?.into_iter().collect();
+let amount_2 = { let q: &dyn Query = g; (i64::from(item.x)).min(i16::MAX.into()) as i16 }; let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let army_2: Vec<ObjectId> = cantrip_mechanics::amass::amass_army(g, player_2, asker.source, &token_3::CARD, Subtype::Orc, amount_2)?.into_iter().collect();
 g.end_sentence();
  Ok(()) }
 fn ability_2_if(q: &dyn Query, asker: &Asker) -> bool { (q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && from.is(ZoneKind::Battlefield) && q.chars(id).is(CardType::Creature) { return Some(Fired { subject, data }); } }  None }).count() as i64) >= (1i64) }

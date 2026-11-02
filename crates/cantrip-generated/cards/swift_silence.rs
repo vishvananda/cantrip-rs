@@ -6,7 +6,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let objects_0 = { let q: &dyn Query = g; (q.state().zone(Zone::STACK).to_vec()).into_iter().filter(|&id| true && !(Some(asker.source) == Some(id))).collect::<Vec<ObjectId>>() }; cantrip_api::instruction(g, |g| { for spell in objects_0 { g.counter(spell); } });
 let countered_2: Vec<ObjectId> = { let q: &dyn Query = g; (q.state().zone(Zone::STACK).to_vec()).into_iter().filter(|&id| true && !(Some(asker.source) == Some(id))).collect::<Vec<ObjectId>>() }.into_iter().filter_map(|o: ObjectId| g.state().obj(o).became).collect();
 g.end_sentence();
-let amount_3 = { let q: &dyn Query = g; ((countered_2.clone()).len() as i64).max(0) as u32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_3 = { let q: &dyn Query = g; ((countered_2.clone()).len() as i64) as u32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_3 { g.draw(player, amount_3); }
 g.end_sentence();
  Ok(()) }

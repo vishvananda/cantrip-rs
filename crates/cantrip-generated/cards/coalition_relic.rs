@@ -24,7 +24,7 @@ let objects_2_0 = { let q: &dyn Query = g; Some(asker.source).into_iter().collec
 let amount_2_0 = i16::MAX; cantrip_api::instruction(g, |g| { for object in objects_2_0 { removed_2 += i64::from(g.remove_counters(object, CounterKind::Charge, amount_2_0)); } });
 g.end_sentence();
 let mana_players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_4 = { let q: &dyn Query = g; ((removed_2 as i64)).clamp(0, 255) as u8 };
+let mana_4 = { let q: &dyn Query = g; ((removed_2 as i64)).min(u8::MAX.into()) as u8 };
 for player in mana_players_4 {
 if mana_4 > 0 { let colors = cantrip_mechanics::choose_colors(g, player, asker.source, ColorSet(31), mana_4)?;
 for color in colors { g.add_mana(player, color.mana(), 1); }

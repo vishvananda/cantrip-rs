@@ -7,7 +7,7 @@
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mana_players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_1 = { let q: &dyn Query = g; (q.event_objects(item).len() as i64).clamp(0, 255) as u8 };
+let mana_1 = { let q: &dyn Query = g; (q.event_objects(item).len() as i64).min(u8::MAX.into()) as u8 };
 for player in mana_players_1 {
 if mana_1 > 0 { let colors = cantrip_mechanics::choose_colors(g, player, asker.source, ColorSet(24), mana_1)?;
 for color in colors { g.add_mana_until_end_of_turn(player, color.mana(), 1); }

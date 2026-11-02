@@ -6,7 +6,7 @@
 // Berserk — When this creature becomes monstrous, destroy target permanent.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_0 = { let q: &dyn Query = g; (planned_value!("numeric expression Dice", 0i64 => g.last_roll(asker.controller).result)).clamp(0, 32767) as i16 }; g.monstrosity(asker.source, amount_0);
+let amount_0 = { let q: &dyn Query = g; (planned_value!("numeric expression Dice", 0i64 => g.last_roll(asker.controller).result)).min(i16::MAX.into()) as i16 }; g.monstrosity(asker.source, amount_0);
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (true)) }

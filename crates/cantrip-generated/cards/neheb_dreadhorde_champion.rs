@@ -22,11 +22,11 @@ hoisted_5.extend({ let q: &dyn Query = g; discarded_2.clone() });
 }
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
-let amount_6 = { let q: &dyn Query = g; ((hoisted_5.clone()).len() as i64).max(0) as u32 }; let players_6 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_6 = { let q: &dyn Query = g; ((hoisted_5.clone()).len() as i64) as u32 }; let players_6 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_6 { g.draw(player, amount_6); }
 g.end_sentence();
 let mana_players_8 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_8_0 = { let q: &dyn Query = g; ((hoisted_5.clone()).len() as i64).max(0) as u32 };
+let mana_8_0 = { let q: &dyn Query = g; ((hoisted_5.clone()).len() as i64) as u32 };
 for player in mana_players_8 {
 g.add_mana_until_end_of_turn(player, Mana::R, mana_8_0);}
 g.end_sentence();

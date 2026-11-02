@@ -14,7 +14,7 @@ let had_0: Vec<_> = counters_0.iter().map(|c| g.state().obj(c.0).counters(c.1)).
 g.end_sentence();
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let depth_1 = { let q: &dyn Query = g; (planned_value!("numeric expression PaidCountersRemoved", 0i64 => i64::from(q.counters_paid(item)))).max(0) as usize };  let taken_1 = cantrip_mechanics::library::look_at_top(g, player_1, asker.source, depth_1, (1, 1), false, |_| true, cantrip_mechanics::library::Rest::BottomChosen)?;
+let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let depth_1 = { let q: &dyn Query = g; (planned_value!("numeric expression PaidCountersRemoved", 0i64 => i64::from(q.counters_paid(item)))) as usize };  let taken_1 = cantrip_mechanics::library::look_at_top(g, player_1, asker.source, depth_1, (1, 1), false, |_| true, cantrip_mechanics::library::Rest::BottomChosen)?;
 g.end_sentence();
  Ok(()) }
 

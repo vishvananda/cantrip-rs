@@ -25,7 +25,7 @@ pub static EXTRA: &[&CardDef] = &[&adventure::CARD];
 pub mod adventure {
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let count_0: u32 = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as u32 }; let mut conjured_0: Vec<ObjectId> = Vec::new(); for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { conjured_0.extend(planned_value!("operation Conjure", Vec::<ObjectId>::new() => cantrip_mechanics::conjure::conjure(g, player, player, asker.source, Conjured::FromSpellbook("Giant Secrets", SpellbookPick::Random), count_0, ConjureTo::Hand)?)); }
+let count_0: u32 = { let q: &dyn Query = g; (i64::from(item.x)) as u32 }; let mut conjured_0: Vec<ObjectId> = Vec::new(); for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { conjured_0.extend(planned_value!("operation Conjure", Vec::<ObjectId>::new() => cantrip_mechanics::conjure::conjure(g, player, player, asker.source, Conjured::FromSpellbook("Giant Secrets", SpellbookPick::Random), count_0, ConjureTo::Hand)?)); }
 g.end_sentence();
  Ok(()) }
 

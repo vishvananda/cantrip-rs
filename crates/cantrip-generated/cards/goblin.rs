@@ -12,7 +12,7 @@ let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a referen
 planned!("operation-put-sticker" => cantrip_mechanics::stickers::name_sticker(g, player_1, asker.source, &objects_1)?);
 g.end_sentence();
 let mana_players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_3_0 = { let q: &dyn Query = g; (planned_value!("stickers", 0i64 => cantrip_mechanics::stickers::measure(q, &Vec::<ObjectId>::new(), StickerMeasure::UniqueVowels))).max(0) as u32 };
+let mana_3_0 = { let q: &dyn Query = g; (planned_value!("stickers", 0i64 => cantrip_mechanics::stickers::measure(q, &Vec::<ObjectId>::new(), StickerMeasure::UniqueVowels))) as u32 };
 for player in mana_players_3 {
 g.add_mana(player, Mana::R, mana_3_0);}
 g.end_sentence();

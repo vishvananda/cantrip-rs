@@ -8,7 +8,7 @@
 entering.chosen_color = Some(chosen_0);
 let Some(chosen_1) = cantrip_mechanics::chosen_type::choose_creature_type(g, entering)? else { return Ok(()) };
  Ok(()) }
-#[allow(unused_variables, unused_mut)] fn ability_1_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let more = { let q: &dyn Query = g; (i64::from(entering.x)).clamp(0, 32767) as i16 }; entering.counters[CounterKind::Charge as usize] = entering.counters[CounterKind::Charge as usize].saturating_add(more);
+#[allow(unused_variables, unused_mut)] fn ability_1_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let more = { let q: &dyn Query = g; (i64::from(entering.x)).min(i16::MAX.into()) as i16 }; entering.counters[CounterKind::Charge as usize] = entering.counters[CounterKind::Charge as usize].saturating_add(more);
  Ok(()) }
 pub mod token_4 {
 #[allow(unused_imports)] use cantrip_api::*;

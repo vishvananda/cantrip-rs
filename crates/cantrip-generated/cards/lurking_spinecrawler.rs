@@ -36,10 +36,10 @@ g.end_sentence();
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && (q.chars(id).colors.iter().count() as i64) > (1i64) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_8 = { let q: &dyn Query = g; (item.subject.object().map_or(0i64, |o: ObjectId| q.chars(o).colors.iter().count() as i64)).max(0) as i32 }; let players_8 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+let amount_8 = { let q: &dyn Query = g; (item.subject.object().map_or(0i64, |o: ObjectId| q.chars(o).colors.iter().count() as i64)) as i32 }; let players_8 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
 for player in players_8 { g.lose_life(player, amount_8); }
 g.end_sentence();
-let amount_9 = { let q: &dyn Query = g; (item.subject.object().map_or(0i64, |o: ObjectId| q.chars(o).colors.iter().count() as i64)).max(0) as i32 }; let players_9 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_9 = { let q: &dyn Query = g; (item.subject.object().map_or(0i64, |o: ObjectId| q.chars(o).colors.iter().count() as i64)) as i32 }; let players_9 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_9 { g.gain_life(player, amount_9); }
 g.end_sentence();
  Ok(()) }

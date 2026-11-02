@@ -4,7 +4,7 @@
 // As long as this creature is monstrous, it has trample.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_0 = { let q: &dyn Query = g; (i64::from(item.x)).clamp(0, 32767) as i16 }; g.monstrosity(asker.source, amount_0);
+let amount_0 = { let q: &dyn Query = g; (i64::from(item.x)).min(i16::MAX.into()) as i16 }; g.monstrosity(asker.source, amount_0);
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_0_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); (Some(asker.source).is_some_and(|candidate: ObjectId| q.state().obj(candidate).marks.monstrous)) && (source == affected) }

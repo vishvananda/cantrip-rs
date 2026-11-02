@@ -10,7 +10,7 @@ let mut gathered_1: Vec<ObjectId> = Vec::new();
 let objects_3 = { let q: &dyn Query = g; gathered_1.clone() }; let moved_3 = g.put_into_library(&objects_3, LibraryPlace::ShuffledIn);
 g.end_sentence();
 let mut players_4: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
- for (index_4, bound_0) in players_4.iter().copied().enumerate() { let amount_5 = { let q: &dyn Query = g; (((moved_3.clone()).into_iter().filter(|&id: &ObjectId| q.state().obj(id).owner == bound_0).collect::<Vec<ObjectId>>()).into_iter().count() as i64).max(0) as u32 }; let players_5 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
+ for (index_4, bound_0) in players_4.iter().copied().enumerate() { let amount_5 = { let q: &dyn Query = g; (((moved_3.clone()).into_iter().filter(|&id: &ObjectId| q.state().obj(id).owner == bound_0).collect::<Vec<ObjectId>>()).into_iter().count() as i64) as u32 }; let players_5 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_5 { g.draw(player, amount_5); }
     } 
 g.end_sentence();

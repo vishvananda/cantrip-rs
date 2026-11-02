@@ -20,7 +20,7 @@ pub static EXTRA: &[&CardDef] = &[];
 static REFLEXIVE_7_TARGETS: &[cantrip_api::TargetSpec] = &[cantrip_mechanics::targets::ANY];
 fn reflexive_7(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let source_8 = { let q: &dyn Query = g; Some(asker.source) }; let amount_8 = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as u16 }; let recipients_8 = { let q: &dyn Query = g; t_0.clone() }; if let Some(source) = source_8 { let batch: Vec<(ObjectId, Target, u16)> = recipients_8.iter().map(|t| (source, *t, amount_8)).collect(); g.damage_together(&batch); }
+let source_8 = { let q: &dyn Query = g; Some(asker.source) }; let amount_8 = { let q: &dyn Query = g; (i64::from(item.x)) as u16 }; let recipients_8 = { let q: &dyn Query = g; t_0.clone() }; if let Some(source) = source_8 { let batch: Vec<(ObjectId, Target, u16)> = recipients_8.iter().map(|t| (source, *t, amount_8)).collect(); g.damage_together(&batch); }
 g.end_sentence();
  Ok(()) }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_2: Vec<ObjectId> = Vec::new();

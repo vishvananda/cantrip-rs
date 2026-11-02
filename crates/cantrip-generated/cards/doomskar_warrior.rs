@@ -8,7 +8,7 @@
 if let Event::Damage { source, target, amount, kind, .. } = event { let (source, amount, combat) = (*source, *amount, kind.is_combat()); let subject = Target::Object(source); let data = [u32::from(amount), match target { Target::Object(o) => o.0, _ => u32::MAX }]; if combat && !q.state().obj(source).zone.is(ZoneKind::Stack) && Some(asker.source) == Some(source) && matches!(*target, Target::Object(o) if q.chars(o).is(CardType::Battle)) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0_gains_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let depth_0 = { let q: &dyn Query = g; (i64::from(item.data[0])).max(0) as usize };  let taken_0 = cantrip_mechanics::library::look_at_top(g, player_0, asker.source, depth_0, (0, 1), true, |c| (c.is(CardType::Creature) || c.is(CardType::Land)), cantrip_mechanics::library::Rest::BottomRandom)?;
+let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let depth_0 = { let q: &dyn Query = g; (i64::from(item.data[0])) as usize };  let taken_0 = cantrip_mechanics::library::look_at_top(g, player_0, asker.source, depth_0, (0, 1), true, |c| (c.is(CardType::Creature) || c.is(CardType::Land)), cantrip_mechanics::library::Rest::BottomRandom)?;
 g.end_sentence();
  Ok(()) }
 fn ability_0_backup(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { cantrip_mechanics::backup::resolve(g, item, 1, &[Keyword::Trample], Some(0)) }
@@ -16,7 +16,7 @@ fn ability_0_backup(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 if let Event::Damage { source, target, amount, kind, .. } = event { let (source, amount, combat) = (*source, *amount, kind.is_combat()); let subject = Target::Object(source); let data = [u32::from(amount), match target { Target::Object(o) => o.0, _ => u32::MAX }]; if combat && !q.state().obj(source).zone.is(ZoneKind::Stack) && Some(asker.source) == Some(source) && matches!(*target, Target::Object(o) if q.chars(o).is(CardType::Battle)) { return Some(Fired { subject, data }); } }
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let depth_1 = { let q: &dyn Query = g; (i64::from(item.data[0])).max(0) as usize };  let taken_1 = cantrip_mechanics::library::look_at_top(g, player_1, asker.source, depth_1, (0, 1), true, |c| (c.is(CardType::Creature) || c.is(CardType::Land)), cantrip_mechanics::library::Rest::BottomRandom)?;
+let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let depth_1 = { let q: &dyn Query = g; (i64::from(item.data[0])) as usize };  let taken_1 = cantrip_mechanics::library::look_at_top(g, player_1, asker.source, depth_1, (0, 1), true, |c| (c.is(CardType::Creature) || c.is(CardType::Land)), cantrip_mechanics::library::Rest::BottomRandom)?;
 g.end_sentence();
  Ok(()) }
 

@@ -12,7 +12,7 @@ let objects_0 = { let q: &dyn Query = g; { let mut all: Vec<ObjectId> = Vec::new
 g.end_sentence();
 let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let originals_1 = { let q: &dyn Query = g; moved_0.clone() }; let times_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let mut copies_1: Vec<ObjectId> = Vec::new(); for _ in 0..times_1 { for &card in &originals_1 { copies_1.push(g.create_copy_in_exile(card, player_1)); } }
 g.end_sentence();
-let caster_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let mut pool_2: Vec<ObjectId> = { let q: &dyn Query = g; (copies_1.clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let mut left_2: u32 = { let q: &dyn Query = g; ((copies_1.clone()).len() as i64).max(0) as u32 }; let mut played_2: Vec<ObjectId> = Vec::new();
+let caster_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let mut pool_2: Vec<ObjectId> = { let q: &dyn Query = g; (copies_1.clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let mut left_2: u32 = { let q: &dyn Query = g; ((copies_1.clone()).len() as i64) as u32 }; let mut played_2: Vec<ObjectId> = Vec::new();
 let among_2 = pool_2.len() > 1;
 while left_2 > 0 {
 let mut open_2: Vec<ObjectId> = Vec::new(); for &c in &pool_2 { let ways = g.cast_ways_during_resolution_by(c, caster_2); if ways.iter().any(|w| true) { open_2.push(c); } }

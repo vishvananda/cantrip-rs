@@ -4,9 +4,9 @@
 // Batroc enters with a +1/+1 counter on him for each time he was kicked.
 // When Batroc enters, he deals damage equal to his power to each of up to X targets, where X is the number of times he was kicked.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables, unused_mut)] fn ability_1_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let more = { let q: &dyn Query = g; (Target::Object(asker.source).object().map_or(0i64, |o: ObjectId| i64::from(q.state().obj(o).kicked))).clamp(0, 32767) as i16 }; entering.counters[CounterKind::PlusOne as usize] = entering.counters[CounterKind::PlusOne as usize].saturating_add(more);
+#[allow(unused_variables, unused_mut)] fn ability_1_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let more = { let q: &dyn Query = g; (Target::Object(asker.source).object().map_or(0i64, |o: ObjectId| i64::from(q.state().obj(o).kicked))).min(i16::MAX.into()) as i16 }; entering.counters[CounterKind::PlusOne as usize] = entering.counters[CounterKind::PlusOne as usize].saturating_add(more);
  Ok(()) }
-#[allow(unused_variables)] fn ability_2_0_count(q: &dyn Query, asker: &Asker) -> u16 { (Some(asker.source).map_or(0i64, |o: ObjectId| i64::from(q.state().obj(o).kicked))).clamp(0, 65535) as u16 }
+#[allow(unused_variables)] fn ability_2_0_count(q: &dyn Query, asker: &Asker) -> u16 { (Some(asker.source).map_or(0i64, |o: ObjectId| i64::from(q.state().obj(o).kicked))).min(u16::MAX.into()) as u16 }
 static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[cantrip_mechanics::targets::ANY.between(0, TargetSpec::COUNTED)];
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }

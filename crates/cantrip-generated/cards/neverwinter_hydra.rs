@@ -5,7 +5,7 @@
 // Trample
 // Ward {4} (Whenever this creature becomes the target of a spell or ability an opponent controls, counter it unless that player pays {4}.)
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let amount_0 = { let q: &dyn Query = g; (i64::from(entering.x)).max(0) as u32 }; let player_0 = { let q: &dyn Query = g; Target::Object(asker.source).object().map(|o: ObjectId| q.controller(o)).expect("a reference that always names a player") }; let value_0: i64 = planned_value!("keyword action RollDie(6) with an amount", 0i64 => cantrip_mechanics::dice::roll_several(g, player_0, 6, amount_0)?.total());
+#[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let amount_0 = { let q: &dyn Query = g; (i64::from(entering.x)) as u32 }; let player_0 = { let q: &dyn Query = g; Target::Object(asker.source).object().map(|o: ObjectId| q.controller(o)).expect("a reference that always names a player") }; let value_0: i64 = planned_value!("keyword action RollDie(6) with an amount", 0i64 => cantrip_mechanics::dice::roll_several(g, player_0, 6, amount_0)?.total());
 let more = { let q: &dyn Query = g; (value_0).clamp(0, 32767) as i16 }; entering.counters[CounterKind::PlusOne as usize] = entering.counters[CounterKind::PlusOne as usize].saturating_add(more);
  Ok(()) }
 

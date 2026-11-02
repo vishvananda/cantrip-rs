@@ -57,7 +57,7 @@ tokens_10.extend(std::iter::repeat((def_10_0,player)).take(count_10_0 as usize))
 let created_10 = g.create_tokens_worded(&tokens_10, false, None, words_10)?;
 g.end_sentence();
 let mut counters_12: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; (((moved_0.clone()).into_iter().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>()).len() as i64).clamp(0, 32767) as i16 }; for t in { let q: &dyn Query = g; (created_10.clone()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_12.push((object, CounterKind::PlusOne, amount)); } }
+let amount = { let q: &dyn Query = g; (((moved_0.clone()).into_iter().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>()).len() as i64).min(i16::MAX.into()) as i16 }; for t in { let q: &dyn Query = g; (created_10.clone()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_12.push((object, CounterKind::PlusOne, amount)); } }
 let had_12: Vec<_> = counters_12.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_12); let applied_12: Vec<ObjectId> = counters_12.iter().zip(had_12).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
 hoisted_13.extend(applied_12.clone());

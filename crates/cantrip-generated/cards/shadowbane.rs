@@ -3,7 +3,7 @@
 // The next time a source of your choice would deal damage to you and/or creatures you control this turn, prevent that damage. If damage from a black source is prevented this way, you gain that much life.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables, unused_mut)] fn made_2_then_steps(g: &mut dyn Game, asker: &Asker, affected: ObjectId, subject: Target, data: [u32; 2], done_prevented: u16) -> Result<(), Suspend> { if { let q: &dyn Query = g; (((done_prevented as i64)) > (0i64) && ((((Some(ObjectId(data[1])).filter(|o| *o != ObjectId::NONE)).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.chars(id).colors.has(q.words(asker.source).color(Color::Black))).collect::<Vec<ObjectId>>()).len() as i64) > (0i64)) } {
-let amount_3 = { let q: &dyn Query = g; ((done_prevented as i64)).clamp(0, 2147483647) as i32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_3 = { let q: &dyn Query = g; ((done_prevented as i64)).min(i32::MAX.into()) as i32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_3 { g.gain_life(player, amount_3); }
 }
  Ok(()) }

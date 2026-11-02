@@ -43,7 +43,7 @@ each_11[index_0] = { let q: &dyn Query = g; hoisted_7.clone() }; all_11.extend(e
    } 
 planned!("per-player-choice-among-different-actions-done-at-once" => g.end_batch(););
 g.end_sentence();
-let amount_12 = { let q: &dyn Query = g; ((all_9.clone()).into_iter().filter(|&id| q.chars(id).is(CardType::Land)).count() as i64).max(0) as u32 }; let players_12 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_12 = { let q: &dyn Query = g; ((all_9.clone()).into_iter().filter(|&id| q.chars(id).is(CardType::Land)).count() as i64) as u32 }; let players_12 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_12 { g.draw(player, amount_12); }
 g.end_sentence();
  Ok(()) }

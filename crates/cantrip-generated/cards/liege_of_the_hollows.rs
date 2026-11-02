@@ -24,7 +24,7 @@ each_4[index_0] = done_1;
 g.end_sentence();
 let mut players_7: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
 let mut gathered_8: Vec<(CardId, PlayerId)> = Vec::new();
- for (index_7, bound_1048576) in players_7.iter().copied().enumerate() { let def_9 = g.card_id(&token_10::CARD); let count_9 = { let q: &dyn Query = g; ((shares_3.iter().filter(|share| share.0 == bound_1048576).map(|share| share.1).sum::<i64>() as i64)).max(0) as u32 }; let player_9 = { let q: &dyn Query = g; Some(bound_1048576).expect("a reference that always names a player") }; gathered_8.extend(std::iter::repeat((def_9, player_9)).take(count_9 as usize));
+ for (index_7, bound_1048576) in players_7.iter().copied().enumerate() { let def_9 = g.card_id(&token_10::CARD); let count_9 = { let q: &dyn Query = g; ((shares_3.iter().filter(|share| share.0 == bound_1048576).map(|share| share.1).sum::<i64>() as i64)) as u32 }; let player_9 = { let q: &dyn Query = g; Some(bound_1048576).expect("a reference that always names a player") }; gathered_8.extend(std::iter::repeat((def_9, player_9)).take(count_9 as usize));
     } 
 let words_8 = g.words(asker.source); let created_8 = g.create_tokens_worded(&gathered_8, false, None, words_8)?;
 g.end_sentence();

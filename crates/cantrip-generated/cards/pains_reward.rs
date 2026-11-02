@@ -8,7 +8,7 @@
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 planned!("operation-bid" => cantrip_mechanics::bid::bid(g, asker.source, { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }, None)?);
 g.end_sentence();
-let amount_1 = { let q: &dyn Query = g; (planned_value!("numeric expression Game", 0i64 => q.game_value(item, GameValue::WinningBid))).clamp(0, 2147483647) as i32 }; let players_1 = { let q: &dyn Query = g; planned_value!("player reference Prior", None::<PlayerId> => g.winning_bidder(item)).into_iter().collect::<Vec<PlayerId>>() };
+let amount_1 = { let q: &dyn Query = g; (planned_value!("numeric expression Game", 0i64 => q.game_value(item, GameValue::WinningBid))).min(i32::MAX.into()) as i32 }; let players_1 = { let q: &dyn Query = g; planned_value!("player reference Prior", None::<PlayerId> => g.winning_bidder(item)).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_1 { g.lose_life(player, amount_1); }
 let amount_2 = { let q: &dyn Query = g; (4i64).max(0) as u32 }; let players_2 = { let q: &dyn Query = g; planned_value!("player reference Prior", None::<PlayerId> => g.winning_bidder(item)).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_2 { g.draw(player, amount_2); }

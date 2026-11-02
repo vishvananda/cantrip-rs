@@ -12,9 +12,9 @@ pub static EXTRA: &[&CardDef] = &[];
 
 }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_0 = { let q: &dyn Query = g; (i64::from(item.x)).clamp(0, 32767) as i16 }; let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let army_0: Vec<ObjectId> = cantrip_mechanics::amass::amass_army(g, player_0, asker.source, &token_1::CARD, Subtype::Orc, amount_0)?.into_iter().collect();
+let amount_0 = { let q: &dyn Query = g; (i64::from(item.x)).min(i16::MAX.into()) as i16 }; let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let army_0: Vec<ObjectId> = cantrip_mechanics::amass::amass_army(g, player_0, asker.source, &token_1::CARD, Subtype::Orc, amount_0)?.into_iter().collect();
 g.end_sentence();
-let amount_2 = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as u32 }; let mills_2: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_2)).collect(); let milled_2 = g.mill_together(&mills_2);
+let amount_2 = { let q: &dyn Query = g; (i64::from(item.x)) as u32 }; let mills_2: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_2)).collect(); let milled_2 = g.mill_together(&mills_2);
 g.end_sentence();
 let caster_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let mut pool_3: Vec<ObjectId> = { let q: &dyn Query = g; (milled_2.clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let mut left_3: u32 = 1; let mut played_3: Vec<ObjectId> = Vec::new();
 let limit_3_0: i64 = i64::from({ let q: &dyn Query = g; i64::from(item.x) });

@@ -6,8 +6,8 @@ static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[cantrip_mechanics::targ
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let source_0 = { let q: &dyn Query = g; Some(asker.source) }; let mut batch_0: Vec<(ObjectId, Target, u16)> = Vec::new();
-let amount_0_0 = { let q: &dyn Query = g; ((i64::from(item.x)).div_euclid(2)).max(0) as u16 }; if let Some(source) = source_0 { for t in { let q: &dyn Query = g; t_0.clone() } { batch_0.push((source, t, amount_0_0)); } }
-let amount_0_1 = { let q: &dyn Query = g; ((i64::from(item.x)).saturating_add(1).div_euclid(2)).max(0) as u16 }; if let Some(source) = source_0 { for t in { let q: &dyn Query = g; (Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() } { batch_0.push((source, t, amount_0_1)); } }
+let amount_0_0 = { let q: &dyn Query = g; ((i64::from(item.x)).div_euclid(2)) as u16 }; if let Some(source) = source_0 { for t in { let q: &dyn Query = g; t_0.clone() } { batch_0.push((source, t, amount_0_0)); } }
+let amount_0_1 = { let q: &dyn Query = g; ((i64::from(item.x)).saturating_add(1).div_euclid(2)) as u16 }; if let Some(source) = source_0 { for t in { let q: &dyn Query = g; (Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() } { batch_0.push((source, t, amount_0_1)); } }
 g.damage_together(&batch_0);
 g.end_sentence();
  Ok(()) }

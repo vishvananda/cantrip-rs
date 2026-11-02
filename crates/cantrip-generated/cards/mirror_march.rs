@@ -11,7 +11,7 @@ g.end_sentence();
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let times_0: Option<u32> = None; let mut done_0: i64 = 0; let mut flips_0: u32 = 0; while times_0.map_or(true, |n| flips_0 < n) { flips_0 += 1; if g.flip_coin(player_0) { done_0 += 1; } else if true { break; } }
 g.end_sentence();
-let original_1 = { let q: &dyn Query = g; item.subject.object() }; let count_1 = { let q: &dyn Query = g; (done_0).max(0) as u32 }; let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let created_1 = match original_1 { Some(original) => g.create_token_copies(original, player_1, count_1)?, None => Vec::new() };
+let original_1 = { let q: &dyn Query = g; item.subject.object() }; let count_1 = { let q: &dyn Query = g; (done_0) as u32 }; let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let created_1 = match original_1 { Some(original) => g.create_token_copies(original, player_1, count_1)?, None => Vec::new() };
 g.end_sentence();
 let objects_2 = { let q: &dyn Query = g; (created_1.clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_2 = { let q: &dyn Query = g; Some(asker.source) }; let duration_2 = Duration::Indefinite;
 let kind_2_0_0 = { let q: &dyn Query = g; EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])) };

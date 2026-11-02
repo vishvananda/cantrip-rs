@@ -21,7 +21,7 @@ if done_1 { left_1 -= 1; played_1.push(g.state().obj(card_1).became.unwrap_or(ca
 g.end_sentence();
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_2 = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as usize }; let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; cantrip_mechanics::scry(g, player_2, asker.source, amount_2)?;
+let amount_2 = { let q: &dyn Query = g; (i64::from(item.x)) as usize }; let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; cantrip_mechanics::scry(g, player_2, asker.source, amount_2)?;
 g.end_sentence();
  Ok(()) }
 

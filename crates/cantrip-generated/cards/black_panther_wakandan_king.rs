@@ -25,7 +25,7 @@ let t_1_raw = announced(g, item, 1, false); let t_1 = announced(g, item, 1, true
 let mut done_1: i64 = 0; let actor_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let sources_1 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let to_1: Option<ObjectId> = ({ let q: &dyn Query = g; (t_1_raw.get(0).copied().filter(|t| t_1.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied(); if let Some(to) = to_1 { for from in sources_1 { for kind in [CounterKind::PlusOne] { let amount = i16::MAX; done_1 += i64::from(g.move_counters(from, to, kind, amount)); } } }
 g.end_sentence();
 if { let q: &dyn Query = g; ((done_1 as i64)) >= (1i64) } {
-let amount_2 = { let q: &dyn Query = g; ((done_1 as i64)).clamp(0, 2147483647) as i32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_2 = { let q: &dyn Query = g; ((done_1 as i64)).min(i32::MAX.into()) as i32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_2 { g.gain_life(player, amount_2); }
 g.end_sentence();
 let amount_3 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };

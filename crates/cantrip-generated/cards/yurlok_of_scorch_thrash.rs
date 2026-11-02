@@ -18,7 +18,7 @@ g.add_mana(player, Mana::B, mana_4_0);g.add_mana(player, Mana::R, mana_4_1);g.ad
     } 
  Ok(()) }
 planned_item!("player-rule-as-mana-empties" => statics: player_rule(ability_1_0_applies, PlayerRule::AsManaEmpties { mana: UnspentMana::AnyUnspentMana, then: &[|g: &mut dyn Game, asker: &Asker| -> Result<(), Suspend> { let mut players_0: Vec<PlayerId> = planned_value!("player reference Prior", Vec::<PlayerId>::new() => "(kind:One,args:(kind:Prior,args:That))");
- for (index_0, bound_9000) in players_0.iter().copied().enumerate() { let amount_1 = { let q: &dyn Query = g; (planned_value!("numeric expression Game", 0i64 => q.game_value(item, GameValue::ManaLostThisWay))).clamp(0, 2147483647) as i32 }; let players_1 = { let q: &dyn Query = g; Some(bound_9000).into_iter().collect::<Vec<PlayerId>>() };
+ for (index_0, bound_9000) in players_0.iter().copied().enumerate() { let amount_1 = { let q: &dyn Query = g; (planned_value!("numeric expression Game", 0i64 => q.game_value(item, GameValue::ManaLostThisWay))).min(i32::MAX.into()) as i32 }; let players_1 = { let q: &dyn Query = g; Some(bound_9000).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_1 { g.lose_life(player, amount_1); }
     } 
 g.end_sentence();

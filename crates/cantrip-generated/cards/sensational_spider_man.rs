@@ -19,7 +19,7 @@ let mut removed_2: i64 = 0;
 let objects_2_0 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| true).collect::<Vec<ObjectId>>() };
 planned!("counter-removal-among-them" => removed_2 += i64::from(cantrip_mechanics::effects::remove_chosen_counters(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, asker.source, &objects_2_0, Some(CounterKind::Stun), RemovedCounters::AmongThem(cantrip_mechanics::select::Count::UpTo((3i64).max(0) as u32)))?););
 g.end_sentence();
-let amount_3 = { let q: &dyn Query = g; ((removed_2 as i64)).max(0) as u32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_3 = { let q: &dyn Query = g; ((removed_2 as i64)) as u32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_3 { g.draw(player, amount_3); }
 g.end_sentence();
  Ok(()) }

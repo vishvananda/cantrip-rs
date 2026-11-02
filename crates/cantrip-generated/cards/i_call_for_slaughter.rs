@@ -24,7 +24,7 @@ pub static EXTRA: &[&CardDef] = &[];
 }
 #[allow(unused_variables)] fn made_4_applies(q: &dyn Query, asker: &Asker, affected: ObjectId, proposal: &Proposal) -> bool { if let Proposal::Damage(e) = proposal { let (source, target, amount, combat) = (e.source, &e.target, e.amount, e.combat); let subject = *target; let data = [u32::from(amount), source.0]; if true && Some(asker.controller) == Some(q.controller(source)) && true { return true; } }
  false }
-#[allow(unused_variables, unused_mut)] fn made_4_apply(q: &dyn Query, asker: &Asker, affected: ObjectId, proposal: &mut Proposal) { let seen = *proposal; if let Proposal::Damage(seen) = &seen { let e = seen; let (source, target, amount, combat) = (e.source, &e.target, e.amount, e.combat); let subject = *target; let data = [u32::from(amount), source.0]; if let Proposal::Damage(e) = proposal { e.amount = ((i64::from(data[0]) + 1i64)).clamp(0, 65535) as u16; } } }
+#[allow(unused_variables, unused_mut)] fn made_4_apply(q: &dyn Query, asker: &Asker, affected: ObjectId, proposal: &mut Proposal) { let seen = *proposal; if let Proposal::Damage(seen) = &seen { let e = seen; let (source, target, amount, combat) = (e.source, &e.target, e.amount, e.combat); let subject = *target; let data = [u32::from(amount), source.0]; if let Proposal::Damage(e) = proposal { e.amount = ((i64::from(data[0]) + 1i64)).min(u16::MAX.into()) as u16; } } }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_0 = Vec::new();
 let count_0_0 = { let q: &dyn Query = g; (3i64).max(0) as u32 }; let def_0_0 = g.card_id(&token_1::CARD);
