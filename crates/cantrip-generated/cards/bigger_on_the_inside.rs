@@ -16,7 +16,7 @@ if mana_2 > 0 { let colors = cantrip_mechanics::choose_colors(g, player, asker.s
 g.add_mana(player, colors[0].mana(), mana_2);}
 }
 g.end_sentence();
-planned!("operation-change-spell" => cantrip_mechanics::spell_changes::next_spell(g, asker, { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.player()).expect("a reference that always names a player") }, |q: &dyn Query, asker: &Asker, id: ObjectId| true, NextSpell { this_turn: true, from_hand: false }, &[SpellChange::Gains("Mechanic")]));
+planned!("operation-change-spell" => { let changes = { let q: &dyn Query = g; [SpellChange::Gains("Mechanic")] }; cantrip_mechanics::spell_changes::next_spell(g, asker, { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.player()).expect("a reference that always names a player") }, |q: &dyn Query, asker: &Asker, id: ObjectId| true, NextSpell { this_turn: true, from_hand: false }, &changes); });
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); let card = { let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }; let _ = card; if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) { chars.abilities[slot] = Some(AbilityRef::delayed({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, 0)); } }

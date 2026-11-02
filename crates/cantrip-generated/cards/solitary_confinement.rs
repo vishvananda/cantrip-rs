@@ -26,10 +26,11 @@ hoisted_5.extend({ let q: &dyn Query = g; objects_3.iter().copied().filter(|&o| 
 }
 g.end_sentence();
  Ok(()) }
+planned_item!("skipping-a-step-of-the-turn" => #[allow(unused_variables)] fn ability_1_0_skips_0(q: &dyn Query, asker: &Asker, player: PlayerId) -> bool { player == asker.controller });
 #[allow(unused_variables)] fn ability_2_0_rule(q: &dyn LayerQuery, source: ObjectId, player: PlayerId) -> bool { let asker = &Asker::new(source, q.controller(source)); player == asker.controller }
 #[allow(unused_variables)] fn ability_3_applies(q: &dyn Query, asker: &Asker, e: &cantrip_api::DamageEvent) -> bool { { let (source, target, amount, combat) = (e.source, &e.target, e.amount, e.combat); let subject = *target; let data = [u32::from(amount), source.0]; if true && true && matches!(*target, Target::Player(p) if Some(asker.controller) == Some(p)) { return true; } }
  false }
-planned_item!("skipping-a-step-of-the-turn" => skip_steps: SkipStep { applies: |q, asker, player| player == asker.controller, step: Step::Draw });
+planned_item!("skipping-a-step-of-the-turn" => skip_steps: SkipStep { applies: ability_1_0_skips_0, step: Step::Draw });
 
 pub static CARD: CardDef = CardDef { name: "Solitary Confinement", token_words: &[], oracle: true, cost: ManaCost { generic: 2, x: 0, symbols: [1, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Enchantment]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::STEP_BEGAN.0), ability_0_event), ability_0, "At the beginning of your upkeep, sacrifice this enchantment unless you discard a card.").targets(&[])], statics: &[], replacements: &[], preventions: &[PreventionDef { hint: "prevents all damage that would be dealt to you", applies: ability_3_applies, amount: None }], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, player_keywords: &[PlayerKeywordRule { keyword: Keyword::Shroud, applies: ability_2_0_rule }], ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

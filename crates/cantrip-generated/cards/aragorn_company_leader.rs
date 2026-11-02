@@ -6,7 +6,7 @@
 // Whenever the Ring tempts you, if you chose a creature other than Aragorn as your Ring-bearer, put your choice of a counter from among first strike, vigilance, deathtouch, and lifelink on Aragorn.
 // Whenever you put one or more counters on Aragorn, put one of each of those kinds of counters on up to one other target creature.
 #[allow(unused_imports)] use cantrip_api::*;
-fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { planned_value!("object reference RingBearer", None::<ObjectId> => q.ring_bearer(player)).is_some_and(|candidate: ObjectId| (!(Some(asker.source) == Some(candidate)) && q.chars(candidate).is(CardType::Creature))) }
+fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { planned_value!("object reference RingBearer", None::<ObjectId> => q.ring_bearer(Some(asker.controller).expect("a reference that always names a player"))).is_some_and(|candidate: ObjectId| (!(Some(asker.source) == Some(candidate)) && q.chars(candidate).is(CardType::Creature))) }
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_8: Vec<ObjectId> = Vec::new();
 let mut hoisted_6: Vec<ObjectId> = Vec::new();

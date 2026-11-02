@@ -11,23 +11,23 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
 { let order: Vec<PlayerId> = g.state().apnap().collect(); players_0.sort_by_key(|p| order.iter().position(|o| o == p)); }
  for (index_0, bound_0) in players_0.iter().copied().enumerate() { let voters_1: Vec<PlayerId> = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
-planned!("operation-vote" => cantrip_mechanics::vote::ballot(g, asker.source, &voters_1, cantrip_mechanics::vote::Ballot::Words(&["Silence", "Snitch"]), true)?);
+planned!("operation-vote" => cantrip_mechanics::vote::ballot(g, asker.source, &voters_1, cantrip_mechanics::vote::Ballot::Words(&["Silence", "Snitch"]), &Vec::<Target>::new(), true)?);
     } 
 g.end_sentence();
 planned!("operation-reveal-choices" => cantrip_mechanics::secret::reveal_choices(g, asker.source, ChoiceKind::Word));
 g.end_sentence();
-if { let q: &dyn Query = g; planned_value!("condition AllVotedFor", false => g.votes().voted(option)) } {
-let source_3 = { let q: &dyn Query = g; Some(asker.source) }; let amount_3 = { let q: &dyn Query = g; (4i64).max(0) as u16 }; let recipients_3 = { let q: &dyn Query = g; (q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => g.votes().voted(option))).collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() }; if let Some(source) = source_3 { let batch: Vec<(ObjectId, Target, u16)> = recipients_3.iter().map(|t| (source, *t, amount_3)).collect(); g.damage_together(&batch); }
+if { let q: &dyn Query = g; planned_value!("condition AllVotedFor", false => q.votes().unanimous(cantrip_mechanics::vote::Vote::Word("Silence"))) } {
+let source_3 = { let q: &dyn Query = g; Some(asker.source) }; let amount_3 = { let q: &dyn Query = g; (4i64).max(0) as u16 }; let recipients_3 = { let q: &dyn Query = g; (q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => Some(bound_0).is_some_and(|p: PlayerId| q.votes().voted(p, cantrip_mechanics::vote::Vote::Word("Silence"))))).collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() }; if let Some(source) = source_3 { let batch: Vec<(ObjectId, Target, u16)> = recipients_3.iter().map(|t| (source, *t, amount_3)).collect(); g.damage_together(&batch); }
 g.end_sentence();
 }
 g.end_sentence();
-if { let q: &dyn Query = g; planned_value!("condition AllVotedFor", false => g.votes().voted(option)) } {
-let source_4 = { let q: &dyn Query = g; Some(asker.source) }; let amount_4 = { let q: &dyn Query = g; (8i64).max(0) as u16 }; let recipients_4 = { let q: &dyn Query = g; (q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => g.votes().voted(option))).collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() }; if let Some(source) = source_4 { let batch: Vec<(ObjectId, Target, u16)> = recipients_4.iter().map(|t| (source, *t, amount_4)).collect(); g.damage_together(&batch); }
+if { let q: &dyn Query = g; planned_value!("condition AllVotedFor", false => q.votes().unanimous(cantrip_mechanics::vote::Vote::Word("Snitch"))) } {
+let source_4 = { let q: &dyn Query = g; Some(asker.source) }; let amount_4 = { let q: &dyn Query = g; (8i64).max(0) as u16 }; let recipients_4 = { let q: &dyn Query = g; (q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => Some(bound_0).is_some_and(|p: PlayerId| q.votes().voted(p, cantrip_mechanics::vote::Vote::Word("Snitch"))))).collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() }; if let Some(source) = source_4 { let batch: Vec<(ObjectId, Target, u16)> = recipients_4.iter().map(|t| (source, *t, amount_4)).collect(); g.damage_together(&batch); }
 g.end_sentence();
 }
 g.end_sentence();
-if { let q: &dyn Query = g; !((planned_value!("condition AllVotedFor", false => g.votes().voted(option)) || planned_value!("condition AllVotedFor", false => g.votes().voted(option)))) } {
-let source_5 = { let q: &dyn Query = g; Some(asker.source) }; let amount_5 = { let q: &dyn Query = g; (12i64).max(0) as u16 }; let recipients_5 = { let q: &dyn Query = g; (q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => g.votes().voted(option))).collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() }; if let Some(source) = source_5 { let batch: Vec<(ObjectId, Target, u16)> = recipients_5.iter().map(|t| (source, *t, amount_5)).collect(); g.damage_together(&batch); }
+if { let q: &dyn Query = g; !((planned_value!("condition AllVotedFor", false => q.votes().unanimous(cantrip_mechanics::vote::Vote::Word("Silence"))) || planned_value!("condition AllVotedFor", false => q.votes().unanimous(cantrip_mechanics::vote::Vote::Word("Snitch"))))) } {
+let source_5 = { let q: &dyn Query = g; Some(asker.source) }; let amount_5 = { let q: &dyn Query = g; (12i64).max(0) as u16 }; let recipients_5 = { let q: &dyn Query = g; (q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => Some(bound_0).is_some_and(|p: PlayerId| q.votes().voted(p, cantrip_mechanics::vote::Vote::Word("Silence"))))).collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() }; if let Some(source) = source_5 { let batch: Vec<(ObjectId, Target, u16)> = recipients_5.iter().map(|t| (source, *t, amount_5)).collect(); g.damage_together(&batch); }
 g.end_sentence();
 }
 g.end_sentence();

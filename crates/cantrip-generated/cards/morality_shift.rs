@@ -4,7 +4,7 @@
 // Exchange your graveyard and library. Then shuffle your library.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-exchange" => cantrip_mechanics::exchange::exchange(g, asker.source, Exchange::Zones(Graveyard, Library), { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, None));
+planned!("operation-exchange" => cantrip_mechanics::exchange::exchange(g, asker.source, Exchange::Zones(ZoneKind::Graveyard, ZoneKind::Library), { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, None));
 g.end_sentence();
 for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.shuffle(player); }
 g.end_sentence();

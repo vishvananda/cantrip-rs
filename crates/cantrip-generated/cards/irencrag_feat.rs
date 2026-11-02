@@ -9,7 +9,7 @@ let mana_1_0 = { let q: &dyn Query = g; (7i64).max(0) as u32 };
 for player in mana_players_1 {
 g.add_mana(player, Mana::R, mana_1_0);}
 g.end_sentence();
-planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on(g, asker, EffectOn::Players({ let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }), &[FuturePlayerEffect::CanCastOnlyOneMoreSpellThisTurn], None)?);
+planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on_players(g, asker, &{ let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[FuturePlayerEffect::CanCastOnlyOneMoreSpellThisTurn], None)?);
 g.end_sentence();
  Ok(()) }
 

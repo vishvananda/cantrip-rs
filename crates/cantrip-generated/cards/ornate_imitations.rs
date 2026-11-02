@@ -5,7 +5,7 @@
 // For each number between 1 and X, conjure a random creature card with that mana value onto the battlefield. X can't be 0.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-each-number" => for number in { let q: &dyn Query = g; 1i64 }..={ let q: &dyn Query = g; i64::from(item.x) } { for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { cantrip_mechanics::conjure::conjure(g, player, player, asker.source, Conjured::AtRandom(|q: &dyn Query, asker: &Asker, id: ObjectId| (q.chars(id).is(CardType::Creature) && (i64::from(q.mana_value(id))) == (planned_value!("numeric expression Game", 0i64 => q.game_value(item, GameValue::EachValue))))), { let q: &dyn Query = g; 1i64 }, ConjureTo::Entering(EventZone::Battlefield, ConjureSpot::Random, &[EnterFlag::EntersNormally]))?; }; });
+planned!("operation-each-number" => for number in ({ let q: &dyn Query = g; 1i64 })..=({ let q: &dyn Query = g; i64::from(item.x) }) { { let mut conjured: Vec<ObjectId> = Vec::new(); for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { conjured.extend(cantrip_mechanics::conjure::conjure(g, player, player, asker.source, Conjured::AtRandom(|q: &dyn Query, asker: &Asker, id: ObjectId| (q.chars(id).is(CardType::Creature) && (i64::from(q.mana_value(id))) == (planned_value!("numeric expression Game", 0i64 => q.game_value(item, GameValue::EachValue))))), { let q: &dyn Query = g; 1i64 }, ConjureTo::Entering(EventZone::Battlefield, ConjureSpot::Random, &[EnterFlag::EntersNormally]))?); }; conjured };; });
 g.end_sentence();
  Ok(()) }
 

@@ -1,6 +1,6 @@
 // Academic Probation
 // status: planned
-// requires: player rule for a while can't cast some spells
+// requires: a lasting rule reading what its ability chose
 // Choose one —
 // • Choose a nonland card name. Opponents can't cast spells with the chosen name until your next turn.
 // • Choose target nonland permanent. Until your next turn, it can't attack or block, and its activated abilities can't be activated.
@@ -8,18 +8,18 @@
 fn ability_0_mode_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let Answer::Name(Some(chosen_0)) = g.ask(player_0, RequestKind::ChooseName { source: asker.source, looked_at: Vec::new(), suggestion: None, kind: NameKind { non_types: TypeSet::of(&[CardType::Land]), ..NameKind::ANY } })? else { return Ok(()) };
 g.end_sentence();
-planned!("player-rule-for-a-while-can-t-cast-some-spells" => let players_1_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_1_0 { g.add_player_effect(asker.controller, source, EffectKind::CantCast { player, spells: SpellSet::matching(move |q, spell| Some(chosen_0).is_some_and(|chosen| cantrip_mechanics::library::object_has_name(q, spell, chosen))) }, Duration::UntilNextTurnOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })); } });
+planned!("a-lasting-rule-reading-what-its-ability-chose" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() } { g.add_player_effect(player, source, EffectKind::PlayerRule(PlayerRule::Cant(Prohibition::CastSpell { from: None, spells: |q: &dyn Query, asker: &Asker, player: PlayerId, spell: ObjectId| Some(chosen_0).is_some_and(|chosen| cantrip_mechanics::library::object_has_name(q, spell, chosen)) })), Duration::UntilNextTurnOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })); } });
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_0_mode_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (!(q.chars(id).is(CardType::Land)))) }
 static ABILITY_0_MODE_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_mode_1_target_0)];
 fn ability_0_mode_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let objects_2 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_2 = { let q: &dyn Query = g; Some(asker.source) }; let duration_2 = Duration::UntilNextTurnOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") });
-let kind_2_0_0 = { let q: &dyn Query = g; EffectKind::CantAttack };
-let kind_2_1_0 = { let q: &dyn Query = g; EffectKind::CantBlock };
-let kind_2_2_0 = { let q: &dyn Query = g; EffectKind::CantActivateAbilities };
-if let Some(source) = source_2 { cantrip_api::instruction(g, |g| { for &object in &objects_2 { g.add_effect(source, object, kind_2_0_0, duration_2); g.add_effect(source, object, kind_2_1_0, duration_2); g.add_effect(source, object, kind_2_2_0, duration_2);  } }); }
+let objects_3 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_3 = { let q: &dyn Query = g; Some(asker.source) }; let duration_3 = Duration::UntilNextTurnOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") });
+let kind_3_0_0 = { let q: &dyn Query = g; EffectKind::CantAttack };
+let kind_3_1_0 = { let q: &dyn Query = g; EffectKind::CantBlock };
+let kind_3_2_0 = { let q: &dyn Query = g; EffectKind::CantActivateAbilities };
+if let Some(source) = source_3 { cantrip_api::instruction(g, |g| { for &object in &objects_3 { g.add_effect(source, object, kind_3_0_0, duration_3); g.add_effect(source, object, kind_3_1_0, duration_3); g.add_effect(source, object, kind_3_2_0, duration_3);  } }); }
 g.end_sentence();
  Ok(()) }
 static ABILITY_0_MODES: ModalDef = modes(&[mode(ability_0_mode_0, "Choose a nonland card name. Opponents can't cast spells with the chosen name until your next turn.").targets(&[]),mode(ability_0_mode_1, "Choose target nonland permanent. Until your next turn, it can't attack or block, and its activated abilities can't be activated.").targets(ABILITY_0_MODE_1_TARGETS)]).choose(1, 1);

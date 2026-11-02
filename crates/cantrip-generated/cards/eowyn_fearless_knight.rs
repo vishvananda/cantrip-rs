@@ -1,6 +1,6 @@
 // Éowyn, Fearless Knight
 // status: planned
-// requires: engine: no protection from this quality
+// requires: a lasting rule reading what its ability chose
 // Haste
 // When Éowyn enters, exile target creature an opponent controls with greater power. Legendary creatures you control gain protection from each of that creature's colors until end of turn.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -12,9 +12,7 @@ fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let objects_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; let moved_0 = g.exile_all(&objects_0);
 g.end_sentence();
-let objects_1 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).supertypes.legendary && q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let duration_1 = Duration::EndOfTurn;
-let kind_1_0_0 = { let q: &dyn Query = g; planned_value!("engine: no protection from this quality", EffectKind::Pump(0, 0) => EffectKind::ProtectionFrom(ProtectionQuality::Matching(|q, asker, id| (moved_0.clone()).first().copied().is_some_and(|o: ObjectId| q.chars(o).colors.intersects(q.chars(id).colors))))) };
-if let Some(source) = source_1 { cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.add_effect(source, object, kind_1_0_0, duration_1);  } }); }
+planned!("a-lasting-rule-reading-what-its-ability-chose" => { let objects: Vec<ObjectId> = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).supertypes.legendary && q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }; cantrip_mechanics::effects::grant(g, item, &objects, &[Grant::Keyword(Keyword::ProtectionFrom(|q: &dyn Query, asker: &Asker, id: ObjectId| -> bool { (moved_0.clone()).first().copied().is_some_and(|o: ObjectId| q.chars(o).colors.intersects(q.chars(id).colors)) }))], Duration::EndOfTurn)? });
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

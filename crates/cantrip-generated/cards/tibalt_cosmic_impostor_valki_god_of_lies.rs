@@ -44,7 +44,8 @@ pub mod back {
 #[allow(unused_imports)] use cantrip_api::*;
 pub mod emblem_0 {
 #[allow(unused_imports)] use cantrip_api::*;
-planned_item!("play-permission-with-mana-as-though-any-color" => exile_casts: ExileCast { text: "Play from exile", allows: |q, asker, card, player| { player == asker.controller && planned_value!("object reference Granter", None::<ObjectId> => q.granted_by(asker.source)).is_some_and(|o: ObjectId| q.exiled_with(q.linked_to(&Asker::new(o, q.controller(o)))).contains(&card)) }, additional: Cost::NONE, any_type: false, lands: true, life_for_mana_value: false, any_color: true });
+planned_item!("play-permission-with-mana-as-though-any-color" => #[allow(unused_variables)] fn ability_0_0_allows(q: &dyn Query, asker: &Asker, card: ObjectId, player: PlayerId) -> bool { player == asker.controller && planned_value!("object reference Granter", None::<ObjectId> => q.granted_by(asker.source)).is_some_and(|o: ObjectId| q.exiled_with(q.linked_to(&Asker::new(o, q.controller(o)))).contains(&card)) });
+planned_item!("play-permission-with-mana-as-though-any-color" => exile_casts: ExileCast { text: "Play from exile", allows: ability_0_0_allows, additional: Cost::NONE, any_type: false, lands: true, life_for_mana_value: false, any_color: true });
 
 pub static CARD: CardDef = CardDef { name: "Tibalt, Cosmic Impostor emblem", token_words: &[], oracle: false, cost: ManaCost::ZERO, has_cost: false, types: TypeSet::of(&[]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

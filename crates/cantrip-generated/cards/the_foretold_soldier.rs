@@ -13,7 +13,7 @@
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let objects_0 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let by_0 = None; let moved_0 = g.exile_face_down(&objects_0, by_0);
 g.end_sentence();
-planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on(g, asker, EffectOn::Objects({ let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }), &[ExiledCardEffect::IsForetold], None)?);
+planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on_objects(g, asker, &{ let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }, &[ExiledCardEffect::IsForetold], None)?);
 g.end_sentence();
  Ok(()) }
 

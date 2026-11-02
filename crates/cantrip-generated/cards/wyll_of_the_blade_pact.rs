@@ -24,7 +24,7 @@ hoisted_4.extend(objects_2.clone());
 hoisted_5.extend({ let q: &dyn Query = g; turned_2.clone() });
 }
 g.end_sentence();
-planned!("engine-no-additional-phase-but-combat" => g.add_phases(AddedPhases::CombatAndMain););
+planned!("engine-no-additional-phase-but-combat" => { let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; g.add_phases(player, AddedPhases::CombatAndMain, 1, None); });
 g.end_sentence();
  Ok(()) }
 planned_item!("engine-no-specialize-event" => matcher: #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Specialized { permanent } = event { let id = *permanent; let subject = Target::Object(id); let data = [u32::MAX, u32::MAX]; if Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }

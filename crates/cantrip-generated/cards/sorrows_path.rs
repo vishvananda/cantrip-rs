@@ -8,7 +8,7 @@
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0).between(2, 2).together(cantrip_api::select::set_part(&(common_controller as SelectFn), &(largest_common_controller as cantrip_api::select::LargestFn), 0, "with the same controller"))];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-planned!("operation-change-combat" => cantrip_mechanics::combat::change(g, asker, CombatChange::SwapBlocks { first: { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) }, second: { let q: &dyn Query = g; t_0_raw.get(1).copied().and_then(|t: Target| t.object()) }, attacking: false })?);
+planned!("operation-change-combat" => cantrip_mechanics::combat::change(g, asker, &Vec::<ObjectId>::new(), CombatChange::SwapBlocks { first: { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) }, second: { let q: &dyn Query = g; t_0_raw.get(1).copied().and_then(|t: Target| t.object()) }, attacking: false })?);
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Tapped { permanent } = event { let id = *permanent; let subject = Target::Object(id); let data = [u32::MAX, u32::MAX]; if Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }

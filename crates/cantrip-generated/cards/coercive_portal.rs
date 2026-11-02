@@ -12,9 +12,9 @@ let mut hoisted_4: Vec<ObjectId> = Vec::new();
 let mut hoisted_3: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let voters_0: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-planned!("operation-vote" => cantrip_mechanics::vote::ballot(g, asker.source, &voters_0, cantrip_mechanics::vote::Ballot::Words(&["Carnage", "Homage"]), false)?);
+planned!("operation-vote" => cantrip_mechanics::vote::ballot(g, asker.source, &voters_0, cantrip_mechanics::vote::Ballot::Words(&["Carnage", "Homage"]), &Vec::<Target>::new(), false)?);
 g.end_sentence();
-if { let q: &dyn Query = g; planned_value!("condition MostVotes", false => g.votes().most(option)) } {
+if { let q: &dyn Query = g; planned_value!("condition MostVotes", false => q.votes().most(cantrip_mechanics::vote::Vote::Word("Carnage"), false)) } {
 let objects_1 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut picks_1: Vec<(PlayerId, ObjectId)> = Vec::new();
 for &object in &objects_1 { let controller = g.controller(object); if players_1.contains(&controller) && g.can_sacrifice(controller, object) { picks_1.push((controller, object)); } }
 let sacrificed_1 = g.sacrifice_each(&picks_1);
@@ -27,7 +27,7 @@ hoisted_5.extend({ let q: &dyn Query = g; objects_1.iter().copied().filter(|&o| 
 hoisted_6.extend({ let q: &dyn Query = g; objects_2.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() });
 }
 g.end_sentence();
-if { let q: &dyn Query = g; planned_value!("condition MostVotes", false => g.votes().most(option)) } {
+if { let q: &dyn Query = g; planned_value!("condition MostVotes", false => q.votes().most(cantrip_mechanics::vote::Vote::Word("Homage"), true)) } {
 let amount_7 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_7 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_7 { g.draw(player, amount_7); }
 g.end_sentence();

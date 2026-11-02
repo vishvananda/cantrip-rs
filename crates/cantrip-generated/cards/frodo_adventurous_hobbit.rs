@@ -13,7 +13,7 @@ fn ability_2_if(q: &dyn Query, asker: &Asker) -> bool { (q.history().this_turn()
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 planned!("engine-no-ring-temptation" => { let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; cantrip_mechanics::ring::tempt(g, player, asker.source)?; });
 g.end_sentence();
-if { let q: &dyn Query = g; (Some(asker.source).is_some_and(|candidate: ObjectId| planned_value!("object reference RingBearer", None::<ObjectId> => q.ring_bearer(player)) == Some(candidate)) && (Some(asker.controller).map_or(0i64, |p: PlayerId| planned_value!("numeric expression PlayerNumber RingTemptations", 0i64 => q.player_number(p, PlayerNumber::RingTemptations)))) >= (2i64)) } {
+if { let q: &dyn Query = g; (Some(asker.source).is_some_and(|candidate: ObjectId| planned_value!("object reference RingBearer", None::<ObjectId> => q.ring_bearer({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })) == Some(candidate)) && (Some(asker.controller).map_or(0i64, |p: PlayerId| planned_value!("numeric expression PlayerNumber RingTemptations", 0i64 => q.player_number(p, PlayerNumber::RingTemptations)))) >= (2i64)) } {
 let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_1 { g.draw(player, amount_1); }
 g.end_sentence();

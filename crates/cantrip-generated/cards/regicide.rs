@@ -5,7 +5,7 @@
 // Reveal this card as you draft it. The player to your right chooses a color, you choose another color, then the player to your left chooses a third color.
 // Destroy target creature that's one or more of the colors chosen as you drafted cards named Regicide.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && planned_value!("object filter DraftNoted", false => q.draft_notes(id, DraftNoted(DraftNote { kind: Color, player: AbilityController, card: "Regicide" })))))) }
+#[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && planned_value!("object filter DraftNoted", false => q.draft_noted_card(id, "DraftNoted(DraftNote { kind: Color, player: AbilityController, card: \"Regicide\" })"))))) }
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);

@@ -5,8 +5,9 @@
 // Buyback {2}{W}{W} (You may pay an additional {2}{W}{W} as you cast this spell. If you do, put this card into your hand as it resolves.)
 // Gain control of target creature of an opponent's choice they control.
 #[allow(unused_imports)] use cantrip_api::*;
+planned_item!("targets-chosen-by-another-player" => #[allow(unused_variables)] fn target_chooser_0(q: &dyn Query, asker: &Asker) -> Vec<PlayerId> { Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() });
 #[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && Some(planned_value!("player reference OneOf", asker.controller => q.player_picked_for(asker, Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()))) == Some(q.controller(id))))) }
-static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[planned_value!("targets chosen by another player", target(ability_1_target_0) => target(ability_1_target_0).chosen_by_one_of(|q: &dyn Query, asker: &Asker| Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()))];
+static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[planned_value!("targets chosen by another player", target(ability_1_target_0) => target(ability_1_target_0).chosen_by_one_of(target_chooser_0))];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let objects_0 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_0 = { let q: &dyn Query = g; Some(asker.source) }; let duration_0 = Duration::Indefinite;

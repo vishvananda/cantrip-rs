@@ -13,11 +13,12 @@ pub mod left {
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::PrecombatMain) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
+planned_item!("mana-spending-purpose" => #[allow(dead_code, unused_variables)] fn mana_use_377(q: &dyn Query, asker: &Asker, spending: &Spending) -> bool { (spending.purpose == SpendingFor::Casting && spending.source.is_some_and(|spell| q.chars(spell).has_subtype(q.words(asker.source).subtype(Subtype::Room)))) || (spending.part == ManaPart::UnlockDoor) });
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mana_players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 let mana_1_0 = { let q: &dyn Query = g; (2i64).max(0) as u32 };
 for player in mana_players_1 {
-g.add_restricted_mana(player, Mana::R, mana_1_0, planned_value!("mana spending purpose", ManaRestriction::ABILITIES => ManaRestriction::Rule(&ManaRule { spend: |q, asker, spending| (spending.purpose == SpendingFor::Casting && spending.source.is_some_and(|spell| q.chars(spell).has_subtype(q.words(asker.source).subtype(Subtype::Room)))) || (spending.part == ManaPart::UnlockDoor), spent: None })));}
+g.add_restricted_mana(player, Mana::R, mana_1_0, planned_value!("mana spending purpose", ManaRestriction::ABILITIES => ManaRestriction::Rule(&ManaRule { spend: mana_use_377, spent: None })));}
 g.end_sentence();
  Ok(()) }
 

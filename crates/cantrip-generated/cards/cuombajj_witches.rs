@@ -3,7 +3,8 @@
 // requires: targets chosen by another player
 // {T}: This creature deals 1 damage to any target and 1 damage to any target of an opponent's choice.
 #[allow(unused_imports)] use cantrip_api::*;
-static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[cantrip_mechanics::targets::ANY,planned_value!("targets chosen by another player", cantrip_mechanics::targets::ANY => cantrip_mechanics::targets::ANY.chosen_by_one_of(|q: &dyn Query, asker: &Asker| Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()))];
+planned_item!("targets-chosen-by-another-player" => #[allow(unused_variables)] fn target_chooser_0(q: &dyn Query, asker: &Asker) -> Vec<PlayerId> { Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() });
+static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[cantrip_mechanics::targets::ANY,planned_value!("targets chosen by another player", cantrip_mechanics::targets::ANY => cantrip_mechanics::targets::ANY.chosen_by_one_of(target_chooser_0))];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let t_1_raw = announced(g, item, 1, false); let t_1 = announced(g, item, 1, true);

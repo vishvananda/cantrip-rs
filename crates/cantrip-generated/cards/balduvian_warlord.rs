@@ -10,7 +10,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 planned!("engine-no-effect-removes-from-combat" => if let Some(object) = ({ let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied() { g.remove_from_combat_and_unblock(object); });
 g.end_sentence();
-planned!("operation-change-combat" => cantrip_mechanics::combat::change(g, asker, CombatChange::Block { blocker: { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) }, attackers: { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| ((q.state().attackers.iter().any(|a| a.id == id) || q.was_attacking(id)) && q.chars(id).is(CardType::Creature))).collect::<Vec<ObjectId>>() } })?);
+planned!("operation-change-combat" => cantrip_mechanics::combat::change(g, asker, &{ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| ((q.state().attackers.iter().any(|a| a.id == id) || q.was_attacking(id)) && q.chars(id).is(CardType::Creature))).collect::<Vec<ObjectId>>() }, CombatChange::Block { blocker: { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) } })?);
 g.end_sentence();
  Ok(()) }
 fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { q.state().turn.step() == Step::DeclareBlockers }

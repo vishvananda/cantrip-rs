@@ -6,7 +6,7 @@
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && true { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-game-effect" => cantrip_mechanics::game_rules::for_a_time(g, asker, Duration::EndOfTurn, GameEffect::SpellsAndAbilitiesCantTargetPermanents(SpellsAndAbilities::ControlledByAPlayer({ let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }), { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() })));
+planned!("operation-game-effect" => cantrip_mechanics::game_rules::for_a_time(g, asker, Duration::EndOfTurn, &Vec::<ObjectId>::new(), &{ let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }, GameEffect::SpellsAndAbilitiesCantTargetPermanents(SpellsAndAbilities::ControlledByAPlayer, |q: &dyn Query, asker: &Asker, id: ObjectId| -> bool { (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id))) })));
 g.end_sentence();
  Ok(()) }
 

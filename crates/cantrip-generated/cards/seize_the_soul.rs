@@ -29,7 +29,7 @@ g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((!(q.chars(id).colors.has(q.words(asker.source).color(Color::White))) && !(q.chars(id).colors.has(q.words(asker.source).color(Color::Black))) && q.chars(id).is(CardType::Creature)))) }
 static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target_0)];
-#[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && from.is(ZoneKind::Battlefield) && planned_value!("object reference HauntedBy", None::<ObjectId> => q.state().obj(o).haunted_by) == Some(id) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && from.is(ZoneKind::Battlefield) && planned_value!("object reference HauntedBy", None::<ObjectId> => Some(asker.source).and_then(|o: ObjectId| q.state().obj(o).haunted_by)) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 pub mod token_5 {
 #[allow(unused_imports)] use cantrip_api::*;

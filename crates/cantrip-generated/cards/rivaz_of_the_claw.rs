@@ -18,7 +18,7 @@ for color in colors { g.add_restricted_mana(player, color.mana(), 1, ManaRestric
 #[allow(unused_variables)] fn ability_3_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && ((q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Dragon)) && q.chars(id).is(CardType::Creature)) && cast_at(q, event, id).is_some_and(|cast| cast.from == ZoneKind::Graveyard && Some(asker.controller).into_iter().collect::<Vec<PlayerId>>().contains(&q.state().obj(cast.spell).owner))) { return Some(Fired { subject, data }); } }
  None }
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-change-spell" => if let Some(spell) = { let q: &dyn Query = g; item.subject.object() } { cantrip_mechanics::spell_changes::change(g, asker, spell, &[SpellChange::Gains("Triggered")]); });
+planned!("operation-change-spell" => if let Some(spell) = { let q: &dyn Query = g; item.subject.object() } { let changes = { let q: &dyn Query = g; [SpellChange::Gains("Triggered")] }; cantrip_mechanics::spell_changes::change(g, asker, spell, &changes); });
 g.end_sentence();
  Ok(()) }
 fn cast_of<'a>(q: &'a dyn Query, id: ObjectId) -> Option<&'a Cast> { let records = q.history().all(); let spell = records.iter().rev().find_map(|r| match r.event { Event::ZoneChange { old, new, reason: ZoneReason::Resolve, .. } if new == id => Some(old), _ => None }).unwrap_or(id); records.iter().rev().find_map(|r| match &r.event { Event::Cast(cast) if cast.spell == spell => Some(cast), _ => None }) }

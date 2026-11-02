@@ -12,6 +12,7 @@
 // Whenever you roll the planar die, draw a card.
 // Whenever chaos ensues, reveal the top card of your planar deck. You may put it on the bottom of your planar deck.
 #[allow(unused_imports)] use cantrip_api::*;
+planned_item!("a-maximum-hand-size-of-other-players" => #[allow(unused_variables)] fn ability_0_0_hand_size_0(q: &dyn Query, asker: &Asker, player: PlayerId) -> bool { true });
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let amount_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
@@ -28,7 +29,7 @@ g.end_sentence();
 }
 g.end_sentence();
  Ok(()) }
-planned_item!("a-maximum-hand-size-of-other-players" => hand_size_rules: HandSizeRule { applies: |q, asker, player| true, size: HandSize::Unlimited });
+planned_item!("a-maximum-hand-size-of-other-players" => hand_size_rules: HandSizeRule { applies: ability_0_0_hand_size_0, size: HandSize::Unlimited });
 planned_item!("trigger-event-player-rolls-planar-die" => matcher: #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::PlanarDieRolled { player, .. } = event { let subject = Target::Player(*player); let data = [0u32; 2]; if Some(asker.controller) == Some(*player) { return Some(Fired { subject, data }); } }
  None });
 planned_item!("trigger-event-player-chaos-ensues" => matcher: #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ChaosEnsued { player } = event { let subject = Target::Player(*player); let data = [0u32; 2]; if true { return Some(Fired { subject, data }); } }

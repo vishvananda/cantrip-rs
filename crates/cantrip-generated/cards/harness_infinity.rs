@@ -5,7 +5,7 @@
 // Exile Harness Infinity.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-exchange" => cantrip_mechanics::exchange::exchange(g, asker.source, Exchange::Zones(Hand, Graveyard), { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, None));
+planned!("operation-exchange" => cantrip_mechanics::exchange::exchange(g, asker.source, Exchange::Zones(ZoneKind::Hand, ZoneKind::Graveyard), { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, None));
 g.end_sentence();
 let objects_1 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let moved_1 = g.exile_all(&objects_1);
 g.end_sentence();

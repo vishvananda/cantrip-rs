@@ -34,7 +34,7 @@ g.end_sentence();
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let amount_2 = { let q: &dyn Query = g; (planned_value!("numeric expression Noted", 0i64 => q.noted(asker, Noted { object: Some(Target { slot: Slot(0), index: 0 }), measure: CreatureTypes }))) as u32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_2 = { let q: &dyn Query = g; (planned_value!("numeric expression Noted", 0i64 => q.noted(asker, "Noted { object: Some(Target { slot: Slot(0), index: 0 }), measure: CreatureTypes }"))) as u32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_2 { g.draw(player, amount_2); }
 g.end_sentence();
  Ok(()) }

@@ -8,7 +8,7 @@
 let objects_0 = { let q: &dyn Query = g; selected_1.clone() }; let moved_0 = g.exile_all(&objects_0);
 let paid_0 = moved_0.clone().iter().any(|&o| g.obj(o).zone.is(ZoneKind::Exile));
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
-planned!("event-change-as-it-enters-entry-counters-of-choice" => let many = { let q: &dyn Query = g; (((moved_0.clone()).into_iter().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>()).len() as i64) as u32 }; for _ in 0..many { cantrip_mechanics::choose::counter_as_enters(g, entering, &[planned_value!("power/toughness counter other than ±1/±1", CounterKind::PlusOne => CounterKind::Plus2Plus0), CounterKind::PlusOne, planned_value!("power/toughness counter other than ±1/±1", CounterKind::PlusOne => CounterKind::Plus0Plus2)])?; });
+planned!("event-change-as-it-enters-entry-counters-of-choice" => let many = { let q: &dyn Query = g; (((moved_0.clone()).into_iter().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>()).len() as i64) as u32 }; for _ in 0..many { cantrip_mechanics::choose::counter_as_enters(g, &mut *entering, &[planned_value!("power/toughness counter other than ±1/±1", CounterKind::PlusOne => CounterKind::Plus2Plus0), CounterKind::PlusOne, planned_value!("power/toughness counter other than ±1/±1", CounterKind::PlusOne => CounterKind::Plus0Plus2)])?; });
 } else {
 entering.instead = Some(Zone::graveyard(g.obj(entering.object).owner));
 }

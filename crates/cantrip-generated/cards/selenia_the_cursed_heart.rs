@@ -44,7 +44,7 @@ pub static EXTRA: &[&CardDef] = &[];
 }
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let created_0: Vec<ObjectId> = planned_value!("tokens entering in a special state", Vec::<ObjectId>::new() => cantrip_mechanics::tokens::create(g, asker, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[({ let q: &dyn Query = g; (1i64).max(0) as u32 }, TokenRecipe::Defined(g.card_id(&token_2::CARD)))], Arrival { tapped: false, counters: &[], states: &[ArrivalState::AttachedToPlayer({ let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()) })] })?);
+let created_0: Vec<ObjectId> = planned_value!("tokens entering in a special state", Vec::<ObjectId>::new() => cantrip_mechanics::tokens::create_from_recipes(g, asker.source, &{ let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[({ let q: &dyn Query = g; (1i64).max(0) as u32 }, TokenRecipe::Defined(g.card_id(&token_2::CARD)))], Arrival { tapped: false, counters: &[], states: &[ArrivalState::AttachedToPlayer({ let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()) })] })?);
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

@@ -21,8 +21,8 @@ fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let source_0 = { let q: &dyn Query = g; Some(asker.source) }; let amount_0 = { let q: &dyn Query = g; (2i64).max(0) as u16 }; let recipients_0 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() }; if let Some(source) = source_0 { let batch: Vec<(ObjectId, Target, u16)> = recipients_0.iter().map(|t| (source, *t, amount_0)).collect(); g.damage_together(&batch); }
 g.end_sentence();
  Ok(()) }
-planned_item!("static-rule-combat-group-attacker" => combat_groups: CombatGroupRule { role: CombatRole::Attacker, applies: ability_0_0_rule, counted: ability_0_0_rule_counted, others_only: false, count: 0..=1 });
-planned_item!("static-rule-combat-group-blocker" => combat_groups: CombatGroupRule { role: CombatRole::Blocker, applies: ability_1_0_rule, counted: ability_1_0_rule_counted, others_only: false, count: 0..=1 });
+planned_item!("static-rule-combat-group-attacker" => combat_groups: CombatGroupRule { role: CombatRole::Attacker, applies: ability_0_0_rule, counted: ability_0_0_rule_counted, others_only: false, at_least: 0, at_most: 1 });
+planned_item!("static-rule-combat-group-blocker" => combat_groups: CombatGroupRule { role: CombatRole::Blocker, applies: ability_1_0_rule, counted: ability_1_0_rule_counted, others_only: false, at_least: 0, at_most: 1 });
 planned_item!("trigger-event-player-chaos-ensues" => matcher: #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ChaosEnsued { player } = event { let subject = Target::Player(*player); let data = [0u32; 2]; if true { return Some(Fired { subject, data }); } }
  None });
 planned_item!("layout-planar" => variant: Some(Variant::Planechase));

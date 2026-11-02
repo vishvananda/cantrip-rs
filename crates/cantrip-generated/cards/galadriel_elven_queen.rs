@@ -14,20 +14,20 @@ let asker = &Asker::new(item.object, item.controller);
 let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
 let first_0 = { let q: &dyn Query = g; Some(asker.controller) }; if let Some(at) = players_0.iter().position(|&p| Some(p) == first_0) { players_0.rotate_left(at); }
  for (index_0, bound_0) in players_0.iter().copied().enumerate() { let voters_1: Vec<PlayerId> = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
-planned!("operation-vote" => cantrip_mechanics::vote::ballot(g, asker.source, &voters_1, cantrip_mechanics::vote::Ballot::Words(&["Dominion", "Guidance"]), false)?);
+planned!("operation-vote" => cantrip_mechanics::vote::ballot(g, asker.source, &voters_1, cantrip_mechanics::vote::Ballot::Words(&["Dominion", "Guidance"]), &Vec::<Target>::new(), false)?);
     } 
 g.end_sentence();
-if { let q: &dyn Query = g; planned_value!("condition MostVotes", false => g.votes().most(option)) } {
+if { let q: &dyn Query = g; planned_value!("condition MostVotes", false => q.votes().most(cantrip_mechanics::vote::Vote::Word("Dominion"), false)) } {
 planned!("engine-no-ring-temptation" => { let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; cantrip_mechanics::ring::tempt(g, player, asker.source)?; });
 g.end_sentence();
 let mut counters_3: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (planned_value!("object reference RingBearer", None::<ObjectId> => q.ring_bearer(player)).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_3.push((object, CounterKind::PlusOne, amount)); } }
+let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (planned_value!("object reference RingBearer", None::<ObjectId> => q.ring_bearer({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_3.push((object, CounterKind::PlusOne, amount)); } }
 let had_3: Vec<_> = counters_3.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_3); let applied_3: Vec<ObjectId> = counters_3.iter().zip(had_3).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
 hoisted_4.extend(applied_3.clone());
 }
 g.end_sentence();
-if { let q: &dyn Query = g; planned_value!("condition MostVotes", false => g.votes().most(option)) } {
+if { let q: &dyn Query = g; planned_value!("condition MostVotes", false => q.votes().most(cantrip_mechanics::vote::Vote::Word("Guidance"), true)) } {
 let amount_5 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_5 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_5 { g.draw(player, amount_5); }
 g.end_sentence();

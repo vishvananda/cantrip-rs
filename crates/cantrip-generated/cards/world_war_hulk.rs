@@ -7,7 +7,7 @@
 // III — Choose target creature you control. Until end of turn, double its power and toughness and it gains trample.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on(g, asker, EffectOn::Players({ let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }), &[FuturePlayerEffect::MayCastTheirNextSpellThisTurnWithoutPaying(|q: &dyn Query, asker: &Asker, id: ObjectId| ((q.chars(id).colors.has(q.words(asker.source).color(Color::Red)) || q.chars(id).colors.has(q.words(asker.source).color(Color::Green))) && q.chars(id).is(CardType::Creature)))], None)?);
+planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on_players(g, asker, &{ let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[FuturePlayerEffect::MayCastTheirNextSpellThisTurnWithoutPaying(|q: &dyn Query, asker: &Asker, id: ObjectId| ((q.chars(id).colors.has(q.words(asker.source).color(Color::Red)) || q.chars(id).colors.has(q.words(asker.source).color(Color::Green))) && q.chars(id).is(CardType::Creature)))], None)?);
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_0_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id))))) }

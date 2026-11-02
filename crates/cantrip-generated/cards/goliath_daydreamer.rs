@@ -7,7 +7,7 @@
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && ((q.chars(id).is(CardType::Instant) || q.chars(id).is(CardType::Sorcery)) && cast_at(q, event, id).is_some_and(|cast| cast.from == ZoneKind::Hand && q.state().obj(cast.spell).owner == cast.player)) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on(g, asker, EffectOn::Objects({ let q: &dyn Query = g; item.subject.object().into_iter().collect::<Vec<ObjectId>>() }), &[SpellEffect::ResolvesIntoExileInsteadOfGraveyardWithACounter(CounterType::DreamCounter)], None)?);
+planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on_objects(g, asker, &{ let q: &dyn Query = g; item.subject.object().into_iter().collect::<Vec<ObjectId>>() }, &[SpellEffect::ResolvesIntoExileInsteadOfGraveyardWithACounter(CounterType::DreamCounter)], None)?);
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Attacks { attacker, defending, .. } = event { let id = *attacker; let subject = Target::Object(id); let data = [u32::from(defending.0), u32::MAX]; if Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }

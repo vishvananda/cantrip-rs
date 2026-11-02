@@ -5,7 +5,7 @@
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Player(p) if (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&p)) }
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0)];
-fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { (planned_value!("numeric expression Game", 0i64 => q.game_value(item, GameValue::ResolutionsThisTurn))) == (0i64) }
+fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { (planned_value!("numeric expression Game", 0i64 => q.game_value_of(asker, GameValue::ResolutionsThisTurn))) == (0i64) }
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::PrecombatMain | Step::PostcombatMain) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

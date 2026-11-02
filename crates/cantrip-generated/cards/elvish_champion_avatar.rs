@@ -17,14 +17,15 @@ pub static CARD: CardDef = CardDef { name: token!(Elf).name, token_words: token!
 pub static EXTRA: &[&CardDef] = &[];
 
 }
-planned_item!("ability-before-game" => before_game: (BeforeGameMoment::GameBegins, &[|g: &mut dyn Game, asker: &Asker| -> Result<(), Suspend> { let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_0 = Vec::new();
+planned_item!("ability-before-game" => #[allow(unused_variables)] fn ability_0_before_game(g: &mut dyn Game, asker: &Asker) -> Result<(), Suspend> { cantrip_mechanics::before_game::perform(g, asker, &[|g: &mut dyn Game, asker: &Asker| -> Result<(), Suspend> { let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_0 = Vec::new();
 let count_0_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let def_0_0 = g.card_id(&token_1::CARD);
 for player in players_0 {
 tokens_0.extend(std::iter::repeat((def_0_0,player)).take(count_0_0 as usize));
 } let words_0 = g.words(asker.source);
 let created_0 = g.create_tokens_worded(&tokens_0, false, None, words_0)?;
 g.end_sentence();
- Ok(()) }]));
+ Ok(()) }]) });
+planned_item!("ability-before-game" => before_game: (BeforeGameMoment::GameBegins, ability_0_before_game));
 planned_item!("layout-vanguard" => variant: Some(Variant::Vanguard { hand: 0, life: -5 }));
 
 pub static CARD: CardDef = CardDef { name: "Elvish Champion Avatar", token_words: &[], oracle: true, cost: ManaCost::ZERO, has_cost: false, types: TypeSet::of(&[planned_value!("card type Vanguard", CardType::Land => CardType::Vanguard)]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };

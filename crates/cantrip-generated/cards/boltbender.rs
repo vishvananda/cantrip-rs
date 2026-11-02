@@ -8,7 +8,7 @@
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let decider_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_0, asker.source, Purpose::Optional)? {
-planned!("operation-retarget-each" => cantrip_mechanics::copy::retarget_each(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, |q: &dyn Query, asker: &Asker, id: ObjectId| true, NewTargets::May)?);
+planned!("operation-retarget-each" => cantrip_mechanics::copy::retarget_each(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, |q: &dyn Query, asker: &Asker, id: ObjectId| true, NewTargets::May, &Vec::<Target>::new())?);
 g.end_sentence();
 }
 g.end_sentence();

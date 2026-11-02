@@ -5,8 +5,9 @@
 // You may choose not to untap this creature during your untap step.
 // {T}: For as long as this creature remains tapped, gain control of target creature of an opponent's choice they control.
 #[allow(unused_imports)] use cantrip_api::*;
+planned_item!("targets-chosen-by-another-player" => #[allow(unused_variables)] fn target_chooser_0(q: &dyn Query, asker: &Asker) -> Vec<PlayerId> { Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() });
 #[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && Some(planned_value!("player reference OneOf", asker.controller => q.player_picked_for(asker, Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()))) == Some(q.controller(id))))) }
-static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[planned_value!("targets chosen by another player", target(ability_1_target_0) => target(ability_1_target_0).chosen_by_one_of(|q: &dyn Query, asker: &Asker| Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()))];
+static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[planned_value!("targets chosen by another player", target(ability_1_target_0) => target(ability_1_target_0).chosen_by_one_of(target_chooser_0))];
 #[allow(unused_variables)] fn lasting_0(q: &dyn Query, e: &ContinuousEffect) -> bool { let asker = &Asker::new(e.source, e.controller); is_live(q, e.source) && q.is_on_battlefield(e.source) && q.state().obj(e.source).tapped }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);

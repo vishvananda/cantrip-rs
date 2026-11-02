@@ -98,7 +98,11 @@ planned_item!("ability-dungeon-room" => rooms: Room { name: "Veils of Fear", eff
 planned_item!("ability-dungeon-room" => rooms: Room { name: "Sandfall Cell", effect: spell(&[], ability_2_room), leads_to: &["Cradle of the Death God"] });
 planned_item!("ability-dungeon-room" => rooms: Room { name: "Oubliette", effect: spell(&[], ability_3_room), leads_to: &["Cradle of the Death God"] });
 planned_item!("ability-dungeon-room" => rooms: Room { name: "Cradle of the Death God", effect: spell(&[], ability_4_room), leads_to: &[] });
-planned_item!("layout-dungeon" => dungeon: &[&[1, 3], &[2], &[4], &[4], &[]]);
+planned_item!("layout-dungeon" => dungeon: &[1, 3]);
+planned_item!("layout-dungeon" => dungeon: &[2]);
+planned_item!("layout-dungeon" => dungeon: &[4]);
+planned_item!("layout-dungeon" => dungeon: &[4]);
+planned_item!("layout-dungeon" => dungeon: &[]);
 
 pub static CARD: CardDef = CardDef { name: "Tomb of Annihilation", token_words: &[], oracle: true, cost: ManaCost::ZERO, has_cost: false, types: TypeSet::of(&[]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[&token_19::CARD];

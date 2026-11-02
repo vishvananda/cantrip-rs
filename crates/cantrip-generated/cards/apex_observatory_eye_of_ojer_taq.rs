@@ -25,7 +25,7 @@ pub mod back {
 planned!("a-card-type-shared-among-the-cards-used-to-craft-it", ChooseValueWith, "actor" = { let q: &dyn Query = g; Target::Object(asker.source).object().map(|o: ObjectId| q.controller(o)).into_iter().collect::<Vec<PlayerId>>() }, "kind" = "\"CardType\"", "terms" = "{\"count\":(),\"except\":[],\"options\":[{\"args\":{\"args\":{\"filter\":{\"args\":{\"kind\":\"Source\"},\"kind\":\"ExiledWith\"},\"kind\":\"Card\",\"scope\":{\"Shared\":\"Exile\"}},\"kind\":\"Zone\"},\"kind\":\"Objects\"}],\"ordered\":false,\"random\":false,\"secret\":false,\"unchosen\":false,\"up_to\":false}");
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on(g, asker, EffectOn::Players({ let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }), &[FuturePlayerEffect::MayCastTheirNextSpellThisTurnWithoutPaying(|q: &dyn Query, asker: &Asker, id: ObjectId| planned_value!("depends on an instruction with a gap", None::<CardType> => q.state().chosen_card_type(q.linked(item))).is_some_and(|chosen| q.chars(id).is(chosen)))], None)?);
+planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on_players(g, asker, &{ let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[FuturePlayerEffect::MayCastTheirNextSpellThisTurnWithoutPaying(|q: &dyn Query, asker: &Asker, id: ObjectId| planned_value!("depends on an instruction with a gap", None::<CardType> => q.state().chosen_card_type(q.linked(item))).is_some_and(|chosen| q.chars(id).is(chosen)))], None)?);
 g.end_sentence();
  Ok(()) }
 

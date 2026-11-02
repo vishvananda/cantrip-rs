@@ -10,7 +10,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let objects_0 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_0: Vec<ObjectId> = objects_0.iter().copied().filter(|&o| g.state().obj(o).tapped != false).collect(); cantrip_api::instruction(g, |g| { for &object in &turned_0 { g.untap(object); } });
 g.end_sentence();
-planned!("engine-no-additional-phase-but-combat" => g.add_phases(AddedPhases::CombatAndMain););
+planned!("engine-no-additional-phase-but-combat" => { let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; g.add_phases(player, AddedPhases::CombatAndMain, 1, None); });
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_require(q: &dyn Query, asker: &Asker) -> bool { ((q.chars(asker.source).is(CardType::Instant) || q.chars(asker.source).is(CardType::Sorcery))) }

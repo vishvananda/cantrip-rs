@@ -15,7 +15,7 @@ let kind_0_0_0 = { let q: &dyn Query = g; EffectKind::CantBlock };
 if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &object in &objects_0 { g.add_effect(source, object, kind_0_0_0, duration_0);  } }); }
 g.end_sentence();
 if { let q: &dyn Query = g; (q.history().resolutions(item.object, item.ability) as i64 + 1) == (2i64) } {
-planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on(g, asker, EffectOn::Objects({ let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }), &[PermanentRule::AttacksEachCombatIfAble], Some(planned_value!("duration UntilNext", Duration::Indefinite => Duration::UntilNext(TurnPoint::CombatEnds, { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).map(|o: ObjectId| q.controller(o)).into_iter().collect::<Vec<PlayerId>>() }))))?);
+planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on_objects(g, asker, &{ let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }, &[PermanentRule::AttacksEachCombatIfAble], Some(planned_value!("duration UntilNext", Duration::Indefinite => Duration::UntilNext(TurnPoint::CombatEnds, { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).map(|o: ObjectId| q.controller(o)) }))))?);
 g.end_sentence();
 }
 g.end_sentence();

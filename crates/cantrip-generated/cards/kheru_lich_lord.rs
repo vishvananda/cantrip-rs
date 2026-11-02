@@ -32,7 +32,7 @@ if let Some(source) = source_3 { cantrip_api::instruction(g, |g| { for &object i
 g.end_sentence();
 { let mut about: Vec<ObjectId> = Vec::new(); about.extend({ let q: &dyn Query = g; (moved_2.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }); about.push(ObjectId::NONE);  if about.iter().any(|&o| o != ObjectId::NONE) { g.delayed_trigger_about(DelayedWhen::Step { step: Step::End, on_turn_of: Some({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }) }, item.object, item.controller, AbilityRef::delayed(item.ability.card, 0), &about); } }
 g.end_sentence();
-{  let to = Some(Target::None); let about = { let q: &dyn Query = g; (moved_2.clone()).get(0 as usize).copied() }; if let (Some(to), Some(about)) = (to, about) { let _ = to; g.add_effect(item.object, about, EffectKind::Replacement { card: item.ability.card, index: 0 }, planned_value!("duration WhileOnBattlefield", Duration::Indefinite => Duration::WhileOnBattlefield(Result { result: ResultId(2), phase: After, index: 0 }))); } }
+{  let to = Some(Target::None); let about = { let q: &dyn Query = g; (moved_2.clone()).get(0 as usize).copied() }; if let (Some(to), Some(about)) = (to, about) { let _ = to; g.add_effect(item.object, about, EffectKind::Replacement { card: item.ability.card, index: 0 }, planned_value!("duration WhileOnBattlefield", Duration::Indefinite => Duration::WhileOnBattlefield({ let q: &dyn Query = g; (moved_2.clone()).get(0 as usize).copied() }))); } }
 g.end_sentence();
 hoisted_10.extend(moved_2.clone());
 hoisted_11.extend(picked_1.clone());

@@ -13,7 +13,7 @@ let objects_0 = { let q: &dyn Query = g; item.subject.object().into_iter().colle
 let paid_0 = moved_0.clone().iter().any(|&o| g.obj(o).zone.is(ZoneKind::Exile));
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
-let created_2: Vec<ObjectId> = planned_value!("token recipe CopyAtRandom", Vec::<ObjectId>::new() => cantrip_mechanics::tokens::create(g, asker, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[({ let q: &dyn Query = g; (1i64).max(0) as u32 }, TokenRecipe::CopyAtRandom(CardsInOracle::And(CardsInOracle::IsNonCreatureType(CreatureType::Shapeshifter), CardsInOracle::IsCreatureType(CreatureType::Sliver), CardsInOracle::IsCardtype(CardType::Creature), CardsInOracle::ManaValueIs("Comparison(Equal, ObjectProperty { object: EventSubject, property: ManaValue, information: CurrentOrLastKnown })"))))], Arrival { tapped: false, counters: &[], states: &[] })?);
+let created_2: Vec<ObjectId> = planned_value!("token recipe CopyAtRandom", Vec::<ObjectId>::new() => cantrip_mechanics::tokens::create_from_recipes(g, asker.source, &{ let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[({ let q: &dyn Query = g; (1i64).max(0) as u32 }, TokenRecipe::CopyAtRandom(CardsInOracle::And(&[CardsInOracle::IsNonCreatureType(CreatureType::Shapeshifter), CardsInOracle::IsCreatureType(CreatureType::Sliver), CardsInOracle::IsCardtype(CardType::Creature), CardsInOracle::ManaValueIs("Comparison(Equal, ObjectProperty { object: EventSubject, property: ManaValue, information: CurrentOrLastKnown })")])))], Arrival { tapped: false, counters: &[], states: &[] })?);
 g.end_sentence();
 hoisted_3.extend(created_2.clone());
 }

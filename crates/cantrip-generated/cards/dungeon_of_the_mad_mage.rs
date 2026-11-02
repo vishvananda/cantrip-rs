@@ -108,7 +108,15 @@ planned_item!("ability-dungeon-room" => rooms: Room { name: "Runestone Caverns",
 planned_item!("ability-dungeon-room" => rooms: Room { name: "Muiral's Graveyard", effect: spell(&[], ability_6_room), leads_to: &["Deep Mines"] });
 planned_item!("ability-dungeon-room" => rooms: Room { name: "Deep Mines", effect: spell(&[], ability_7_room), leads_to: &["Mad Wizard's Lair"] });
 planned_item!("ability-dungeon-room" => rooms: Room { name: "Mad Wizard's Lair", effect: spell(&[], ability_8_room), leads_to: &[] });
-planned_item!("layout-dungeon" => dungeon: &[&[1], &[2, 3], &[4], &[4], &[5, 6], &[7], &[7], &[8], &[]]);
+planned_item!("layout-dungeon" => dungeon: &[1]);
+planned_item!("layout-dungeon" => dungeon: &[2, 3]);
+planned_item!("layout-dungeon" => dungeon: &[4]);
+planned_item!("layout-dungeon" => dungeon: &[4]);
+planned_item!("layout-dungeon" => dungeon: &[5, 6]);
+planned_item!("layout-dungeon" => dungeon: &[7]);
+planned_item!("layout-dungeon" => dungeon: &[7]);
+planned_item!("layout-dungeon" => dungeon: &[8]);
+planned_item!("layout-dungeon" => dungeon: &[]);
 
 pub static CARD: CardDef = CardDef { name: "Dungeon of the Mad Mage", token_words: &[], oracle: true, cost: ManaCost::ZERO, has_cost: false, types: TypeSet::of(&[]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[&token_3::CARD,&token_9::CARD];

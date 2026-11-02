@@ -1,6 +1,5 @@
 // Unstable Amulet
 // status: planned
-// requires: duration UntilAnotherExiled
 // requires: play permission lasting UntilAnotherExiled
 // When this artifact enters, you get {E}{E} (two energy counters).
 // Whenever you cast a spell from anywhere other than your hand, this artifact deals 1 damage to each opponent.
@@ -21,7 +20,7 @@ g.end_sentence();
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let objects_2 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((1i64).max(0) as usize).collect::<Vec<ObjectId>>() }; let moved_2 = g.exile_all(&objects_2);
 g.end_sentence();
-planned!("play-permission-lasting-until-another-exiled" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.add_player_effect(player, source, EffectKind::PlayerRule(PlayerRule::Play { zone: ZoneKind::Exile, cards: CardsOfRule::These({ let q: &dyn Query = g; (moved_2.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }), grant: PlayGrant { lands: true, ..PlayGrant::CAST } }), planned_value!("duration UntilAnotherExiled", Duration::Indefinite => Duration::UntilAnotherExiled { by: { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, with: { let q: &dyn Query = g; Some(asker.source) } })); } });
+planned!("play-permission-lasting-until-another-exiled" => let cards = { let q: &dyn Query = g; (moved_2.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players { g.allow_play(card, player, PlayGrant { expiry: Expiry::UntilAnotherExiledWith(asker.source), lands: true, ..PlayGrant::CAST }); } } } }););
 g.end_sentence();
  Ok(()) }
 fn cast_of<'a>(q: &'a dyn Query, id: ObjectId) -> Option<&'a Cast> { let records = q.history().all(); let spell = records.iter().rev().find_map(|r| match r.event { Event::ZoneChange { old, new, reason: ZoneReason::Resolve, .. } if new == id => Some(old), _ => None }).unwrap_or(id); records.iter().rev().find_map(|r| match &r.event { Event::Cast(cast) if cast.spell == spell => Some(cast), _ => None }) }

@@ -19,7 +19,7 @@ hoisted_3.extend(chosen_1.clone());
 }
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
-planned!("a-copy-of-a-spell-for-each-object-it-could-target" => if let Some(spell) = { let q: &dyn Query = g; item.subject.object() } { cantrip_mechanics::copy::on_stack(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, spell, { let q: &dyn Query = g; (1i64).max(0) as u32 }, NewTargets::Each({ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (hoisted_3.clone()).contains(&id)).collect::<Vec<ObjectId>>() }))?; });
+planned!("a-copy-of-a-spell-for-each-object-it-could-target" => if let Some(spell) = { let q: &dyn Query = g; item.subject.object() } { cantrip_mechanics::copy::on_stack(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, spell, { let q: &dyn Query = g; (1i64).max(0) as u32 }, NewTargets::Each, &{ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (hoisted_3.clone()).contains(&id)).collect::<Vec<ObjectId>>() }.into_iter().map(Target::Object).collect::<Vec<Target>>())?; });
 g.end_sentence();
 }
 g.end_sentence();

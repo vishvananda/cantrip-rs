@@ -36,7 +36,7 @@ let amount_12 = { let q: &dyn Query = g; (7i64).max(0) as u32 }; let players_12 
 for player in players_12 { g.draw(player, amount_12); }
 g.end_sentence();
  Ok(()) }
-planned_item!("a-gift-of-another-kind" => gift: Some(GiftDef { kind: Gift::Custom, give: &[ability_0_stated_gift_0] }));
+planned_item!("a-gift-of-another-kind" => gift: Some(GiftDef { kind: Gift::Custom, give: ability_0_stated_gift_0 }));
 planned_item!("a-gift-of-another-kind" => spell: cantrip_mechanics::gift::spell(Some(SpellBranch::Plain(&[], ability_0_stated_promised)), Some(SpellBranch::Plain(&[], ability_0_stated_unpromised))));
 
 pub static CARD: CardDef = CardDef { name: "Archival Whorl", token_words: &[], oracle: true, cost: ManaCost { generic: 3, x: 0, symbols: [0, 2, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Sorcery]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };

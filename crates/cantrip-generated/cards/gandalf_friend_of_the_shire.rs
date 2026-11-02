@@ -7,7 +7,7 @@
 // Whenever the Ring tempts you, if you chose a creature other than Gandalf as your Ring-bearer, draw a card.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_1_0_rule(q: &dyn Query, asker: &Asker, spell: ObjectId, player: PlayerId) -> bool { player == asker.controller && q.chars(spell).is(CardType::Sorcery) }
-fn ability_2_if(q: &dyn Query, asker: &Asker) -> bool { planned_value!("object reference RingBearer", None::<ObjectId> => q.ring_bearer(player)).is_some_and(|candidate: ObjectId| (!(Some(asker.source) == Some(candidate)) && q.chars(candidate).is(CardType::Creature))) }
+fn ability_2_if(q: &dyn Query, asker: &Asker) -> bool { planned_value!("object reference RingBearer", None::<ObjectId> => q.ring_bearer(Some(asker.controller).expect("a reference that always names a player"))).is_some_and(|candidate: ObjectId| (!(Some(asker.source) == Some(candidate)) && q.chars(candidate).is(CardType::Creature))) }
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let amount_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };

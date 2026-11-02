@@ -16,7 +16,7 @@ g.add_mana(player, Mana::U, mana_1_0);}
 static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target_0)];
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let created_2: Vec<ObjectId> = planned_value!("token copy entering with counters", Vec::<ObjectId>::new() => cantrip_mechanics::tokens::create(g, asker, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[({ let q: &dyn Query = g; (1i64).max(0) as u32 }, TokenRecipe::Copy({ let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) }, &[TokenCopyEffects::NoTokenCopyEffects]))], Arrival { tapped: false, counters: &[(CounterKind::PlusOne, { let q: &dyn Query = g; 1i64 })], states: &[] })?);
+let created_2: Vec<ObjectId> = planned_value!("token copy entering with counters", Vec::<ObjectId>::new() => cantrip_mechanics::tokens::create_from_recipes(g, asker.source, &{ let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[({ let q: &dyn Query = g; (1i64).max(0) as u32 }, TokenRecipe::Copy({ let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) }, &[TokenCopyEffects::NoTokenCopyEffects]))], Arrival { tapped: false, counters: &[(CounterKind::PlusOne, { let q: &dyn Query = g; 1i64 })], states: &[] })?);
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

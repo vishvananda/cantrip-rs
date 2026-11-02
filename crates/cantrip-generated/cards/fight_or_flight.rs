@@ -9,7 +9,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 g.end_sentence();
 let cards_0 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && item.subject.player() == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }; let separator_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let chooser_0 = { let q: &dyn Query = g; item.subject.player().expect("a reference that always names a player") }; let (first_0, second_0) = cantrip_mechanics::choose::separate(g, Some(separator_0), asker.source, cards_0)?; let (pile_0, other_0) = cantrip_mechanics::choose::pile(g, chooser_0, asker.source, first_0, second_0)?;
 g.end_sentence();
-planned!("operation-change-combat" => cantrip_mechanics::combat::change(g, asker, CombatChange::OnlyAttackers { objects: { let q: &dyn Query = g; pile_0.clone() }, added_phase: false })?);
+planned!("operation-change-combat" => cantrip_mechanics::combat::change(g, asker, &{ let q: &dyn Query = g; pile_0.clone() }, CombatChange::OnlyAttackers { added_phase: false })?);
 g.end_sentence();
  Ok(()) }
 

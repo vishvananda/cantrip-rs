@@ -14,6 +14,7 @@ pub static CARD: CardDef = CardDef { name: token!(Cat).name, token_words: token!
 pub static EXTRA: &[&CardDef] = &[];
 
 }
+planned_item!("event-change-in-the-program-of-another-event" => #[allow(unused_variables)] fn event_edit_0(q: &dyn Query, asker: &Asker, affected: ObjectId, subject: Target, data: [u32; 2], proposal: &mut Proposal) -> () { if let Proposal::TokenCreation(t) = proposal { let each = t.count; t.count = t.count.saturating_mul(0); planned_value!("replacement of token creation with other tokens", () => t.also(q.card_id(&token_3::CARD), (i64::from(data[0])) as u32, q.words(asker.source))); } });
 pub mod token_5 {
 #[allow(unused_imports)] use cantrip_api::*;
 
@@ -21,16 +22,18 @@ pub static CARD: CardDef = CardDef { name: token!(Dog).name, token_words: token!
 pub static EXTRA: &[&CardDef] = &[];
 
 }
+planned_item!("event-change-in-the-program-of-another-event" => #[allow(unused_variables)] fn event_edit_1(q: &dyn Query, asker: &Asker, affected: ObjectId, subject: Target, data: [u32; 2], proposal: &mut Proposal) -> () { if let Proposal::TokenCreation(t) = proposal { let each = t.count; t.count = t.count.saturating_mul(0); planned_value!("replacement of token creation with other tokens", () => t.also(q.card_id(&token_5::CARD), (i64::from(data[0])) as u32, q.words(asker.source))); } });
+planned_item!("event-change-in-the-program-of-another-event" => #[allow(unused_variables)] fn event_edit_2(q: &dyn Query, asker: &Asker, affected: ObjectId, subject: Target, data: [u32; 2], proposal: &mut Proposal) -> () { if let Proposal::TokenCreation(t) = proposal { t.count = t.count.saturating_mul(1); } });
 #[allow(unused_variables, unused_mut)] fn ability_0_then_steps(g: &mut dyn Game, asker: &Asker, subject: Target, data: [u32; 2]) -> Result<(), Suspend> { let decider_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
-match planned_value!("depends on an instruction with a gap", 0u8 => cantrip_mechanics::choose::one_of(g, decider_1, asker.source, vec![Label::Card(card_1, 0), Label::Card(card_1, 1), Label::Card(card_1, 2)])?) {
+match planned_value!("depends on an instruction with a gap", 0u8 => { let card_1 = g.card_id(&CARD); cantrip_mechanics::choose::one_of(g, decider_1, asker.source, vec![Label::Card(card_1, 0), Label::Card(card_1, 1), Label::Card(card_1, 2)])? }) {
 0 => {
-planned!("event-change-in-the-program-of-another-event" => g.change_event(|q, proposal| { if let Proposal::TokenCreation(t) = proposal { let each = t.count; t.count = t.count.saturating_mul(0); planned_value!("replacement of token creation with other tokens", () => t.also(q.card_id(&token_3::CARD), (i64::from(data[0])) as u32, q.words(asker.source))); } }););
+planned!("event-change-in-the-program-of-another-event" => g.change_event(event_edit_0););
 }
 1 => {
-planned!("event-change-in-the-program-of-another-event" => g.change_event(|q, proposal| { if let Proposal::TokenCreation(t) = proposal { let each = t.count; t.count = t.count.saturating_mul(0); planned_value!("replacement of token creation with other tokens", () => t.also(q.card_id(&token_5::CARD), (i64::from(data[0])) as u32, q.words(asker.source))); } }););
+planned!("event-change-in-the-program-of-another-event" => g.change_event(event_edit_1););
 }
 _ => {
-planned!("event-change-in-the-program-of-another-event" => g.change_event(|q, proposal| { if let Proposal::TokenCreation(t) = proposal { t.count = t.count.saturating_mul(1); } }););
+planned!("event-change-in-the-program-of-another-event" => g.change_event(event_edit_2););
 }
 }
  Ok(()) }

@@ -13,9 +13,9 @@ let mut hoisted_6: Vec<ObjectId> = Vec::new();
 let mut hoisted_5: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let voters_0: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-planned!("operation-vote" => cantrip_mechanics::vote::ballot(g, asker.source, &voters_0, cantrip_mechanics::vote::Ballot::Words(&["Grace", "Condemnation"]), false)?);
+planned!("operation-vote" => cantrip_mechanics::vote::ballot(g, asker.source, &voters_0, cantrip_mechanics::vote::Ballot::Words(&["Grace", "Condemnation"]), &Vec::<Target>::new(), false)?);
 g.end_sentence();
-if { let q: &dyn Query = g; planned_value!("condition MostVotes", false => g.votes().most(option)) } {
+if { let q: &dyn Query = g; planned_value!("condition MostVotes", false => q.votes().most(cantrip_mechanics::vote::Vote::Word("Grace"), false)) } {
 let mut players_1: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
 let mut gathered_2: Vec<ObjectId> = Vec::new();
  for (index_1, bound_0) in players_1.iter().copied().enumerate() { gathered_2.extend({ let q: &dyn Query = g; ((Some(bound_0).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>() });
@@ -26,7 +26,7 @@ hoisted_5.extend(moved_4.clone());
 hoisted_6.extend({ let q: &dyn Query = g; objects_4.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() });
 }
 g.end_sentence();
-if { let q: &dyn Query = g; planned_value!("condition MostVotes", false => g.votes().most(option)) } {
+if { let q: &dyn Query = g; planned_value!("condition MostVotes", false => q.votes().most(cantrip_mechanics::vote::Vote::Word("Condemnation"), true)) } {
 let objects_7 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && !(Some(asker.source) == Some(id)))).collect::<Vec<ObjectId>>() }; let destroyed_7 = g.destroy_all(&objects_7);
 g.end_sentence();
 hoisted_8.extend(destroyed_7.clone());

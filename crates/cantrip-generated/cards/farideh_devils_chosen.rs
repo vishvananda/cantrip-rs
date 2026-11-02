@@ -11,7 +11,7 @@ let kind_0_0_0 = { let q: &dyn Query = g; EffectKind::AddKeywords(Keywords::of(&
 let kind_0_1_0 = { let q: &dyn Query = g; EffectKind::AddKeywords(Keywords::of(&[Keyword::Menace])) };
 if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &object in &objects_0 { g.add_effect(source, object, kind_0_0_0, duration_0); g.add_effect(source, object, kind_0_1_0, duration_0);  } }); }
 g.end_sentence();
-if { let q: &dyn Query = g; (planned_value!("numeric expression Dice", 0i64 => g.last_roll(asker.controller).matching(Comparison::GreaterOrEqual, 10i64))) >= (1i64) } {
+if { let q: &dyn Query = g; (planned_value!("numeric expression Dice", 0i64 => q.last_roll(asker.controller).matching(Comparison::GreaterOrEqual, 10i64))) >= (1i64) } {
 let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_1 { g.draw(player, amount_1); }
 g.end_sentence();

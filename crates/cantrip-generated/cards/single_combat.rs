@@ -3,6 +3,7 @@
 // requires: player rule for a while can't cast some spells
 // Each player chooses a creature or planeswalker they control, then sacrifices the rest. Players can't cast creature or planeswalker spells until the end of your next turn.
 #[allow(unused_imports)] use cantrip_api::*;
+planned_item!("player-rule-for-a-while-can-t-cast-some-spells" => #[allow(unused_variables)] fn lasting_spell_rule_0(q: &dyn Query, asker: &Asker, about: Target, player: PlayerId, spell: ObjectId) -> bool { let source = asker.source; (q.chars(spell).is(CardType::Creature) || q.chars(spell).is(CardType::Planeswalker)) });
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
 let mut each_2: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut all_2: Vec<ObjectId> = Vec::new();
@@ -14,9 +15,10 @@ let objects_3 = { let q: &dyn Query = g; { let chosen: Vec<ObjectId> = all_2.clo
 for &object in &objects_3 { let controller = g.controller(object); if players_3.contains(&controller) && g.can_sacrifice(controller, object) { picks_3.push((controller, object)); } }
 let sacrificed_3 = g.sacrifice_each(&picks_3);
 g.end_sentence();
-planned!("player-rule-for-a-while-can-t-cast-some-spells" => let players_4_0 = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_4_0 { g.add_player_effect(asker.controller, source, EffectKind::CantCast { player, spells: SpellSet::matching(move |q, spell| (q.chars(spell).is(CardType::Creature) || q.chars(spell).is(CardType::Planeswalker))) }, Duration::EndOfNextTurnOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })); } });
+planned!("player-rule-for-a-while-can-t-cast-some-spells" => let players_4_0 = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_4_0 { g.add_player_effect(asker.controller, source, EffectKind::CantCast { player, card: item.ability.card, index: 0, about: Target::None }, Duration::EndOfNextTurnOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })); } });
 g.end_sentence();
  Ok(()) }
+planned_item!("player-rule-for-a-while-can-t-cast-some-spells" => lasting_spell_rules: lasting_spell_rule_0);
 
 pub static CARD: CardDef = CardDef { name: "Single Combat", token_words: &[], oracle: true, cost: ManaCost { generic: 3, x: 0, symbols: [2, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Sorcery]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: spell(&[], ability_0), abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

@@ -8,7 +8,7 @@
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && (q.chars(id).is(CardType::Creature) && (i64::from(q.mana_value(id))) >= (5i64)) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-change-spell" => if let Some(spell) = { let q: &dyn Query = g; item.subject.object() } { cantrip_mechanics::spell_changes::change(g, asker, spell, &[SpellChange::EntersWithCounters(CounterKind::PlusOne, ((item.subject.object().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o))) - 4i64)).clamp(0, 32767) as i16)]); });
+planned!("operation-change-spell" => if let Some(spell) = { let q: &dyn Query = g; item.subject.object() } { let changes = { let q: &dyn Query = g; [SpellChange::EntersWithCounters(CounterKind::PlusOne, ((item.subject.object().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o))) - 4i64)).clamp(0, 32767) as i16)] }; cantrip_mechanics::spell_changes::change(g, asker, spell, &changes); });
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); ((*so_far).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(affected)) && (i64::from(q.state().obj(affected).counters(CounterKind::PlusOne))) >= (3i64)) }

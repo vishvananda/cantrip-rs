@@ -12,7 +12,7 @@ fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 g.end_sentence();
  Ok(()) }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-change-spell" => cantrip_mechanics::spell_changes::next_spell(g, asker, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, |q: &dyn Query, asker: &Asker, id: ObjectId| true, NextSpell { this_turn: true, from_hand: false }, &[SpellChange::CantBeCountered]));
+planned!("operation-change-spell" => { let changes = { let q: &dyn Query = g; [SpellChange::CantBeCountered] }; cantrip_mechanics::spell_changes::next_spell(g, asker, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, |q: &dyn Query, asker: &Asker, id: ObjectId| true, NextSpell { this_turn: true, from_hand: false }, &changes); });
 g.end_sentence();
  Ok(()) }
 

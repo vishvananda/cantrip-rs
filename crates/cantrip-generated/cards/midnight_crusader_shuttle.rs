@@ -33,7 +33,7 @@ if let Some(source) = source_10 { cantrip_api::instruction(g, |g| { for &object 
 g.end_sentence();
 let objects_12 = { let q: &dyn Query = g; ((carried_11_0.clone()).first().copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_12: Vec<ObjectId> = objects_12.iter().copied().filter(|&o| g.state().obj(o).tapped != true).collect(); g.tap_together(&turned_12);
 g.end_sentence();
-planned!("operation-change-combat" => cantrip_mechanics::combat::change(g, asker, CombatChange::AssignAttack { objects: { let q: &dyn Query = g; (carried_11_0.clone()).first().copied().into_iter().collect::<Vec<ObjectId>>() }, to: AttackAssignment::Player({ let q: &dyn Query = g; item.subject.object().and_then(|o: ObjectId| q.defending_player(o)) }) })?);
+planned!("operation-change-combat" => cantrip_mechanics::combat::change(g, asker, &{ let q: &dyn Query = g; (carried_11_0.clone()).first().copied().into_iter().collect::<Vec<ObjectId>>() }, CombatChange::AssignAttack { to: AttackAssignment::Player({ let q: &dyn Query = g; item.subject.object().and_then(|o: ObjectId| q.defending_player(o)) }) })?);
 g.end_sentence();
 hoisted_14.extend(objects_12.clone());
 hoisted_15.extend(carried_11_0.clone());

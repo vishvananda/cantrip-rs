@@ -5,7 +5,7 @@
 // Flashback {R} (You may cast this card from your graveyard for its flashback cost. Then exile it.)
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-game-effect" => cantrip_mechanics::game_rules::for_a_time(g, asker, Duration::EndOfTurn, GameEffect::DamageCantBePrevented));
+planned!("operation-game-effect" => cantrip_mechanics::game_rules::for_a_time(g, asker, Duration::EndOfTurn, &Vec::<ObjectId>::new(), &Vec::<PlayerId>::new(), GameEffect::DamageCantBePrevented));
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_require(q: &dyn Query, asker: &Asker) -> bool { ((q.chars(asker.source).is(CardType::Instant) || q.chars(asker.source).is(CardType::Sorcery))) }

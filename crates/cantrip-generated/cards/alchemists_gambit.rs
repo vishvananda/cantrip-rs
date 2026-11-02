@@ -9,7 +9,7 @@
 fn ability_0_paid(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let turn_0 = g.add_extra_turn({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") });
 g.end_sentence();
-planned!("operation-game-effect" => cantrip_mechanics::game_rules::for_a_time(g, asker, planned_value!("duration ExtraTurn", Duration::Indefinite => Duration::ExtraTurn(turn_0)), GameEffect::DamageCantBePrevented));
+planned!("operation-game-effect" => cantrip_mechanics::game_rules::for_a_time(g, asker, planned_value!("duration ExtraTurn", Duration::Indefinite => Duration::ExtraTurn(turn_0)), &Vec::<ObjectId>::new(), &Vec::<PlayerId>::new(), GameEffect::DamageCantBePrevented));
 g.end_sentence();
 let objects_2 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let moved_2 = g.exile_all(&objects_2);
 g.end_sentence();
@@ -21,7 +21,7 @@ g.end_sentence();
 fn ability_0_unpaid(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let turn_3 = g.add_extra_turn({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") });
 g.end_sentence();
-planned!("operation-game-effect" => cantrip_mechanics::game_rules::for_a_time(g, asker, planned_value!("duration ExtraTurn", Duration::Indefinite => Duration::ExtraTurn(turn_3)), GameEffect::DamageCantBePrevented));
+planned!("operation-game-effect" => cantrip_mechanics::game_rules::for_a_time(g, asker, planned_value!("duration ExtraTurn", Duration::Indefinite => Duration::ExtraTurn(turn_3)), &Vec::<ObjectId>::new(), &Vec::<PlayerId>::new(), GameEffect::DamageCantBePrevented));
 g.end_sentence();
 if let Some(turn) = turn_3 { g.delayed_trigger(DelayedWhen::ExtraTurnStep { step: Step::End, turn }, item.object, item.controller, AbilityRef::delayed(item.ability.card, 0), Target::None); }
 g.end_sentence();

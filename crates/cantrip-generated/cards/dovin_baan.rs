@@ -28,7 +28,9 @@ g.end_sentence();
  Ok(()) }
 pub mod emblem_4 {
 #[allow(unused_imports)] use cantrip_api::*;
-planned_item!("a-limit-on-what-untaps-in-an-untap-step" => untap_limits: UntapLimit { applies: |q, asker, player| player != asker.controller, permanents: |q, asker, id| true, amount: 2 });
+planned_item!("a-limit-on-what-untaps-in-an-untap-step" => #[allow(unused_variables)] fn ability_0_0_untaps_0(q: &dyn Query, asker: &Asker, player: PlayerId) -> bool { player != asker.controller });
+planned_item!("a-limit-on-what-untaps-in-an-untap-step" => #[allow(unused_variables)] fn ability_0_0_untapping_0(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { true });
+planned_item!("a-limit-on-what-untaps-in-an-untap-step" => untap_limits: UntapLimit { applies: ability_0_0_untaps_0, permanents: ability_0_0_untapping_0, amount: 2 });
 
 pub static CARD: CardDef = CardDef { name: "Dovin Baan emblem", token_words: &[], oracle: false, cost: ManaCost::ZERO, has_cost: false, types: TypeSet::of(&[]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

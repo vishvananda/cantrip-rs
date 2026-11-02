@@ -4,7 +4,7 @@
 // Jolly Gutpipes — {2}, {T}, Sacrifice a creature: The next creature spell you cast this turn has cascade. (When you next cast a creature spell, exile cards from the top of your library until you exile a nonland card that costs less. You may cast it without paying its mana cost. Put the exiled cards on the bottom in a random order.)
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-change-spell" => cantrip_mechanics::spell_changes::next_spell(g, asker, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, |q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Creature), NextSpell { this_turn: true, from_hand: false }, &[SpellChange::Gains("Mechanic")]));
+planned!("operation-change-spell" => { let changes = { let q: &dyn Query = g; [SpellChange::Gains("Mechanic")] }; cantrip_mechanics::spell_changes::next_spell(g, asker, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, |q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Creature), NextSpell { this_turn: true, from_hand: false }, &changes); });
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_0_1(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { q.chars(id).is(CardType::Creature) }

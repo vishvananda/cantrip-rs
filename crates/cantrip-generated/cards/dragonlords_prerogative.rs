@@ -6,7 +6,7 @@
 // Draw four cards.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_0(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Dragon)) }
-#[allow(unused_variables)] fn ability_1_apply(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); if (q.history().casts().any(|c| (c.spell == asker.source || q.state().obj(c.spell).became == Some(asker.source)) && c.fact != 0) || planned_value!("engine: no reveal cost", false => q.as_cast(asker, AsCast { player: AbilityController, action: Revealed(Subtype(Dragon)) }))) { chars.keywords = chars.keywords.with(Keyword::CantBeCountered); } }
+#[allow(unused_variables)] fn ability_1_apply(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); if (q.history().casts().any(|c| (c.spell == asker.source || q.state().obj(c.spell).became == Some(asker.source)) && c.fact != 0) || planned_value!("engine: no reveal cost", false => q.as_cast(asker, "AsCast { player: AbilityController, action: Revealed(Subtype(Dragon)) }"))) { chars.keywords = chars.keywords.with(Keyword::CantBeCountered); } }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let amount_1 = { let q: &dyn Query = g; (4i64).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_1 { g.draw(player, amount_1); }

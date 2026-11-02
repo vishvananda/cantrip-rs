@@ -33,10 +33,10 @@ let asker = &Asker::new(item.object, item.controller);
 let mut players_3: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
 let first_3 = { let q: &dyn Query = g; Some(asker.controller) }; if let Some(at) = players_3.iter().position(|&p| Some(p) == first_3) { players_3.rotate_left(at); }
  for (index_3, bound_0) in players_3.iter().copied().enumerate() { let voters_4: Vec<PlayerId> = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
-planned!("operation-vote" => cantrip_mechanics::vote::ballot(g, asker.source, &voters_4, cantrip_mechanics::vote::Ballot::Words(&["Innocent", "Guilty"]), false)?);
+planned!("operation-vote" => cantrip_mechanics::vote::ballot(g, asker.source, &voters_4, cantrip_mechanics::vote::Ballot::Words(&["Innocent", "Guilty"]), &Vec::<Target>::new(), false)?);
     } 
 g.end_sentence();
-if { let q: &dyn Query = g; planned_value!("condition MostVotes", false => g.votes().most(option)) } {
+if { let q: &dyn Query = g; planned_value!("condition MostVotes", false => q.votes().most(cantrip_mechanics::vote::Vote::Word("Guilty"), false)) } {
 let objects_5 = { let q: &dyn Query = g; (((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && q.exiled_with(q.linked_to(asker)).contains(&id)).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Exile).collect::<Vec<ObjectId>>() }; let moved_5 = g.put_into_library(&objects_5, LibraryPlace::Bottom);
 g.end_sentence();
 hoisted_6.extend(moved_5.clone());

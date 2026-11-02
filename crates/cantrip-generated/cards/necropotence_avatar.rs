@@ -6,6 +6,7 @@
 // Skip your draw step.
 // At the beginning of your end step, if it's not the first turn of the game, put a death counter on Necropotence Avatar. You draw X cards and you lose X life, where X is the number of death counters on Necropotence Avatar.
 #[allow(unused_imports)] use cantrip_api::*;
+planned_item!("skipping-a-step-of-the-turn" => #[allow(unused_variables)] fn ability_0_0_skips_0(q: &dyn Query, asker: &Asker, player: PlayerId) -> bool { player == asker.controller });
 fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { (i64::from(q.state().turn.number)) >= (2i64) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::End) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
@@ -21,7 +22,7 @@ let amount_2 = { let q: &dyn Query = g; ((Some(asker.source).into_iter().collect
 for player in players_2 { g.lose_life(player, amount_2); }
 g.end_sentence();
  Ok(()) }
-planned_item!("skipping-a-step-of-the-turn" => skip_steps: SkipStep { applies: |q, asker, player| player == asker.controller, step: Step::Draw });
+planned_item!("skipping-a-step-of-the-turn" => skip_steps: SkipStep { applies: ability_0_0_skips_0, step: Step::Draw });
 planned_item!("layout-vanguard" => variant: Some(Variant::Vanguard { hand: 0, life: 4 }));
 
 pub static CARD: CardDef = CardDef { name: "Necropotence Avatar", token_words: &[], oracle: true, cost: ManaCost::ZERO, has_cost: false, types: TypeSet::of(&[planned_value!("card type Vanguard", CardType::Land => CardType::Vanguard)]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::STEP_BEGAN.0), ability_1_event), ability_1, "At the beginning of your end step, if it's not the first turn of the game, put a death counter on Necropotence Avatar. You draw X cards and you lose X life, where X is the number of death counters on Necropotence Avatar.").targets(&[]).condition(ability_1_if)], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };

@@ -5,7 +5,7 @@
 // Reveal this card as you draft it and note how many cards you've drafted this draft round, including this card.
 // {W}, {T}: Tap target creature with power less than or equal to the highest number you noted for cards named Custodi Peacekeeper.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && q.chars(id).power.is_some_and(|v| (i64::from(v)) <= (planned_value!("numeric expression DraftNoted", 0i64 => q.draft_notes(asker.controller, DraftNoted { note: DraftNote { kind: Number, player: AbilityController, card: "Custodi Peacekeeper" }, highest: true }))))))) }
+#[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && q.chars(id).power.is_some_and(|v| (i64::from(v)) <= (planned_value!("numeric expression DraftNoted", 0i64 => q.draft_note_count(asker.controller, "DraftNoted { note: DraftNote { kind: Number, player: AbilityController, card: \"Custodi Peacekeeper\" }, highest: true }"))))))) }
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);

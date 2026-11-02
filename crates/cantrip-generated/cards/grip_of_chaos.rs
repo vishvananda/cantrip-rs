@@ -6,7 +6,7 @@
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller); if !{ let q: &dyn Query = g; item.subject.object().is_some_and(|candidate: ObjectId| q.state().stack.iter().find(|i| i.object == candidate).is_some_and(|i| q.state().targets(i).len() == 1)) } { return Ok(()); } let asker = &Asker::new(item.object, item.controller);
-planned!("new-targets-chosen-at-random" => if let Some(spell) = { let q: &dyn Query = g; item.subject.object() } { cantrip_mechanics::copy::retarget(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, spell, NewTargets::Random)?; });
+planned!("new-targets-chosen-at-random" => if let Some(spell) = { let q: &dyn Query = g; item.subject.object() } { cantrip_mechanics::copy::retarget(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, spell, NewTargets::Random, &Vec::<Target>::new())?; });
 g.end_sentence();
  Ok(()) }
 planned_item!("trigger-event-onto-stack" => matcher: #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::PutOnStack { object, .. } = event { let id = *object; let subject = Target::Object(id); let data = [u32::MAX, u32::MAX]; if true && subject.object().is_some_and(|candidate: ObjectId| q.state().stack.iter().find(|i| i.object == candidate).is_some_and(|i| q.state().targets(i).len() == 1)) { return Some(Fired { subject, data }); } }

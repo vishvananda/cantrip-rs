@@ -14,7 +14,7 @@
 pub mod token_3 {
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_1_0_rule(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { let source = asker.source; id == asker.source }
-planned_item!("static-rule-prohibit-be-attached-by" => statics: object_rule(ability_1_0_rule, Rule::Cant(Action::BeAttachedBy { attachments: |q: &dyn Query, asker: &Asker, attachment: ObjectId| q.chars(attachment).has_subtype(q.words(asker.source).subtype(Subtype::Aura)), keep_existing: false })));
+planned_item!("static-rule-prohibit-be-attached-by" => statics: object_rule(ability_1_0_rule, Rule::Cant(ObjectAction::BeAttachedBy { attachments: |q: &dyn Query, asker: &Asker, attachment: ObjectId| q.chars(attachment).has_subtype(q.words(asker.source).subtype(Subtype::Aura)), keep_existing: false })));
 
 pub static CARD: CardDef = CardDef { name: token!(Tetravite).name, token_words: token!(Tetravite).token_words, oracle: false, cost: ManaCost::ZERO, has_cost: false, types: TypeSet::of(&[CardType::Artifact,CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Tetravite]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: Some(1), toughness: Some(1), loyalty: None, defense: None, keywords: Keywords::of(&[Keyword::Flying]), protection: ColorSet(0), spell: None, abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

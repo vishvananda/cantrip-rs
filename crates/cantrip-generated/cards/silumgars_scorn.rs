@@ -9,7 +9,7 @@
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-if { let q: &dyn Query = g; Some(asker.source).is_some_and(|candidate: ObjectId| (planned_value!("engine: no reveal cost", false => q.as_cast(asker, AsCast { player: AbilityController, action: Revealed(Subtype(Dragon)) })) || q.history().casts().any(|c| (c.spell == asker.source || q.state().obj(c.spell).became == Some(asker.source)) && c.fact != 0))) } {
+if { let q: &dyn Query = g; Some(asker.source).is_some_and(|candidate: ObjectId| (planned_value!("engine: no reveal cost", false => q.as_cast(asker, "AsCast { player: AbilityController, action: Revealed(Subtype(Dragon)) }")) || q.history().casts().any(|c| (c.spell == asker.source || q.state().obj(c.spell).became == Some(asker.source)) && c.fact != 0))) } {
 let objects_1 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; cantrip_api::instruction(g, |g| { for spell in objects_1 { g.counter(spell); } });
 g.end_sentence();
 } else {

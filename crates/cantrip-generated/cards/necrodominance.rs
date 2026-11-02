@@ -6,6 +6,7 @@
 // Your maximum hand size is five.
 // If a card or token would be put into your graveyard from anywhere, exile it instead.
 #[allow(unused_imports)] use cantrip_api::*;
+planned_item!("skipping-a-step-of-the-turn" => #[allow(unused_variables)] fn ability_0_0_skips_0(q: &dyn Query, asker: &Asker, player: PlayerId) -> bool { player == asker.controller });
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::End) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
@@ -22,7 +23,7 @@ g.end_sentence();
  false }
 #[allow(unused_variables, unused_mut)] fn ability_3_apply(q: &dyn Query, asker: &Asker, proposal: &mut Proposal) { let seen = *proposal; if let Proposal::ZoneChange(seen) = &seen { let z = seen; let id = z.object; let subject = Target::Object(id); let data = [u32::MAX; 2]; if let Proposal::ZoneChange(z) = proposal { z.to = Zone::exile(q.state().obj(z.object).owner); } } }
 static PAY_QUESTION: Question = Question::new("Pay", "pay {cost}?", "", "Pay {cost}", "Decline");
-planned_item!("skipping-a-step-of-the-turn" => skip_steps: SkipStep { applies: |q, asker, player| player == asker.controller, step: Step::Draw });
+planned_item!("skipping-a-step-of-the-turn" => skip_steps: SkipStep { applies: ability_0_0_skips_0, step: Step::Draw });
 
 pub static CARD: CardDef = CardDef { name: "Necrodominance", token_words: &[], oracle: true, cost: ManaCost { generic: 0, x: 0, symbols: [0, 0, 3, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Enchantment]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: true, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::STEP_BEGAN.0), ability_1_event), ability_1, "At the beginning of your end step, you may pay any amount of life. If you do, draw that many cards.").targets(&[])], statics: &[], replacements: &[replacement(ReplacementKind::ZoneChange, ability_3_applies, ability_3_apply, "If a card or token would be put into your graveyard from anywhere, exile it instead.")], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, play_rules: &[PlayRule::MaximumHandSize(Some(5))], ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

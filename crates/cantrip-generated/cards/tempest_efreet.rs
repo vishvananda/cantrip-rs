@@ -24,7 +24,7 @@ g.reveal(player_1, &shown_1);
 g.end_sentence();
 planned!("operation-exchange" => cantrip_mechanics::exchange::exchange(g, asker.source, Exchange::Ownership, { let q: &dyn Query = g; (shown_1.clone()).get(0).copied() }, { let q: &dyn Query = g; Some(asker.source) }, None));
 g.end_sentence();
-let moved_3: Vec<ObjectId> = planned_value!("move to Hand", Vec::<ObjectId>::new() => cantrip_mechanics::enter::change_zone(g, asker, ZoneChange { actor: { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, cards: { let q: &dyn Query = g; (shown_1.clone()).get(0).copied().into_iter().collect::<Vec<ObjectId>>() }, count: None, random: false, group: None, destination: Destination::Hand, entry: &[], face_down: None })?);
+let moved_3: Vec<ObjectId> = planned_value!("move to Hand", Vec::<ObjectId>::new() => cantrip_mechanics::enter::change_zone(g, asker, &{ let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &{ let q: &dyn Query = g; (shown_1.clone()).get(0).copied().into_iter().collect::<Vec<ObjectId>>() }, CardMove { count: None, random: false, group: None, destination: ZoneDestination::Hand, entry: &[], face_down: None })?);
 g.end_sentence();
 let objects_6 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let moved_6 = { let moves: Vec<(ObjectId, Zone)> = objects_6.iter().map(|&o| (o, Zone::graveyard(g.state().obj(o).owner))).collect(); let moved = g.move_together(&moves, MoveReason::Other); moved.into_iter().filter(|&o| g.state().obj(o).zone.kind() == ZoneKind::Graveyard).collect::<Vec<ObjectId>>() };
 g.end_sentence();

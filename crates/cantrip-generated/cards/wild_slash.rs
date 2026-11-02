@@ -8,7 +8,7 @@ static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[cantrip_mechanics::targ
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 if { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| q.controller(id) == Some(asker.controller).unwrap_or(PlayerId(u8::MAX)) && (q.chars(id).is(CardType::Creature) && q.chars(id).power.is_some_and(|v| (i64::from(v)) >= (4i64)))).count() >= 1 } {
-planned!("operation-game-effect" => cantrip_mechanics::game_rules::for_a_time(g, asker, Duration::EndOfTurn, GameEffect::DamageCantBePrevented));
+planned!("operation-game-effect" => cantrip_mechanics::game_rules::for_a_time(g, asker, Duration::EndOfTurn, &Vec::<ObjectId>::new(), &Vec::<PlayerId>::new(), GameEffect::DamageCantBePrevented));
 g.end_sentence();
 }
 g.end_sentence();

@@ -10,11 +10,11 @@ fn watch_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let aske
 let decider_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
 let offered_2: Vec<u8> = [(0u8, true), (1u8, true)].into_iter().filter(|option| option.1).map(|option| option.0).collect(); let card_2 = item.ability.card; let picked_2 = if offered_2.len() > 1 { offered_2[cantrip_mechanics::choose::one_of(g, decider_2, asker.source, offered_2.iter().map(|&option| Label::Card(card_2, option)).collect())? as usize] } else { offered_2.first().copied().unwrap_or(u8::MAX) }; match picked_2 {
 0 => {
-planned!("operation-change-spell" => if let Some(spell) = { let q: &dyn Query = g; item.subject.object() } { cantrip_mechanics::spell_changes::change(g, asker, spell, &[SpellChange::Effect(EffectKind::AddAbility(AbilityRef::delayed({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, 0)))]); });
+planned!("operation-change-spell" => if let Some(spell) = { let q: &dyn Query = g; item.subject.object() } { let changes = { let q: &dyn Query = g; [SpellChange::Effect(EffectKind::AddAbility(AbilityRef::delayed({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, 0)))] }; cantrip_mechanics::spell_changes::change(g, asker, spell, &changes); });
 g.end_sentence();
 }
 1 => {
-planned!("operation-change-spell" => if let Some(spell) = { let q: &dyn Query = g; item.subject.object() } { cantrip_mechanics::spell_changes::change(g, asker, spell, &[SpellChange::Effect(EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])))]); });
+planned!("operation-change-spell" => if let Some(spell) = { let q: &dyn Query = g; item.subject.object() } { let changes = { let q: &dyn Query = g; [SpellChange::Effect(EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])))] }; cantrip_mechanics::spell_changes::change(g, asker, spell, &changes); });
 g.end_sentence();
 }
 _ => {}

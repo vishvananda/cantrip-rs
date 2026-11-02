@@ -13,17 +13,17 @@ if let Event::Attacks { attacker, defending, .. } = event { let id = *attacker; 
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
  for (index_0, bound_0) in players_0.iter().copied().enumerate() { let voters_1: Vec<PlayerId> = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
-planned!("operation-vote" => cantrip_mechanics::vote::ballot(g, asker.source, &voters_1, cantrip_mechanics::vote::Ballot::Players({ let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }), true)?);
+planned!("operation-vote" => cantrip_mechanics::vote::ballot(g, asker.source, &voters_1, cantrip_mechanics::vote::Ballot::Players, &({ let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }).into_iter().map(Target::Player).collect::<Vec<Target>>(), true)?);
     } 
 g.end_sentence();
 planned!("operation-reveal-choices" => cantrip_mechanics::secret::reveal_choices(g, asker.source, ChoiceKind::Player));
 g.end_sentence();
-let mut players_3: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0).is_some_and(|player: PlayerId| planned_value!("player state ReceivedAVote", false => g.votes().received(player)))).collect::<Vec<PlayerId>>() };
- for (index_3, bound_0) in players_3.iter().copied().enumerate() { let amount_4 = { let q: &dyn Query = g; (planned_value!("numeric expression Votes", 0i64 => g.votes().count(Player))) as u32 }; let players_4 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
+let mut players_3: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0).is_some_and(|player: PlayerId| planned_value!("player state ReceivedAVote", false => q.votes().count(cantrip_mechanics::vote::Vote::Player(player)) > 0))).collect::<Vec<PlayerId>>() };
+ for (index_3, bound_0) in players_3.iter().copied().enumerate() { let amount_4 = { let q: &dyn Query = g; (planned_value!("numeric expression Votes", 0i64 => q.votes().count(cantrip_mechanics::vote::Vote::Player(Some(bound_0).expect("a reference that always names a player"))))) as u32 }; let players_4 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_4 { g.draw(player, amount_4); }
     } 
 g.end_sentence();
-let mut players_5: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| !(Some(bound_0).is_some_and(|player: PlayerId| planned_value!("player state ReceivedAVote", false => g.votes().received(player))))).collect::<Vec<PlayerId>>() };
+let mut players_5: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| !(Some(bound_0).is_some_and(|player: PlayerId| planned_value!("player state ReceivedAVote", false => q.votes().count(cantrip_mechanics::vote::Vote::Player(player)) > 0)))).collect::<Vec<PlayerId>>() };
 let mut guard_5_0 = vec![false; players_5.len()];
 let mut each_7: Vec<Vec<ObjectId>> = vec![Vec::new(); players_5.len()]; let mut all_7: Vec<ObjectId> = Vec::new();
  for (index_5, bound_0) in players_5.iter().copied().enumerate() { if true { guard_5_0[index_5] = true;

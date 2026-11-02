@@ -13,7 +13,7 @@ let kind_0_1_0 = { let q: &dyn Query = g; EffectKind::AddKeywords(Keywords::of(&
 let kind_0_2_0 = { let q: &dyn Query = g; EffectKind::AddKeywords(Keywords::of(&[Keyword::Menace])) };
 if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &object in &objects_0 { g.add_effect(source, object, kind_0_0_0, duration_0); g.add_effect(source, object, kind_0_1_0, duration_0); g.add_effect(source, object, kind_0_2_0, duration_0);  } }); }
 g.end_sentence();
-planned!("operation-game-effect" => cantrip_mechanics::game_rules::for_a_time(g, asker, Duration::EndOfTurn, GameEffect::DamageCantBePrevented));
+planned!("operation-game-effect" => cantrip_mechanics::game_rules::for_a_time(g, asker, Duration::EndOfTurn, &Vec::<ObjectId>::new(), &Vec::<PlayerId>::new(), GameEffect::DamageCantBePrevented));
 g.end_sentence();
  Ok(()) }
 

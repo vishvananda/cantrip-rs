@@ -17,7 +17,7 @@ if let Some(source) = source_1 { cantrip_api::instruction(g, |g| { for &object i
 g.end_sentence();
 let chooser_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let attacker_2 = { let q: &dyn Query = g; Some(PlayerId(item.data[0] as u8)).expect("a reference that always names a player") }; let candidates_2: Vec<Target> = { let q: &dyn Query = g; let mut seen: Vec<Target> = Vec::new(); for a in q.state().attackers.iter() { let attacked = match a.target { Target::Player(_) => true, Target::Object(o) => q.chars(o).is(CardType::Planeswalker), _ => false }; if attacked && q.controller(a.id) == attacker_2 && !seen.contains(&a.target) { seen.push(a.target); } } seen }; let defender_2: Option<Target> = cantrip_mechanics::combat::choose_among(g, chooser_2, asker.source, &candidates_2)?;
 g.end_sentence();
-planned!("operation-change-combat" => cantrip_mechanics::combat::change(g, asker, CombatChange::AssignAttack { objects: { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }, to: "Object(Result { result: ResultId(1), phase: After, index: 0 })" })?);
+planned!("operation-change-combat" => cantrip_mechanics::combat::change(g, asker, &{ let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }, CombatChange::AssignAttack { to: "Object(Result { result: ResultId(1), phase: After, index: 0 })" })?);
 g.end_sentence();
 hoisted_4.extend(objects_1.clone());
 }

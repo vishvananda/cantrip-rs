@@ -15,7 +15,7 @@ g.end_sentence();
 }
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_1_apply_1(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); planned_value!("the abilities of ability stickers", () => chars.gain_abilities_of(AbilitiesOf { objects: { let ids: Vec<ObjectId> = Some(asker.source).into_iter().collect::<Vec<ObjectId>>(); ids }, kinds: &[CheckHasable::AbilityStickerAbility], once_each_turn: false, spend_as: None })); }
+#[allow(unused_variables)] fn ability_1_apply_1(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); planned_value!("the abilities of ability stickers", () => chars.gain_abilities_of(AbilitiesFrom { objects: { let ids: Vec<ObjectId> = Some(asker.source).into_iter().collect::<Vec<ObjectId>>(); ids }, kinds: &[CheckHasable::AbilityStickerAbility], once_each_turn: false, spend_as: None })); }
 #[allow(unused_variables)] fn ability_1_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); let (p, t) = ((1i64) as i16, (1i64) as i16); chars.power = chars.power.map(|v| v.saturating_add(p)); chars.toughness = chars.toughness.map(|v| v.saturating_add(t)); }
 #[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id))))) }
 static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target_0)];

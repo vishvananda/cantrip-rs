@@ -39,7 +39,7 @@ pub static EXTRA: &[&CardDef] = &[];
 }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 planned!("depends-on-an-instruction-with-a-gap" => g.begin_simultaneous());
-planned!("operation-exchange" => cantrip_mechanics::exchange::exchange(g, asker.source, Exchange::Zones(Hand, Library), { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, None));
+planned!("operation-exchange" => cantrip_mechanics::exchange::exchange(g, asker.source, Exchange::Zones(ZoneKind::Hand, ZoneKind::Library), { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, None));
 for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.shuffle(player); }
 planned!("depends-on-an-instruction-with-a-gap" => g.end_simultaneous());
 g.end_sentence();

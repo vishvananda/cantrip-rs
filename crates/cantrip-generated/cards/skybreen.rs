@@ -9,6 +9,7 @@
 // Spells that share a card type with the top card of a library can't be cast.
 // Whenever chaos ensues, target player loses life equal to the number of cards in their hand.
 #[allow(unused_imports)] use cantrip_api::*;
+planned_item!("a-library-s-top-card-open-to-view" => #[allow(unused_variables)] fn library_top_open_0(q: &dyn Query, asker: &Asker, player: PlayerId) -> bool { true });
 #[allow(unused_variables)] fn ability_1_0_rule(q: &dyn Query, asker: &Asker, player: PlayerId, spell: ObjectId) -> bool { !(true && ((q.state().apnap().collect::<Vec<PlayerId>>()).into_iter().filter_map(|p: PlayerId| q.state().zone(Zone::library(p)).first().copied()).collect::<Vec<ObjectId>>()).iter().any(|&o| { let (a, b) = (&q.chars(spell), &q.chars(o)); a.types.iter().any(|t| b.types.has(t)) })) }
 #[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Player(p) if true) }
 static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target_0)];
@@ -22,7 +23,7 @@ for player in players_1 { g.lose_life(player, amount_1); }
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
-planned_item!("a-library-s-top-card-open-to-view" => play_rules: PlayRule::LibraryTopRevealed(|q, asker, player| true));
+planned_item!("a-library-s-top-card-open-to-view" => play_rules: PlayRule::LibraryTopRevealed(library_top_open_0));
 planned_item!("trigger-event-player-chaos-ensues" => matcher: #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ChaosEnsued { player } = event { let subject = Target::Player(*player); let data = [0u32; 2]; if true { return Some(Fired { subject, data }); } }
  None });
 planned_item!("layout-planar" => variant: Some(Variant::Planechase));

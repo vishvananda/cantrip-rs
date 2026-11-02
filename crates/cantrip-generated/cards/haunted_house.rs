@@ -23,7 +23,7 @@ g.end_sentence();
  Ok(()) }
 fn about(q: &dyn Query, item: &StackItem, part: usize) -> Vec<ObjectId> { q.event_objects(item).split(|&id| id == ObjectId::NONE).nth(part).map_or_else(Vec::new, <[ObjectId]>::to_vec) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
-planned_item!("ability-visit" => abilities: cantrip_mechanics::attractions::visit(spell(ABILITY_0_VISIT_TARGETS, ability_0_visit), None, "Return the chosen permanents to their owners' hands. Change characteristics until end of turn. "));
+planned_item!("ability-visit" => abilities: cantrip_mechanics::attractions::visit_ability(spell(ABILITY_0_VISIT_TARGETS, ability_0_visit), None, "Return the chosen permanents to their owners' hands. Change characteristics until end of turn. "));
 
 pub static CARD: CardDef = CardDef { name: "Haunted House", token_words: &[], oracle: true, cost: ManaCost::ZERO, has_cost: false, types: TypeSet::of(&[CardType::Artifact]), subtypes: SubtypeSet::of(&[Subtype::Attraction]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[delayed_trigger(delayed_3, "Exile it at the beginning of your next end step.")], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

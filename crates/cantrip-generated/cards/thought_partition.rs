@@ -22,7 +22,7 @@ hoisted_3.extend(selected_2.clone());
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_1 as i64) != 0) } {
 let objects_4: Vec<ObjectId> = { let q: &dyn Query = g; (hoisted_3.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() };
-planned!("engine-no-perpetual-effects" => for &object in &objects_4 { cantrip_mechanics::perpetual::apply(g, asker.source, object, PerpetualEffect::SetColor(SettableColor::SimpleColorList(SimpleColor::White))); cantrip_mechanics::perpetual::apply(g, asker.source, object, PerpetualEffect::SetManaCost(ManaSymbolX::ManaCostGeneric(5))); });
+planned!("engine-no-perpetual-effects" => for &object in &objects_4 { cantrip_mechanics::perpetual::apply(g, asker.source, object, PerpetualEffect::SetColor(SettableColor::SimpleColorList(&[SimpleColor::White]))); cantrip_mechanics::perpetual::apply(g, asker.source, object, PerpetualEffect::SetManaCost(ManaSymbolX::ManaCostGeneric(5))); });
 g.end_sentence();
 }
 g.end_sentence();

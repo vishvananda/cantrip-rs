@@ -9,7 +9,7 @@
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let Answer::Colors(colors_0) = g.ask(player_0, RequestKind::ChooseColors { source: asker.source, choices: ColorSet(31), count: 1, purpose: ColorUse::Any })? else { return Ok(()) }; let chosen_0 = colors_0[0];
 g.end_sentence();
-planned!("player-rule-for-a-while-grant-keyword" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.add_player_effect(player, source, EffectKind::PlayerRule(PlayerRule::Protection(Protection::Objects(|q: &dyn Query, asker: &Asker, id: ObjectId| Some(chosen_0).is_some_and(|chosen| q.chars(id).colors.has(chosen))))), Duration::EndOfTurn); } });
+planned!("player-rule-for-a-while-grant-keyword" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.add_player_effect(player, source, EffectKind::PlayerRule(PlayerRule::Protection(Protection::Color(chosen_0))), Duration::EndOfTurn); } });
 g.end_sentence();
  Ok(()) }
 

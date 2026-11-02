@@ -20,7 +20,7 @@ let objects_0 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0
 g.end_sentence();
 if let Some(object) = ({ let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied() { g.phase_out(&[object]); }
 g.end_sentence();
-planned!("operation-game-effect" => cantrip_mechanics::game_rules::for_a_time(g, asker, { let q: &dyn Query = g; Duration::AsLongAs({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, 0) }, GameEffect::PermanentCantPhaseIn({ let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) })));
+planned!("operation-game-effect" => cantrip_mechanics::game_rules::for_a_time(g, asker, { let q: &dyn Query = g; Duration::AsLongAs({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, 0) }, &Vec::<ObjectId>::new(), &Vec::<PlayerId>::new(), GameEffect::PermanentCantPhaseIn({ let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) })));
 g.end_sentence();
 if let Some(source) = Some(item.object) { g.delayed_trigger(DelayedWhen::UntilEvent, source, item.controller, AbilityRef::delayed(item.ability.card, 0), { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) }.map_or(Target::None, Target::Object)); }
 g.end_sentence();

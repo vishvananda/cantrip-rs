@@ -12,7 +12,8 @@ let amount_0 = { let q: &dyn Query = g; (7i64).max(0) as u32 }; let players_0 = 
 for player in players_0 { g.draw(player, amount_0); }
 g.end_sentence();
  Ok(()) }
-planned_item!("a-maximum-hand-size-of-other-players" => hand_size_rules: HandSizeRule { applies: |q, asker, player| player != asker.controller, size: HandSize::Adjust(-7) });
+planned_item!("a-maximum-hand-size-of-other-players" => #[allow(unused_variables)] fn ability_2_0_hand_size_0(q: &dyn Query, asker: &Asker, player: PlayerId) -> bool { player != asker.controller });
+planned_item!("a-maximum-hand-size-of-other-players" => hand_size_rules: HandSizeRule { applies: ability_2_0_hand_size_0, size: HandSize::Adjust(-7) });
 
 pub static CARD: CardDef = CardDef { name: "Jin-Gitaxias, Core Augur", token_words: &[], oracle: true, cost: ManaCost { generic: 8, x: 0, symbols: [0, 2, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Phyrexian,Subtype::Praetor]), supertypes: Supertypes { basic: false, legendary: true, snow: false }, colors: None, power: Some(5), toughness: Some(4), loyalty: None, defense: None, keywords: Keywords::of(&[Keyword::Flash]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::STEP_BEGAN.0), ability_1_event), ability_1, "At the beginning of your end step, draw seven cards.").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

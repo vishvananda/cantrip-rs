@@ -7,7 +7,7 @@
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && (((q.chars(id).colors.iter().count() as i64) > (1i64) && (q.chars(id).is(CardType::Instant) || q.chars(id).is(CardType::Sorcery))) && cast_at(q, event, id).is_some_and(|cast| cast.from == ZoneKind::Hand && q.state().obj(cast.spell).owner == cast.player)) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on(g, asker, EffectOn::Objects({ let q: &dyn Query = g; item.subject.object().into_iter().collect::<Vec<ObjectId>>() }), &[SpellEffect::AsResolves(&[ResolveAction::ExileResolvingSpellAndPlotIt])], None)?);
+planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on_objects(g, asker, &{ let q: &dyn Query = g; item.subject.object().into_iter().collect::<Vec<ObjectId>>() }, &[SpellEffect::AsResolves(&[ResolveAction::ExileResolvingSpellAndPlotIt])], None)?);
 g.end_sentence();
  Ok(()) }
 fn cast_of<'a>(q: &'a dyn Query, id: ObjectId) -> Option<&'a Cast> { let records = q.history().all(); let spell = records.iter().rev().find_map(|r| match r.event { Event::ZoneChange { old, new, reason: ZoneReason::Resolve, .. } if new == id => Some(old), _ => None }).unwrap_or(id); records.iter().rev().find_map(|r| match &r.event { Event::Cast(cast) if cast.spell == spell => Some(cast), _ => None }) }

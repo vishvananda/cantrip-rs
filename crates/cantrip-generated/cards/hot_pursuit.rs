@@ -15,7 +15,7 @@ g.end_sentence();
 let objects_1 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let duration_1 = Duration::WhileSourceOnBattlefield; for object in objects_1 { cantrip_mechanics::goad::goad_for(g, item, object, duration_1); }
 g.end_sentence();
  Ok(()) }
-fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { (planned_value!("numeric expression Game", 0i64 => q.game_value(item, GameValue::PlayersWhoLost))) >= (2i64) }
+fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { (planned_value!("numeric expression Game", 0i64 => q.game_value_of(asker, GameValue::PlayersWhoLost))) >= (2i64) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::BeginCombat) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

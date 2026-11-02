@@ -16,7 +16,7 @@ let mut each_2: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut 
 g.end_sentence();
 planned!("per-player-tokens-entering-attached" => g.begin_batch(););
 let mut each_4: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut all_4: Vec<ObjectId> = Vec::new();
- for (index_0, _) in players_0.iter().copied().enumerate() { let created_3: Vec<ObjectId> = planned_value!("tokens entering in a special state", Vec::<ObjectId>::new() => cantrip_mechanics::tokens::create(g, asker, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[({ let q: &dyn Query = g; (1i64).max(0) as u32 }, TokenRecipe::CopyNamed("Arrest", &[TokenCopyEffects::NoTokenCopyEffects]))], Arrival { tapped: false, counters: &[], states: &[ArrivalState::AttachedTo({ let q: &dyn Query = g; (each_2[index_0].clone()).get(0 as usize).copied() })] })?);
+ for (index_0, _) in players_0.iter().copied().enumerate() { let created_3: Vec<ObjectId> = planned_value!("tokens entering in a special state", Vec::<ObjectId>::new() => cantrip_mechanics::tokens::create_from_recipes(g, asker.source, &{ let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[({ let q: &dyn Query = g; (1i64).max(0) as u32 }, TokenRecipe::CopyNamed("Arrest", &[TokenCopyEffects::NoTokenCopyEffects]))], Arrival { tapped: false, counters: &[], states: &[ArrivalState::AttachedTo({ let q: &dyn Query = g; (each_2[index_0].clone()).get(0 as usize).copied() })] })?);
  each_4[index_0] = created_3.clone(); all_4.extend(each_4[index_0].iter().copied());
    } 
 planned!("per-player-tokens-entering-attached" => g.end_batch(););

@@ -24,7 +24,7 @@ tokens_0.extend(std::iter::repeat((def_0_0,player)).take(count_0_0 as usize));
 let created_0 = g.create_tokens_worded(&tokens_0, false, None, words_0)?;
 g.end_sentence();
  Ok(()) }
-planned_item!("keyword-modifier-x-cant-be-zero" => abilities: modified(Mechanic, Modifier::XCantBeZero));
+planned_item!("keyword-modifier-x-cant-be-zero" => abilities: modified("Mechanic", Modifier::XCantBeZero));
 planned_item!("engine-no-event-for-a-counter-being-removed" => matcher: #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::CountersRemoved { object, kind, amount, by, .. } = event { let id = *object; let subject = Target::Object(id); let data = [*amount as u32, id.0]; if Some(asker.source) == Some(id) && *kind == CounterKind::Time { return Some(Fired { subject, data }); } }
  None });
 

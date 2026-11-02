@@ -15,7 +15,7 @@ let objects_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.
 let paid_0 = moved_0.clone().iter().any(|&o| g.obj(o).zone.is(ZoneKind::Exile));
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
-planned!("operation-change-spell" => if let Some(spell) = { let q: &dyn Query = g; Some(asker.source) } { cantrip_mechanics::spell_changes::change(g, asker, spell, &[SpellChange::Gains("Triggered")]); });
+planned!("operation-change-spell" => if let Some(spell) = { let q: &dyn Query = g; Some(asker.source) } { let changes = { let q: &dyn Query = g; [SpellChange::Gains("Triggered")] }; cantrip_mechanics::spell_changes::change(g, asker, spell, &changes); });
 g.end_sentence();
 }
 g.end_sentence();

@@ -15,7 +15,7 @@ let had_3: Vec<_> = counters_3.iter().map(|c| g.state().obj(c.0).counters(c.1)).
 g.end_sentence();
  Ok(()) }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on(g, asker, EffectOn::Players({ let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }), &[FuturePlayerEffect::MayCastTheirNextSpellThisTurnAsThoughItHadFlash(|q: &dyn Query, asker: &Asker, id: ObjectId| true)], None)?);
+planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on_players(g, asker, &{ let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[FuturePlayerEffect::MayCastTheirNextSpellThisTurnAsThoughItHadFlash(|q: &dyn Query, asker: &Asker, id: ObjectId| true)], None)?);
 g.end_sentence();
 if let Some(source) = Some(item.object) { g.delayed_trigger(DelayedWhen::NextThisTurn, source, item.controller, AbilityRef::delayed(item.ability.card, 0), Target::None); }
 g.end_sentence();

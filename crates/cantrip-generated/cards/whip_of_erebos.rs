@@ -26,7 +26,7 @@ if let Some(source) = source_1 { cantrip_api::instruction(g, |g| { for &object i
 g.end_sentence();
 { let mut about: Vec<ObjectId> = Vec::new(); about.extend({ let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }); about.push(ObjectId::NONE);  if about.iter().any(|&o| o != ObjectId::NONE) { g.delayed_trigger_about(DelayedWhen::Step { step: Step::End, on_turn_of: None }, item.object, item.controller, AbilityRef::delayed(item.ability.card, 0), &about); } }
 g.end_sentence();
-{  let to = Some(Target::None); let about = { let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied() }; if let (Some(to), Some(about)) = (to, about) { let _ = to; g.add_effect(item.object, about, EffectKind::Replacement { card: item.ability.card, index: 0 }, planned_value!("duration WhileOnBattlefield", Duration::Indefinite => Duration::WhileOnBattlefield(Result { result: ResultId(0), phase: After, index: 0 }))); } }
+{  let to = Some(Target::None); let about = { let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied() }; if let (Some(to), Some(about)) = (to, about) { let _ = to; g.add_effect(item.object, about, EffectKind::Replacement { card: item.ability.card, index: 0 }, planned_value!("duration WhileOnBattlefield", Duration::Indefinite => Duration::WhileOnBattlefield({ let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied() }))); } }
 g.end_sentence();
  Ok(()) }
 fn about(q: &dyn Query, item: &StackItem, part: usize) -> Vec<ObjectId> { q.event_objects(item).split(|&id| id == ObjectId::NONE).nth(part).map_or_else(Vec::new, <[ObjectId]>::to_vec) }

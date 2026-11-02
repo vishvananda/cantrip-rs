@@ -14,7 +14,7 @@ let objects_0 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0
 g.end_sentence();
 {  let to = Some(Target::None); let about = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) }; if let (Some(to), Some(about)) = (to, about) { g.add_effect(item.object, about, EffectKind::Prevention { card: item.ability.card, index: 0, to, shield: Shield::All }, Duration::EndOfTurn); } }
 g.end_sentence();
-planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on(g, asker, EffectOn::Objects({ let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }), &[PermanentRule::DoesntUntapDuringControllersUntap], Some(planned_value!("duration DuringControllersNextUntapSteps", Duration::Indefinite => Duration::ControllersNextUntapSteps({ let q: &dyn Query = g; 2i64 }))))?);
+planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on_objects(g, asker, &{ let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }, &[PermanentRule::DoesntUntapDuringControllersUntap], Some(planned_value!("duration DuringControllersNextUntapSteps", Duration::Indefinite => Duration::ControllersNextUntapSteps({ let q: &dyn Query = g; 2i64 }))))?);
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

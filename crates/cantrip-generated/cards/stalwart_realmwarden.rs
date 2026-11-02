@@ -10,7 +10,7 @@ static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-planned!("operation-change-spell" => cantrip_mechanics::spell_changes::next_spell(g, asker, { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.player()).expect("a reference that always names a player") }, |q: &dyn Query, asker: &Asker, id: ObjectId| !(q.chars(id).is(CardType::Creature)), NextSpell { this_turn: false, from_hand: false }, &[SpellChange::Cost(CostDelta::more(2))]));
+planned!("operation-change-spell" => { let changes = { let q: &dyn Query = g; [SpellChange::Cost(CostDelta::more(2))] }; cantrip_mechanics::spell_changes::next_spell(g, asker, { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.player()).expect("a reference that always names a player") }, |q: &dyn Query, asker: &Asker, id: ObjectId| !(q.chars(id).is(CardType::Creature)), NextSpell { this_turn: false, from_hand: false }, &changes); });
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

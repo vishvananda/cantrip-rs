@@ -1,6 +1,6 @@
 // Failure // Comply
 // status: planned
-// requires: player rule for a while can't cast some spells
+// requires: a lasting rule reading what its ability chose
 // Return target spell to its owner's hand.
 // Aftermath (Cast this spell only from your graveyard. Then exile it.)
 // Choose a card name. Until your next turn, your opponents can't cast spells with the chosen name.
@@ -26,7 +26,7 @@ pub mod right {
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let Answer::Name(Some(chosen_0)) = g.ask(player_0, RequestKind::ChooseName { source: asker.source, looked_at: Vec::new(), suggestion: None, kind: NameKind::ANY })? else { return Ok(()) };
 g.end_sentence();
-planned!("player-rule-for-a-while-can-t-cast-some-spells" => let players_1_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_1_0 { g.add_player_effect(asker.controller, source, EffectKind::CantCast { player, spells: SpellSet::matching(move |q, spell| Some(chosen_0).is_some_and(|chosen| cantrip_mechanics::library::object_has_name(q, spell, chosen))) }, Duration::UntilNextTurnOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })); } });
+planned!("a-lasting-rule-reading-what-its-ability-chose" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() } { g.add_player_effect(player, source, EffectKind::PlayerRule(PlayerRule::Cant(Prohibition::CastSpell { from: None, spells: |q: &dyn Query, asker: &Asker, player: PlayerId, spell: ObjectId| Some(chosen_0).is_some_and(|chosen| cantrip_mechanics::library::object_has_name(q, spell, chosen)) })), Duration::UntilNextTurnOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })); } });
 g.end_sentence();
  Ok(()) }
 

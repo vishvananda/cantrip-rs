@@ -25,12 +25,14 @@ pub static CARD: CardDef = CardDef { name: "Zenos yae Galvus", token_words: &[],
 pub static EXTRA: &[&CardDef] = &[];
 pub mod back {
 #[allow(unused_imports)] use cantrip_api::*;
+planned_item!("ability-as-event" => #[allow(unused_variables)] fn ability_1_as_object(g: &mut dyn Game, asker: &Asker) -> Option<ObjectId> { { let q: &dyn Query = g; Some(asker.source) } });
+planned_item!("ability-as-event" => #[allow(unused_variables)] fn ability_1_as_actions(g: &mut dyn Game, asker: &Asker) -> Result<(), Suspend> { cantrip_mechanics::as_events::perform(g, asker, &[TransformAction::ChooseAPlayer({ let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() })]) });
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 { let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; g.win_game(player); if g.state().is_over() { return Ok(()); }; }
 g.end_sentence();
  Ok(()) }
-planned_item!("ability-as-event" => as_events: AsEventDef { event: AsEvent::Transforms, object: |g: &mut dyn Game, asker: &Asker| { let q: &dyn Query = g; Some(asker.source) }, actions: &[TransformAction::ChooseAPlayer({ let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() })] });
+planned_item!("ability-as-event" => as_events: AsEventDef { event: AsEvent::Transforms, object: ability_1_as_object, actions: ability_1_as_actions });
 planned_item!("engine-no-ability-triggers-on-losing-the-game" => matcher: #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::GameLost { player, .. } = event { let subject = Target::Player(*player); let data = [0u32; 2]; if (q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("depends on an instruction with a gap", false => Some(bound_0).is_some_and(|p: PlayerId| q.state().chosen_players(q.linked_to(asker)).contains(&p)))).collect::<Vec<PlayerId>>()).contains(&*player) { return Some(Fired { subject, data }); } }
  None });
 

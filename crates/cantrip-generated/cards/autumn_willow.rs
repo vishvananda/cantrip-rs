@@ -8,9 +8,7 @@
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let objects_0 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_0 = { let q: &dyn Query = g; Some(asker.source) }; let duration_0 = Duration::EndOfTurn;
-let kind_0_0_0 = { let q: &dyn Query = g; planned_value!("continuous rule TargetableDespite", EffectKind::CantBlock => EffectKind::Rule(Rule::TargetableDespite { by: |q: &dyn Query, asker: &Asker, by: &Asker, by_source: &Chars| t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()) == Some(by.controller), keyword: Keyword::Shroud })) };
-if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &object in &objects_0 { g.add_effect(source, object, kind_0_0_0, duration_0);  } }); }
+planned!("continuous-rule-targetable-despite", CreateContinuousEffect, "affected" = "{\"Objects\":{\"args\":{\"kind\":\"Source\"},\"kind\":\"One\"}}", "changes" = "[{\"args\":{\"TargetableDespite\":{\"keyword\":\"Shroud\",\"sources\":{\"args\":{\"args\":{\"args\":{\"index\":0,\"slot\":0},\"kind\":\"Target\"},\"kind\":\"One\"},\"kind\":\"ControlledBy\"}}},\"kind\":\"Rule\"}]", "duration" = "\"EndOfTurn\"", "evaluation" = "\"LiveObjects\"", "source" = { let q: &dyn Query = g; Some(asker.source) });
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

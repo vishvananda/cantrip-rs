@@ -22,14 +22,14 @@ let mut each_chosen_1 = Vec::new();
    } 
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_1_0_applies(q: &dyn Query, asker: &Asker, player: PlayerId) -> bool { (q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => g.votes().voted(option))).collect::<Vec<PlayerId>>()).contains(&player) }
-#[allow(unused_variables)] fn ability_2_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); ((*so_far).is(CardType::Creature) && (q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => g.votes().voted(option))).collect::<Vec<PlayerId>>()).contains(&q.controller(affected))) }
+#[allow(unused_variables)] fn ability_1_0_applies(q: &dyn Query, asker: &Asker, player: PlayerId) -> bool { (q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => Some(bound_0).is_some_and(|p: PlayerId| q.votes().voted(p, cantrip_mechanics::vote::Vote::Word("Green Anchor"))))).collect::<Vec<PlayerId>>()).contains(&player) }
+#[allow(unused_variables)] fn ability_2_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); ((*so_far).is(CardType::Creature) && (q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => Some(bound_0).is_some_and(|p: PlayerId| q.votes().voted(p, cantrip_mechanics::vote::Vote::Word("Red Waterfall"))))).collect::<Vec<PlayerId>>()).contains(&q.controller(affected))) }
 #[allow(unused_variables)] fn ability_2_apply_1(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); chars.keywords = chars.keywords.with(Keyword::Haste); }
 #[allow(unused_variables)] fn ability_2_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); let (p, t) = ((2i64) as i16, (0i64) as i16); chars.power = chars.power.map(|v| v.saturating_add(p)); chars.toughness = chars.toughness.map(|v| v.saturating_add(t)); }
 #[allow(unused_variables)] fn ability_3_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { None }
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_2: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
- for (index_2, bound_0) in players_2.iter().copied().enumerate() { planned!("two-choices-of-labels-as-it-enters" => cantrip_mechanics::choose::value(g, asker.source, { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() }, ChoiceKind::Word, 1, &["Green Anchor", "Red Waterfall"])?);
+ for (index_2, bound_0) in players_2.iter().copied().enumerate() { planned!("two-choices-of-labels-as-it-enters" => cantrip_mechanics::choose::value(g, { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() }, asker.source, ChoiceKind::Word, ChoiceTerms { options: &["Green Anchor", "Red Waterfall"], except: &[], count: Some(1), secret: false, unchosen: false, random: false, ordered: false, up_to: false })?);
     } 
 g.end_sentence();
  Ok(()) }

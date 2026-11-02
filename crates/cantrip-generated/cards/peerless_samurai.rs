@@ -7,7 +7,7 @@
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Attacks { attacker, defending, .. } = event { let id = *attacker; let subject = Target::Object(id); let data = [u32::from(defending.0), u32::MAX]; if q.state().attackers.len() == 1 && ((q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Samurai)) || q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Warrior))) && Some(asker.controller) == Some(q.controller(id))) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-change-spell" => cantrip_mechanics::spell_changes::next_spell(g, asker, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, |q: &dyn Query, asker: &Asker, id: ObjectId| true, NextSpell { this_turn: true, from_hand: false }, &[SpellChange::Cost(CostDelta::less((1i64) as u8))]));
+planned!("operation-change-spell" => { let changes = { let q: &dyn Query = g; [SpellChange::Cost(CostDelta::less((1i64) as u8))] }; cantrip_mechanics::spell_changes::next_spell(g, asker, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, |q: &dyn Query, asker: &Asker, id: ObjectId| true, NextSpell { this_turn: true, from_hand: false }, &changes); });
 g.end_sentence();
  Ok(()) }
 

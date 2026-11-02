@@ -6,7 +6,7 @@
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { (Some(asker.controller) == Some(q.state().turn.active) && q.state().turn.step() == Step::DeclareAttackers) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-game-effect" => cantrip_mechanics::game_rules::for_a_time(g, asker, Duration::EndOfTurn, GameEffect::DefendingPlayersChooseCreaturesToDefendAttackersAtRandom));
+planned!("operation-game-effect" => cantrip_mechanics::game_rules::for_a_time(g, asker, Duration::EndOfTurn, &Vec::<ObjectId>::new(), &Vec::<PlayerId>::new(), GameEffect::DefendingPlayersChooseCreaturesToDefendAttackersAtRandom));
 g.end_sentence();
  Ok(()) }
 

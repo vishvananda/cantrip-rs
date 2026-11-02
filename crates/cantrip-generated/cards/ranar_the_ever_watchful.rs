@@ -6,6 +6,8 @@
 // The first card you foretell each turn costs {0} to foretell.
 // Whenever one or more cards are put into exile from your hand or a spell or ability you control exiles one or more permanents from the battlefield, create a 1/1 white Spirit creature token with flying.
 #[allow(unused_imports)] use cantrip_api::*;
+planned_item!("a-keyword-s-cost-changed" => #[allow(unused_variables)] fn ability_2_0_keyword_cards_0(q: &dyn Query, asker: &Asker, player: PlayerId, card: ObjectId) -> bool { player == asker.controller && true });
+planned_item!("a-keyword-s-cost-changed" => #[allow(unused_variables)] fn ability_2_0_keyword_per_0(q: &dyn Query, asker: &Asker) -> i64 { 1 });
 #[allow(unused_variables)] fn ability_3_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [new.0, u32::MAX]; if to.is(ZoneKind::Exile) && from.is(ZoneKind::Hand) && Some(asker.controller) == Some(q.state().obj(id).owner) && !q.state().obj(id).token { return Some(Fired { subject, data }); } }
  None }
 pub mod token_1 {
@@ -41,7 +43,7 @@ tokens_2.extend(std::iter::repeat((def_2_0,player)).take(count_2_0 as usize));
 let created_2 = g.create_tokens_worded(&tokens_2, false, None, words_2)?;
 g.end_sentence();
  Ok(()) }
-planned_item!("a-keyword-s-cost-changed" => keyword_costs: KeywordCostRule { keyword: CostedKeyword::Foretell, applies: |q, asker, player, card| player == asker.controller && true, change: KeywordCostChange::Alternate(Cost::generic(0)), per: |q, asker| 1, first_each_turn: true });
+planned_item!("a-keyword-s-cost-changed" => keyword_costs: KeywordCostRule { keyword: CostedKeyword::Foretell, applies: ability_2_0_keyword_cards_0, change: KeywordCostChange::Alternate(Cost::generic(0)), per: ability_2_0_keyword_per_0, first_each_turn: true });
 planned_item!("trigger-event-caused" => matcher: #[allow(unused_variables)] fn ability_4_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [new.0, u32::MAX]; let data = [data[0], match q.event_cause() { Cause::Spell(c) | Cause::Ability { source: c, .. } => u32::from(q.controller(c).0), _ => u32::MAX }]; if to.is(ZoneKind::Exile) && from.is(ZoneKind::Battlefield) && true && !q.state().obj(id).token && match q.event_cause() { Cause::Spell(causer) | Cause::Ability { source: causer, .. } => Some(asker.controller) == Some(q.controller(causer)), _ => false } { return Some(Fired { subject, data }); } }
  None });
 

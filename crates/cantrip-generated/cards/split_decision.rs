@@ -11,15 +11,15 @@ let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true
 let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
 let first_0 = { let q: &dyn Query = g; Some(asker.controller) }; if let Some(at) = players_0.iter().position(|&p| Some(p) == first_0) { players_0.rotate_left(at); }
  for (index_0, bound_0) in players_0.iter().copied().enumerate() { let voters_1: Vec<PlayerId> = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
-planned!("operation-vote" => cantrip_mechanics::vote::ballot(g, asker.source, &voters_1, cantrip_mechanics::vote::Ballot::Words(&["Denial", "Duplication"]), false)?);
+planned!("operation-vote" => cantrip_mechanics::vote::ballot(g, asker.source, &voters_1, cantrip_mechanics::vote::Ballot::Words(&["Denial", "Duplication"]), &Vec::<Target>::new(), false)?);
     } 
 g.end_sentence();
-if { let q: &dyn Query = g; planned_value!("condition MostVotes", false => g.votes().most(option)) } {
+if { let q: &dyn Query = g; planned_value!("condition MostVotes", false => q.votes().most(cantrip_mechanics::vote::Vote::Word("Denial"), false)) } {
 let objects_2 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; cantrip_api::instruction(g, |g| { for spell in objects_2 { g.counter(spell); } });
 g.end_sentence();
 }
 g.end_sentence();
-if { let q: &dyn Query = g; planned_value!("condition MostVotes", false => g.votes().most(option)) } {
+if { let q: &dyn Query = g; planned_value!("condition MostVotes", false => q.votes().most(cantrip_mechanics::vote::Vote::Word("Duplication"), true)) } {
 let copier_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let spell_3: Option<ObjectId> = ({ let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied();
 if let Some(spell) = spell_3 { g.copy_spell(spell, copier_3, true)?; }
 g.end_sentence();

@@ -27,8 +27,9 @@ hoisted_6.extend({ let q: &dyn Query = g; turned_3.clone() });
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_4_0_rule(q: &dyn Query, asker: &Asker, attacker: ObjectId, defender: Target) -> bool { attacker == asker.source && true }
+#[allow(unused_variables)] fn ability_4_0_rule_cost_7(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Island)) }
 static PAY_QUESTION: Question = Question::new("Pay", "pay {cost}?", "", "Pay {cost}", "Decline");
-planned_item!("static-rule-combat-cost-other-than-mana" => attack_cost_rules: AttackCost { applies: ability_4_0_rule, cost: "Cost" });
+planned_item!("static-rule-combat-cost-other-than-mana" => attack_cost_rules: AttackPayment { applies: ability_4_0_rule, cost: Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(sacrifice(2, ability_4_0_rule_cost_7)) });
 
 pub static CARD: CardDef = CardDef { name: "Leviathan", token_words: &[], oracle: true, cost: ManaCost { generic: 5, x: 0, symbols: [0, 4, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Leviathan]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: Some(10), toughness: Some(10), loyalty: None, defense: None, keywords: Keywords::of(&[Keyword::Trample,Keyword::DoesNotUntap]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::STEP_BEGAN.0), ability_3_event), ability_3, "At the beginning of your upkeep, you may sacrifice two Islands. If you do, untap this creature.").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: Some(ability_1_enters), modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

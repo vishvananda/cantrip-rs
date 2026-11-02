@@ -24,7 +24,7 @@ let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true
 let objects_1 = { let q: &dyn Query = g; (t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_1: Vec<ObjectId> = objects_1.iter().copied().filter(|&o| g.state().obj(o).tapped != false).collect(); cantrip_api::instruction(g, |g| { for &object in &turned_1 { g.untap(object); } });
 g.end_sentence();
 if { let q: &dyn Query = g; matches!(q.state().turn.step(), Step::PrecombatMain | Step::PostcombatMain) } {
-planned!("engine-no-additional-phase-but-combat" => g.add_phases(AddedPhases::CombatAndMain););
+planned!("engine-no-additional-phase-but-combat" => { let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; g.add_phases(player, AddedPhases::CombatAndMain, 1, None); });
 g.end_sentence();
 }
 g.end_sentence();

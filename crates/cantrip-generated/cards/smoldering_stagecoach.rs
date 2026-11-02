@@ -9,9 +9,9 @@
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Attacks { attacker, defending, .. } = event { let id = *attacker; let subject = Target::Object(id); let data = [u32::from(defending.0), u32::MAX]; if Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-change-spell" => cantrip_mechanics::spell_changes::next_spell(g, asker, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, |q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Instant), NextSpell { this_turn: true, from_hand: false }, &[SpellChange::Gains("Mechanic")]));
+planned!("operation-change-spell" => { let changes = { let q: &dyn Query = g; [SpellChange::Gains("Mechanic")] }; cantrip_mechanics::spell_changes::next_spell(g, asker, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, |q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Instant), NextSpell { this_turn: true, from_hand: false }, &changes); });
 g.end_sentence();
-planned!("operation-change-spell" => cantrip_mechanics::spell_changes::next_spell(g, asker, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, |q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Sorcery), NextSpell { this_turn: true, from_hand: false }, &[SpellChange::Gains("Mechanic")]));
+planned!("operation-change-spell" => { let changes = { let q: &dyn Query = g; [SpellChange::Gains("Mechanic")] }; cantrip_mechanics::spell_changes::next_spell(g, asker, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, |q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Sorcery), NextSpell { this_turn: true, from_hand: false }, &changes); });
 g.end_sentence();
  Ok(()) }
 

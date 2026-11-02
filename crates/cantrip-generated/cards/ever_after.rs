@@ -8,7 +8,7 @@ static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
-let objects_0 = ({ let q: &dyn Query = g; t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_0 = planned_value!("several objects entering with a color", Vec::<ObjectId>::new() => { let rows_0: Vec<(ObjectId, PlayerId)> = objects_0.iter().map(|&o| (o, player_0)).collect(); g.put_all_onto_battlefield_becoming(&rows_0, item, &EntersAs { adds_colors: ColorSet::of(&[Color::Black]), subtypes: &[Subtype::Zombie], ..EntersAs::NONE }, &[])? });
+let objects_0 = ({ let q: &dyn Query = g; t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_0 = planned_value!("several objects entering with a color", Vec::<ObjectId>::new() => { let rows_0: Vec<(ObjectId, PlayerId)> = objects_0.iter().map(|&o| (o, player_0)).collect(); g.put_all_onto_battlefield_becoming(&rows_0, item, &EntersAs { adds_colors: ColorSet(4), subtypes: &[Subtype::Zombie], ..EntersAs::NONE }, &[])? });
 g.end_sentence();
 let objects_1 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let moved_1 = g.put_into_library(&objects_1, LibraryPlace::Bottom);
 g.end_sentence();

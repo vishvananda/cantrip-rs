@@ -1,6 +1,5 @@
 // Jace, Multiverse Architect
 // status: planned
-// requires: continuous rule Prohibit Attack
 // requires: engine: no resolving rule on an open set: Prohibit Attack beyond lasting rules
 // At the beginning of combat on each opponent's turn, they may pay {2}. If they don't, creatures they control can't attack Jaces you control this turn.
 // [+1]: Draw two cards, then put a card from your hand on the bottom of your library.
@@ -13,7 +12,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let payer_0 = { let q: &dyn Query = g; item.subject.player().expect("a reference that always names a player") }; let paid_0 = g.may_pay(payer_0, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 2, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })), &PAY_QUESTION)?;
 g.end_sentence();
 if { let q: &dyn Query = g; !(((paid_0 as i64) != 0)) } {
-planned!("engine-no-resolving-rule-on-an-open-set-prohibit-attack-beyond-lasting-rules" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| (q.chars(id).is(CardType::Creature) && item.subject.player() == Some(q.controller(id))), planned_value!("continuous rule Prohibit Attack", EffectKind::CantBlock => EffectKind::Rule(Rule::Cant(Action::Attack(|q: &dyn Query, asker: &Asker, defender: Target| matches!(defender, Target::Object(id) if (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Jace)) && Some(asker.controller) == Some(q.controller(id)))))))), Duration::EndOfTurn); });
+planned!("engine-no-resolving-rule-on-an-open-set-prohibit-attack-beyond-lasting-rules", CreateContinuousEffect, "affected" = "{\"Objects\":{\"args\":{\"args\":[{\"args\":\"Creature\",\"kind\":\"CardType\"},{\"args\":{\"args\":{\"kind\":\"EventSubject\"},\"kind\":\"One\"},\"kind\":\"ControlledBy\"}],\"kind\":\"All\"},\"kind\":\"Battlefield\"}}", "changes" = "[{\"args\":{\"Prohibit\":{\"Attack\":{\"Objects\":{\"args\":[{\"args\":\"Jace\",\"kind\":\"Subtype\"},{\"args\":{\"args\":{\"kind\":\"AbilityController\"},\"kind\":\"One\"},\"kind\":\"ControlledBy\"}],\"kind\":\"All\"}}}},\"kind\":\"Rule\"}]", "duration" = "\"EndOfTurn\"", "evaluation" = "\"LiveObjects\"", "source" = { let q: &dyn Query = g; Some(asker.source) });
 g.end_sentence();
 }
 g.end_sentence();

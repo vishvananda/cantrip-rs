@@ -11,7 +11,7 @@ static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target
 fn delayed_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_6: Vec<ObjectId> = Vec::new();
 let mut hoisted_5: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-if { let q: &dyn Query = g; !(Some(asker.source).is_some_and(|candidate: ObjectId| planned_value!("object reference RingBearer", None::<ObjectId> => q.ring_bearer(player)) == Some(candidate))) } {
+if { let q: &dyn Query = g; !(Some(asker.source).is_some_and(|candidate: ObjectId| planned_value!("object reference RingBearer", None::<ObjectId> => q.ring_bearer({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })) == Some(candidate))) } {
 let objects_4 = { let q: &dyn Query = g; about(q, item, 0) }; let moved_4 = g.exile_all(&objects_4);
 g.end_sentence();
 hoisted_5.extend(moved_4.clone());

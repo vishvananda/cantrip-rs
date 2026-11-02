@@ -19,7 +19,7 @@ g.end_sentence();
 if { let q: &dyn Query = g; ((i64::from(chosen_0) as i64)) >= (1i64) } {
 let among: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
 let Some(picked_0) = (if among.len() > 1 { cantrip_mechanics::choose::player(g, asker.controller, asker.source, among, "ChooseRevealedCard", 0)? } else { among.first().copied() }) else { return Ok(()); };
-planned!("operation-guess" => cantrip_mechanics::guess::guess(g, { let q: &dyn Query = g; Some(picked_0).expect("a reference that always names a player") }, asker.source, None, None, None)?);
+planned!("operation-guess" => let result_1 = cantrip_mechanics::guess::guess(g, { let q: &dyn Query = g; Some(picked_0).expect("a reference that always names a player") }, asker.source, None, None, None)?;);
 
 g.end_sentence();
 planned!("operation-reveal-choices" => cantrip_mechanics::secret::reveal_choices(g, asker.source, ChoiceKind::Number));

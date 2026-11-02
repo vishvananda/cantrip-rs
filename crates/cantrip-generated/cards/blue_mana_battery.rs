@@ -15,7 +15,7 @@ let mana_1_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 };
 for player in mana_players_1 {
 g.add_mana(player, Mana::U, mana_1_0);}
 let mana_players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_3_0 = { let q: &dyn Query = g; (planned_value!("numeric expression PaidCountersRemoved", 0i64 => i64::from(q.counters_paid(item)))) as u32 };
+let mana_3_0 = { let q: &dyn Query = g; (planned_value!("numeric expression PaidCountersRemoved", 0i64 => i64::from(q.obj(asker.source).x))) as u32 };
 for player in mana_players_3 {
 g.add_mana(player, Mana::U, mana_3_0);}
  Ok(()) }

@@ -84,7 +84,13 @@ planned_item!("ability-dungeon-room" => rooms: Room { name: "Storeroom", effect:
 planned_item!("ability-dungeon-room" => rooms: Room { name: "Dark Pool", effect: spell(&[], ability_4_room), leads_to: &["Temple of Dumathoin"] });
 planned_item!("ability-dungeon-room" => rooms: Room { name: "Fungi Cavern", effect: spell(ABILITY_5_ROOM_TARGETS, ability_5_room), leads_to: &["Temple of Dumathoin"] });
 planned_item!("ability-dungeon-room" => rooms: Room { name: "Temple of Dumathoin", effect: spell(&[], ability_6_room), leads_to: &[] });
-planned_item!("layout-dungeon" => dungeon: &[&[1, 2], &[3, 4], &[4, 5], &[6], &[6], &[6], &[]]);
+planned_item!("layout-dungeon" => dungeon: &[1, 2]);
+planned_item!("layout-dungeon" => dungeon: &[3, 4]);
+planned_item!("layout-dungeon" => dungeon: &[4, 5]);
+planned_item!("layout-dungeon" => dungeon: &[6]);
+planned_item!("layout-dungeon" => dungeon: &[6]);
+planned_item!("layout-dungeon" => dungeon: &[6]);
+planned_item!("layout-dungeon" => dungeon: &[]);
 
 pub static CARD: CardDef = CardDef { name: "Lost Mine of Phandelver", token_words: &[], oracle: true, cost: ManaCost::ZERO, has_cost: false, types: TypeSet::of(&[]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[&token_2::CARD,&token_4::CARD];

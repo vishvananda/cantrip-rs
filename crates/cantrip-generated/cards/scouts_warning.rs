@@ -5,7 +5,7 @@
 // Draw a card.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on(g, asker, EffectOn::Players({ let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }), &[FuturePlayerEffect::NextCardPlayedThisCanCanBePlayedAsThoughItHadFlash(|q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Creature))], None)?);
+planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on_players(g, asker, &{ let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[FuturePlayerEffect::NextCardPlayedThisCanCanBePlayedAsThoughItHadFlash(|q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Creature))], None)?);
 g.end_sentence();
 let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_1 { g.draw(player, amount_1); }

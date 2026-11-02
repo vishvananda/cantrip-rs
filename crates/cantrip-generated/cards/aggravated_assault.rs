@@ -6,7 +6,7 @@
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let objects_0 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_0: Vec<ObjectId> = objects_0.iter().copied().filter(|&o| g.state().obj(o).tapped != false).collect(); cantrip_api::instruction(g, |g| { for &object in &turned_0 { g.untap(object); } });
 g.end_sentence();
-planned!("engine-no-additional-phase-but-combat" => g.add_phases(AddedPhases::CombatAndMain););
+planned!("engine-no-additional-phase-but-combat" => { let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; g.add_phases(player, AddedPhases::CombatAndMain, 1, None); });
 g.end_sentence();
  Ok(()) }
 

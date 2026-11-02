@@ -38,7 +38,7 @@ pub mod back {
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 planned!("operation-choose-at-random" => cantrip_mechanics::choose::at_random(g, asker.source, ChoiceKind::Ability, &["Ability(Keyword(Flying))", "Ability(Keyword(Indestructible))"])?);
 g.end_sentence();
-planned!("a-choice-of-ability-outside-its-body" => cantrip_mechanics::effects::grant(g, item, { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }, &[Grant::ChosenAbility], Duration::EndOfTurn)?);
+planned!("a-choice-of-ability-outside-its-body" => { let objects: Vec<ObjectId> = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; cantrip_mechanics::effects::grant(g, item, &objects, &[Grant::ChosenAbility], Duration::EndOfTurn)? });
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Damage { source, target, amount, kind, .. } = event { let (source, amount, combat) = (*source, *amount, kind.is_combat()); let subject = Target::Object(source); let data = [u32::from(amount), match target { Target::Player(p) => u32::from(p.0), _ => u32::MAX }]; if combat && !q.state().obj(source).zone.is(ZoneKind::Stack) && Some(asker.source) == Some(source) && matches!(*target, Target::Player(p) if true) { return Some(Fired { subject, data }); } }

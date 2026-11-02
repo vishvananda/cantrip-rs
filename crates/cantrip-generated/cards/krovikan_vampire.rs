@@ -1,5 +1,6 @@
 // Krovikan Vampire
 // status: planned
+// requires: engine: a delayed ability on an event keeps no list
 // requires: reflexive ability about a list of objects
 // requires: trigger event Player LosesControl
 // At the beginning of each end step, if a creature dealt damage by this creature this turn died, put that card onto the battlefield under your control. Sacrifice it when you lose control of this creature.
@@ -9,7 +10,7 @@ fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { (q.history().this_turn()
  None }
 #[allow(unused_variables)] fn delayed_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { None }
 fn delayed_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let objects_3 = { let q: &dyn Query = g; planned_value!("reflexive ability about a list of objects", Vec::<ObjectId>::new() => about(q, item, moved_0.clone())) }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut picks_3: Vec<(PlayerId, ObjectId)> = Vec::new();
+let objects_3 = { let q: &dyn Query = g; planned_value!("reflexive ability about a list of objects", Vec::<ObjectId>::new() => about(q, item, 0)) }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut picks_3: Vec<(PlayerId, ObjectId)> = Vec::new();
 for &object in &objects_3 { let controller = g.controller(object); if players_3.contains(&controller) && g.can_sacrifice(controller, object) { picks_3.push((controller, object)); } }
 let sacrificed_3 = g.sacrifice_each(&picks_3);
 g.end_sentence();
@@ -18,7 +19,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
 let objects_0 = ({ let q: &dyn Query = g; ((q.state().apnap().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && ((q.chars(id).is(CardType::Creature) && (q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::Damage { source, target, amount, kind, controller, known, .. } = event { let (source, amount, combat, controller) = (*source, *amount, kind.is_combat(), *controller); let dealt = DamageDealt { source, target: *target, amount, combat, controller, known: *known }; let subject = *target; let data = [u32::from(amount), source.0]; if q.state().obj(source).zone.is(ZoneKind::Battlefield) && Some(asker.source) == Some(source) && matches!(*target, Target::Object(o) if Some(id) == Some(o)) { return Some(Fired { subject, data }); } }  None }).count() as i64) >= (1i64)) && q.history().this_turn().iter().any(|r| matches!(r.event, Event::ZoneChange { new, from, to, .. } if new == id && from.is(ZoneKind::Battlefield) && to.is(ZoneKind::Graveyard))))).collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_0 = { let rows_0: Vec<(ObjectId, PlayerId, bool)> = objects_0.iter().map(|&o| (o, player_0, false)).collect(); let came_0 = g.put_all_onto_battlefield_as(&rows_0)?; came_0.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
 g.end_sentence();
-if let Some(source) = Some(item.object) { g.delayed_trigger(DelayedWhen::UntilEvent, source, item.controller, AbilityRef::delayed(item.ability.card, 0), Target::None); }
+planned!("engine-a-delayed-ability-on-an-event-keeps-no-list" => if let Some(source) = Some(item.object) { let mut about: Vec<ObjectId> = Vec::new(); about.extend({ let q: &dyn Query = g; moved_0.clone() }); about.push(ObjectId::NONE);  g.delayed_trigger_about(DelayedWhen::UntilEvent, source, item.controller, AbilityRef::delayed(item.ability.card, 0), &about); });
 g.end_sentence();
  Ok(()) }
 fn about(q: &dyn Query, item: &StackItem, part: usize) -> Vec<ObjectId> { q.event_objects(item).split(|&id| id == ObjectId::NONE).nth(part).map_or_else(Vec::new, <[ObjectId]>::to_vec) }

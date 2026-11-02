@@ -21,15 +21,15 @@ g.end_sentence();
 let mut players_4: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
 let first_4 = { let q: &dyn Query = g; Some(asker.controller) }; if let Some(at) = players_4.iter().position(|&p| Some(p) == first_4) { players_4.rotate_left(at); }
  for (index_4, bound_0) in players_4.iter().copied().enumerate() { let voters_5: Vec<PlayerId> = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
-planned!("operation-vote" => cantrip_mechanics::vote::ballot(g, asker.source, &voters_5, cantrip_mechanics::vote::Ballot::Words(&["Planeswalk", "Chaos"]), false)?);
+planned!("operation-vote" => cantrip_mechanics::vote::ballot(g, asker.source, &voters_5, cantrip_mechanics::vote::Ballot::Words(&["Planeswalk", "Chaos"]), &Vec::<Target>::new(), false)?);
     } 
 g.end_sentence();
-if { let q: &dyn Query = g; planned_value!("condition MostVotes", false => g.votes().most(option)) } {
+if { let q: &dyn Query = g; planned_value!("condition MostVotes", false => q.votes().most(cantrip_mechanics::vote::Vote::Word("Planeswalk"), false)) } {
 planned!("engine-no-planar-deck" => { let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; g.planeswalk(player); });
 g.end_sentence();
 }
 g.end_sentence();
-if { let q: &dyn Query = g; planned_value!("condition MostVotes", false => g.votes().most(option)) } {
+if { let q: &dyn Query = g; planned_value!("condition MostVotes", false => q.votes().most(cantrip_mechanics::vote::Vote::Word("Chaos"), true)) } {
 planned!("keyword-action-chaos-ensues" => { let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; cantrip_mechanics::planechase::chaos_ensues(g, player)?; });
 g.end_sentence();
 }

@@ -29,7 +29,7 @@ let mut hoisted_7: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let mut players_2: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
  for (index_2, bound_0) in players_2.iter().copied().enumerate() { let voters_3: Vec<PlayerId> = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
-planned!("operation-vote" => cantrip_mechanics::vote::ballot(g, asker.source, &voters_3, cantrip_mechanics::vote::Ballot::UpToOne({ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>() }), true)?);
+planned!("operation-vote" => cantrip_mechanics::vote::ballot(g, asker.source, &voters_3, cantrip_mechanics::vote::Ballot::UpToOne, &({ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>() }).into_iter().map(Target::Object).collect::<Vec<Target>>(), true)?);
     } 
 g.end_sentence();
 planned!("operation-reveal-choices" => cantrip_mechanics::secret::reveal_choices(g, asker.source, ChoiceKind::Object));
@@ -39,7 +39,7 @@ let amount_5 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_5 = 
 for player in players_5 { g.draw(player, amount_5); }
 g.end_sentence();
 } else {
-let objects_6 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| planned_value!("object state MostVotes", false => votes.most(id))).collect::<Vec<ObjectId>>() }; let destroyed_6 = g.destroy_all(&objects_6);
+let objects_6 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| planned_value!("object state MostVotes", false => q.votes().most(cantrip_mechanics::vote::Vote::Object(id), true))).collect::<Vec<ObjectId>>() }; let destroyed_6 = g.destroy_all(&objects_6);
 g.end_sentence();
 hoisted_7.extend(destroyed_6.clone());
 hoisted_8.extend({ let q: &dyn Query = g; objects_6.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() });
@@ -51,7 +51,7 @@ let mut hoisted_14: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let mut players_9: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
  for (index_9, bound_0) in players_9.iter().copied().enumerate() { let voters_10: Vec<PlayerId> = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
-planned!("operation-vote" => cantrip_mechanics::vote::ballot(g, asker.source, &voters_10, cantrip_mechanics::vote::Ballot::UpToOne({ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>() }), true)?);
+planned!("operation-vote" => cantrip_mechanics::vote::ballot(g, asker.source, &voters_10, cantrip_mechanics::vote::Ballot::UpToOne, &({ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>() }).into_iter().map(Target::Object).collect::<Vec<Target>>(), true)?);
     } 
 g.end_sentence();
 planned!("operation-reveal-choices" => cantrip_mechanics::secret::reveal_choices(g, asker.source, ChoiceKind::Object));
@@ -61,7 +61,7 @@ let amount_12 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_12 
 for player in players_12 { g.draw(player, amount_12); }
 g.end_sentence();
 } else {
-let objects_13 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| planned_value!("object state MostVotes", false => votes.most(id))).collect::<Vec<ObjectId>>() }; let destroyed_13 = g.destroy_all(&objects_13);
+let objects_13 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| planned_value!("object state MostVotes", false => q.votes().most(cantrip_mechanics::vote::Vote::Object(id), true))).collect::<Vec<ObjectId>>() }; let destroyed_13 = g.destroy_all(&objects_13);
 g.end_sentence();
 hoisted_14.extend(destroyed_13.clone());
 hoisted_15.extend({ let q: &dyn Query = g; objects_13.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() });

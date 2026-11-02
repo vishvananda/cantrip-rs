@@ -9,7 +9,7 @@
 #[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let runs_0 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; for _ in 0..runs_0 {
 let player_1 = { let q: &dyn Query = g; Target::Object(asker.source).object().map(|o: ObjectId| q.controller(o)).expect("a reference that always names a player") }; let value_1 = i64::from(g.roll_die(player_1, 6).result);
 }
-planned!("event-change-as-it-enters-a-power-and-toughness-read-then" => entering.base_power_toughness = Some(((planned_value!("numeric expression Dice", 0i64 => g.last_roll(asker.controller).dice[1])).clamp(-32768, 32767) as i16, (planned_value!("numeric expression Dice", 0i64 => g.last_roll(asker.controller).dice[2])).clamp(-32768, 32767) as i16)););
+planned!("event-change-as-it-enters-a-power-and-toughness-read-then" => let size = { let q: &dyn Query = g; ((planned_value!("numeric expression Dice", 0i64 => q.last_roll(asker.controller).dice[1])).clamp(-32768, 32767) as i16, (planned_value!("numeric expression Dice", 0i64 => q.last_roll(asker.controller).dice[2])).clamp(-32768, 32767) as i16) }; entering.base_power_toughness = Some(size););
  Ok(()) }
 planned_item!("replacement-of-roll-d6" => callbacks: #[allow(unused_variables)] fn ability_1_applies(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool { if let Proposal::DieRoll(p) = proposal { let amount = p.count; let subject = Target::Player(p.player); let data = [p.count, u32::MAX]; if Some(asker.controller) == Some(p.player) { return true; } }
  false }

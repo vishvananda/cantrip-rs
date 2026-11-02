@@ -104,7 +104,15 @@ planned_item!("ability-dungeon-room" => rooms: Room { name: "Stash", effect: spe
 planned_item!("ability-dungeon-room" => rooms: Room { name: "Archives", effect: spell(&[], ability_7_room), leads_to: &["Throne of the Dead Three"] });
 planned_item!("ability-dungeon-room" => rooms: Room { name: "Catacombs", effect: spell(&[], ability_8_room), leads_to: &["Throne of the Dead Three"] });
 planned_item!("ability-dungeon-room" => rooms: Room { name: "Throne of the Dead Three", effect: spell(&[], ability_9_room), leads_to: &[] });
-planned_item!("layout-dungeon" => dungeon: &[&[1, 2], &[3, 4], &[4, 5], &[6], &[6, 7], &[7], &[8], &[8], &[]]);
+planned_item!("layout-dungeon" => dungeon: &[1, 2]);
+planned_item!("layout-dungeon" => dungeon: &[3, 4]);
+planned_item!("layout-dungeon" => dungeon: &[4, 5]);
+planned_item!("layout-dungeon" => dungeon: &[6]);
+planned_item!("layout-dungeon" => dungeon: &[6, 7]);
+planned_item!("layout-dungeon" => dungeon: &[7]);
+planned_item!("layout-dungeon" => dungeon: &[8]);
+planned_item!("layout-dungeon" => dungeon: &[8]);
+planned_item!("layout-dungeon" => dungeon: &[]);
 
 pub static CARD: CardDef = CardDef { name: "Undercity", token_words: &[], oracle: true, cost: ManaCost::ZERO, has_cost: false, types: TypeSet::of(&[]), subtypes: SubtypeSet::of(&[Subtype::Undercity]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[&token_9::CARD,&token_12::CARD];

@@ -1,6 +1,5 @@
 // Furious Rise
 // status: planned
-// requires: duration UntilAnotherExiled
 // requires: play permission lasting UntilAnotherExiled
 // At the beginning of your end step, if you control a creature with power 4 or greater, exile the top card of your library. You may play that card until you exile another card with this enchantment.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -10,7 +9,7 @@ fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { q.state().battlefield().
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let objects_0 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((1i64).max(0) as usize).collect::<Vec<ObjectId>>() }; let moved_0 = g.exile_all(&objects_0);
 g.end_sentence();
-planned!("play-permission-lasting-until-another-exiled" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.add_player_effect(player, source, EffectKind::PlayerRule(PlayerRule::Play { zone: ZoneKind::Exile, cards: CardsOfRule::These({ let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }), grant: PlayGrant { lands: true, ..PlayGrant::CAST } }), planned_value!("duration UntilAnotherExiled", Duration::Indefinite => Duration::UntilAnotherExiled { by: { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, with: { let q: &dyn Query = g; Some(asker.source) } })); } });
+planned!("play-permission-lasting-until-another-exiled" => let cards = { let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players { g.allow_play(card, player, PlayGrant { expiry: Expiry::UntilAnotherExiledWith(asker.source), lands: true, ..PlayGrant::CAST }); } } } }););
 g.end_sentence();
  Ok(()) }
 

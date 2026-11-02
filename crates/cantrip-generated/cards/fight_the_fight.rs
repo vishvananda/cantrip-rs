@@ -20,7 +20,7 @@ g.end_sentence();
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let decider_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_0, asker.source, Purpose::Optional)? {
 let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let objects_1 = { let q: &dyn Query = g; item.subject.object().into_iter().collect::<Vec<ObjectId>>() };
-planned!("operation-put-sticker" => cantrip_mechanics::stickers::name_sticker(g, player_1, asker.source, &objects_1)?);
+planned!("operation-put-sticker" => let result_0 = cantrip_mechanics::stickers::name_sticker(g, player_1, asker.source, &objects_1)?;);
 if planned_value!("depends on an instruction with a gap", false => result_0) && true { g.reflexive_trigger(item.object, item.controller, AbilityRef::delayed(item.ability.card, 0), Target::None); }
 g.end_sentence();
 }

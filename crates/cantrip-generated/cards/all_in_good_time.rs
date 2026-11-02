@@ -11,7 +11,7 @@
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let turn_0 = g.add_extra_turn({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") });
 g.end_sentence();
-planned!("operation-game-effect" => cantrip_mechanics::game_rules::for_a_time(g, asker, planned_value!("duration ExtraTurn", Duration::Indefinite => Duration::ExtraTurn(turn_0)), GameEffect::SchemesCantBeSetInMotion));
+planned!("operation-game-effect" => cantrip_mechanics::game_rules::for_a_time(g, asker, planned_value!("duration ExtraTurn", Duration::Indefinite => Duration::ExtraTurn(turn_0)), &Vec::<ObjectId>::new(), &Vec::<PlayerId>::new(), GameEffect::SchemesCantBeSetInMotion));
 g.end_sentence();
  Ok(()) }
 planned_item!("trigger-event-player-sets-scheme-in-motion" => matcher: #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SchemeSetInMotion { player, object, .. } = event { let id = *object; let subject = Target::Object(id); let data = [u32::from(player.0), 0]; if Some(asker.controller) == Some(*player) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }

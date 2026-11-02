@@ -13,7 +13,7 @@ let amount_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_0 = 
 for player in players_0 { g.draw(player, amount_0); }
 g.end_sentence();
  Ok(()) }
-planned_item!("keyword-modifier-x-cant-be-zero" => abilities: modified(Mechanic, Modifier::XCantBeZero));
+planned_item!("keyword-modifier-x-cant-be-zero" => abilities: modified("Mechanic", Modifier::XCantBeZero));
 planned_item!("engine-no-event-for-a-counter-being-removed" => matcher: #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::CountersRemoved { object, kind, amount, by, .. } = event { let id = *object; let subject = Target::Object(id); let data = [*amount as u32, id.0]; if Some(asker.source) == Some(id) && *kind == CounterKind::Time { return Some(Fired { subject, data }); } }
  None });
 

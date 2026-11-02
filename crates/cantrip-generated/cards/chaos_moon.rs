@@ -32,7 +32,7 @@ let objects_6 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied(
 let kind_6_0_0 = { let q: &dyn Query = g; EffectKind::Pump((-1i64) as i16, (-1i64) as i16) };
 if let Some(source) = source_6 { cantrip_api::instruction(g, |g| { for &object in &objects_6 { g.add_effect(source, object, kind_6_0_0, duration_6);  } }); }
 g.end_sentence();
-planned!("operation-game-effect" => cantrip_mechanics::game_rules::for_a_time(g, asker, Duration::EndOfTurn, GameEffect::PermanentsTappedByPlayerForManaProduceColorlessInstead({ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Mountain))).collect::<Vec<ObjectId>>() }, { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() })));
+planned!("operation-game-effect" => cantrip_mechanics::game_rules::for_a_time(g, asker, Duration::EndOfTurn, &Vec::<ObjectId>::new(), &{ let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }, GameEffect::PermanentsTappedByPlayerForManaProduceColorlessInstead(|q: &dyn Query, asker: &Asker, id: ObjectId| -> bool { q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Mountain)) })));
 g.end_sentence();
 hoisted_8.extend(objects_6.clone());
 }

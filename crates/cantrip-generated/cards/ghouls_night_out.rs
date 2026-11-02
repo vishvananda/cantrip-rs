@@ -11,7 +11,7 @@ let mut each_2: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut 
  each_2[index_0] = selected_1.clone(); all_2.extend(each_2[index_0].iter().copied());
    } 
 g.end_sentence();
-let objects_3: Vec<ObjectId> = { let q: &dyn Query = g; all_2.clone() }; let moved_3: Vec<ObjectId> = planned_value!("move arrival with a color", Vec::<ObjectId>::new() => cantrip_mechanics::enter::in_state(g, asker, &objects_3, Destination::Battlefield({ let q: &dyn Query = g; Some(asker.controller) }), Arrival { tapped: false, counters: &[], states: &[ArrivalState::Changes(&[planned_value!("engine: no effect adds colors", EffectKind::Pump(0, 0) => EffectKind::AddColors(ColorSet(4))), EffectKind::AddSubtype(q.words(asker.source).subtype(Subtype::Zombie))])] }, false)?);
+let objects_3: Vec<ObjectId> = { let q: &dyn Query = g; all_2.clone() }; let moved_3: Vec<ObjectId> = planned_value!("move arrival with a color", Vec::<ObjectId>::new() => cantrip_mechanics::enter::in_state(g, asker, &objects_3, ZoneDestination::Battlefield({ let q: &dyn Query = g; Some(asker.controller) }), Arrival { tapped: false, counters: &[], states: &[ArrivalState::Changes(&[planned_value!("engine: no effect adds colors", EffectKind::Pump(0, 0) => EffectKind::AddColors(ColorSet(4))), { let q: &dyn Query = g; EffectKind::AddSubtype(q.words(asker.source).subtype(Subtype::Zombie)) }])] }, false)?);
 g.end_sentence();
 let objects_4 = { let q: &dyn Query = g; (moved_3.clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_4 = { let q: &dyn Query = g; Some(asker.source) }; let duration_4 = Duration::Indefinite;
 let kind_4_0_0 = { let q: &dyn Query = g; EffectKind::AddKeywords(Keywords::of(&[Keyword::Decayed])) };

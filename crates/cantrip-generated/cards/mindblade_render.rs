@@ -3,7 +3,7 @@
 // requires: object collection Damage
 // Whenever your opponents are dealt combat damage, if any of that damage was dealt by a Warrior, you draw a card and you lose 1 life.
 #[allow(unused_imports)] use cantrip_api::*;
-fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { (((planned_value!("object collection Damage", Vec::<ObjectId>::new() => q.damage_objects(item, DamageSubject::Source))).into_iter().filter(|&id| q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Warrior))).collect::<Vec<ObjectId>>()).len() as i64) >= (1i64) }
+fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { (((planned_value!("object collection Damage", Vec::<ObjectId>::new() => q.damage_objects_of(asker, DamageSubject::Source))).into_iter().filter(|&id| q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Warrior))).collect::<Vec<ObjectId>>()).len() as i64) >= (1i64) }
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Damage { source, target, amount, kind, .. } = event { let (source, amount, combat) = (*source, *amount, kind.is_combat()); let subject = *target; let data = [u32::from(amount), source.0]; if combat && true && true && matches!(*target, Target::Player(p) if (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&p)) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

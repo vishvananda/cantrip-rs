@@ -12,7 +12,7 @@ let had_0: Vec<_> = counters_0.iter().map(|c| g.state().obj(c.0).counters(c.1)).
 g.end_sentence();
 let turn_1 = g.add_extra_turn({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") });
 g.end_sentence();
-planned!("operation-game-effect" => cantrip_mechanics::game_rules::for_a_time(g, asker, planned_value!("duration ExtraTurn", Duration::Indefinite => Duration::ExtraTurn(turn_1)), GameEffect::PowerUpAbilitiesCantBeActivated));
+planned!("operation-game-effect" => cantrip_mechanics::game_rules::for_a_time(g, asker, planned_value!("duration ExtraTurn", Duration::Indefinite => Duration::ExtraTurn(turn_1)), &Vec::<ObjectId>::new(), &Vec::<PlayerId>::new(), GameEffect::PowerUpAbilitiesCantBeActivated));
 g.end_sentence();
  Ok(()) }
 

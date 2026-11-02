@@ -8,7 +8,7 @@ let selected_0_player = { let q: &dyn Query = g; Some(asker.controller).expect("
 let objects_1 = { let q: &dyn Query = g; selected_0.clone() }; let moved_1 = g.return_to_hand(&objects_1);
 g.end_sentence();
  Ok(()) }
-planned_item!("ability-visit" => abilities: cantrip_mechanics::attractions::visit(spell(&[], ability_0_visit), None, " Return the chosen permanents to their owners' hands."));
+planned_item!("ability-visit" => abilities: cantrip_mechanics::attractions::visit_ability(spell(&[], ability_0_visit), None, " Return the chosen permanents to their owners' hands."));
 
 pub static CARD: CardDef = CardDef { name: "Bounce Chamber", token_words: &[], oracle: true, cost: ManaCost::ZERO, has_cost: false, types: TypeSet::of(&[CardType::Artifact]), subtypes: SubtypeSet::of(&[Subtype::Attraction]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

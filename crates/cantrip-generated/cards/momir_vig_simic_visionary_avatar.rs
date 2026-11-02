@@ -6,7 +6,7 @@
 // {X}, Discard a card: Create a token that's a copy of a creature card with mana value X chosen at random. Activate only as a sorcery and only once each turn.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let created_1: Vec<ObjectId> = planned_value!("token recipe CopyAtRandom", Vec::<ObjectId>::new() => cantrip_mechanics::tokens::create(g, asker, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[({ let q: &dyn Query = g; (1i64).max(0) as u32 }, TokenRecipe::CopyAtRandom(CardsInOracle::And(CardsInOracle::IsCardtype(CardType::Creature), CardsInOracle::ManaValueIs("Comparison(Equal, AnnouncedX)"))))], Arrival { tapped: false, counters: &[], states: &[] })?);
+let created_1: Vec<ObjectId> = planned_value!("token recipe CopyAtRandom", Vec::<ObjectId>::new() => cantrip_mechanics::tokens::create_from_recipes(g, asker.source, &{ let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[({ let q: &dyn Query = g; (1i64).max(0) as u32 }, TokenRecipe::CopyAtRandom(CardsInOracle::And(&[CardsInOracle::IsCardtype(CardType::Creature), CardsInOracle::ManaValueIs("Comparison(Equal, AnnouncedX)")])))], Arrival { tapped: false, counters: &[], states: &[] })?);
 g.end_sentence();
  Ok(()) }
 planned_item!("layout-vanguard" => variant: Some(Variant::Vanguard { hand: 0, life: 4 }));

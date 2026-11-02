@@ -42,7 +42,7 @@ g.end_sentence();
  Ok(()) }
 static ABILITY_0_VISIT_MODES: ModalDef = modes(&[mode(ability_0_visit_mode_0, "Create a 1/1 red Balloon creature token with flying.").targets(&[]),mode(ability_0_visit_mode_1, "Sacrifice a Balloon. If you do, target creature gains flying until end of turn.").targets(ABILITY_0_VISIT_MODE_1_TARGETS)]).choose(1, 1);
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
-planned_item!("ability-visit" => abilities: cantrip_mechanics::attractions::visit(Some(&ABILITY_0_VISIT_MODES), None, ""));
+planned_item!("ability-visit" => abilities: cantrip_mechanics::attractions::visit_ability(Some(&ABILITY_0_VISIT_MODES), None, ""));
 
 pub static CARD: CardDef = CardDef { name: "Balloon Stand", token_words: &[], oracle: true, cost: ManaCost::ZERO, has_cost: false, types: TypeSet::of(&[CardType::Artifact]), subtypes: SubtypeSet::of(&[Subtype::Attraction]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[&token_1::CARD];

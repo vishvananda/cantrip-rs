@@ -62,6 +62,8 @@ let amount_2 = { let q: &dyn Query = g; (1i64).max(0) as i32 }; let players_2 = 
 for player in players_2 { g.gain_life(player, amount_2); }
 g.end_sentence();
  Ok(()) }
+planned_item!("ability-as-event" => #[allow(unused_variables)] fn ability_1_as_object(g: &mut dyn Game, asker: &Asker) -> Option<ObjectId> { { let q: &dyn Query = g; Some(asker.source) } });
+planned_item!("ability-as-event" => #[allow(unused_variables)] fn ability_1_as_actions(g: &mut dyn Game, asker: &Asker) -> Result<(), Suspend> { cantrip_mechanics::as_events::perform(g, asker, &[TransformAction::GetAnEmblem(&[GrantedAbility::Delayed(0)])]) });
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Attacks { attacker, defending, .. } = event { let id = *attacker; let subject = Target::Object(id); let data = [u32::from(defending.0), u32::MAX]; if Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
@@ -80,7 +82,7 @@ g.end_sentence();
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
-planned_item!("ability-as-event" => as_events: AsEventDef { event: AsEvent::Transforms, object: |g: &mut dyn Game, asker: &Asker| { let q: &dyn Query = g; Some(asker.source) }, actions: &[TransformAction::GetAnEmblem(AbilityRef::delayed(q.card_id(&CARD), 0))] });
+planned_item!("ability-as-event" => as_events: AsEventDef { event: AsEvent::Transforms, object: ability_1_as_object, actions: ability_1_as_actions });
 
 pub static CARD: CardDef = CardDef { name: "Sephiroth, One-Winged Angel", token_words: &[], oracle: true, cost: ManaCost::ZERO, has_cost: false, types: TypeSet::of(&[CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Angel,Subtype::Nightmare,Subtype::Avatar]), supertypes: Supertypes { basic: false, legendary: true, snow: false }, colors: Some(ColorSet(4)), power: Some(5), toughness: Some(5), loyalty: None, defense: None, keywords: Keywords::of(&[Keyword::Flying]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::ATTACKS.0), ability_2_event), ability_2, "Whenever Sephiroth attacks, you may sacrifice any number of other creatures. If you do, draw that many cards.").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[triggered(when_asked(EventMask(EventMask::ZONE_CHANGE.0), granted_0_event), granted_0, "Whenever a creature dies, target opponent loses 1 life and you gain 1 life.").targets(GRANTED_0_TARGETS)], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 }

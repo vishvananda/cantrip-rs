@@ -18,7 +18,7 @@ let mut each_3: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut 
  each_3[index_0] = chosen_2.clone(); all_3.extend(each_3[index_0].iter().copied());
    } 
 g.end_sentence();
-planned!("operation-change-combat" => cantrip_mechanics::combat::change(g, asker, CombatChange::OnlyBlockers({ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| piles_0.iter().any(|row| row.2.is_some_and(|at| row.1[at].contains(&id)))).collect::<Vec<ObjectId>>() }))?);
+planned!("operation-change-combat" => cantrip_mechanics::combat::change(g, asker, &{ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| piles_0.iter().any(|row| row.2.is_some_and(|at| row.1[at].contains(&id)))).collect::<Vec<ObjectId>>() }, CombatChange::OnlyBlockers)?);
 g.end_sentence();
  Ok(()) }
 

@@ -6,8 +6,9 @@
 // Whenever a player attacks enchanted player with one or more creatures, that attacking player may tap or untap target permanent of their choice.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_enchant(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Player(p) if true) }
+planned_item!("targets-chosen-by-another-player" => #[allow(unused_variables)] fn target_chooser_0(q: &dyn Query, asker: &Asker) -> PlayerId { Some(PlayerId(planned_value!("event value in a target filter beyond its subject", [u32::MAX; 2] => q.event_data())[0] as u8)).expect("a reference that always names a player") });
 #[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (true)) }
-static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[planned_value!("targets chosen by another player", target(ability_1_target_0) => target(ability_1_target_0).chosen_by(|q: &dyn Query, asker: &Asker| Some(PlayerId(planned_value!("event value in a target filter beyond its subject", [u32::MAX; 2] => q.event_data())[0] as u8)).expect("a reference that always names a player")))];
+static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[planned_value!("targets chosen by another player", target(ability_1_target_0) => target(ability_1_target_0).chosen_by(target_chooser_0))];
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Attacks { attacker, defender, defending, .. } = event { let id = *attacker; let subject = Target::Player(*defending); let data = [u32::from(q.controller(id).0), u32::from(defending.0)]; if q.chars(id).is(CardType::Creature) && true && match *defender { Target::Player(p) => Some(asker.source).and_then(|o: ObjectId| q.state().obj(o).attached_player) == Some(p), _ => false } { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

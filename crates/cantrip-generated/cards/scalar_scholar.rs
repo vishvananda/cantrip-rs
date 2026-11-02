@@ -8,7 +8,7 @@
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let objects_0: Vec<ObjectId> = { let q: &dyn Query = g; ({ let mut all: Vec<ObjectId> = q.state().battlefield().to_vec(); all.extend_from_slice(q.state().zone(Zone::STACK)); all.extend_from_slice(q.state().zone(Zone::COMMAND)); for p in q.state().seats() { for zone in [Zone::library(p), Zone::hand(p), Zone::graveyard(p), Zone::exile(p)] { all.extend_from_slice(q.state().zone(zone)); } } all }).into_iter().filter(|&id| (Some(asker.controller) == Some(q.state().obj(id).owner) && q.mana_cost(id).x > 0)).collect::<Vec<ObjectId>>() };
-planned!("engine-no-perpetual-effects" => for &object in &objects_0 { cantrip_mechanics::perpetual::apply(g, asker.source, object, PerpetualEffect::AddAbility("Ability(Casting(ReduceCost([ManaReduction { color: None, amount: Constant(1) }])))")); });
+planned!("engine-no-perpetual-effects" => for &object in &objects_0 { cantrip_mechanics::perpetual::apply(g, asker.source, object, PerpetualEffect::AddAbility(&["Ability(Casting(ReduceCost([ManaReduction { color: None, amount: Constant(1) }])))"])); });
 g.end_sentence();
  Ok(()) }
 

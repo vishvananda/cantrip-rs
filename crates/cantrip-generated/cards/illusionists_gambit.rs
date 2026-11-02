@@ -1,7 +1,7 @@
 // Illusionist's Gambit
 // status: planned
-// requires: duration ExtraCombat
 // requires: engine: no effect removes from combat
+// requires: engine: no resolving rule on an open set: Prohibit Attack beyond lasting rules
 // Cast this spell only during the declare blockers step on an opponent's turn.
 // Remove all attacking creatures from combat and untap them. After this phase, there is an additional combat phase. Each of those creatures attacks that combat if able. They can't attack you or planeswalkers you control that combat.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -15,7 +15,7 @@ g.end_sentence();
 g.add_combat_phase();
 let happened_3: bool = true;
 g.end_sentence();
-planned!("duration-extra-combat", CreateContinuousEffect, "affected" = "{\"Objects\":{\"args\":{\"args\":0,\"kind\":\"InResult\"},\"kind\":\"Battlefield\"}}", "changes" = "[{\"args\":{\"RequireCombat\":{\"action\":{\"Attack\":\"Any\"},\"amount\":{\"AtLeast\":{\"args\":1,\"kind\":\"Constant\"}}}},\"kind\":\"Rule\"},{\"args\":{\"Prohibit\":{\"Attack\":{\"PlayersAndPlaneswalkers\":{\"args\":{\"kind\":\"AbilityController\"},\"kind\":\"One\"}}}},\"kind\":\"Rule\"}]", "duration" = "{\"ExtraCombat\":2}", "evaluation" = "\"LiveObjects\"", "source" = { let q: &dyn Query = g; Some(asker.source) });
+planned!("engine-no-resolving-rule-on-an-open-set-prohibit-attack-beyond-lasting-rules", CreateContinuousEffect, "affected" = "{\"Objects\":{\"args\":{\"args\":0,\"kind\":\"InResult\"},\"kind\":\"Battlefield\"}}", "changes" = "[{\"args\":{\"RequireCombat\":{\"action\":{\"Attack\":\"Any\"},\"amount\":{\"AtLeast\":{\"args\":1,\"kind\":\"Constant\"}}}},\"kind\":\"Rule\"},{\"args\":{\"Prohibit\":{\"Attack\":{\"PlayersAndPlaneswalkers\":{\"args\":{\"kind\":\"AbilityController\"},\"kind\":\"One\"}}}},\"kind\":\"Rule\"}]", "duration" = "{\"ExtraCombat\":2}", "evaluation" = "\"LiveObjects\"", "source" = { let q: &dyn Query = g; Some(asker.source) });
 g.end_sentence();
  Ok(()) }
 

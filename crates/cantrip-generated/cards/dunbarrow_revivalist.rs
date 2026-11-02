@@ -41,7 +41,7 @@ pub static EXTRA: &[&CardDef] = &[];
 
 }
 fn watch_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let created_2: Vec<ObjectId> = planned_value!("tokens entering in a special state", Vec::<ObjectId>::new() => cantrip_mechanics::tokens::create(g, asker, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[({ let q: &dyn Query = g; (1i64).max(0) as u32 }, TokenRecipe::Defined(g.card_id(&token_4::CARD)))], Arrival { tapped: false, counters: &[], states: &[ArrivalState::AttachedToChosen(|q: &dyn Query, asker: &Asker, id: ObjectId| (q.event_objects(item).to_vec()).contains(&id))] })?);
+let created_2: Vec<ObjectId> = planned_value!("tokens entering in a special state", Vec::<ObjectId>::new() => cantrip_mechanics::tokens::create_from_recipes(g, asker.source, &{ let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[({ let q: &dyn Query = g; (1i64).max(0) as u32 }, TokenRecipe::Defined(g.card_id(&token_4::CARD)))], Arrival { tapped: false, counters: &[], states: &[ArrivalState::AttachedToChosen(|q: &dyn Query, asker: &Asker, id: ObjectId| (q.event_objects(item).to_vec()).contains(&id))] })?);
 g.end_sentence();
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_9: Vec<ObjectId> = Vec::new();

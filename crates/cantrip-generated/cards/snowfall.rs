@@ -6,13 +6,15 @@
 // Whenever an Island is tapped for mana, its controller may add an additional {U}. If that Island is snow, its controller may add an additional {U}{U} instead. Spend this mana only to pay cumulative upkeep costs.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { None }
+planned_item!("mana-spending-purpose" => #[allow(dead_code, unused_variables)] fn mana_use_117(q: &dyn Query, asker: &Asker, spending: &Spending) -> bool { spending.part == ManaPart::CumulativeUpkeep });
+planned_item!("mana-spending-purpose" => #[allow(dead_code, unused_variables)] fn mana_use_321(q: &dyn Query, asker: &Asker, spending: &Spending) -> bool { spending.part == ManaPart::CumulativeUpkeep });
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 if { let q: &dyn Query = g; item.subject.object().is_some_and(|candidate: ObjectId| q.chars(candidate).supertypes.snow) } {
 let decider_0 = { let q: &dyn Query = g; item.subject.object().map(|o: ObjectId| q.controller(o)).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_0, asker.source, Purpose::Optional)? {
 let mana_players_2 = { let q: &dyn Query = g; item.subject.object().map(|o: ObjectId| q.controller(o)).into_iter().collect::<Vec<PlayerId>>() };
 let mana_2_0 = { let q: &dyn Query = g; (2i64).max(0) as u32 };
 for player in mana_players_2 {
-g.add_restricted_mana(player, Mana::U, mana_2_0, planned_value!("mana spending purpose", ManaRestriction::ABILITIES => ManaRestriction::Rule(&ManaRule { spend: |q, asker, spending| spending.part == ManaPart::CumulativeUpkeep, spent: None })));}
+g.add_restricted_mana(player, Mana::U, mana_2_0, planned_value!("mana spending purpose", ManaRestriction::ABILITIES => ManaRestriction::Rule(&ManaRule { spend: mana_use_117, spent: None })));}
 g.end_sentence();
 }
 g.end_sentence();
@@ -21,7 +23,7 @@ let decider_3 = { let q: &dyn Query = g; item.subject.object().map(|o: ObjectId|
 let mana_players_5 = { let q: &dyn Query = g; item.subject.object().map(|o: ObjectId| q.controller(o)).into_iter().collect::<Vec<PlayerId>>() };
 let mana_5_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 };
 for player in mana_players_5 {
-g.add_restricted_mana(player, Mana::U, mana_5_0, planned_value!("mana spending purpose", ManaRestriction::ABILITIES => ManaRestriction::Rule(&ManaRule { spend: |q, asker, spending| spending.part == ManaPart::CumulativeUpkeep, spent: None })));}
+g.add_restricted_mana(player, Mana::U, mana_5_0, planned_value!("mana spending purpose", ManaRestriction::ABILITIES => ManaRestriction::Rule(&ManaRule { spend: mana_use_321, spent: None })));}
 g.end_sentence();
 }
 g.end_sentence();

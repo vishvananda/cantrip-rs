@@ -19,14 +19,14 @@ pub static EXTRA: &[&CardDef] = &[];
 
 }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let players_0 = { let q: &dyn Query = g; { let mut all = Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>(); let other = q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedAs", false => Some(bound_0).zip(Some(asker.controller)).is_some_and(|(a, b): (PlayerId, PlayerId)| g.votes().same(a, b) == true))).collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all } }; let mut tokens_0 = Vec::new();
+let players_0 = { let q: &dyn Query = g; { let mut all = Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>(); let other = q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedAs", false => Some(bound_0).zip(Some(asker.controller)).is_some_and(|(a, b): (PlayerId, PlayerId)| q.votes().same(a, b) == true))).collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all } }; let mut tokens_0 = Vec::new();
 let count_0_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let def_0_0 = g.card_id(&token_1::CARD);
 for player in players_0 {
 tokens_0.extend(std::iter::repeat((def_0_0,player)).take(count_0_0 as usize));
 } let words_0 = Words::NONE;
 let created_0 = g.create_tokens_worded(&tokens_0, false, None, words_0)?;
 g.end_sentence();
-let amount_2 = { let q: &dyn Query = g; (({ let mut all = Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>(); let other = q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedAs", false => Some(bound_0).zip(Some(asker.controller)).is_some_and(|(a, b): (PlayerId, PlayerId)| g.votes().same(a, b) == false))).collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all }).len() as i64) as usize }; let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; cantrip_mechanics::scry(g, player_2, asker.source, amount_2)?;
+let amount_2 = { let q: &dyn Query = g; (({ let mut all = Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>(); let other = q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedAs", false => Some(bound_0).zip(Some(asker.controller)).is_some_and(|(a, b): (PlayerId, PlayerId)| q.votes().same(a, b) == false))).collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all }).len() as i64) as usize }; let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; cantrip_mechanics::scry(g, player_2, asker.source, amount_2)?;
 g.end_sentence();
 let amount_3 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_3 { g.draw(player, amount_3); }

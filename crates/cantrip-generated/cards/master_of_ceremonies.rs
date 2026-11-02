@@ -55,12 +55,12 @@ let mut each_chosen_1 = Vec::new();
 g.end_sentence();
 planned!("depends-on-an-instruction-with-a-gap" => g.begin_simultaneous());
 let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_3 = Vec::new();
-let count_3_0 = { let q: &dyn Query = g; ((q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => g.votes().voted(option))).collect::<Vec<PlayerId>>()).len() as i64) as u32 }; let def_3_0 = g.card_id(&token_4::CARD);
+let count_3_0 = { let q: &dyn Query = g; ((q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => Some(bound_0).is_some_and(|p: PlayerId| q.votes().voted(p, cantrip_mechanics::vote::Vote::Word("Money"))))).collect::<Vec<PlayerId>>()).len() as i64) as u32 }; let def_3_0 = g.card_id(&token_4::CARD);
 for player in players_3 {
 tokens_3.extend(std::iter::repeat((def_3_0,player)).take(count_3_0 as usize));
 } let words_3 = Words::NONE;
 let created_3 = g.create_tokens_worded(&tokens_3, false, None, words_3)?;
-let players_5 = { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => g.votes().voted(option))).collect::<Vec<PlayerId>>() }; let mut tokens_5 = Vec::new();
+let players_5 = { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => Some(bound_0).is_some_and(|p: PlayerId| q.votes().voted(p, cantrip_mechanics::vote::Vote::Word("Money"))))).collect::<Vec<PlayerId>>() }; let mut tokens_5 = Vec::new();
 let count_5_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let def_5_0 = g.card_id(&token_6::CARD);
 for player in players_5 {
 tokens_5.extend(std::iter::repeat((def_5_0,player)).take(count_5_0 as usize));
@@ -70,12 +70,12 @@ planned!("depends-on-an-instruction-with-a-gap" => g.end_simultaneous());
 g.end_sentence();
 planned!("depends-on-an-instruction-with-a-gap" => g.begin_simultaneous());
 let players_8 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_8 = Vec::new();
-let count_8_0 = { let q: &dyn Query = g; ((q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => g.votes().voted(option))).collect::<Vec<PlayerId>>()).len() as i64) as u32 }; let def_8_0 = g.card_id(&token_9::CARD);
+let count_8_0 = { let q: &dyn Query = g; ((q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => Some(bound_0).is_some_and(|p: PlayerId| q.votes().voted(p, cantrip_mechanics::vote::Vote::Word("Friends"))))).collect::<Vec<PlayerId>>()).len() as i64) as u32 }; let def_8_0 = g.card_id(&token_9::CARD);
 for player in players_8 {
 tokens_8.extend(std::iter::repeat((def_8_0,player)).take(count_8_0 as usize));
 } let words_8 = g.words(asker.source);
 let created_8 = g.create_tokens_worded(&tokens_8, false, None, words_8)?;
-let players_10 = { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => g.votes().voted(option))).collect::<Vec<PlayerId>>() }; let mut tokens_10 = Vec::new();
+let players_10 = { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => Some(bound_0).is_some_and(|p: PlayerId| q.votes().voted(p, cantrip_mechanics::vote::Vote::Word("Friends"))))).collect::<Vec<PlayerId>>() }; let mut tokens_10 = Vec::new();
 let count_10_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let def_10_0 = g.card_id(&token_11::CARD);
 for player in players_10 {
 tokens_10.extend(std::iter::repeat((def_10_0,player)).take(count_10_0 as usize));
@@ -84,9 +84,9 @@ let created_10 = g.create_tokens_worded(&tokens_10, false, None, words_10)?;
 planned!("depends-on-an-instruction-with-a-gap" => g.end_simultaneous());
 g.end_sentence();
 planned!("depends-on-an-instruction-with-a-gap" => g.begin_simultaneous());
-let amount_13 = { let q: &dyn Query = g; ((q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => g.votes().voted(option))).collect::<Vec<PlayerId>>()).len() as i64) as u32 }; let players_13 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_13 = { let q: &dyn Query = g; ((q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => Some(bound_0).is_some_and(|p: PlayerId| q.votes().voted(p, cantrip_mechanics::vote::Vote::Word("Secrets"))))).collect::<Vec<PlayerId>>()).len() as i64) as u32 }; let players_13 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_13 { g.draw(player, amount_13); }
-let amount_14 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_14 = { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => g.votes().voted(option))).collect::<Vec<PlayerId>>() };
+let amount_14 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_14 = { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => Some(bound_0).is_some_and(|p: PlayerId| q.votes().voted(p, cantrip_mechanics::vote::Vote::Word("Secrets"))))).collect::<Vec<PlayerId>>() };
 for player in players_14 { g.draw(player, amount_14); }
 planned!("depends-on-an-instruction-with-a-gap" => g.end_simultaneous());
 g.end_sentence();

@@ -5,10 +5,10 @@
 // {3}{G}{G}: Adapt 3. (If this creature has no +1/+1 counters on it, put three +1/+1 counters on it.)
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { if { let q: &dyn Query = g; Some(asker.source).is_some_and(|candidate: ObjectId| (i64::from(q.state().obj(candidate).counters(CounterKind::PlusOne))) > (0i64)) } {
-planned!("mana-production-could-produce" => for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { cantrip_mechanics::mana::add_production(g, player, Production::Repeat({ let q: &dyn Query = g; (3i64).max(0) as u32 }, &Production::CouldProduce({ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Land) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }, false), ManaChoiceTiming::Once), None, None)?; });
+planned!("mana-production-could-produce" => for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { cantrip_mechanics::mana::add_production(g, player, Production::Repeat({ let q: &dyn Query = g; (3i64).max(0) as u32 }, &Production::CouldProduce(|q: &dyn Query, asker: &Asker, id: ObjectId| (q.chars(id).is(CardType::Land) && Some(asker.controller) == Some(q.controller(id))), false), ManaChoiceTiming::Once), None, None)?; });
 g.end_sentence();
 } else {
-planned!("mana-production-could-produce" => for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { cantrip_mechanics::mana::add_production(g, player, Production::CouldProduce({ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Land) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }, false), None, None)?; });
+planned!("mana-production-could-produce" => for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { cantrip_mechanics::mana::add_production(g, player, Production::CouldProduce(|q: &dyn Query, asker: &Asker, id: ObjectId| (q.chars(id).is(CardType::Land) && Some(asker.controller) == Some(q.controller(id))), false), None, None)?; });
 g.end_sentence();
 }
  Ok(()) }

@@ -7,7 +7,7 @@
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0)];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-planned!("operation-counter-with" => if let Some(spell) = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) } { cantrip_mechanics::counter::to(g, spell, None, Destination::Exile, &[{ let q: &dyn Query = g; 3i64 }, CounterType::TimeCounter, &[ExiledCardEffect::AddAbility("Ability(Mechanic { mechanic: BasicSuspend, cost: None, amount: None, filter: None })")]]); });
+planned!("operation-counter-with" => let destination = ZoneDestination::Exile; if let Some(spell) = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) } { cantrip_mechanics::counter::to(g, spell, None, destination, &[{ let q: &dyn Query = g; 3i64 }, CounterType::TimeCounter, &[ExiledCardEffect::AddAbility(&["Ability(Mechanic { mechanic: BasicSuspend, cost: None, amount: None, filter: None })"])]]); });
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

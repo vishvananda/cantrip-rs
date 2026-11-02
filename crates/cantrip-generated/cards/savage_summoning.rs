@@ -5,7 +5,7 @@
 // The next creature spell you cast this turn can be cast as though it had flash. That spell can't be countered. That creature enters with an additional +1/+1 counter on it.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on(g, asker, EffectOn::Players({ let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }), &[FuturePlayerEffect::MayCastTheirNextSpellThisTurnAsThoughItHadFlashWithEffects(|q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Creature), &[SpellEffect::CantBeCountered, SpellEffect::EntersWithACounter(CounterType::PTCounter(1, 1))])], None)?);
+planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on_players(g, asker, &{ let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[FuturePlayerEffect::MayCastTheirNextSpellThisTurnAsThoughItHadFlashWithEffects(|q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).is(CardType::Creature), &[SpellEffect::CantBeCountered, SpellEffect::EntersWithACounter(CounterType::PTCounter(1, 1))])], None)?);
 g.end_sentence();
  Ok(()) }
 

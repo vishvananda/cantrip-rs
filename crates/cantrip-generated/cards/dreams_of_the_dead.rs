@@ -17,7 +17,7 @@ let objects_1 = { let q: &dyn Query = g; ((moved_0.clone()).get(0 as usize).copi
 let kind_1_0_0 = { let q: &dyn Query = g; EffectKind::AddAbility(AbilityRef::delayed({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, 0)) };
 if let Some(source) = source_1 { cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.add_effect(source, object, kind_1_0_0, duration_1);  } }); }
 g.end_sentence();
-{  let to = Some(Target::None); let about = { let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied() }; if let (Some(to), Some(about)) = (to, about) { let _ = to; g.add_effect(item.object, about, EffectKind::Replacement { card: item.ability.card, index: 0 }, planned_value!("duration WhileOnBattlefield", Duration::Indefinite => Duration::WhileOnBattlefield(Result { result: ResultId(0), phase: After, index: 0 }))); } }
+{  let to = Some(Target::None); let about = { let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied() }; if let (Some(to), Some(about)) = (to, about) { let _ = to; g.add_effect(item.object, about, EffectKind::Replacement { card: item.ability.card, index: 0 }, planned_value!("duration WhileOnBattlefield", Duration::Indefinite => Duration::WhileOnBattlefield({ let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied() }))); } }
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

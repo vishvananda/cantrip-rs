@@ -17,7 +17,7 @@ pub static EXTRA: &[&CardDef] = &[];
 #[allow(unused_variables)] fn delayed_3_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if from.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn delayed_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let objects_4 = { let q: &dyn Query = g; planned_value!("reflexive ability about a list of objects", Vec::<ObjectId>::new() => about(q, item, created_0.clone())) }; let moved_4 = g.exile_all(&objects_4);
+let objects_4 = { let q: &dyn Query = g; planned_value!("reflexive ability about a list of objects", Vec::<ObjectId>::new() => about(q, item, 0)) }; let moved_4 = g.exile_all(&objects_4);
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn delayed_6_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if from.is(ZoneKind::Battlefield) && (planned_value!("event trigger carrying values", Vec::<ObjectId>::new() => q.trigger_about(asker, 0))).contains(&id) { return Some(Fired { subject, data }); } }
@@ -36,7 +36,7 @@ tokens_0.extend(std::iter::repeat((def_0_0,player)).take(count_0_0 as usize));
 } let words_0 = g.words(asker.source);
 let created_0 = g.create_tokens_worded(&tokens_0, false, None, words_0)?;
 g.end_sentence();
-if let Some(source) = Some(item.object) { g.delayed_trigger(DelayedWhen::UntilEvent, source, item.controller, AbilityRef::delayed(item.ability.card, 0), Target::None); }
+planned!("engine-a-delayed-ability-on-an-event-keeps-no-list" => if let Some(source) = Some(item.object) { let mut about: Vec<ObjectId> = Vec::new(); about.extend({ let q: &dyn Query = g; created_0.clone() }); about.push(ObjectId::NONE);  g.delayed_trigger_about(DelayedWhen::UntilEvent, source, item.controller, AbilityRef::delayed(item.ability.card, 0), &about); });
 g.end_sentence();
 planned!("engine-a-delayed-ability-on-an-event-keeps-no-list" => if let Some(source) = Some(item.object) { let mut about: Vec<ObjectId> = Vec::new(); about.extend({ let q: &dyn Query = g; created_0.clone() }); about.push(ObjectId::NONE);  g.delayed_trigger_about(DelayedWhen::UntilEvent, source, item.controller, AbilityRef::delayed(item.ability.card, 1), &about); });
 g.end_sentence();

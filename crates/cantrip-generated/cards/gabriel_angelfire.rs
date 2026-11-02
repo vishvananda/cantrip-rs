@@ -8,9 +8,9 @@
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::Upkeep) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("a-choice-of-ability" => cantrip_mechanics::choose::value(g, asker.source, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, ChoiceKind::Ability, 1, &["Ability(Keyword(Flying))", "Ability(Keyword(FirstStrike))", "Ability(Keyword(Trample))", "Ability(Mechanic { mechanic: Rampage, cost: None, amount: Some(Constant(3)), filter: None })"])?);
+planned!("a-choice-of-ability" => cantrip_mechanics::choose::value(g, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, asker.source, ChoiceKind::Ability, ChoiceTerms { options: &["Ability(Keyword(Flying))", "Ability(Keyword(FirstStrike))", "Ability(Keyword(Trample))", "Ability(Mechanic { mechanic: Rampage, cost: None, amount: Some(Constant(3)), filter: None })"], except: &[], count: Some(1), secret: false, unchosen: false, random: false, ordered: false, up_to: false })?);
 g.end_sentence();
-planned!("a-choice-of-ability-outside-its-body" => cantrip_mechanics::effects::grant(g, item, { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }, &[Grant::ChosenAbility], planned_value!("duration UntilNext upkeep", Duration::Indefinite => Duration::UntilNextUpkeepOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })))?);
+planned!("a-choice-of-ability-outside-its-body" => { let objects: Vec<ObjectId> = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; cantrip_mechanics::effects::grant(g, item, &objects, &[Grant::ChosenAbility], planned_value!("duration UntilNext upkeep", Duration::Indefinite => Duration::UntilNextUpkeepOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })))? });
 g.end_sentence();
  Ok(()) }
 

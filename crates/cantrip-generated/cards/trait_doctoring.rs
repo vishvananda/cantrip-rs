@@ -11,7 +11,7 @@ let mut hoisted_3: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let decider_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
-match planned_value!("instruction ChooseOne", 0u8 => cantrip_mechanics::choose::one_of(g, decider_0, asker.source, vec![Label::Card(card_0, 0), Label::Card(card_0, 1)])?) {
+match planned_value!("instruction ChooseOne", 0u8 => { let card_0 = item.ability.card; cantrip_mechanics::choose::one_of(g, decider_0, asker.source, vec![Label::Card(card_0, 0), Label::Card(card_0, 1)])? }) {
 0 => {
 let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let words_1 = cantrip_mechanics::text_change::color_word(g, player_1, asker.source)?;
 g.end_sentence();

@@ -1,6 +1,5 @@
 // Superior Foes of Spider-Man
 // status: planned
-// requires: duration UntilAnotherExiled
 // requires: play permission lasting UntilAnotherExiled
 // Trample
 // Whenever you cast a spell with mana value 4 or greater, you may exile the top card of your library. If you do, you may play that card until you exile another card with this creature.
@@ -17,7 +16,7 @@ hoisted_2.extend(moved_1.clone());
 hoisted_3.extend({ let q: &dyn Query = g; objects_1.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() });
 }
 g.end_sentence();
-planned!("play-permission-lasting-until-another-exiled" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.add_player_effect(player, source, EffectKind::PlayerRule(PlayerRule::Play { zone: ZoneKind::Exile, cards: CardsOfRule::These({ let q: &dyn Query = g; (hoisted_2.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }), grant: PlayGrant { lands: true, ..PlayGrant::CAST } }), planned_value!("duration UntilAnotherExiled", Duration::Indefinite => Duration::UntilAnotherExiled { by: { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, with: { let q: &dyn Query = g; Some(asker.source) } })); } });
+planned!("play-permission-lasting-until-another-exiled" => let cards = { let q: &dyn Query = g; (hoisted_2.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players { g.allow_play(card, player, PlayGrant { expiry: Expiry::UntilAnotherExiledWith(asker.source), lands: true, ..PlayGrant::CAST }); } } } }););
 g.end_sentence();
  Ok(()) }
 

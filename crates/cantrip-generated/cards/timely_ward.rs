@@ -6,7 +6,7 @@
 // Enchant creature
 // Enchanted creature has indestructible.
 #[allow(unused_imports)] use cantrip_api::*;
-fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { planned_value!("condition TargetsMatch", false => Some(asker.source).is_some_and(|o: ObjectId| q.targets_of(o).into_iter().all(|id: ObjectId| ObjectKind::Permanent.is(q, id) && planned_value!("engine: no commander", false => q.is_commander(id))))) }
+fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { planned_value!("condition TargetsMatch", false => Some(asker.source).is_some_and(|o: ObjectId| q.targets_of(o).into_iter().all(|id: ObjectId| q.state().obj(id).zone.kind() == ZoneKind::Battlefield && planned_value!("engine: no commander", false => q.is_commander(id))))) }
 #[allow(unused_variables)] fn ability_1_enchant(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
 #[allow(unused_variables)] fn ability_2_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); chars.keywords = chars.keywords.with(Keyword::Indestructible); }
 

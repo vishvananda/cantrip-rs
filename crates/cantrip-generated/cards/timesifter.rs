@@ -9,7 +9,7 @@
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_9: Vec<ObjectId> = Vec::new();
 let mut hoisted_8: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-planned!("keyword-action-set-repeatable-players" => cantrip_mechanics::players::set_repeatable(g, { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }, asker.source)?;);
+planned!("keyword-action-set-repeatable-players" => { let players: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }; cantrip_mechanics::players::set_repeatable(g, &players, asker.source)?; });
 g.end_sentence();
 loop { let mut again_1 = false;
 let mut players_2: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0).is_some_and(|p: PlayerId| (planned_value!("player collection Scoped", Vec::<PlayerId>::new() => q.players_in_scope(asker))).contains(&p))).collect::<Vec<PlayerId>>() };
@@ -19,7 +19,7 @@ let mut gathered_3: Vec<ObjectId> = Vec::new();
 let objects_5 = { let q: &dyn Query = g; gathered_3.clone() }; let moved_5 = g.exile_all(&objects_5);
 g.end_sentence();
 if { let q: &dyn Query = g; (({ let mut all = q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0).is_some_and(|p: PlayerId| (planned_value!("player collection Scoped", Vec::<PlayerId>::new() => q.players_in_scope(asker))).contains(&p))).collect::<Vec<PlayerId>>(); let other = q.state().apnap().filter(|&bound_0: &PlayerId| { let those: Vec<ObjectId> = moved_5.clone(); let extreme = those.iter().map(|&o| q.mana_value(o)).max(); those.iter().any(|&o| Some(q.state().obj(o).owner) == Some(bound_0) && Some(q.mana_value(o)) == extreme) }).collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all }).len() as i64) >= (2i64) } {
-planned!("keyword-action-set-repeatable-players" => cantrip_mechanics::players::set_repeatable(g, { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| { let those: Vec<ObjectId> = moved_5.clone(); let extreme = those.iter().map(|&o| q.mana_value(o)).max(); those.iter().any(|&o| Some(q.state().obj(o).owner) == Some(bound_0) && Some(q.mana_value(o)) == extreme) }).collect::<Vec<PlayerId>>() }, asker.source)?;);
+planned!("keyword-action-set-repeatable-players" => { let players: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| { let those: Vec<ObjectId> = moved_5.clone(); let extreme = those.iter().map(|&o| q.mana_value(o)).max(); those.iter().any(|&o| Some(q.state().obj(o).owner) == Some(bound_0) && Some(q.mana_value(o)) == extreme) }).collect::<Vec<PlayerId>>() }; cantrip_mechanics::players::set_repeatable(g, &players, asker.source)?; });
 g.end_sentence();
 again_1 = true;
 g.end_sentence();

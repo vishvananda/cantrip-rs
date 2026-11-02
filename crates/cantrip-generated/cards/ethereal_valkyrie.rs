@@ -14,7 +14,7 @@ g.end_sentence();
 let selected_1_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_1_candidates = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>() }; let selected_1_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let selected_1 = { cantrip_mechanics::choose::select(g, selected_1_player, asker.source, Purpose::Exile, selected_1_candidates, cantrip_mechanics::select::Selection::of(selected_1_count, &[]))? };
 let objects_2 = { let q: &dyn Query = g; selected_1.clone() }; let by_2 = None; let moved_2 = g.exile_face_down(&objects_2, by_2);
 g.end_sentence();
-planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on(g, asker, EffectOn::Objects({ let q: &dyn Query = g; (moved_2.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }), &[ExiledCardEffect::IsForetoldForCost("Cost(Cost { parts: [ManaCostReduced { object: None, reduction: Term { family: \"CostReductionSymbol\", form: \"CostReduceGeneric\", operands: [Integer(2)] } }] })")], None)?);
+planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on_objects(g, asker, &{ let q: &dyn Query = g; (moved_2.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }, &[ExiledCardEffect::IsForetoldForCost("Cost(Cost { parts: [ManaCostReduced { object: None, reduction: Term { family: \"CostReductionSymbol\", form: \"CostReduceGeneric\", operands: [Integer(2)] } }] })")], None)?);
 g.end_sentence();
  Ok(()) }
 

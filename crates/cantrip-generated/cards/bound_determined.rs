@@ -27,7 +27,7 @@ pub static CARD: CardDef = CardDef { name: "Bound", token_words: &[], oracle: tr
 pub mod right {
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-effect-on" => cantrip_mechanics::effects::effect_on(g, asker, EffectOn::EachSpell(|q: &dyn Query, asker: &Asker, id: ObjectId| (!(Some(asker.source) == Some(id)) && Some(asker.controller) == Some(q.controller(id)))), &[SpellEffect::CantBeCountered], Some(Duration::EndOfTurn))?);
+planned!("operation-effect-on" => let result_0 = cantrip_mechanics::effects::effect_on(g, asker, EffectOn::EachSpell(|q: &dyn Query, asker: &Asker, id: ObjectId| (!(Some(asker.source) == Some(id)) && Some(asker.controller) == Some(q.controller(id)))), &[SpellEffect::CantBeCountered], Some(Duration::EndOfTurn))?;);
 g.end_sentence();
 let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_1 { g.draw(player, amount_1); }

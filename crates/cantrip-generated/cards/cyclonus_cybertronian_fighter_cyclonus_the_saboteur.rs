@@ -36,7 +36,7 @@ g.end_sentence();
 }
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
-planned!("engine-no-additional-phase-but-combat" => g.add_phases(AddedPhases::Beginning););
+planned!("engine-no-additional-phase-but-combat" => { let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; g.add_phases(player, AddedPhases::Beginning, 1, None); });
 g.end_sentence();
 }
 g.end_sentence();

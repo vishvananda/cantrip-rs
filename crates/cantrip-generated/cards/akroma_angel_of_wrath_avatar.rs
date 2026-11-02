@@ -11,7 +11,7 @@
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 planned!("operation-choose-value-with" => cantrip_mechanics::choose::value(g, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, asker.source, ChoiceKind::Ability, ChoiceTerms { options: &["Ability(Keyword(Flying))", "Ability(Keyword(FirstStrike))", "Ability(Keyword(Trample))", "Ability(Keyword(Haste))", "Ability(Keyword(Protection(Objects { kind: Any, filter: Color(Black) })))", "Ability(Keyword(Protection(Objects { kind: Any, filter: Color(Red) })))", "Ability(Keyword(Vigilance))"], except: &[], count: Some({ let q: &dyn Query = g; (2i64).max(0) as u32 }), secret: false, unchosen: false, random: true, ordered: false, up_to: false })?);
 g.end_sentence();
-planned!("a-choice-of-ability-outside-its-body" => cantrip_mechanics::effects::grant(g, item, { let q: &dyn Query = g; item.subject.object().into_iter().collect::<Vec<ObjectId>>() }, &[Grant::ChosenAbility], Duration::Indefinite)?);
+planned!("a-choice-of-ability-outside-its-body" => { let objects: Vec<ObjectId> = { let q: &dyn Query = g; item.subject.object().into_iter().collect::<Vec<ObjectId>>() }; cantrip_mechanics::effects::grant(g, item, &objects, &[Grant::ChosenAbility], Duration::Indefinite)? });
 g.end_sentence();
  Ok(()) }
 planned_item!("layout-vanguard" => variant: Some(Variant::Vanguard { hand: 1, life: 7 }));

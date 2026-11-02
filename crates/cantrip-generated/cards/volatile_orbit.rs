@@ -14,7 +14,7 @@ let source_0 = { let q: &dyn Query = g; Some(asker.source) }; let amount_0 = { l
 g.end_sentence();
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-conjure" => for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { cantrip_mechanics::conjure::conjure(g, player, player, asker.source, Conjured::FromSpellbook("Planets", SpellbookPick::Choice), { let q: &dyn Query = g; 1i64 }, ConjureTo::Entering(EventZone::Battlefield, ConjureSpot::Random, &[&[EnterFlag::EntersTapped, EnterFlag::EntersWithNumberCounters({ let q: &dyn Query = g; 8i64 }, CounterType::ChargeCounter)]]))?; });
+planned!("operation-conjure" => { let mut conjured: Vec<ObjectId> = Vec::new(); for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { conjured.extend(cantrip_mechanics::conjure::conjure(g, player, player, asker.source, Conjured::FromSpellbook("Planets", SpellbookPick::Choice), { let q: &dyn Query = g; 1i64 }, ConjureTo::Entering(EventZone::Battlefield, ConjureSpot::Random, &[&[EnterFlag::EntersTapped, EnterFlag::EntersWithNumberCounters({ let q: &dyn Query = g; 8i64 }, CounterType::ChargeCounter)]]))?); }; conjured };);
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

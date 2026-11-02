@@ -9,7 +9,7 @@
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let objects_0 = { let q: &dyn Query = g; (q.state().apnap().collect::<Vec<PlayerId>>()).into_iter().filter_map(|p: PlayerId| q.state().zone(Zone::library(p)).first().copied()).collect::<Vec<ObjectId>>() }; let mut owners_0: Vec<PlayerId> = objects_0.iter().map(|o| g.state().obj(*o).owner).collect(); owners_0.dedup(); for owner in owners_0 { let cards: Vec<ObjectId> = objects_0.iter().copied().filter(|o| g.state().obj(*o).owner == owner).collect(); g.reveal(owner, &cards); }
 g.end_sentence();
-planned!("operation-change-spell" => if let Some(spell) = { let q: &dyn Query = g; Some(asker.source) } { cantrip_mechanics::spell_changes::change(g, asker, spell, &[SpellChange::EntersWithCounters(CounterKind::PlusOne, ((objects_0.clone()).into_iter().map(|id: ObjectId| i64::from(q.mana_value(id))).sum::<i64>()).min(i16::MAX.into()) as i16)]); });
+planned!("operation-change-spell" => if let Some(spell) = { let q: &dyn Query = g; Some(asker.source) } { let changes = { let q: &dyn Query = g; [SpellChange::EntersWithCounters(CounterKind::PlusOne, ((objects_0.clone()).into_iter().map(|id: ObjectId| i64::from(q.mana_value(id))).sum::<i64>()).min(i16::MAX.into()) as i16)] }; cantrip_mechanics::spell_changes::change(g, asker, spell, &changes); });
 g.end_sentence();
  Ok(()) }
 

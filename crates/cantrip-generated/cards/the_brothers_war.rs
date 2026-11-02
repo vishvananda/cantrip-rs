@@ -1,6 +1,5 @@
 // The Brothers' War
 // status: planned
-// requires: continuous rule RequireCombat Attack
 // requires: engine: no resolving rule on an open set: RequireCombat Attack beyond lasting rules
 // (As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)
 // I — Create two tapped Powerstone tokens.
@@ -27,7 +26,7 @@ g.end_sentence();
 static ABILITY_0_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_1_target_0).between(2, 2)];
 fn ability_0_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-planned!("engine-no-resolving-rule-on-an-open-set-require-combat-attack-beyond-lasting-rules" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| (q.chars(id).is(CardType::Creature) && (q.state().apnap().filter(|&p| t_0.iter().any(|t| t.player() == Some(p))).collect::<Vec<PlayerId>>()).contains(&q.controller(id))), planned_value!("continuous rule RequireCombat Attack", EffectKind::CantBlock => EffectKind::Rule(Rule::Must(Action::Attack(|q: &dyn Query, asker: &Asker, defender: Target| (match defender { Target::Player(p) => (q.state().apnap().filter(|&p| t_0.iter().any(|t| t.player() == Some(p))).collect::<Vec<PlayerId>>()).contains(&p), Target::Object(id) => false && q.chars(id).is(CardType::Planeswalker) && (q.state().apnap().filter(|&p| t_0.iter().any(|t| t.player() == Some(p))).collect::<Vec<PlayerId>>()).contains(&q.controller(id)), _ => false })), Required::AtLeast(1i64)))), Duration::UntilNextTurnOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })); });
+planned!("engine-no-resolving-rule-on-an-open-set-require-combat-attack-beyond-lasting-rules", CreateContinuousEffect, "affected" = "{\"Objects\":{\"args\":{\"args\":[{\"args\":\"Creature\",\"kind\":\"CardType\"},{\"args\":{\"args\":0,\"kind\":\"Targets\"},\"kind\":\"ControlledBy\"}],\"kind\":\"All\"},\"kind\":\"Battlefield\"}}", "changes" = "[{\"args\":{\"RequireCombat\":{\"action\":{\"Attack\":{\"Players\":{\"args\":0,\"kind\":\"Targets\"}}},\"amount\":{\"AtLeast\":{\"args\":1,\"kind\":\"Constant\"}}}},\"kind\":\"Rule\"}]", "duration" = "{\"UntilNextTurn\":{\"kind\":\"AbilityController\"}}", "evaluation" = "\"LiveObjects\"", "source" = { let q: &dyn Query = g; Some(asker.source) });
 g.end_sentence();
  Ok(()) }
 static ABILITY_0_2_TARGETS: &[cantrip_api::TargetSpec] = &[cantrip_mechanics::targets::ANY.between(2, 2)];

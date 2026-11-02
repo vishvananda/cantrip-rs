@@ -18,11 +18,11 @@ g.end_sentence();
  None }
 fn watch_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 planned!("engine-no-perpetual-effects" => let objects_5: Vec<ObjectId> = { let q: &dyn Query = g; item.subject.object().into_iter().collect::<Vec<ObjectId>>() };
-for &object in &objects_5 { let kind_5_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::Pump((planned_value!("numeric expression Noted", 0i64 => q.noted(asker, Noted { object: None, measure: Number }))).clamp(-32768, 32767) as i16, (0i64) as i16)) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_5_0); });
+for &object in &objects_5 { let kind_5_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Effect(EffectKind::Pump((planned_value!("numeric expression Noted", 0i64 => q.noted(asker, "Noted { object: None, measure: Number }"))).clamp(-32768, 32767) as i16, (0i64) as i16)) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_5_0); });
 g.end_sentence();
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller); if !{ let q: &dyn Query = g; item.subject.object().is_some_and(|candidate: ObjectId| q.chars(candidate).power.is_some_and(|v| (i64::from(v)) > (0i64))) } { return Ok(()); } let asker = &Asker::new(item.object, item.controller);
-planned!("operation-note" => cantrip_mechanics::notes::note(g, asker, Note::Number({ let q: &dyn Query = g; item.subject.object().map_or(0i64, |o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0))) })));
+planned!("operation-note" => { let by = g.linked(item); cantrip_mechanics::notes::note(g, by, Note::Number({ let q: &dyn Query = g; item.subject.object().map_or(0i64, |o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0))) })); });
 g.end_sentence();
 if let Some(source) = Some(item.object) { g.delayed_trigger(DelayedWhen::UntilEvent, source, item.controller, AbilityRef::delayed(item.ability.card, 0), Target::None); }
 g.end_sentence();

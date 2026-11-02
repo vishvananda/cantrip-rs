@@ -1,6 +1,7 @@
 // The Doctor's Childhood Barn
 // status: planned
 // requires: card type Plane
+// requires: engine: a delayed ability on an event keeps no list
 // requires: engine: no effect phases a permanent in
 // requires: layout Planar
 // requires: operation GameEffect
@@ -20,7 +21,7 @@ static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target
 #[allow(unused_variables)] fn lasting_0(q: &dyn Query, e: &ContinuousEffect) -> bool { let asker = &Asker::new(e.source, e.controller); is_live(q, e.source) && q.is_on_battlefield(e.source) && !(q.state().obj(e.source).face_down) }
 #[allow(unused_variables)] fn delayed_4_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { None }
 fn delayed_4(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-for bound_4294967290 in { let q: &dyn Query = g; planned_value!("reflexive ability about a list of objects", Vec::<ObjectId>::new() => about(q, item, acted_1.clone())) } {
+for bound_4294967290 in { let q: &dyn Query = g; planned_value!("reflexive ability about a list of objects", Vec::<ObjectId>::new() => about(q, item, 0)) } {
 planned!("engine-no-effect-phases-a-permanent-in" => if let Some(object) = ({ let q: &dyn Query = g; (Some(bound_4294967290).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied() { g.phase_in(&[object]); });
 }
 g.end_sentence();
@@ -32,9 +33,9 @@ g.end_sentence();
 let acted_1: Vec<ObjectId> = { let q: &dyn Query = g; (t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() };
 let objects_1 = { let q: &dyn Query = g; (t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; g.phase_out(&objects_1);
 g.end_sentence();
-planned!("operation-game-effect" => cantrip_mechanics::game_rules::for_a_time(g, asker, { let q: &dyn Query = g; Duration::AsLongAs({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, 0) }, GameEffect::PermanentsCantPhaseIn({ let q: &dyn Query = g; acted_1.clone() })));
+planned!("operation-game-effect" => cantrip_mechanics::game_rules::for_a_time(g, asker, { let q: &dyn Query = g; Duration::AsLongAs({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, 0) }, &{ let q: &dyn Query = g; acted_1.clone() }, &Vec::<PlayerId>::new(), GameEffect::PermanentsCantPhaseIn));
 g.end_sentence();
-if let Some(source) = Some(item.object) { g.delayed_trigger(DelayedWhen::UntilEvent, source, item.controller, AbilityRef::delayed(item.ability.card, 0), Target::None); }
+planned!("engine-a-delayed-ability-on-an-event-keeps-no-list" => if let Some(source) = Some(item.object) { let mut about: Vec<ObjectId> = Vec::new(); about.extend({ let q: &dyn Query = g; acted_1.clone() }); about.push(ObjectId::NONE);  g.delayed_trigger_about(DelayedWhen::UntilEvent, source, item.controller, AbilityRef::delayed(item.ability.card, 0), &about); });
 g.end_sentence();
  Ok(()) }
 fn about(q: &dyn Query, item: &StackItem, part: usize) -> Vec<ObjectId> { q.event_objects(item).split(|&id| id == ObjectId::NONE).nth(part).map_or_else(Vec::new, <[ObjectId]>::to_vec) }

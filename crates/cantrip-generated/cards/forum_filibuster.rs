@@ -17,7 +17,7 @@ static REFLEXIVE_3_TARGETS: &[cantrip_api::TargetSpec] = &[target(reflexive_3_ta
 fn reflexive_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let player_4 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
-let objects_4 = ({ let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_4 = { let mut moved: Vec<ObjectId> = Vec::new(); for &o in &objects_4 { let controller = player_4; let aura = g.chars(o).has_subtype(Subtype::Aura); let hosts: Vec<ObjectId> = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&host| (planned_value!("reflexive ability about a list of objects", Vec::<ObjectId>::new() => about(q, item, created_0.clone()))).contains(&host) && (!aura || could_enchant(q, o, controller, host))).collect() }; match cantrip_mechanics::choose::card(g, controller, asker.source, Purpose::Attach, hosts)? { Some(host) => moved.extend(g.put_onto_battlefield_attached(o, controller, host)?), None if !aura => moved.push(g.put_onto_battlefield(o, controller, false)?), None => {} } } moved };
+let objects_4 = ({ let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_4 = { let mut moved: Vec<ObjectId> = Vec::new(); for &o in &objects_4 { let controller = player_4; let aura = g.chars(o).has_subtype(Subtype::Aura); let hosts: Vec<ObjectId> = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&host| (planned_value!("reflexive ability about a list of objects", Vec::<ObjectId>::new() => about(q, item, 0))).contains(&host) && (!aura || could_enchant(q, o, controller, host))).collect() }; match cantrip_mechanics::choose::card(g, controller, asker.source, Purpose::Attach, hosts)? { Some(host) => moved.extend(g.put_onto_battlefield_attached(o, controller, host)?), None if !aura => moved.push(g.put_onto_battlefield(o, controller, false)?), None => {} } } moved };
 g.end_sentence();
  Ok(()) }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
@@ -27,7 +27,7 @@ for player in players_0 {
 tokens_0.extend(std::iter::repeat((def_0_0,player)).take(count_0_0 as usize));
 } let words_0 = g.words(asker.source);
 let created_0 = g.create_tokens_worded(&tokens_0, false, None, words_0)?;
-if !created_0.clone().is_empty() && true { g.reflexive_trigger(item.object, item.controller, AbilityRef::delayed(item.ability.card, 0), Target::None); }
+planned!("reflexive-ability-about-a-list-of-objects" => if !created_0.clone().is_empty() && true { let mut about: Vec<ObjectId> = Vec::new(); about.extend({ let q: &dyn Query = g; created_0.clone() }); about.push(ObjectId::NONE); g.reflexive_trigger_about(item.object, item.controller, AbilityRef::delayed(item.ability.card, 0), Target::None, &about); });
 g.end_sentence();
  Ok(()) }
 fn about(q: &dyn Query, item: &StackItem, part: usize) -> Vec<ObjectId> { q.event_objects(item).split(|&id| id == ObjectId::NONE).nth(part).map_or_else(Vec::new, <[ObjectId]>::to_vec) }

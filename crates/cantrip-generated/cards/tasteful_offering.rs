@@ -24,7 +24,7 @@ pub static EXTRA: &[&CardDef] = &[];
 
 }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-create-boon" => cantrip_mechanics::boon::create(g, asker.source, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, { let q: &dyn Query = g; (2i64).max(0) as u32 }, AbilityRef::delayed(item.ability.card, 0)));
+planned!("operation-create-boon" => let result_0 = cantrip_mechanics::boon::create(g, asker.source, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, { let q: &dyn Query = g; (2i64).max(0) as u32 }, AbilityRef::delayed(item.ability.card, 0)););
 g.end_sentence();
 let players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_4 = Vec::new();
 let count_4_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let def_4_0 = g.card_id(&token_5::CARD);

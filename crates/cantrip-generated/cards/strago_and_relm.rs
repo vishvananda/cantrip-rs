@@ -23,7 +23,7 @@ if done_3 { left_3 -= 1; played_3.push(g.state().obj(card_3).became.unwrap_or(ca
 }
 g.end_sentence();
 if { let q: &dyn Query = g; (((played_3.clone()).into_iter().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>()).len() as i64) >= (1i64) } {
-planned!("operation-change-spell" => if let Some(spell) = { let q: &dyn Query = g; (played_3.clone()).get(0).copied() } { cantrip_mechanics::spell_changes::change(g, asker, spell, &[SpellChange::Effect(EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste]))), SpellChange::Gains("Triggered")]); });
+planned!("operation-change-spell" => if let Some(spell) = { let q: &dyn Query = g; (played_3.clone()).get(0).copied() } { let changes = { let q: &dyn Query = g; [SpellChange::Effect(EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste]))), SpellChange::Gains("Triggered")] }; cantrip_mechanics::spell_changes::change(g, asker, spell, &changes); });
 g.end_sentence();
 }
 g.end_sentence();

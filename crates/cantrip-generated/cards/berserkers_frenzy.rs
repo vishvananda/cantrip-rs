@@ -11,7 +11,7 @@ fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { ((q.state().turn.step() 
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_4: Vec<ObjectId> = Vec::new();
 let mut hoisted_3: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-planned!("keyword-action-roll-keep-highest-20-with-an-amount" => { let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let amount = { let q: &dyn Query = g; (2i64).max(0) as u32 }; cantrip_mechanics::dice::roll_keep_highest(g, player, 20, amount)?; });
+planned!("keyword-action-roll-keep-highest-20-with-an-amount" => let result_0 = { let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let amount = { let q: &dyn Query = g; (2i64).max(0) as u32 }; cantrip_mechanics::dice::roll_keep_highest(g, player, 20, amount)? };);
 g.end_sentence();
 if { let q: &dyn Query = g; ((planned_value!("depends on an instruction with a gap", 0i64 => result_0)) >= (1i64) && (planned_value!("depends on an instruction with a gap", 0i64 => result_0)) <= (14i64)) } {
 let selected_1_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_1_candidates = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>() }; let selected_1_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AnyNumber }; let selected_1 = { cantrip_mechanics::choose::select(g, selected_1_player, asker.source, Purpose::ChooseAsEnters, selected_1_candidates, cantrip_mechanics::select::Selection::of(selected_1_count, &[]))? };
