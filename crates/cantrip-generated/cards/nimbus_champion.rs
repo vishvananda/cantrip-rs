@@ -1,6 +1,5 @@
 // Nimbus Champion
-// status: planned
-// requires: condition SameTeam
+// status: ready
 // Flying
 // Whenever this creature attacks, you may return target creature to its owner's hand if that creature's power is less than or equal to the number of Warriors your team controls.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -14,7 +13,7 @@ let mut hoisted_3: Vec<ObjectId> = Vec::new();
 let mut hoisted_2: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-if { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).is_some_and(|candidate: ObjectId| q.chars(candidate).power.is_some_and(|v| (i64::from(v)) <= ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Warrior)) && (q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition SameTeam", false => q.state().same_team(a, b))).collect::<Vec<PlayerId>>()).contains(&q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64))) } {
+if { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).is_some_and(|candidate: ObjectId| q.chars(candidate).power.is_some_and(|v| (i64::from(v)) <= ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Warrior)) && (q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0) == Some(asker.controller)).collect::<Vec<PlayerId>>()).contains(&q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64))) } {
 let decider_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_0, asker.source, Purpose::Optional)? {
 let objects_1 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; let moved_1 = g.return_to_hand(&objects_1);
 g.end_sentence();

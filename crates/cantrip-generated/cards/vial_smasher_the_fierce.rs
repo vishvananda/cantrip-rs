@@ -1,6 +1,5 @@
 // Vial Smasher the Fierce
-// status: planned
-// requires: a choice of Recipient
+// status: ready
 // Whenever you cast your first spell each turn, choose an opponent at random. Vial Smasher deals damage equal to that spell's mana value to that player or a planeswalker that player controls.
 // Partner (You can have two commanders if both have partner.)
 #[allow(unused_imports)] use cantrip_api::*;
@@ -9,7 +8,7 @@
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let pool_1: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }; if pool_1.is_empty() { return Ok(()); } let chosen_1 = pool_1[g.choose_at_random(pool_1.len())];
 g.end_sentence();
-let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let candidates_2: Vec<Target> = { let q: &dyn Query = g; { let mut all: Vec<Target> = Vec::new(); for t in (Some(chosen_1).into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() { if !all.contains(&t) { all.push(t); } } for t in (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Planeswalker) && Some(chosen_1) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() { if !all.contains(&t) { all.push(t); } } all } }; let chosen_2: Target = planned_value!("a choice of Recipient", Target::None => cantrip_mechanics::choose::recipient(g, player_2, asker.source, candidates_2)?);
+let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let candidates_2: Vec<Target> = { let q: &dyn Query = g; { let mut all: Vec<Target> = Vec::new(); for t in (Some(chosen_1).into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() { if !all.contains(&t) { all.push(t); } } for t in (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Planeswalker) && Some(chosen_1) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() { if !all.contains(&t) { all.push(t); } } all } }; let chosen_2: Target = match candidates_2.len() { 0 => Target::None, 1 => candidates_2[0], _ => match g.ask(player_2, RequestKind::ChooseTarget { label: "", slot_player: None, together: None, source: asker.source, purpose: Purpose::Targets, candidates: candidates_2.clone(), optional: false, least: 1, count: 1, any_number: false })? { Answer::Targets(chosen) => chosen.first().copied().unwrap_or(Target::None), _ => Target::None } };
 g.end_sentence();
 let source_3 = { let q: &dyn Query = g; Some(asker.source) }; let amount_3 = { let q: &dyn Query = g; (item.subject.object().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o)))).clamp(0, 65535) as u16 }; let recipients_3 = { let q: &dyn Query = g; vec![chosen_2] }; if let Some(source) = source_3 { let batch: Vec<(ObjectId, Target, u16)> = recipients_3.iter().map(|t| (source, *t, amount_3)).collect(); g.damage_together(&batch); }
 g.end_sentence();

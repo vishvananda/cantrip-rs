@@ -1,6 +1,5 @@
 // Expose the Culprit
-// status: planned
-// requires: operation Move
+// status: ready
 // Choose one or both —
 // • Turn target face-down creature face up.
 // • Exile any number of face-up creatures you control with disguise in a face-down pile, shuffle that pile, then cloak them. (To cloak a card, put it onto the battlefield face down as a 2/2 creature with ward {2}. Turn it face up any time for its mana cost if it's a creature card.)
@@ -13,7 +12,7 @@ if let Some(object) = ({ let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(
 g.end_sentence();
  Ok(()) }
 fn ability_0_mode_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let objects_1: Vec<ObjectId> = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (!(q.state().obj(id).face_down) && q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)) && (q.chars(id).keywords.has(Keyword::Disguise)))).collect::<Vec<ObjectId>>() }; let moved_1: Vec<ObjectId> = planned_value!("operation Move", Vec::<ObjectId>::new() => cantrip_mechanics::enter::in_state(g, asker, &objects_1, Destination::Exile, Arrival { tapped: false, counters: &[], states: &[ArrivalState::ExilePile { shuffled: true }] }, true)?);
+let mut pool_1 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (!(q.state().obj(id).face_down) && q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)) && (q.chars(id).keywords.has(Keyword::Disguise)))).collect::<Vec<ObjectId>>() }; let mut objects_1: Vec<ObjectId> = Vec::new(); while !pool_1.is_empty() { let at = g.choose_at_random(pool_1.len()); objects_1.push(pool_1.remove(at)); } let moved_1 = g.exile_face_down(&objects_1, None);
 g.end_sentence();
 let controller_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
 let cards_2 = { let q: &dyn Query = g; moved_1.clone() }; let entered_2: Vec<ObjectId> = g.put_all_onto_battlefield_face_down(&cards_2, controller_2, FaceDown::Cloaked, false)?.into_iter().flatten().collect();

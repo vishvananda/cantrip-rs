@@ -19,7 +19,7 @@ let mut each_5: Vec<Vec<ObjectId>> = vec![Vec::new(); players_1.len()]; let mut 
 let mut each_6: Vec<Vec<ObjectId>> = vec![Vec::new(); players_1.len()]; let mut all_6: Vec<ObjectId> = Vec::new();
 let mut each_7 = vec![Default::default(); players_1.len()];
  for (index_1, bound_0) in players_1.iter().copied().enumerate() { let payer_2 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; let (paid_2, after_2, before_2, picked_2): (bool, Vec<ObjectId>, Vec<ObjectId>, Vec<ObjectId>) = if true {
-let amount_4 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_4 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_4 = Vec::new(); for player in players_4 { cards_4.extend({ let hand = g.state().zone(Zone::hand(player)).to_vec(); cantrip_mechanics::choose::cards(g, player, asker.source, Purpose::Discard, hand, amount_4, true)? }); } let discarded_4 = g.discard_together(&cards_4);
+let amount_4 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_4: Vec<PlayerId> = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_4 = Vec::new(); for player in players_4 { cards_4.extend({ let hand = g.state().zone(Zone::hand(player)).to_vec(); cantrip_mechanics::choose::cards(g, player, asker.source, Purpose::Discard, hand, amount_4, true)? }); } let discarded_4 = g.discard_together(&cards_4);
 let paid_3 = !discarded_4.clone().is_empty();
 (paid_3, { let q: &dyn Query = g; (discarded_4).clone() }, { let q: &dyn Query = g; (discarded_4.clone()).clone() }, Vec::new()) } else { (false, Vec::new(), Vec::new(), Vec::new()) };
  each_5[index_1] = after_2.clone(); all_5.extend(each_5[index_1].iter().copied());
@@ -38,7 +38,7 @@ g.end_sentence();
 static ABILITY_0_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_2_target_0).between(0, cantrip_api::TargetSpec::ANY_NUMBER)];
 fn ability_0_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let objects_9 = { let q: &dyn Query = g; ((q.state().apnap().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && (t_0.iter().filter_map(|t| t.player()).collect::<Vec<PlayerId>>()).contains(&q.state().obj(id).owner))).collect::<Vec<ObjectId>>() }; let moved_9 = g.exile_all(&objects_9);
+let objects_9 = { let q: &dyn Query = g; ((q.state().apnap().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && (q.state().apnap().filter(|&p| t_0.iter().any(|t| t.player() == Some(p))).collect::<Vec<PlayerId>>()).contains(&q.state().obj(id).owner))).collect::<Vec<ObjectId>>() }; let moved_9 = g.exile_all(&objects_9);
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

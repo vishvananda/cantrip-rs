@@ -1,7 +1,6 @@
 // Animation Module
 // status: planned
 // requires: counters a player has, by kind
-// requires: modes implied by the target chosen
 // Whenever one or more +1/+1 counters are put on a permanent you control, you may pay {1}. If you do, create a 1/1 colorless Servo artifact creature token.
 // {3}, {T}: Choose a counter on target permanent or player. Give that permanent or player another counter of that kind.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -31,23 +30,26 @@ hoisted_3.extend(created_1.clone());
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_mode_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (true)) }
-static ABILITY_1_MODE_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_mode_0_target_0)];
+#[allow(unused_variables)] fn ability_1_mode_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Player(p) if true) }
+#[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { ability_1_mode_0_target_0(q, asker, t) || ability_1_mode_1_target_0(q, asker, t) }
+static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 fn ability_1_mode_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let from_4: Vec<ObjectId> = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; let to_4: Vec<ObjectId> = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; let kinds_4: Vec<CounterKind> = CounterKind::ALL.into_iter().filter(|&kind| true && from_4.iter().any(|&o| g.obj(o).counter_array()[kind as usize] > 0)).collect();
 if !kinds_4.is_empty() { let kind = kinds_4[cantrip_mechanics::choose::one_of(g, asker.controller, asker.source, kinds_4.iter().map(|&k| Label::Counter(k)).collect())? as usize]; let puts: Vec<(ObjectId, CounterKind, i16)> = to_4.iter().copied().map(|o| (o, kind, 1i16)).collect(); g.add_counters_together(&puts); }
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_1_mode_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Player(p) if true) }
-static ABILITY_1_MODE_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_mode_1_target_0)];
 fn ability_1_mode_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 planned!("counters-a-player-has-by-kind" => let from: Vec<PlayerId> = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() }; let to: Vec<PlayerId> = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() }; cantrip_mechanics::counters::duplicate_on_players(g, asker, &from, &to, "One")?;);
 g.end_sentence();
  Ok(()) }
-static ABILITY_1_MODES: ModalDef = planned_value!("modes implied by the target chosen", modes(&[mode(ability_1_mode_0, "").targets(ABILITY_1_MODE_0_TARGETS),mode(ability_1_mode_1, "").targets(ABILITY_1_MODE_1_TARGETS)]).choose(1, 1) => modes(&[mode(ability_1_mode_0, "").targets(ABILITY_1_MODE_0_TARGETS),mode(ability_1_mode_1, "").targets(ABILITY_1_MODE_1_TARGETS)]).choose(1, 1).implied_by_target());
+fn ability_1_implied(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller); let chosen = (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == 0).map(|i| g.state().target(item, i)).next().unwrap_or(Target::None);
+if ability_1_mode_0_target_0(g, asker, chosen) { return ability_1_mode_0(g, item); }
+if ability_1_mode_1_target_0(g, asker, chosen) { return ability_1_mode_1(g, item); }
+ability_1_mode_1(g, item) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
 static PAY_QUESTION: Question = Question::new("Pay", "pay {cost}?", "", "Pay {cost}", "Decline");
 
-pub static CARD: CardDef = CardDef { name: "Animation Module", token_words: &[], oracle: true, cost: ManaCost { generic: 1, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Artifact]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::COUNTERS.0), ability_0_event), ability_0, "Whenever one or more +1/+1 counters are put on a permanent you control, you may pay {1}. If you do, create a 1/1 colorless Servo artifact creature token.").targets(&[]).once_per_batch().batch_by_data(),modal_ability(Cost::NONE.and(Cost::mana(ManaCost { generic: 3, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(Cost { tap: true, ..Cost::NONE }), &ABILITY_1_MODES, "{3}, {T}: Choose a counter on target permanent or player. Give that permanent or player another counter of that kind.")], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
+pub static CARD: CardDef = CardDef { name: "Animation Module", token_words: &[], oracle: true, cost: ManaCost { generic: 1, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Artifact]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::COUNTERS.0), ability_0_event), ability_0, "Whenever one or more +1/+1 counters are put on a permanent you control, you may pay {1}. If you do, create a 1/1 colorless Servo artifact creature token.").targets(&[]).once_per_batch().batch_by_data(),ability(Cost::NONE.and(Cost::mana(ManaCost { generic: 3, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(Cost { tap: true, ..Cost::NONE }), ability_1_implied, "{3}, {T}: Choose a counter on target permanent or player. Give that permanent or player another counter of that kind.").targets(ABILITY_1_TARGETS)], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[&token_2::CARD];

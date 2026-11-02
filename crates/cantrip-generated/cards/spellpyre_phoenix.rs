@@ -1,12 +1,10 @@
 // Spellpyre Phoenix
-// status: planned
-// requires: condition PlayerDid Cycled
-// requires: object filter HasActivatedAbility
+// status: ready
 // Flying
 // When this creature enters, you may return target instant or sorcery card with a cycling ability from your graveyard to your hand.
 // At the beginning of each end step, if you cycled two or more cards this turn, return this card from your graveyard to your hand.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && ((((q.chars(id).is(CardType::Instant) || q.chars(id).is(CardType::Sorcery)) && planned_value!("object filter HasActivatedAbility", false => q.card_of(id).activated.iter().any(|d| matches(d)))) && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(id).owner))))) }
+#[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && ((((q.chars(id).is(CardType::Instant) || q.chars(id).is(CardType::Sorcery)) && q.chars(id).abilities().any(|a| q.activated_ability(a).is_some_and(|d| !d.special_action && d.cycling))) && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(id).owner))))) }
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
@@ -22,7 +20,7 @@ hoisted_3.extend({ let q: &dyn Query = g; objects_1.iter().copied().filter(|&o| 
 }
 g.end_sentence();
  Ok(()) }
-fn ability_2_if(q: &dyn Query, asker: &Asker) -> bool { planned_value!("condition PlayerDid Cycled", false => q.player_did(q.history().this_turn().iter(), Some(asker.controller), PlayerDeed::Cycled(Comparison::GreaterOrEqual, 2i64, |q: &dyn Query, asker: &Asker, id: ObjectId| true))) }
+fn ability_2_if(q: &dyn Query, asker: &Asker) -> bool { (q.history().this_turn().iter().filter_map(|r: &Record| match r.event { Event::Cycled { card, player } if Some(player) == Some(asker.controller) => Some(card), _ => None }).filter(|&id: &ObjectId| true).count() as i64) >= (2i64) }
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::End) && true { return Some(Fired { subject, data }); } }
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

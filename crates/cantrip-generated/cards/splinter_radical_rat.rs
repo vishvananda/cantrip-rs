@@ -3,7 +3,7 @@
 // If a triggered ability of a Ninja creature you control triggers, that ability triggers an additional time.
 // {1}{U}: Target Ninja can't be blocked this turn.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_trigger_rule(q: &dyn Query, asker: &Asker, event: &Event, triggering: &Triggering) -> bool { (triggering.permanent && (q.chars(triggering.source).has_subtype(q.words(asker.source).subtype(Subtype::Ninja)) && q.chars(triggering.source).is(CardType::Creature) && Some(asker.controller) == Some(triggering.controller))) && true }
+#[allow(unused_variables)] fn ability_0_trigger_rule(q: &dyn Query, asker: &Asker, event: &Event, triggering: &Triggering) -> bool { true && (triggering.permanent && (q.chars(triggering.source).has_subtype(q.words(asker.source).subtype(Subtype::Ninja)) && q.chars(triggering.source).is(CardType::Creature) && Some(asker.controller) == Some(triggering.controller))) && true }
 #[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Ninja)))) }
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

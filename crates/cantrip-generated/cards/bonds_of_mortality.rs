@@ -1,6 +1,5 @@
 // Bonds of Mortality
-// status: planned
-// requires: losing ability AnyHexproof
+// status: ready
 // When this enchantment enters, draw a card.
 // {G}: Creatures your opponents control lose hexproof and indestructible until end of turn.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -13,7 +12,7 @@ g.end_sentence();
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let objects_1 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let duration_1 = Duration::EndOfTurn;
-let kind_1_0_0 = { let q: &dyn Query = g; planned_value!("losing ability AnyHexproof", EffectKind::Pump(0, 0) => EffectKind::LosesAbility(Lost::AnyHexproof)) };
+let kind_1_0_0 = { let q: &dyn Query = g; EffectKind::LoseKeywords(Keywords::of(&[Keyword::Hexproof])) };
 let kind_1_1_0 = { let q: &dyn Query = g; EffectKind::LoseKeywords(Keywords::of(&[Keyword::Indestructible])) };
 if let Some(source) = source_1 { cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.add_effect(source, object, kind_1_0_0, duration_1); g.add_effect(source, object, kind_1_1_0, duration_1);  } }); }
 g.end_sentence();

@@ -1,6 +1,5 @@
 // Unwilling Vessel
-// status: planned
-// requires: counter kind Possession
+// status: ready
 // Vigilance
 // Eerie — Whenever an enchantment you control enters and whenever you fully unlock a Room, put a possession counter on this creature.
 // When this creature dies, create an X/X blue Spirit creature token with flying, where X is the number of counters on this creature.
@@ -10,7 +9,7 @@ if let Event::DoorUnlocked { permanent, player, .. } = event { let id = *permane
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut counters_0: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_0.push((object, planned_value!("counter kind Possession", CounterKind::Charge => CounterKind::Possession), amount)); } }
+let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_0.push((object, CounterKind::Possession, amount)); } }
 let had_0: Vec<_> = counters_0.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_0); let applied_0: Vec<ObjectId> = counters_0.iter().zip(had_0).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
  Ok(()) }
@@ -24,7 +23,7 @@ pub static EXTRA: &[&CardDef] = &[];
 
 }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let count_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let power_1 = { let q: &dyn Query = g; ((item.subject.object().into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| CounterKind::ALL.iter().map(|k| i64::from(q.state().obj(o).counters(*k))).sum::<i64>()).sum::<i64>()).clamp(0, 32767) as i16 }; let toughness_1 = { let q: &dyn Query = g; ((item.subject.object().into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| CounterKind::ALL.iter().map(|k| i64::from(q.state().obj(o).counters(*k))).sum::<i64>()).sum::<i64>()).clamp(0, 32767) as i16 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut values_1 = Copiable::of(g.card_id(&token_2::CARD)).sized(power_1, toughness_1); values_1.words = g.words(asker.source); let mut created_1: Vec<ObjectId> = Vec::new(); for player in players_1 { created_1.extend(g.create_token_copies_of(values_1, player, count_1)?); }
+let count_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let power_1 = { let q: &dyn Query = g; ((item.subject.object().into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| CounterKind::ALL.iter().map(|k| i64::from(q.state().obj(o).counters(*k))).sum::<i64>()).sum::<i64>()).clamp(0, 32767) as i16 }; let toughness_1 = { let q: &dyn Query = g; ((item.subject.object().into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| CounterKind::ALL.iter().map(|k| i64::from(q.state().obj(o).counters(*k))).sum::<i64>()).sum::<i64>()).clamp(0, 32767) as i16 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut values_1 = Copiable::of(g.card_id(&token_2::CARD)).sized(power_1, toughness_1); values_1.words = g.words(asker.source); let mut created_1: Vec<ObjectId> = Vec::new(); for player in players_1 { created_1.extend(g.create_token_copies_tapped(values_1, player, count_1, false)?); }
 g.end_sentence();
  Ok(()) }
 

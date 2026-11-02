@@ -40,8 +40,8 @@ if { let q: &dyn Query = g; planned_value!("condition MostVotes", false => g.vot
 let mut players_12: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
 let mut guard_12_0 = vec![false; players_12.len()];
 let mut gathered_13: Vec<ObjectId> = Vec::new();
- for (index_12, bound_0) in players_12.iter().copied().enumerate() { if cantrip_mechanics::effects::ask_may(g, bound_0, asker.source, Purpose::Optional)? { guard_12_0[index_12] = true;
-let amount_14 = { let q: &dyn Query = g; ((((Some(bound_0).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }; gathered_13.extend(cantrip_mechanics::choose_from_hand(g, bound_0, asker.source, amount_14)?);
+ for (index_12, bound_0) in players_12.iter().copied().enumerate() { if !cant_draw(g, bound_0, 7) && cantrip_mechanics::effects::ask_may(g, bound_0, asker.source, Purpose::Optional)? { guard_12_0[index_12] = true;
+gathered_13.extend(g.state().zone(Zone::hand(bound_0)).to_vec());
    }
  } 
 let cards_15 = { let q: &dyn Query = g; gathered_13.clone() }; let discarded_15 = g.discard_together(&cards_15);

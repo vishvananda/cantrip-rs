@@ -1,11 +1,10 @@
 // Flensing Raptor
-// status: planned
-// requires: object filter HasKeywordFamily
+// status: ready
 // Flying
 // Toxic 1 (Players dealt combat damage by this creature also get a poison counter.)
 // When this creature enters, another target creature you control with toxic gets +1/+1 and gains flying until end of turn.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((!(q.event_subject().object() == Some(id)) && (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)) && planned_value!("object filter HasKeywordFamily", false => q.has_keyword_ability(id, KeywordAbility::Toxic)))))) }
+#[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((!(q.event_subject().object() == Some(id)) && (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)) && q.chars(id).toxic > 0)))) }
 static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target_0)];
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }

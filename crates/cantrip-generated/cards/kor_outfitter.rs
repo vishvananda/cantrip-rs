@@ -11,7 +11,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let t_1_raw = announced(g, item, 1, false); let t_1 = announced(g, item, 1, true);
 let decider_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_0, asker.source, Purpose::Optional)? {
-let attachments_1 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let host_1 = { let q: &dyn Query = g; t_1_raw.get(0).copied().and_then(|t: Target| t.object()) }; if let Some(host) = host_1 { cantrip_api::instruction(g, |g| { for attachment in attachments_1 { g.attach(attachment, host); } }); }
+let attachments_1 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let host_1 = { let q: &dyn Query = g; t_1_raw.get(0).copied().filter(|t| t_1.contains(t)).and_then(|t: Target| t.object()) }; if let Some(host) = host_1 { cantrip_api::instruction(g, |g| { for attachment in attachments_1 { g.attach(attachment, host); } }); }
 g.end_sentence();
 }
 g.end_sentence();

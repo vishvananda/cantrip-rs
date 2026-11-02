@@ -1,6 +1,5 @@
 // Scrap Mastery
-// status: planned
-// requires: per-player move under each player's control
+// status: ready
 // Each player exiles all artifact cards from their graveyard, then sacrifices all artifacts they control, then puts all cards they exiled this way onto the battlefield.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
@@ -15,15 +14,10 @@ for &object in &objects_4 { let controller = g.controller(object); if players_4.
 let sacrificed_4 = g.sacrifice_each(&picks_4);
 g.end_sentence();
 let mut players_5: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
-planned!("per-player-move-under-each-player-s-control" => g.begin_batch(););
-let mut each_7: Vec<Vec<ObjectId>> = vec![Vec::new(); players_5.len()]; let mut all_7: Vec<ObjectId> = Vec::new();
-let mut each_8: Vec<Vec<ObjectId>> = vec![Vec::new(); players_5.len()]; let mut all_8: Vec<ObjectId> = Vec::new();
- for (index_5, bound_0) in players_5.iter().copied().enumerate() { let player_6 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") };
-let objects_6 = ({ let q: &dyn Query = g; (((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && ((moved_3.clone()).into_iter().filter(|&o| Some(q.state().obj(o).owner) == Some(bound_0)).collect::<Vec<ObjectId>>()).contains(&id)).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Exile).collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_6 = { let rows_6: Vec<(ObjectId, PlayerId, bool)> = objects_6.iter().map(|&o| (o, player_6, false)).collect(); let came_6 = g.put_all_onto_battlefield_as(&rows_6)?; came_6.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
- each_7[index_5] = moved_6.clone(); all_7.extend(each_7[index_5].iter().copied());
-each_8[index_5] = { let q: &dyn Query = g; objects_6.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() }; all_8.extend(each_8[index_5].iter().copied());
-   } 
-planned!("per-player-move-under-each-player-s-control" => g.end_batch(););
+let mut gathered_6: Vec<ObjectId> = Vec::new();
+ for (index_5, bound_0) in players_5.iter().copied().enumerate() { gathered_6.extend({ let q: &dyn Query = g; (((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && ((moved_3.clone()).into_iter().filter(|&o| Some(q.state().obj(o).owner) == Some(bound_0)).collect::<Vec<ObjectId>>()).contains(&id)).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Exile).collect::<Vec<ObjectId>>() });
+    } 
+let objects_8 = ({ let q: &dyn Query = g; gathered_6.clone() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_8 = { let rows_8: Vec<(ObjectId, PlayerId, bool)> = objects_8.iter().map(|&o| (o, g.state().obj(o).owner, false)).collect(); let came_8 = g.put_all_onto_battlefield_as(&rows_8)?; came_8.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
 g.end_sentence();
  Ok(()) }
 

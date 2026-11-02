@@ -1,13 +1,12 @@
 // Maze's Mantle
-// status: planned
-// requires: object filter HasKeywordFamily
+// status: ready
 // Flash
 // Enchant creature
 // When this Aura enters, if enchanted creature has toxic, that creature gains hexproof until end of turn.
 // Enchanted creature gets +2/+2.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_1_enchant(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
-fn ability_2_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.source).and_then(|o: ObjectId| q.state().obj(o).attached_to).is_some_and(|candidate: ObjectId| planned_value!("object filter HasKeywordFamily", false => q.has_keyword_ability(candidate, KeywordAbility::Toxic))) }
+fn ability_2_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.source).and_then(|o: ObjectId| q.state().obj(o).attached_to).is_some_and(|candidate: ObjectId| q.chars(candidate).toxic > 0) }
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

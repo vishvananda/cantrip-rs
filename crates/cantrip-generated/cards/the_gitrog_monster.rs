@@ -27,7 +27,7 @@ hoisted_4.extend({ let q: &dyn Query = g; objects_2.iter().copied().filter(|&o| 
 }
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_3_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && ((q.chars(id).is(CardType::Land) && Some(asker.controller) == Some(q.state().obj(id).owner)) && !(q.state().obj(id).token)) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_3_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && ((q.chars(id).is(CardType::Land) && Some(asker.controller) == Some(q.state().obj(id).owner)) && !(q.state().obj(id).token)) && !q.state().obj(id).token { return Some(Fired { subject, data }); } }
  None }
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let amount_5 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_5 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };

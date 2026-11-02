@@ -7,6 +7,7 @@
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let amount_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+let drawing_0: Vec<PlayerId> = players_0.into_iter().collect(); let players_0: Vec<PlayerId> = g.state().apnap().filter(|p| drawing_0.contains(p)).collect();
 for player in players_0 { g.draw(player, amount_0); }
 g.end_sentence();
  Ok(()) }

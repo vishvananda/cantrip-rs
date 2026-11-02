@@ -27,7 +27,7 @@ g.end_sentence();
 hoisted_5.extend(discarded_4.clone());
 hoisted_6.extend({ let q: &dyn Query = g; discarded_4.clone() });
 } else {
-let amount_7 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let players_7 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_7 = Vec::new(); for player in players_7 { cards_7.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_7)?); } let discarded_7 = g.discard_together(&cards_7);
+let amount_7 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let players_7: Vec<PlayerId> = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_7 = Vec::new(); for player in players_7 { cards_7.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_7)?); } let discarded_7 = g.discard_together(&cards_7);
 g.end_sentence();
 hoisted_8.extend(discarded_7.clone());
 hoisted_9.extend({ let q: &dyn Query = g; discarded_7.clone() });

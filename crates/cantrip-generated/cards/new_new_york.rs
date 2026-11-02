@@ -2,7 +2,6 @@
 // status: planned
 // requires: card type Plane
 // requires: layout Planar
-// requires: mixed token text origins in one creation batch
 // requires: subtype NewEarth
 // requires: trigger event Player ChaosEnsues
 // At the beginning of combat on your turn, until end of turn, noncreature artifacts you control become 3/3 Vehicles in addition to their other types and gain flying, haste, and crew 1.
@@ -48,8 +47,8 @@ let count_2_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let def_2_1 = g
 for player in players_2 {
 tokens_2.extend(std::iter::repeat((def_2_0,player)).take(count_2_0 as usize));
 tokens_2.extend(std::iter::repeat((def_2_1,player)).take(count_2_1 as usize));
-} let words_2 = Words::NONE;
-let created_2 = planned_value!("mixed token text origins in one creation batch", g.create_tokens_worded(&tokens_2, false, None, words_2)? => g.create_tokens_each_worded(&tokens_2, false, None, &[(def_2_0, Words::NONE), (def_2_1, g.words(asker.source))])?);
+} let words_2 = g.words(asker.source);
+let created_2 = g.create_tokens_worded(&tokens_2, false, None, words_2)?;
 g.end_sentence();
  Ok(()) }
 planned_item!("trigger-event-player-chaos-ensues" => matcher: #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ChaosEnsued { player } = event { let subject = Target::Player(*player); let data = [0u32; 2]; if true { return Some(Fired { subject, data }); } }

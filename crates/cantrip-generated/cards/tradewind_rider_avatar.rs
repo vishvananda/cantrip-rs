@@ -23,7 +23,7 @@ g.end_sentence();
 planned!("per-player-instruction-with-several-steps" => g.begin_batch(););
 let mut each_6: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut all_6: Vec<ObjectId> = Vec::new();
 let mut each_7: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut all_7: Vec<ObjectId> = Vec::new();
- for (index_0, bound_0) in players_0.iter().copied().enumerate() { if guard_0_0[index_0] {
+ for (index_0, _) in players_0.iter().copied().enumerate() { if guard_0_0[index_0] {
 let objects_5 = { let q: &dyn Query = g; each_4[index_0].clone() }; let moved_5 = g.return_to_hand(&objects_5);
  each_6[index_0] = moved_5.clone(); all_6.extend(each_6[index_0].iter().copied());
 each_7[index_0] = { let q: &dyn Query = g; objects_5.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() }; all_7.extend(each_7[index_0].iter().copied());

@@ -10,7 +10,7 @@ fn granted_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mu
 let mut hoisted_5: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let payer_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let (paid_1, after_1, before_1, picked_1): (bool, Vec<ObjectId>, Vec<ObjectId>, Vec<ObjectId>) = if g.state().zone(Zone::hand(payer_1)).len() >= 1 && cantrip_mechanics::effects::ask_may(g, payer_1, asker.source, Purpose::Optional)? {
-let amount_3 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_3 = Vec::new(); for player in players_3 { cards_3.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_3)?); } let discarded_3 = g.discard_together(&cards_3);
+let amount_3 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_3: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_3 = Vec::new(); for player in players_3 { cards_3.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_3)?); } let discarded_3 = g.discard_together(&cards_3);
 let paid_2 = !discarded_3.clone().is_empty();
 (paid_2, { let q: &dyn Query = g; (discarded_3).clone() }, { let q: &dyn Query = g; (discarded_3.clone()).clone() }, Vec::new()) } else { (false, Vec::new(), Vec::new(), Vec::new()) };
 g.end_sentence();

@@ -2,7 +2,7 @@
 // status: ready
 // Whenever an enchantment you control enters, you may create a token that's a copy of it. Do this only once each turn.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && (q.chars(id).is(CardType::Enchantment) && Some(asker.controller) == Some(q.controller(id))) && !q.history().done(asker.source, AbilityRef { card: q.chars(asker.source).card, index: 200 }, asker.controller) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && (q.chars(id).is(CardType::Enchantment) && Some(asker.controller) == Some(q.controller(id))) && !q.history().this_turn().iter().any(|r| matches!(r.event, Event::Done { ability, player, .. } if ability == AbilityRef { card: q.chars(asker.source).card, index: 200 } && player == asker.controller)) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_3: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);

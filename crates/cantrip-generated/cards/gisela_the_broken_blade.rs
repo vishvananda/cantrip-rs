@@ -1,6 +1,5 @@
 // Gisela, the Broken Blade
 // status: planned
-// requires: layout MeldPiece
 // requires: operation Meld
 // Flying, first strike, lifelink
 // At the beginning of your end step, if you both own and control Gisela and a creature named Bruna, the Fading Light, exile them, then meld them into Brisela, Voice of Nightmares.
@@ -16,7 +15,6 @@ let melding_3 = { let q: &dyn Query = g; moved_1.clone() };
 planned!("operation-meld" => g.meld(&melding_3, "Brisela, Voice of Nightmares"););
 g.end_sentence();
  Ok(()) }
-planned_item!("layout-meld-piece" => melds_into: Some("Brisela, Voice of Nightmares"));
 
 pub static CARD: CardDef = CardDef { name: "Gisela, the Broken Blade", token_words: &[], oracle: true, cost: ManaCost { generic: 2, x: 0, symbols: [2, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Angel,Subtype::Horror]), supertypes: Supertypes { basic: false, legendary: true, snow: false }, colors: None, power: Some(4), toughness: Some(3), loyalty: None, defense: None, keywords: Keywords::of(&[Keyword::Flying,Keyword::FirstStrike,Keyword::Lifelink]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::STEP_BEGAN.0), ability_3_event), ability_3, "At the beginning of your end step, if you both own and control Gisela and a creature named Bruna, the Fading Light, exile them, then meld them into Brisela, Voice of Nightmares.").targets(&[]).condition(ability_3_if)], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

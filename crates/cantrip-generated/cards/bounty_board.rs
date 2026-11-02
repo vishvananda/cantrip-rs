@@ -1,6 +1,5 @@
 // Bounty Board
-// status: planned
-// requires: counter kind Bounty
+// status: ready
 // {T}: Add one mana of any color.
 // {1}, {T}: Put a bounty counter on target creature. Activate only as a sorcery.
 // Whenever a creature with a bounty counter on it dies, each of its controller's opponents draws a card and gains 2 life.
@@ -16,14 +15,15 @@ static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let mut counters_1: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, planned_value!("counter kind Bounty", CounterKind::Charge => CounterKind::Bounty), amount)); } }
+let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, CounterKind::Bounty, amount)); } }
 let had_1: Vec<_> = counters_1.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_1); let applied_1: Vec<ObjectId> = counters_1.iter().zip(had_1).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && from.is(ZoneKind::Battlefield) && (q.chars(id).is(CardType::Creature) && (i64::from(q.state().obj(id).counters(planned_value!("counter kind Bounty", CounterKind::Charge => CounterKind::Bounty)))) > (0i64)) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && from.is(ZoneKind::Battlefield) && (q.chars(id).is(CardType::Creature) && (i64::from(q.state().obj(id).counters(CounterKind::Bounty))) > (0i64)) { return Some(Fired { subject, data }); } }
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let amount_2 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_2 = { let q: &dyn Query = g; item.subject.object().map(|o: ObjectId| q.controller(o)).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+let drawing_2: Vec<PlayerId> = players_2.into_iter().collect(); let players_2: Vec<PlayerId> = g.state().apnap().filter(|p| drawing_2.contains(p)).collect();
 for player in players_2 { g.draw(player, amount_2); }
 g.end_sentence();
 let amount_3 = { let q: &dyn Query = g; (2i64).max(0) as i32 }; let players_3 = { let q: &dyn Query = g; item.subject.object().map(|o: ObjectId| q.controller(o)).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };

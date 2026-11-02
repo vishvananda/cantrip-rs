@@ -1,6 +1,5 @@
 // Colfenor's Urn
-// status: planned
-// requires: numeric object property ExiledCount
+// status: ready
 // Whenever a creature with toughness 4 or greater is put into your graveyard from the battlefield, you may exile it.
 // At the beginning of the end step, if three or more cards have been exiled with this artifact, sacrifice it. If you do, return those cards to the battlefield under their owner's control.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -17,7 +16,7 @@ hoisted_3.extend({ let q: &dyn Query = g; objects_1.iter().copied().filter(|&o| 
 }
 g.end_sentence();
  Ok(()) }
-fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.source).is_some_and(|candidate: ObjectId| (planned_value!("numeric object property ExiledCount", 0i64 => q.exiled_with(q.linked_to(&Asker::of(candidate))).len() as i64)) >= (3i64)) }
+fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.source).is_some_and(|candidate: ObjectId| (q.exiled_with(if candidate == asker.source { q.linked_to(asker) } else { q.text_linked(candidate) }).len() as i64) >= (3i64)) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::End) && true { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_7: Vec<ObjectId> = Vec::new();

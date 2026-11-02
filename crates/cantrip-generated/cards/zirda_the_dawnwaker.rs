@@ -1,11 +1,10 @@
 // Zirda, the Dawnwaker
-// status: planned
-// requires: object filter HasActivatedAbility
+// status: ready
 // Companion — Each permanent card in your starting deck has an activated ability. (If this card is your chosen companion, you may put it into your hand from outside the game for {3} as a sorcery.)
 // Abilities you activate that aren't mana abilities cost {2} less to activate. This effect can't reduce the mana in that cost to less than one mana.
 // {1}, {T}: Target creature can't block this turn.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_companion(q: &dyn Query, deck: &StartingDeck) -> bool { deck.cards.iter().all(|&id| !{ let asker = &Asker::new(id, deck.player); (q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Battle) || q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Enchantment) || q.chars(id).is(CardType::Land) || q.chars(id).is(CardType::Planeswalker)) } || { let asker = &Asker::new(id, deck.player); planned_value!("object filter HasActivatedAbility", false => q.card_of(id).activated.iter().any(|d| matches(d))) }) }
+#[allow(unused_variables)] fn ability_0_companion(q: &dyn Query, deck: &StartingDeck) -> bool { deck.cards.iter().all(|&id| !{ let asker = &Asker::new(id, deck.player); (q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Battle) || q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Enchantment) || q.chars(id).is(CardType::Land) || q.chars(id).is(CardType::Planeswalker)) } || { let asker = &Asker::new(id, deck.player); q.chars(id).abilities().any(|a| q.activated_ability(a).is_some_and(|d| !d.special_action)) }) }
 #[allow(unused_variables)] fn ability_1_0_rule(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, q.controller(source)); let Costed::Ability(permanent, ability, _) = costed else { return CostDelta::NONE; }; let def = q.activated_ability(ability); if player == asker.controller && !(def.is_some_and(|d| d.is_mana_ability())) { CostDelta::less_to_one(2) } else { CostDelta::NONE } }
 #[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
 static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target_0)];

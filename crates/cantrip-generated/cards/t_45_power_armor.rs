@@ -1,6 +1,5 @@
 // T-45 Power Armor
-// status: planned
-// requires: instruction ChooseOne
+// status: ready
 // When this Equipment enters, you get {E}{E} (two energy counters).
 // Equipped creature gets +3/+3 and doesn't untap during its controller's untap step.
 // At the beginning of your upkeep, you may pay {E}. If you do, untap equipped creature, then put your choice of a menace, trample, or lifelink counter on it.
@@ -31,7 +30,8 @@ g.end_sentence();
 if { let q: &dyn Query = g; ((paid_1 as i64) != 0) } {
 let objects_2 = { let q: &dyn Query = g; (Some(asker.source).and_then(|o: ObjectId| q.state().obj(o).attached_to).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_2: Vec<ObjectId> = objects_2.iter().copied().filter(|&o| g.state().obj(o).tapped != false).collect(); cantrip_api::instruction(g, |g| { for &object in &turned_2 { g.untap(object); } });
 g.end_sentence();
-let decider_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; match planned_value!("instruction ChooseOne", 0u8 => cantrip_mechanics::choose::one_of(g, decider_3, asker.source, vec![Label::Card(card_3, 0), Label::Card(card_3, 1), Label::Card(card_3, 2)])?) {
+let decider_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
+let offered_3: Vec<u8> = [(0u8, true), (1u8, true), (2u8, true)].into_iter().filter(|option| option.1).map(|option| option.0).collect(); let card_3 = item.ability.card; let picked_3 = if offered_3.len() > 1 { offered_3[cantrip_mechanics::choose::one_of(g, decider_3, asker.source, offered_3.iter().map(|&option| Label::Card(card_3, option)).collect())? as usize] } else { offered_3.first().copied().unwrap_or(u8::MAX) }; match picked_3 {
 0 => {
 let mut counters_4: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
 let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (Some(asker.source).and_then(|o: ObjectId| q.state().obj(o).attached_to).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_4.push((object, CounterKind::Menace, amount)); } }
@@ -46,13 +46,14 @@ let had_6: Vec<_> = counters_6.iter().map(|c| g.state().obj(c.0).counters(c.1)).
 g.end_sentence();
 hoisted_7.extend(applied_6.clone());
 }
-_ => {
+2 => {
 let mut counters_8: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
 let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (Some(asker.source).and_then(|o: ObjectId| q.state().obj(o).attached_to).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_8.push((object, CounterKind::Lifelink, amount)); } }
 let had_8: Vec<_> = counters_8.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_8); let applied_8: Vec<ObjectId> = counters_8.iter().zip(had_8).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
 hoisted_9.extend(applied_8.clone());
 }
+_ => {}
 }
 g.end_sentence();
 hoisted_10.extend(turned_2.clone());
@@ -68,11 +69,11 @@ g.end_sentence();
 static ABILITY_4_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_4_target_0)];
 fn ability_4(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let attachments_16 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let host_16 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) }; if let Some(host) = host_16 { cantrip_api::instruction(g, |g| { for attachment in attachments_16 { g.attach(attachment, host); } }); }
+let attachments_16 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let host_16 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()) }; if let Some(host) = host_16 { cantrip_api::instruction(g, |g| { for attachment in attachments_16 { g.attach(attachment, host); } }); }
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
 static PAY_QUESTION: Question = Question::new("Pay", "pay {cost}?", "", "Pay {cost}", "Decline");
 
-pub static CARD: CardDef = CardDef { name: "T-45 Power Armor", token_words: &[], oracle: true, cost: ManaCost { generic: 2, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Artifact]), subtypes: SubtypeSet::of(&[Subtype::Equipment]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::ZONE_CHANGE.0), ability_0_event), ability_0, "When this Equipment enters, you get {E}{E} .").targets(&[]),triggered(when_asked(EventMask(EventMask::STEP_BEGAN.0), ability_3_event), ability_3, "At the beginning of your upkeep, you may pay {E}. If you do, untap equipped creature, then put your choice of a menace, trample, or lifelink counter on it.").targets(&[]),ability(Cost::NONE.and(Cost::mana(ManaCost { generic: 3, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })), ability_4, "Equip {3}").targets(ABILITY_4_TARGETS).equip().sorcery_speed()], statics: &[static_ability(Layer::PtModify, cantrip_mechanics::attach::attached_object, ability_1_apply_0, "Equipped creature gets +3/+3 and doesn't untap during its controller's untap step.")], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[ability_2_0_rule], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
+pub static CARD: CardDef = CardDef { name: "T-45 Power Armor", token_words: &[], oracle: true, cost: ManaCost { generic: 2, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Artifact]), subtypes: SubtypeSet::of(&[Subtype::Equipment]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::ZONE_CHANGE.0), ability_0_event), ability_0, "When this Equipment enters, you get {E}{E} .").targets(&[]),triggered(when_asked(EventMask(EventMask::STEP_BEGAN.0), ability_3_event), ability_3, "At the beginning of your upkeep, you may pay {E}. If you do, untap equipped creature, then put your choice of a menace, trample, or lifelink counter on it.").targets(&[]),ability(Cost::NONE.and(Cost::mana(ManaCost { generic: 3, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })), ability_4, "Equip {3}").targets(ABILITY_4_TARGETS).equip().sorcery_speed()], statics: &[static_ability(Layer::PtModify, cantrip_mechanics::attach::attached_object, ability_1_apply_0, "Equipped creature gets +3/+3 and doesn't untap during its controller's untap step.")], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[ability_2_0_rule], delayed: &[], enters: None, modal: None, enchant: None, labels: &["Menace", "Trample", "Lifelink"], ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

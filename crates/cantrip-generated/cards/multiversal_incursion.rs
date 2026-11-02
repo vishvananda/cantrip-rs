@@ -1,10 +1,9 @@
 // Multiversal Incursion
-// status: planned
-// requires: adjusted token copy
+// status: ready
 // For each nontoken creature you control, create a token that's a copy of that creature, except it isn't legendary.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let created_0: Vec<ObjectId> = planned_value!("adjusted token copy", Vec::<ObjectId>::new() => cantrip_mechanics::tokens::create(g, asker, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[({ let q: &dyn Query = g; (1i64).max(0) as u32 }, TokenRecipe::CopyEach({ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (!(q.state().obj(id).token) && q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }, &[TokenCopyEffects::TokenCopyEffects(TokenCopyEffect::RemoveSupertypes(SuperType::Legendary))]))], Arrival { tapped: false, counters: &[], states: &[] })?);
+let originals_0 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (!(q.state().obj(id).token) && q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }; let player_0 = { let q: &dyn Query = g; Some(asker.controller) }; let mut copies_0: Vec<(Copiable, PlayerId)> = Vec::new(); if let Some(player) = player_0 { for &original in &originals_0 { if let Some(values) = { let q: &dyn Query = g; Some(original).map(|original: ObjectId| q.copiable_values(original).nonlegendary()) } { copies_0.push((values, player)); } } } let created_0 = g.create_token_copies_together(&copies_0)?;
 g.end_sentence();
  Ok(()) }
 

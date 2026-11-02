@@ -1,6 +1,5 @@
 // Predators' Hour
 // status: planned
-// requires: a card a player may look at for a while
 // requires: play permission with mana as though any color
 // Until end of turn, creatures you control gain menace and "Whenever this creature deals combat damage to a player, exile the top card of that player's library face down. You may look at and play that card for as long as it remains exiled, and you may spend mana as though it were mana of any color to cast that spell."
 #[allow(unused_imports)] use cantrip_api::*;
@@ -9,7 +8,7 @@
 fn granted_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let objects_2 = { let q: &dyn Query = g; (((Some(PlayerId(item.data[1] as u8)).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((1i64).max(0) as usize).collect::<Vec<ObjectId>>() }; let by_2 = None; let moved_2 = g.exile_face_down(&objects_2, by_2);
 g.end_sentence();
-planned!("a-card-a-player-may-look-at-for-a-while" => let cards_3_0 = { let q: &dyn Query = g; (moved_2.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_3_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &card in &cards_3_0 { for &player in &players_3_0 { g.allow_look(card, player, Expiry::Never); } });
+let cards_3_0 = { let q: &dyn Query = g; (moved_2.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_3_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &player in &players_3_0 { g.look_at(player, &cards_3_0); }
 planned!("play-permission-with-mana-as-though-any-color" => let cards_3_1 = { let q: &dyn Query = g; (moved_2.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_3_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_3_1 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_3_1 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::Never, any_color: true, ..PlayGrant::CAST }); } } } }););
 g.end_sentence();
  Ok(()) }

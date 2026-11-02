@@ -1,7 +1,6 @@
 // Living Breakthrough // Inventive Iteration
 // status: planned
 // requires: player rule for a while can't cast some spells
-// requires: sharing ManaValues
 // Flying
 // Whenever you cast a spell, your opponents can't cast spells with the same mana value as that spell until your next turn.
 // (As this Saga enters and after your draw step, add a lore counter.)
@@ -44,7 +43,7 @@ pub mod back {
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && true { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("player-rule-for-a-while-can-t-cast-some-spells" => let players_0_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_0_0 { g.add_player_effect(asker.controller, source, EffectKind::CantCast { player, spells: SpellSet::matching(move |q, spell| item.subject.object().is_some_and(|o: ObjectId| { let (a, b) = (&q.chars(spell), &q.chars(o)); planned_value!("sharing ManaValues", false => a.mana_value() == b.mana_value()) })) }, Duration::UntilNextTurnOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })); } });
+planned!("player-rule-for-a-while-can-t-cast-some-spells" => let players_0_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_0_0 { g.add_player_effect(asker.controller, source, EffectKind::CantCast { player, spells: SpellSet::matching(move |q, spell| item.subject.object().is_some_and(|o: ObjectId| q.mana_value(spell) == q.mana_value(o))) }, Duration::UntilNextTurnOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })); } });
 g.end_sentence();
  Ok(()) }
 

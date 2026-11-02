@@ -1,6 +1,6 @@
 // Aetherplasm
 // status: planned
-// requires: move arrival state
+// requires: put onto the battlefield blocking
 // Whenever this creature blocks a creature, you may return this creature to its owner's hand. If you do, you may put a creature card from your hand onto the battlefield blocking that creature.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Blocks { blocker, attacker, .. } = event { let id = *blocker; let other = *attacker; let subject = Target::Object(id); let data = [other.0, u32::MAX]; if Some(asker.source) == Some(id) && q.chars(other).is(CardType::Creature) { return Some(Fired { subject, data }); } }
@@ -22,7 +22,7 @@ if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
 let selected_2_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_2_candidates = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>() }; let selected_2_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::UpTo((1i64).max(0) as u32) }; let selected_2 = { cantrip_mechanics::choose::select(g, selected_2_player, asker.source, Purpose::PutOntoBattlefield, selected_2_candidates, cantrip_mechanics::select::Selection::of(selected_2_count, &[]))? };
 if !selected_2.is_empty() { 
 let player_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
-let objects_3 = ({ let q: &dyn Query = g; selected_2.clone() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_3 = { let mut moved: Vec<ObjectId> = Vec::new(); for &o in &objects_3 { let controller = player_3; moved.extend(planned_value!("move arrival state", None::<ObjectId> => cantrip_mechanics::enter::in_state(g, o, controller, item, "[Blocking(BlockPair(Attacker))]", &[], false)?)); } moved };
+let objects_3 = ({ let q: &dyn Query = g; selected_2.clone() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_3 = { let mut moved: Vec<ObjectId> = Vec::new(); for &o in &objects_3 { let controller = player_3; moved.extend(planned_value!("put onto the battlefield blocking", None::<ObjectId> => cantrip_mechanics::enter::in_state(g, o, controller, item, "[Blocking(BlockPair(Attacker))]", &[], false)?)); } moved };
 g.end_sentence();
 hoisted_4.extend(moved_3.clone());
 hoisted_5.extend(selected_2.clone());

@@ -1,6 +1,5 @@
 // Olórin's Searing Light
-// status: planned
-// requires: object reference Earlier
+// status: ready
 // Each opponent exiles a creature with the greatest power among creatures that player controls.
 // Spell mastery — If there are two or more instant and/or sorcery cards in your graveyard, Olórin's Searing Light deals damage to each opponent equal to the power of the creature they exiled.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -16,7 +15,7 @@ g.end_sentence();
 if { let q: &dyn Query = g; ((((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (q.chars(id).is(CardType::Instant) || q.chars(id).is(CardType::Sorcery))).collect::<Vec<ObjectId>>()).len() as i64) >= (2i64) } {
 let mut players_4: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
 let mut gathered_5: Vec<(ObjectId, Target, u16)> = Vec::new();
- for (index_4, bound_0) in players_4.iter().copied().enumerate() { let source_6 = { let q: &dyn Query = g; Some(asker.source) }; let amount_6 = { let q: &dyn Query = g; (planned_value!("object reference Earlier", None::<ObjectId> => q.earlier_object(item, EarlierObjects::Exiled, Some(bound_0))).map_or(0i64, |o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0)))).max(0) as u16 }; if let Some(source) = source_6 { for t in { let q: &dyn Query = g; (Some(bound_0).into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() } { gathered_5.push((source, t, amount_6)); } }
+ for (index_4, bound_0) in players_4.iter().copied().enumerate() { let source_6 = { let q: &dyn Query = g; Some(asker.source) }; let amount_6 = { let q: &dyn Query = g; (((players_0.iter().position(|&p| p == bound_0).map_or_else(Vec::new, |at| each_2[at].clone())).into_iter().filter(|&o| q.state().obj(o).became.is_some_and(|now| q.state().obj(now).zone.is(ZoneKind::Exile))).collect::<Vec<ObjectId>>()).first().copied().map_or(0i64, |o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0)))).max(0) as u16 }; if let Some(source) = source_6 { for t in { let q: &dyn Query = g; (Some(bound_0).into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() } { gathered_5.push((source, t, amount_6)); } }
     } 
 g.damage_together(&gathered_5);
 g.end_sentence();

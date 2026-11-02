@@ -1,6 +1,5 @@
 // War Dance
-// status: planned
-// requires: counter kind Verse
+// status: ready
 // At the beginning of your upkeep, you may put a verse counter on this enchantment.
 // Sacrifice this enchantment: Target creature gets +X/+X until end of turn, where X is the number of verse counters on this enchantment.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -10,7 +9,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mu
 let asker = &Asker::new(item.object, item.controller);
 let decider_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_0, asker.source, Purpose::Optional)? {
 let mut counters_1: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, planned_value!("counter kind Verse", CounterKind::Charge => CounterKind::Verse), amount)); } }
+let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, CounterKind::Verse, amount)); } }
 let had_1: Vec<_> = counters_1.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_1); let applied_1: Vec<ObjectId> = counters_1.iter().zip(had_1).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
 hoisted_2.extend(applied_1.clone());
@@ -22,7 +21,7 @@ static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let objects_3 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_3 = { let q: &dyn Query = g; Some(asker.source) }; let duration_3 = Duration::EndOfTurn;
-let kind_3_0_0 = { let q: &dyn Query = g; EffectKind::Pump(((Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.state().obj(o).counters(planned_value!("counter kind Verse", CounterKind::Charge => CounterKind::Verse)))).sum::<i64>()).clamp(-32768, 32767) as i16, ((Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.state().obj(o).counters(planned_value!("counter kind Verse", CounterKind::Charge => CounterKind::Verse)))).sum::<i64>()).clamp(-32768, 32767) as i16) };
+let kind_3_0_0 = { let q: &dyn Query = g; EffectKind::Pump(((Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.state().obj(o).counters(CounterKind::Verse))).sum::<i64>()).clamp(-32768, 32767) as i16, ((Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.state().obj(o).counters(CounterKind::Verse))).sum::<i64>()).clamp(-32768, 32767) as i16) };
 if let Some(source) = source_3 { cantrip_api::instruction(g, |g| { for &object in &objects_3 { g.add_effect(source, object, kind_3_0_0, duration_3);  } }); }
 g.end_sentence();
  Ok(()) }

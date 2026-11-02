@@ -12,7 +12,8 @@ fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 cantrip_mechanics::learn::learn(g, item)?;
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables, unused_mut)] fn ability_3_stated_then_steps(g: &mut dyn Game, asker: &Asker, subject: Target, data: [u32; 2]) -> Result<(), Suspend> { let decider_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; match planned_value!("instruction ChooseOne", 0u8 => cantrip_mechanics::choose::one_of(g, decider_2, asker.source, vec![Label::Card(card_2, 0), Label::Card(card_2, 1)])?) {
+#[allow(unused_variables, unused_mut)] fn ability_3_stated_then_steps(g: &mut dyn Game, asker: &Asker, subject: Target, data: [u32; 2]) -> Result<(), Suspend> { let decider_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
+match planned_value!("instruction ChooseOne", 0u8 => cantrip_mechanics::choose::one_of(g, decider_2, asker.source, vec![Label::Card(card_2, 0), Label::Card(card_2, 1)])?) {
 0 => {
 let player_4 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
 let objects_4 = ({ let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_4 = { let rows_4: Vec<(ObjectId, PlayerId, bool)> = objects_4.iter().map(|&o| (o, player_4, false)).collect(); let came_4 = g.put_all_onto_battlefield_as(&rows_4)?; came_4.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };

@@ -1,6 +1,5 @@
 // Goblin Traprunner
-// status: planned
-// requires: numeric expression CoinFlipsWon
+// status: ready
 // Whenever this creature attacks, flip three coins. For each flip you win, create a 1/1 red Goblin creature token that's tapped and attacking.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Attacks { attacker, defending, .. } = event { let id = *attacker; let subject = Target::Object(id); let data = [u32::from(defending.0), u32::MAX]; if Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
@@ -16,7 +15,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let count_0 = { let q: &dyn Query = g; (3i64).max(0) as u32 }; let mut done_0: i64 = 0; for _ in 0..count_0 { if g.flip_coin(player_0) { done_0 += 1; } }
 g.end_sentence();
 let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_1 = Vec::new();
-let count_1_0 = { let q: &dyn Query = g; (planned_value!("numeric expression CoinFlipsWon", 0i64 => g.coin_flips(asker.controller, true))).max(0) as u32 }; let def_1_0 = g.card_id(&token_2::CARD);
+let count_1_0 = { let q: &dyn Query = g; (done_0).max(0) as u32 }; let def_1_0 = g.card_id(&token_2::CARD);
 for player in players_1 {
 tokens_1.extend(std::iter::repeat((def_1_0,player)).take(count_1_0 as usize));
 } let words_1 = g.words(asker.source);

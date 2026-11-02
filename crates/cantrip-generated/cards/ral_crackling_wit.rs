@@ -33,7 +33,7 @@ fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let amount_3 = { let q: &dyn Query = g; (3i64).max(0) as u32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_3 { g.draw(player, amount_3); }
 g.end_sentence();
-let amount_4 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_4 = Vec::new(); for player in players_4 { cards_4.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_4)?); } let discarded_4 = g.discard_together(&cards_4);
+let amount_4 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let players_4: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_4 = Vec::new(); for player in players_4 { cards_4.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_4)?); } let discarded_4 = g.discard_together(&cards_4);
 g.end_sentence();
  Ok(()) }
 pub mod emblem_6 {

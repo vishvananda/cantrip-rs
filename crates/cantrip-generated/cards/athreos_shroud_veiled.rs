@@ -1,6 +1,5 @@
 // Athreos, Shroud-Veiled
 // status: planned
-// requires: counter kind Coin
 // requires: numeric expression CountManaSymbols
 // Indestructible
 // As long as your devotion to white and black is less than seven, Athreos isn't a creature.
@@ -16,18 +15,18 @@ static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let mut counters_0: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_0.push((object, planned_value!("counter kind Coin", CounterKind::Charge => CounterKind::Coin), amount)); } }
+let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_0.push((object, CounterKind::Coin, amount)); } }
 let had_0: Vec<_> = counters_0.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_0); let applied_0: Vec<ObjectId> = counters_0.iter().zip(had_0).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_3_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [new.0, u32::MAX]; if to.is(ZoneKind::Graveyard) && from.is(ZoneKind::Battlefield) && (q.chars(id).is(CardType::Creature) && (i64::from(q.state().obj(id).counters(planned_value!("counter kind Coin", CounterKind::Charge => CounterKind::Coin)))) > (0i64)) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_3_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [new.0, u32::MAX]; if to.is(ZoneKind::Graveyard) && from.is(ZoneKind::Battlefield) && (q.chars(id).is(CardType::Creature) && (i64::from(q.state().obj(id).counters(CounterKind::Coin))) > (0i64)) { return Some(Fired { subject, data }); } }
  None }
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
 let objects_1 = ({ let q: &dyn Query = g; ((Some(ObjectId(item.data[0])).filter(|o| *o != ObjectId::NONE).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Graveyard).collect::<Vec<ObjectId>>()).get(0).copied().into_iter().collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_1 = { let rows_1: Vec<(ObjectId, PlayerId, bool)> = objects_1.iter().map(|&o| (o, player_1, false)).collect(); let came_1 = g.put_all_onto_battlefield_as(&rows_1)?; came_1.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_4_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [new.0, u32::MAX]; if to.is(ZoneKind::Exile) && from.is(ZoneKind::Battlefield) && (q.chars(id).is(CardType::Creature) && (i64::from(q.state().obj(id).counters(planned_value!("counter kind Coin", CounterKind::Charge => CounterKind::Coin)))) > (0i64)) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_4_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [new.0, u32::MAX]; if to.is(ZoneKind::Exile) && from.is(ZoneKind::Battlefield) && (q.chars(id).is(CardType::Creature) && (i64::from(q.state().obj(id).counters(CounterKind::Coin))) > (0i64)) { return Some(Fired { subject, data }); } }
  None }
 fn ability_4(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };

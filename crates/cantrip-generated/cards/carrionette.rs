@@ -24,7 +24,7 @@ hoisted_6.extend({ let q: &dyn Query = g; objects_2.iter().copied().filter(|&o| 
 }
 g.end_sentence();
  Ok(()) }
-fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.source).is_some_and(|candidate: ObjectId| (q.state().obj(candidate).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(candidate).owner))) }
+fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.source).is_some_and(|candidate: ObjectId| (q.state().obj(candidate).became.is_none() && q.state().obj(candidate).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(candidate).owner))) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
 static PAY_QUESTION: Question = Question::new("Pay", "pay {cost}?", "", "Pay {cost}", "Decline");
 

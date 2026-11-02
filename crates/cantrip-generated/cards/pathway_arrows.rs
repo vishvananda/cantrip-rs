@@ -1,6 +1,5 @@
 // Pathway Arrows
-// status: planned
-// requires: object filter DamagedBy
+// status: ready
 // Equipped creature has "{2}, {T}: This creature deals 1 damage to target creature. If a colorless creature is dealt damage this way, tap it."
 // Equip {2}
 #[allow(unused_imports)] use cantrip_api::*;
@@ -11,9 +10,9 @@ let mut hoisted_4: Vec<ObjectId> = Vec::new();
 let mut hoisted_3: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let mut done_1: i64 = 0; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u16 }; let recipients_1 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() }; if let Some(source) = source_1 { let batch: Vec<(ObjectId, Target, u16)> = recipients_1.iter().map(|t| (source, *t, amount_1)).collect(); done_1 += g.damage_together(&batch).iter().map(|&n| i64::from(n)).sum::<i64>(); }
+let mut done_1: i64 = 0; let mut dealt_1: Vec<ObjectId> = Vec::new(); let mut hurt_1: Vec<PlayerId> = Vec::new(); let before_1 = g.history().head() as usize; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u16 }; let recipients_1 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() }; if let Some(source) = source_1 { let batch: Vec<(ObjectId, Target, u16)> = recipients_1.iter().map(|t| (source, *t, amount_1)).collect(); done_1 += g.damage_together(&batch).iter().map(|&n| i64::from(n)).sum::<i64>(); dealt_1.extend(cantrip_mechanics::history::permanents_dealt_damage_by(g.history(), source, before_1)); for r in &g.history().all()[before_1..] { if let Event::Damage { source: s, target: Target::Player(p), amount, .. } = r.event { if s == source && amount > 0 && !hurt_1.contains(&p) { hurt_1.push(p); } } } }
 g.end_sentence();
-if { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (planned_value!("object filter DamagedBy", false => cantrip_mechanics::history::permanents_dealt_damage_by(q.history(), asker.source, since).contains(&id)) && (q.chars(id).colors.is_empty() && q.chars(id).is(CardType::Creature)))).collect::<Vec<ObjectId>>()).len() as i64) > (0i64) } {
+if { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (dealt_1.contains(&id) && (q.chars(id).colors.is_empty() && q.chars(id).is(CardType::Creature)))).collect::<Vec<ObjectId>>()).len() as i64) > (0i64) } {
 let objects_2 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_2: Vec<ObjectId> = objects_2.iter().copied().filter(|&o| g.state().obj(o).tapped != true).collect(); g.tap_together(&turned_2);
 g.end_sentence();
 hoisted_3.extend(turned_2.clone());
@@ -27,7 +26,7 @@ g.end_sentence();
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let attachments_6 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let host_6 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) }; if let Some(host) = host_6 { cantrip_api::instruction(g, |g| { for attachment in attachments_6 { g.attach(attachment, host); } }); }
+let attachments_6 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let host_6 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()) }; if let Some(host) = host_6 { cantrip_api::instruction(g, |g| { for attachment in attachments_6 { g.attach(attachment, host); } }); }
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

@@ -16,7 +16,7 @@ let amount_1 = { let q: &dyn Query = g; (4i64).max(0) as i32 }; let players_1 = 
 g.end_sentence();
  Ok(()) }
 fn ability_1_mode_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_2 = { let q: &dyn Query = g; ((((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_2 = Vec::new(); for player in players_2 { cards_2.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_2)?); } let discarded_2 = g.discard_together(&cards_2);
+let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_2 = Vec::new(); for player in players_2 { cards_2.extend(g.state().zone(Zone::hand(player)).to_vec()); } let discarded_2 = g.discard_together(&cards_2);
 g.end_sentence();
  Ok(()) }
 pub mod token_4 {

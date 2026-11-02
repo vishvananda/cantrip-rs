@@ -2,7 +2,7 @@
 // status: ready
 // Whenever one or more cards are put into exile during your turn, put a +1/+1 counter on this creature. This ability triggers only once each turn.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Exile) && true && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Exile) && true && !q.state().obj(id).token && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut counters_0: Vec<(ObjectId, CounterKind, i16)> = Vec::new();

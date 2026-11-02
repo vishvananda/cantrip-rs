@@ -1,6 +1,5 @@
 // Signature Spells
-// status: planned
-// requires: earlier objects CopiedSpell
+// status: ready
 // When this enchantment enters, seek two instant and/or sorcery cards with mana value 3, then exile them.
 // At the beginning of your upkeep, you may copy a card exiled with this enchantment. You may cast the copy without paying its mana cost.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -25,14 +24,14 @@ hoisted_5.extend(copies_4.clone());
 }
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_3 as i64) != 0) } {
-let caster_6 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let mut pool_6: Vec<ObjectId> = { let q: &dyn Query = g; (planned_value!("earlier objects CopiedSpell", Vec::<ObjectId>::new() => q.acted_on(asker, Acted::CopiedSpell))).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let mut left_6: u32 = 1; let mut played_6: Vec<ObjectId> = Vec::new();
+let caster_6 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let mut pool_6: Vec<ObjectId> = { let q: &dyn Query = g; (hoisted_5.clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let mut left_6: u32 = 1; let mut played_6: Vec<ObjectId> = Vec::new();
 while left_6 > 0 {
 let mut open_6: Vec<ObjectId> = Vec::new(); for &c in &pool_6 { let ways = g.cast_ways_during_resolution_by(c, caster_6); if ways.iter().any(|w| true) { open_6.push(c); } }
 let picked_6 = if open_6.is_empty() { None } else if open_6.len() > 1 || (true && (!false || pool_6.len() > 1)) { cantrip_mechanics::choose::cards_from(g, caster_6, asker.source, Purpose::CastFree, pool_6.clone(), open_6.clone(), 1, true)?.first().copied() } else if !true || cantrip_mechanics::effects::ask_may(g, caster_6, open_6[0], Purpose::CastFree)? { Some(open_6[0]) } else { None };
 let Some(card_6) = picked_6 else { break; };
 let ways_6: Vec<CastWay> = g.cast_ways_during_resolution_by(card_6, caster_6).into_iter().filter(|w| true).collect();
 let done_6 = if ways_6.is_empty() { g.play_land_during_resolution(card_6)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_6, card_6, ways_6)?.map(|w| w.way); g.cast_during_resolution_as(card_6, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(caster_6), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
-if done_6 { left_6 -= 1; played_6.push(g.state().obj(card_6).became.unwrap_or(card_6)); } else if 1i64 == 1 { break; } if done_6 || !(true && true) { pool_6.retain(|&c| c != card_6); }
+if done_6 { left_6 -= 1; played_6.push(g.state().obj(card_6).became.unwrap_or(card_6)); } else if true { break; } if done_6 || !(true && true) { pool_6.retain(|&c| c != card_6); }
 }
 g.end_sentence();
 }

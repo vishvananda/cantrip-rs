@@ -1,7 +1,6 @@
 // Doom's Time Platform
 // status: planned
 // requires: exiled card gains suspend
-// requires: object filter HasKeywordFamily
 // Whenever you attack, exile target nonland card from your graveyard with two time counters on it. If it doesn't have suspend, it gains suspend. (At the beginning of your upkeep, remove a time counter. When the last is removed, you may cast it without paying its mana cost. If it's a creature, it has haste.)
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && ((!(q.chars(id).is(CardType::Land)) && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(id).owner))))) }
@@ -12,7 +11,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let objects_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; let moved_0 = { let counters: Vec<(CounterKind, i16)> = vec![(CounterKind::Time, { let q: &dyn Query = g; (2i64).max(0) as i16 })]; let exiled = g.exile_all(&objects_0); let puts: Vec<(ObjectId, CounterKind, i16)> = exiled.iter().flat_map(|&o| counters.iter().map(move |&(kind, n)| (o, kind, n))).collect(); g.add_counters_together(&puts); exiled };
 g.end_sentence();
-if { let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied().is_some_and(|candidate: ObjectId| !(planned_value!("object filter HasKeywordFamily", false => q.has_keyword_ability(candidate, KeywordAbility::Suspend)))) } {
+if { let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied().is_some_and(|candidate: ObjectId| !(q.card(q.chars(candidate).card).suspend.is_some())) } {
 let cards_1 = { let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() };
 planned!("exiled-card-gains-suspend" => for card in cards_1 { cantrip_mechanics::suspend::gains_suspend(g, card); });
 g.end_sentence();

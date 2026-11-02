@@ -1,6 +1,5 @@
 // Wishclaw Talisman
-// status: planned
-// requires: operation GiveControl
+// status: ready
 // This artifact enters with three wish counters on it.
 // {1}, {T}, Remove a wish counter from this artifact: Search your library for a card, put it into your hand, then shuffle. An opponent gains control of this artifact. Activate only during your turn.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -11,7 +10,7 @@ let searcher_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a refer
 let objects_2 = { let q: &dyn Query = g; found_1.clone() }; let moved_2 = g.return_to_hand(&objects_2);
 for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.shuffle(player); }
 g.end_sentence();
-planned!("operation-give-control" => cantrip_mechanics::control::give(g, asker.source, { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }, { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }, None));
+let players_4: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }; let objects_4 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let who_4 = match players_4.as_slice() { [one] => Some(*one), _ => cantrip_mechanics::choose::player(g, asker.controller, asker.source, players_4.clone(), "GainControl", 0)? }; if let Some(who) = who_4 { cantrip_api::instruction(g, |g| { for &object in &objects_4 { g.gain_control(asker.source, object, who, Duration::Indefinite); } }); }
 g.end_sentence();
  Ok(()) }
 fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.controller) == Some(q.state().turn.active) }

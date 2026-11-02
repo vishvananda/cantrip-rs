@@ -20,12 +20,12 @@ let picked_1 = if open_1.is_empty() { None } else if open_1.len() > 1 || (false 
 let Some(card_1) = picked_1 else { break; };
 let ways_1: Vec<CastWay> = g.cast_ways_during_resolution_by(card_1, caster_1).into_iter().filter(|w| true).collect();
 let done_1 = if ways_1.is_empty() { g.play_land_during_resolution(card_1)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_1, card_1, ways_1)?.map(|w| w.way); g.cast_during_resolution_as(card_1, CastTerms { instead: None, way, caster: Some(caster_1), exile_instead: ExileInstead::Spell, ..CastTerms::default() })? };
-if done_1 { left_1 -= 1; played_1.push(g.state().obj(card_1).became.unwrap_or(card_1)); } else if 1i64 == 1 { break; } if done_1 || !(true && false) { pool_1.retain(|&c| c != card_1); }
+if done_1 { left_1 -= 1; played_1.push(g.state().obj(card_1).became.unwrap_or(card_1)); } else if true { break; } if done_1 || !(true && false) { pool_1.retain(|&c| c != card_1); }
 }
 g.end_sentence();
  Ok(()) }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_2 = { let q: &dyn Query = g; ((((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_2 = Vec::new(); for player in players_2 { cards_2.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_2)?); } let discarded_2 = g.discard_together(&cards_2);
+let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_2 = Vec::new(); for player in players_2 { cards_2.extend(g.state().zone(Zone::hand(player)).to_vec()); } let discarded_2 = g.discard_together(&cards_2);
 g.end_sentence();
 let amount_3 = { let q: &dyn Query = g; (7i64).max(0) as u32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_3 { g.draw(player, amount_3); }

@@ -2,7 +2,6 @@
 // status: planned
 // requires: card type Plane
 // requires: earlier objects It
-// requires: engine: no Time Travel
 // requires: exiled card gains suspend
 // requires: layout Planar
 // requires: subtype Earth
@@ -25,9 +24,10 @@ g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("engine-no-time-travel" => { let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; cantrip_mechanics::time_travel::time_travel(g, player, asker.source)?; });
+{ let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; time_travel_for(g, player, asker.source)?; }
 g.end_sentence();
  Ok(()) }
+fn time_travel_for(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Result<(), Suspend> { let mut each: Vec<ObjectId> = g.state().zone(Zone::exile(player)).iter().copied().filter(|&id| g.obj(id).counters(CounterKind::Time) > 0 && g.card(g.obj(id).card).suspend.is_some()).collect(); each.extend(g.permanents_of(player).into_iter().filter(|&id| g.obj(id).counters(CounterKind::Time) > 0)); let any = cantrip_mechanics::select::cards(cantrip_mechanics::select::ANY_NUMBER); let adding = cantrip_mechanics::choose::select(g, player, source, Purpose::PutCounters(CounterKind::Time, 1), each.clone(), any.clone())?; let rest: Vec<ObjectId> = each.into_iter().filter(|id| !adding.contains(id)).collect(); let removing = cantrip_mechanics::choose::select(g, player, source, Purpose::Choose, rest, any)?; let more: Vec<(ObjectId, CounterKind, i16)> = adding.iter().map(|&id| (id, CounterKind::Time, 1)).collect(); g.add_counters_together(&more); for id in removing { g.remove_counters(id, CounterKind::Time, 1); } Ok(()) }
 planned_item!("trigger-event-player-planeswalks" => matcher: #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Planeswalked { player, object, .. } = event { let id = *object; let subject = Target::Object(id); let data = [u32::from(player.0), 0]; if Some(asker.controller) == Some(*player) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
 if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::Upkeep) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None });

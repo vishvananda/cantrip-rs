@@ -23,11 +23,11 @@ let mut hoisted_3: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 if { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).is_some_and(|candidate: ObjectId| q.chars(candidate).has_subtype(q.words(asker.source).subtype(Subtype::Squirrel))) } {
-let original_2 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) }; let count_2 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let created_2 = match original_2 { Some(original) => g.create_token_copies(original, player_2, count_2)?, None => Vec::new() };
+let original_2 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()) }; let count_2 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let created_2 = match original_2 { Some(original) => g.create_token_copies(original, player_2, count_2)?, None => Vec::new() };
 g.end_sentence();
 hoisted_3.extend(created_2.clone());
 } else {
-let original_4 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) }; let count_4 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let player_4 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let created_4 = match original_4 { Some(original) => g.create_token_copies(original, player_4, count_4)?, None => Vec::new() };
+let original_4 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()) }; let count_4 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let player_4 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let created_4 = match original_4 { Some(original) => g.create_token_copies(original, player_4, count_4)?, None => Vec::new() };
 g.end_sentence();
 hoisted_5.extend(created_4.clone());
 }

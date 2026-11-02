@@ -7,13 +7,13 @@
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0).between(0, cantrip_api::TargetSpec::ANY_NUMBER)];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; t_0.iter().filter_map(|t| t.player()).collect::<Vec<PlayerId>>() };
+let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().filter(|&p| t_0.iter().any(|t| t.player() == Some(p))).collect::<Vec<PlayerId>>() };
 let mut gathered_1: Vec<ObjectId> = Vec::new();
- for (index_0, bound_0) in players_0.iter().copied().enumerate() { let amount_2 = { let q: &dyn Query = g; ((((Some(bound_0).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }; gathered_1.extend(cantrip_mechanics::choose_from_hand(g, bound_0, asker.source, amount_2)?);
+ for (index_0, bound_0) in players_0.iter().copied().enumerate() { gathered_1.extend(g.state().zone(Zone::hand(bound_0)).to_vec());
     } 
 let cards_3 = { let q: &dyn Query = g; gathered_1.clone() }; let discarded_3 = g.discard_together(&cards_3);
 g.end_sentence();
-let amount_4 = { let q: &dyn Query = g; (7i64).max(0) as u32 }; let players_4 = { let q: &dyn Query = g; t_0.iter().filter_map(|t| t.player()).collect::<Vec<PlayerId>>() };
+let amount_4 = { let q: &dyn Query = g; (7i64).max(0) as u32 }; let players_4 = { let q: &dyn Query = g; q.state().apnap().filter(|&p| t_0.iter().any(|t| t.player() == Some(p))).collect::<Vec<PlayerId>>() };
 for player in players_4 { g.draw(player, amount_4); }
 g.end_sentence();
 let amount_5 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_5 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };

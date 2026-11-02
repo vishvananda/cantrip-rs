@@ -1,14 +1,13 @@
 // Firkraag, Cunning Instigator
 // status: planned
-// requires: event value in a target filter beyond its subject
 // requires: object state HadToAttack
 // Flying, haste
 // Whenever one or more Dragons you control attack an opponent, goad target creature that player controls.
 // Whenever a creature deals combat damage to one of your opponents, if that creature had to attack this combat, you put a +1/+1 counter on Firkraag and you draw a card.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && Some(PlayerId(planned_value!("event value in a target filter beyond its subject", [u32::MAX; 2] => q.event_data())[1] as u8)) == Some(q.controller(id))))) }
+#[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && q.event_subject().player() == Some(q.controller(id))))) }
 static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target_0)];
-#[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Attacks { attacker, defender, defending, .. } = event { let id = *attacker; let subject = Target::Object(id); let data = [u32::from(q.controller(id).0), u32::from(defending.0)]; if (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Dragon)) && Some(asker.controller) == Some(q.controller(id))) && match *defender { Target::Player(p) => (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&p), _ => false } { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Attacks { attacker, defender, defending, .. } = event { let id = *attacker; let subject = Target::Player(*defending); let data = [u32::from(q.controller(id).0), u32::from(defending.0)]; if (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Dragon)) && Some(asker.controller) == Some(q.controller(id))) && match *defender { Target::Player(p) => (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&p), _ => false } { return Some(Fired { subject, data }); } }
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);

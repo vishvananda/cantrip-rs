@@ -3,7 +3,7 @@
 // If a creature dying causes a triggered ability of a permanent you control to trigger, that ability triggers an additional time.
 // {B/P}{B/P}, Exile three creature cards from your graveyard: Put an indestructible counter on Drivnod. ({B/P} can be paid with either {B} or 2 life.)
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_trigger_rule(q: &dyn Query, asker: &Asker, event: &Event, triggering: &Triggering) -> bool { (triggering.permanent && Some(asker.controller) == Some(triggering.controller)) && cantrip_mechanics::statics::creature_dying(q, event, triggering) }
+#[allow(unused_variables)] fn ability_0_trigger_rule(q: &dyn Query, asker: &Asker, event: &Event, triggering: &Triggering) -> bool { true && (triggering.permanent && Some(asker.controller) == Some(triggering.controller)) && cantrip_mechanics::statics::creature_dying(q, event, triggering) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut counters_0: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
 let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_0.push((object, CounterKind::Indestructible, amount)); } }

@@ -7,7 +7,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let objects_0 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_0 = { let q: &dyn Query = g; Some(asker.source) }; let duration_0 = Duration::EndOfTurn;
 let kind_0_0_0 = { let q: &dyn Query = g; EffectKind::SetPt(((planned_value!("engine: no record of what paid a cost", Vec::<ObjectId>::new() => q.paid_objects(item, [1]).to_vec())).get(0).copied().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o)))).clamp(-32768, 32767) as i16, ((planned_value!("engine: no record of what paid a cost", Vec::<ObjectId>::new() => q.paid_objects(item, [1]).to_vec())).get(0).copied().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o)))).clamp(-32768, 32767) as i16) };
 let kind_0_1_0 = { let q: &dyn Query = g; EffectKind::SetCreatureType(q.words(asker.source).subtype(Subtype::Cat)) };
-let kind_0_2_0 = { let q: &dyn Query = g; EffectKind::SetTypes(TypeSet::of(&[CardType::Artifact, CardType::Creature])) };
+let kind_0_2_0 = { let q: &dyn Query = g; EffectKind::AddTypes(TypeSet::of(&[CardType::Artifact, CardType::Creature])) };
 if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &object in &objects_0 { g.add_effect(source, object, kind_0_0_0, duration_0); g.add_effect(source, object, kind_0_1_0, duration_0); g.add_effect(source, object, kind_0_2_0, duration_0);  } }); }
 g.end_sentence();
  Ok(()) }

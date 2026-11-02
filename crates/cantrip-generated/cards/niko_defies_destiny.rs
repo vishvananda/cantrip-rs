@@ -1,15 +1,13 @@
 // Niko Defies Destiny
 // status: planned
 // requires: mana spending purpose
-// requires: object filter HasKeywordFamily
-// requires: object state Foretold
 // (As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)
 // I — You gain 2 life for each foretold card you own in exile.
 // II — Add {W}{U}. Spend this mana only to foretell cards or cast spells that have foretell.
 // III — Return target card with foretell from your graveyard to your hand.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_0 = { let q: &dyn Query = g; ((2i64 * (((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (planned_value!("object state Foretold", false => cantrip_mechanics::foretell::foretold(q.state(), id)) && Some(asker.controller) == Some(q.state().obj(id).owner))).collect::<Vec<ObjectId>>()).len() as i64)).clamp(0, 2147483647) as i32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_0 = { let q: &dyn Query = g; ((2i64 * (((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && ({ let id = id; let o = q.state().obj(id); let own = AbilityRef::spell(o.card); q.card(o.card).foretell.is_some() && (q.state().permissions.iter().any(|p| p.by.object == id && p.by.ability == own) || q.history().cast_of(id).is_some_and(|cast| cast.granted_by().is_some_and(|by| by.ability == own))) } && Some(asker.controller) == Some(q.state().obj(id).owner))).collect::<Vec<ObjectId>>()).len() as i64)).clamp(0, 2147483647) as i32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_0 { g.gain_life(player, amount_0); }
 g.end_sentence();
  Ok(()) }
@@ -18,10 +16,10 @@ let mana_players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter()
 let mana_2_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 };
 let mana_2_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 };
 for player in mana_players_2 {
-g.add_restricted_mana(player, Mana::W, mana_2_0, planned_value!("mana spending purpose", ManaRestriction::ABILITIES => ManaRestriction::Rule(&ManaRule { spend: |q, asker, spending| (spending.part == ManaPart::Foretell) || (spending.purpose == SpendingFor::Casting && spending.source.is_some_and(|spell| planned_value!("object state Foretold", false => cantrip_mechanics::foretell::foretold(q.state(), spell)))), spent: None })));g.add_restricted_mana(player, Mana::U, mana_2_1, planned_value!("mana spending purpose", ManaRestriction::ABILITIES => ManaRestriction::Rule(&ManaRule { spend: |q, asker, spending| (spending.part == ManaPart::Foretell) || (spending.purpose == SpendingFor::Casting && spending.source.is_some_and(|spell| planned_value!("object state Foretold", false => cantrip_mechanics::foretell::foretold(q.state(), spell)))), spent: None })));}
+g.add_restricted_mana(player, Mana::W, mana_2_0, planned_value!("mana spending purpose", ManaRestriction::ABILITIES => ManaRestriction::Rule(&ManaRule { spend: |q, asker, spending| (spending.part == ManaPart::Foretell) || (spending.purpose == SpendingFor::Casting && spending.source.is_some_and(|spell| { let id = spell; let o = q.state().obj(id); let own = AbilityRef::spell(o.card); q.card(o.card).foretell.is_some() && (q.state().permissions.iter().any(|p| p.by.object == id && p.by.ability == own) || q.history().cast_of(id).is_some_and(|cast| cast.granted_by().is_some_and(|by| by.ability == own))) })), spent: None })));g.add_restricted_mana(player, Mana::U, mana_2_1, planned_value!("mana spending purpose", ManaRestriction::ABILITIES => ManaRestriction::Rule(&ManaRule { spend: |q, asker, spending| (spending.part == ManaPart::Foretell) || (spending.purpose == SpendingFor::Casting && spending.source.is_some_and(|spell| { let id = spell; let o = q.state().obj(id); let own = AbilityRef::spell(o.card); q.card(o.card).foretell.is_some() && (q.state().permissions.iter().any(|p| p.by.object == id && p.by.ability == own) || q.history().cast_of(id).is_some_and(|cast| cast.granted_by().is_some_and(|by| by.ability == own))) })), spent: None })));}
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_0_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && ((planned_value!("object filter HasKeywordFamily", false => q.has_keyword_ability(id, KeywordAbility::Foretell)) && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(id).owner))))) }
+#[allow(unused_variables)] fn ability_0_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && ((q.card(q.chars(id).card).foretell.is_some() && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(id).owner))))) }
 static ABILITY_0_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_2_target_0)];
 fn ability_0_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);

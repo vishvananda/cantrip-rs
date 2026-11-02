@@ -1,10 +1,9 @@
 // Inferno Trap
-// status: planned
-// requires: history measure DistinctSources
+// status: ready
 // If you've been dealt damage by two or more creatures this turn, you may pay {R} rather than pay this spell's mana cost.
 // Inferno Trap deals 4 damage to target creature.
 #[allow(unused_imports)] use cantrip_api::*;
-fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { (planned_value!("history measure DistinctSources", 0i64 => cantrip_mechanics::history::measure(q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::Damage { source, target, amount, kind, .. } = event { let (source, amount, combat) = (*source, *amount, kind.is_combat()); let subject = *target; let data = [u32::from(amount), source.0]; if !q.state().obj(source).zone.is(ZoneKind::Stack) && q.chars(source).is(CardType::Creature) && matches!(*target, Target::Player(p) if Some(asker.controller) == Some(p)) { return Some(Fired { subject, data }); } }  None }), HistoryMeasure::DistinctSources))) >= (2i64) }
+fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { ({ let mut sources: Vec<ObjectId> = q.history().this_turn().iter().filter(|r: &&Record| (|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::Damage { source, target, amount, kind, controller, known, .. } = event { let (source, amount, combat, controller) = (*source, *amount, kind.is_combat(), *controller); let dealt = DamageDealt { source, target: *target, amount, combat, controller, known: *known }; let subject = *target; let data = [u32::from(amount), source.0]; if q.state().obj(source).zone.is(ZoneKind::Battlefield) && dealt.chars(q).is(CardType::Creature) && matches!(*target, Target::Player(p) if Some(asker.controller) == Some(p)) { return Some(Fired { subject, data }); } }  None })(*r).is_some()).filter_map(|r: &Record| if let Event::Damage { source, .. } = r.event { Some(source) } else { None }).collect(); sources.sort(); sources.dedup(); sources.len() as i64 }) >= (2i64) }
 #[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

@@ -1,6 +1,5 @@
 // Niv-Mizzet, Guildpact
-// status: planned
-// requires: distinct ColorPairs
+// status: ready
 // Flying, hexproof from multicolored
 // Whenever Niv-Mizzet deals combat damage to a player, it deals X damage to any target, target player draws X cards, and you gain X life, where X is the number of different color pairs among permanents you control that are exactly two colors.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -11,7 +10,7 @@ static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[cantrip_mechanics::targ
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let t_1_raw = announced(g, item, 1, false); let t_1 = announced(g, item, 1, true);
-let value_0: i64 = { let q: &dyn Query = g; planned_value!("distinct ColorPairs", 0i64 => cantrip_mechanics::domain::color_pairs(q, &q.state().battlefield().iter().copied().filter(|&id| ((q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Battle) || q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Enchantment) || q.chars(id).is(CardType::Land) || q.chars(id).is(CardType::Planeswalker)) && Some(asker.controller) == Some(q.controller(id)) && (q.chars(id).colors.iter().count() as i64) == (2i64))).collect::<Vec<ObjectId>>())) };
+let value_0: i64 = { let q: &dyn Query = g; { let mut seen = Vec::new(); for id in q.state().battlefield().iter().copied().filter(|&id| ((q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Battle) || q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Enchantment) || q.chars(id).is(CardType::Land) || q.chars(id).is(CardType::Planeswalker)) && Some(asker.controller) == Some(q.controller(id)) && (q.chars(id).colors.iter().count() as i64) == (2i64))).collect::<Vec<ObjectId>>() { let value = q.chars(id).colors; if value.iter().count() == 2 && !seen.contains(&value) { seen.push(value); } } seen.len() as i64 } };
 g.end_sentence();
 let source_1 = { let q: &dyn Query = g; item.subject.object() }; let amount_1 = { let q: &dyn Query = g; (value_0).clamp(0, 65535) as u16 }; let recipients_1 = { let q: &dyn Query = g; t_0.clone() }; if let Some(source) = source_1 { let batch: Vec<(ObjectId, Target, u16)> = recipients_1.iter().map(|t| (source, *t, amount_1)).collect(); g.damage_together(&batch); }
 g.end_sentence();

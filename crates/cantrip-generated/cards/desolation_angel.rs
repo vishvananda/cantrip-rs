@@ -11,7 +11,7 @@ let mut hoisted_4: Vec<ObjectId> = Vec::new();
 let mut hoisted_2: Vec<ObjectId> = Vec::new();
 let mut hoisted_1: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-if { let q: &dyn Query = g; item.subject.object().is_some_and(|candidate: ObjectId| q.state().obj(candidate).kicked > 0) } {
+if { let q: &dyn Query = g; item.subject.object().is_some_and(|candidate: ObjectId| (q.state().obj(candidate).kicked > 0 || (q.state().obj(candidate).paid > 0 && q.card(q.state().obj(candidate).card).kicker.is_some()))) } {
 let objects_0 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| q.chars(id).is(CardType::Land)).collect::<Vec<ObjectId>>() }; let destroyed_0 = g.destroy_all(&objects_0);
 g.end_sentence();
 hoisted_1.extend(destroyed_0.clone());

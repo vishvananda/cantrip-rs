@@ -1,6 +1,5 @@
 // Saint Traft and Rem Karolus
-// status: planned
-// requires: object filter HasKeywordFamily
+// status: ready
 // Whenever Saint Traft and Rem Karolus becomes tapped, create a 1/1 red Human creature token if this is the first time this ability has resolved this turn. If it's the second time, create a 1/1 blue Spirit creature token with flying. If it's the third time, create a 4/4 white Angel creature token with flying.
 // Whenever you cast a spell that has convoke, untap Saint Traft and Rem Karolus.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -65,7 +64,7 @@ hoisted_8.extend(created_6.clone());
 }
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && planned_value!("object filter HasKeywordFamily", false => q.has_keyword_ability(id, KeywordAbility::Convoke)) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && (q.card(q.chars(id).card).pay_with.convoke || q.state().battlefield().iter().any(|&p| !q.lost_all_abilities(p) && q.card(q.chars(p).card).grants_pay_with.iter().any(|g| g(q, p, q.controller(id), id).convoke))) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let objects_9 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_9: Vec<ObjectId> = objects_9.iter().copied().filter(|&o| g.state().obj(o).tapped != false).collect(); cantrip_api::instruction(g, |g| { for &object in &turned_9 { g.untap(object); } });

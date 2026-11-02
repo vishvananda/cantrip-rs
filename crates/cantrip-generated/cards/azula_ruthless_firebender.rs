@@ -10,7 +10,7 @@ fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mu
 let mut hoisted_1: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 {
-let amount_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_0 = Vec::new(); for player in players_0 { cards_0.extend({ let hand = g.state().zone(Zone::hand(player)).to_vec(); cantrip_mechanics::choose::cards(g, player, asker.source, Purpose::Discard, hand, amount_0, true)? }); } let discarded_0 = g.discard_together(&cards_0);
+let amount_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_0: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_0 = Vec::new(); for player in players_0 { cards_0.extend({ let hand = g.state().zone(Zone::hand(player)).to_vec(); cantrip_mechanics::choose::cards(g, player, asker.source, Purpose::Discard, hand, amount_0, true)? }); } let discarded_0 = g.discard_together(&cards_0);
 if !cards_0.is_empty() { 
 g.end_sentence();
 hoisted_1.extend(discarded_0.clone());

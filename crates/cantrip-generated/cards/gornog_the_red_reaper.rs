@@ -1,6 +1,5 @@
 // Gornog, the Red Reaper
-// status: planned
-// requires: event value in a target filter beyond its subject
+// status: ready
 // Haste
 // Cowards can't block Warriors.
 // Whenever one or more Warriors you control attack a player, target creature that player controls becomes a Coward.
@@ -8,9 +7,9 @@
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_1_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); (*so_far).has_subtype(q.words(asker.source).subtype(Subtype::Coward)) }
 #[allow(unused_variables)] fn ability_1_0_rule(q: &dyn Query, source: ObjectId, blocker: ObjectId, attacker: ObjectId) -> bool { let asker = &Asker::new(source, q.controller(source)); !(q.chars(blocker).has_subtype(q.words(asker.source).subtype(Subtype::Coward)) && q.chars(attacker).has_subtype(q.words(asker.source).subtype(Subtype::Warrior))) }
-#[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && Some(PlayerId(planned_value!("event value in a target filter beyond its subject", [u32::MAX; 2] => q.event_data())[1] as u8)) == Some(q.controller(id))))) }
+#[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && q.event_subject().player() == Some(q.controller(id))))) }
 static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target_0)];
-#[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Attacks { attacker, defender, defending, .. } = event { let id = *attacker; let subject = Target::Object(id); let data = [u32::from(q.controller(id).0), u32::from(defending.0)]; if (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Warrior)) && Some(asker.controller) == Some(q.controller(id))) && match *defender { Target::Player(p) => true, _ => false } { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Attacks { attacker, defender, defending, .. } = event { let id = *attacker; let subject = Target::Player(*defending); let data = [u32::from(q.controller(id).0), u32::from(defending.0)]; if (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Warrior)) && Some(asker.controller) == Some(q.controller(id))) && match *defender { Target::Player(p) => true, _ => false } { return Some(Fired { subject, data }); } }
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);

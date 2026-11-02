@@ -7,6 +7,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let candidates_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }; let Some(chosen_0) = cantrip_mechanics::choose::player(g, player_0, asker.source, candidates_0, "Choose", 0)? else { return Ok(()) };
 g.end_sentence();
 let amount_1 = { let q: &dyn Query = g; (3i64).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; { let mut all: Vec<PlayerId> = Vec::new(); for p in Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() { if !all.contains(&p) { all.push(p); } } for p in Some(chosen_0).into_iter().collect::<Vec<PlayerId>>() { if !all.contains(&p) { all.push(p); } } all } };
+let drawing_1: Vec<PlayerId> = players_1.into_iter().collect(); let players_1: Vec<PlayerId> = g.state().apnap().filter(|p| drawing_1.contains(p)).collect();
 for player in players_1 { g.draw(player, amount_1); }
 g.end_sentence();
 let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let candidates_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }; let Some(chosen_2) = cantrip_mechanics::choose::player(g, player_2, asker.source, candidates_2, "Choose", 0)? else { return Ok(()) };

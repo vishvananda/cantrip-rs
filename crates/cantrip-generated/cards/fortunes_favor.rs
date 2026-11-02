@@ -1,7 +1,5 @@
 // Fortune's Favor
-// status: planned
-// requires: operation ChoosePile
-// requires: operation Piles
+// status: ready
 // Target opponent looks at the top four cards of your library and separates them into a face-down pile and a face-up pile. Put one pile into your hand and the other into your graveyard.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Player(p) if (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&p)) }
@@ -9,8 +7,8 @@ static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let player_1 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.player()).expect("a reference that always names a player") }; let objects_1 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((4i64).max(0) as usize).collect::<Vec<ObjectId>>() }; g.look_at(player_1, &objects_1);
-planned!("operation-piles" => cantrip_mechanics::choose::into_piles(g, { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.player()).expect("a reference that always names a player") }, asker.source, { let q: &dyn Query = g; (objects_1.clone()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Library).collect::<Vec<ObjectId>>() }, Some({ let q: &dyn Query = g; (2i64).max(0) as u32 }), &["face up", "face down"], None)?);
-planned!("operation-choose-pile" => cantrip_mechanics::choose::of_piles(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, asker.source, None, false, &[], None, Some("OwnersHand"))?);
+let separator_2 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.player()).expect("a reference that always names a player") }; let cards_2 = { let q: &dyn Query = g; (objects_1.clone()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Library).collect::<Vec<ObjectId>>() }; let (face_down_2, face_up_2) = cantrip_mechanics::choose::separate_face_down_and_face_up(g, separator_2, asker.source, cards_2)?;
+if !(face_down_2.is_empty() && face_up_2.is_empty()) { let chooser_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let (keep_3, _) = cantrip_mechanics::choose::face_down_or_face_up_pile(g, chooser_3, asker.source, face_down_2, face_up_2.clone())?; if keep_3 == face_up_2 { g.return_to_hand_revealed(&keep_3); } else { g.return_to_hand(&keep_3); } }
 let objects_4 = { let q: &dyn Query = g; (objects_1.clone()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Library).collect::<Vec<ObjectId>>() }; let moved_4 = { let moves: Vec<(ObjectId, Zone)> = objects_4.iter().map(|&o| (o, Zone::graveyard(g.state().obj(o).owner))).collect(); let moved = g.move_together(&moves, MoveReason::Other); moved.into_iter().filter(|&o| g.state().obj(o).zone.kind() == ZoneKind::Graveyard).collect::<Vec<ObjectId>>() };
 g.end_sentence();
  Ok(()) }

@@ -1,6 +1,5 @@
 // Rampaging Yao Guai
-// status: planned
-// requires: target constraint TotalProperty
+// status: ready
 // Vigilance, trample
 // This creature enters with X +1/+1 counters on it.
 // When this creature enters, destroy any number of target artifacts and/or enchantments with total mana value X or less.
@@ -8,7 +7,7 @@
 #[allow(unused_variables, unused_mut)] fn ability_2_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let more = { let q: &dyn Query = g; (i64::from(entering.x)).clamp(0, 32767) as i16 }; entering.counters[CounterKind::PlusOne as usize] = entering.counters[CounterKind::PlusOne as usize].saturating_add(more);
  Ok(()) }
 #[allow(unused_variables)] fn ability_3_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Enchantment)))) }
-static ABILITY_3_TARGETS: &[cantrip_api::TargetSpec] = &[planned_value!("target constraint TotalProperty", target(ability_3_target_0).between(0, cantrip_api::TargetSpec::ANY_NUMBER) => target(ability_3_target_0).between(0, cantrip_api::TargetSpec::ANY_NUMBER).with_rules(&[SelectionRule::Total(Property::ManaValue, Comparison::LessOrEqual, { let q: &dyn Query = g; q.event_subject().object().map_or(0i64, |o: ObjectId| i64::from(q.state().obj(o).x)) })]))];
+static ABILITY_3_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_3_target_0).between(0, cantrip_api::TargetSpec::ANY_NUMBER).together(cantrip_mechanics::select::total_mana_value_at_most(TargetSpec::COUNTED))];
 #[allow(unused_variables)] fn ability_3_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

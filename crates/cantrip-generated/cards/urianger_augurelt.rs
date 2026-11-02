@@ -1,6 +1,6 @@
 // Urianger Augurelt
 // status: planned
-// requires: play permission with an effect on what is played
+// requires: engine: a play permission that costs less
 // Whenever you play a land from exile or cast a spell from exile, you gain 2 life.
 // Draw Arcanum — {T}: Look at the top card of your library. You may exile it face down.
 // Play Arcanum — {T}: Until end of turn, you may play cards exiled with Urianger Augurelt. Spells you cast this way cost {2} less to cast.
@@ -18,7 +18,7 @@ let mut hoisted_4: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let objects_1 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((1i64).max(0) as usize).collect::<Vec<ObjectId>>() }; g.look_at(player_1, &objects_1);
 g.end_sentence();
-let decider_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_2, asker.source, Purpose::Optional)? {
+let decider_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if !({ let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((1i64).max(0) as usize).collect::<Vec<ObjectId>>() }).is_empty() && cantrip_mechanics::effects::ask_may(g, decider_2, asker.source, Purpose::Optional)? {
 let objects_3 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((1i64).max(0) as usize).collect::<Vec<ObjectId>>() }; let by_3 = Some(g.linked(item)); let moved_3 = g.exile_face_down(&objects_3, by_3);
 g.end_sentence();
 hoisted_4.extend(moved_3.clone());
@@ -27,7 +27,7 @@ hoisted_5.extend({ let q: &dyn Query = g; objects_3.iter().copied().filter(|&o| 
 g.end_sentence();
  Ok(()) }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("play-permission-with-an-effect-on-what-is-played" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.add_player_effect(player, source, EffectKind::PlayerRule(PlayerRule::Play { zone: ZoneKind::Exile, cards: CardsOfRule::kept(move |q: &dyn Query, asker: &Asker, card: ObjectId| (((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && q.exiled_with(q.linked_to(asker)).contains(&id)).collect::<Vec<ObjectId>>()).contains(&card)), grant: PlayGrant { lands: true, rider: Some(&[&[SpellEffect::DecreaseManaCost(CostReductionSymbol::CostReduceGeneric(2))]]), ..PlayGrant::CAST } }), Duration::EndOfTurn); } });
+planned!("engine-a-play-permission-that-costs-less" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.add_player_effect(player, source, EffectKind::PlayerRule(PlayerRule::Play { zone: ZoneKind::Exile, cards: CardsOfRule::kept(move |q: &dyn Query, asker: &Asker, card: ObjectId| (((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && q.exiled_with(q.linked_to(asker)).contains(&id)).collect::<Vec<ObjectId>>()).contains(&card)), grant: PlayGrant { lands: true, rider: Some(&[&[SpellEffect::DecreaseManaCost(CostReductionSymbol::CostReduceGeneric(2))]]), ..PlayGrant::CAST } }), Duration::EndOfTurn); } });
 g.end_sentence();
  Ok(()) }
 fn cast_of<'a>(q: &'a dyn Query, id: ObjectId) -> Option<&'a Cast> { let records = q.history().all(); let spell = records.iter().rev().find_map(|r| match r.event { Event::ZoneChange { old, new, reason: ZoneReason::Resolve, .. } if new == id => Some(old), _ => None }).unwrap_or(id); records.iter().rev().find_map(|r| match &r.event { Event::Cast(cast) if cast.spell == spell => Some(cast), _ => None }) }

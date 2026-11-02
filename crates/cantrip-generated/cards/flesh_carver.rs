@@ -21,7 +21,7 @@ pub static EXTRA: &[&CardDef] = &[];
 
 }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let count_2 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let power_2 = { let q: &dyn Query = g; (item.subject.object().map_or(0i64, |o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0)))).max(0) as i16 }; let toughness_2 = { let q: &dyn Query = g; (item.subject.object().map_or(0i64, |o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0)))).max(0) as i16 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut values_2 = Copiable::of(g.card_id(&token_3::CARD)).sized(power_2, toughness_2); values_2.words = g.words(asker.source); let mut created_2: Vec<ObjectId> = Vec::new(); for player in players_2 { created_2.extend(g.create_token_copies_of(values_2, player, count_2)?); }
+let count_2 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let power_2 = { let q: &dyn Query = g; (item.subject.object().map_or(0i64, |o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0)))).max(0) as i16 }; let toughness_2 = { let q: &dyn Query = g; (item.subject.object().map_or(0i64, |o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0)))).max(0) as i16 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut values_2 = Copiable::of(g.card_id(&token_3::CARD)).sized(power_2, toughness_2); values_2.words = g.words(asker.source); let mut created_2: Vec<ObjectId> = Vec::new(); for player in players_2 { created_2.extend(g.create_token_copies_tapped(values_2, player, count_2, false)?); }
 g.end_sentence();
  Ok(()) }
 

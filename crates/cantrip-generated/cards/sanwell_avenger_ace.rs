@@ -17,7 +17,7 @@ let picked_1 = if open_1.is_empty() { None } else if open_1.len() > 1 || (true &
 let Some(card_1) = picked_1 else { break; };
 let ways_1: Vec<CastWay> = g.cast_ways_during_resolution_by(card_1, caster_1).into_iter().filter(|w| true).collect();
 let done_1 = if ways_1.is_empty() { g.play_land_during_resolution(card_1)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_1, card_1, ways_1)?.map(|w| w.way); g.cast_during_resolution_as(card_1, CastTerms { instead: None, way, caster: Some(caster_1), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
-if done_1 { left_1 -= 1; played_1.push(g.state().obj(card_1).became.unwrap_or(card_1)); } else if 1i64 == 1 { break; } if done_1 || !(true && true) { pool_1.retain(|&c| c != card_1); }
+if done_1 { left_1 -= 1; played_1.push(g.state().obj(card_1).became.unwrap_or(card_1)); } else if true { break; } if done_1 || !(true && true) { pool_1.retain(|&c| c != card_1); }
 }
 g.end_sentence();
 let objects_2 = { let q: &dyn Query = g; (moved_0.clone()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Exile).collect::<Vec<ObjectId>>() }; let moved_2 = g.put_into_library(&objects_2, LibraryPlace::BottomInRandomOrder);

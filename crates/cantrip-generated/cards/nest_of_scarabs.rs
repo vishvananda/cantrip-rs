@@ -2,7 +2,7 @@
 // status: ready
 // Whenever you put one or more -1/-1 counters on a creature, create that many 1/1 black Insect creature tokens.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::CountersPut { object, kind, amount, by, .. } = event { let id = *object; let subject = Target::Object(id); let data = [*amount as u32, id.0]; if q.chars(id).is(CardType::Creature) && *kind == CounterKind::MinusOne && Some(asker.controller) == Some(*by) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::CountersPut { object, kind, amount, by, types, .. } = event { let id = *object; let subject = Target::Object(id); let data = [*amount as u32, id.0]; if types.has(CardType::Creature) && *kind == CounterKind::MinusOne && Some(asker.controller) == Some(*by) { return Some(Fired { subject, data }); } }
  None }
 pub mod token_1 {
 #[allow(unused_imports)] use cantrip_api::*;

@@ -1,10 +1,12 @@
 // Chaos Mutation
-// status: planned
-// requires: target cardinality PerPlayer
+// status: ready
 // Exile any number of target creatures controlled by different players. For each creature exiled this way, its controller reveals cards from the top of their library until they reveal a creature card, puts that card onto the battlefield, then puts the rest on the bottom of their library in a random order.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if planned_value!("target cardinality PerPlayer", true => cantrip_mechanics::targets::controlled_by_slot_player(q, id))) && (matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature)))) }
-static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0).between(0, planned_value!("target cardinality PerPlayer", 1u32 => TargetSpec::EACH_PLAYER))];
+fn different_controllers_key(q: &dyn Query, id: ObjectId) -> PlayerId { q.controller(id) }
+fn different_controllers(q: &dyn Query, choice: &Choice, _: u32) -> Verdict { let used: Vec<PlayerId> = choice.selected.iter().map(|&c| different_controllers_key(q, c)).collect(); let apart = used.iter().enumerate().all(|(i, k)| !used[..i].contains(k)); Verdict { complete: apart, addable: Bits::of(choice.candidates.len(), |i| !used.contains(&different_controllers_key(q, choice.candidates[i]))) } }
+fn largest_different_controllers(q: &dyn Query, choice: &Choice, _: u32) -> Vec<ObjectId> { cantrip_api::select::largest_distinct(choice, |c| different_controllers_key(q, c)) }
+#[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
+static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0).between(0, cantrip_api::TargetSpec::ANY_NUMBER).together(cantrip_api::select::set_part(&(different_controllers as SelectFn), &(largest_different_controllers as cantrip_api::select::LargestFn), 0, "controlled by different players"))];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_8: Vec<ObjectId> = Vec::new();
 let mut hoisted_7: Vec<ObjectId> = Vec::new();
 let mut hoisted_6: Vec<ObjectId> = Vec::new();

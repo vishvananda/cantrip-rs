@@ -1,11 +1,10 @@
 // Abandoned Sarcophagus
-// status: planned
-// requires: object filter HasActivatedAbility
+// status: ready
 // You may cast spells that have a cycling ability from your graveyard.
 // If a card that has a cycling ability would be put into your graveyard from anywhere and it wasn't cycled, exile it instead.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_0_cost(q: &dyn Query, asker: &Asker, card: ObjectId, player: PlayerId) -> Option<Cost> { (player == asker.controller && planned_value!("object filter HasActivatedAbility", false => q.card_of(card).activated.iter().any(|d| matches(d)))).then(|| Cost::mana(q.card(q.chars(card).card).cost)) }
-#[allow(unused_variables)] fn ability_1_applies(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool { if let Proposal::ZoneChange(z) = proposal { let id = z.object; let subject = Target::Object(id); let data = [u32::MAX; 2]; if z.to.is(ZoneKind::Graveyard) && (planned_value!("object filter HasActivatedAbility", false => q.card_of(id).activated.iter().any(|d| matches(d))) && Some(asker.controller) == Some(q.state().obj(id).owner) && !(q.history().all().iter().any(|r| matches!(r.event, Event::Cycled { card, .. } if card == id)))) { return true; } }
+#[allow(unused_variables)] fn ability_0_0_cost(q: &dyn Query, asker: &Asker, card: ObjectId, player: PlayerId) -> Option<Cost> { (player == asker.controller && q.chars(card).abilities().any(|a| q.activated_ability(a).is_some_and(|d| !d.special_action && d.cycling))).then(|| Cost::mana(q.card(q.chars(card).card).cost)) }
+#[allow(unused_variables)] fn ability_1_applies(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool { if let Proposal::ZoneChange(z) = proposal { let id = z.object; let subject = Target::Object(id); let data = [u32::MAX; 2]; if z.to.is(ZoneKind::Graveyard) && (q.chars(id).abilities().any(|a| q.activated_ability(a).is_some_and(|d| !d.special_action && d.cycling)) && Some(asker.controller) == Some(q.state().obj(id).owner) && !(q.history().all().iter().any(|r| matches!(r.event, Event::Cycled { card, .. } if card == id)))) { return true; } }
  false }
 #[allow(unused_variables, unused_mut)] fn ability_1_apply(q: &dyn Query, asker: &Asker, proposal: &mut Proposal) { let seen = *proposal; if let Proposal::ZoneChange(seen) = &seen { let z = seen; let id = z.object; let subject = Target::Object(id); let data = [u32::MAX; 2]; if let Proposal::ZoneChange(z) = proposal { z.to = Zone::exile(q.state().obj(z.object).owner); } } }
 

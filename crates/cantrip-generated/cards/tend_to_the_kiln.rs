@@ -1,6 +1,5 @@
 // Tend to the Kiln
 // status: planned
-// requires: counter kind Flame
 // requires: engine: no perpetual effects
 // requires: operation Conjure
 // When this enchantment enters, all non-Elemental instant and sorcery cards you own perpetually become Elemental kindreds in addition to their other types.
@@ -28,13 +27,13 @@ let mut hoisted_8: Vec<ObjectId> = Vec::new();
 let mut hoisted_7: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let mut counters_1: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, planned_value!("counter kind Flame", CounterKind::Charge => CounterKind::Flame), amount)); } }
+let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, CounterKind::Flame, amount)); } }
 let had_1: Vec<_> = counters_1.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_1); let applied_1: Vec<ObjectId> = counters_1.iter().zip(had_1).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
-if { let q: &dyn Query = g; Some(asker.source).is_some_and(|candidate: ObjectId| (i64::from(q.state().obj(candidate).counters(planned_value!("counter kind Flame", CounterKind::Charge => CounterKind::Flame)))) >= (3i64)) } {
+if { let q: &dyn Query = g; Some(asker.source).is_some_and(|candidate: ObjectId| (i64::from(q.state().obj(candidate).counters(CounterKind::Flame))) >= (3i64)) } {
 let mut removed_2: i64 = 0;
 let objects_2_0 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() };
-let amount_2_0 = i16::MAX; cantrip_api::instruction(g, |g| { for object in objects_2_0 { removed_2 += i64::from(g.remove_counters(object, planned_value!("counter kind Flame", CounterKind::Charge => CounterKind::Flame), amount_2_0)); } });
+let amount_2_0 = i16::MAX; cantrip_api::instruction(g, |g| { for object in objects_2_0 { removed_2 += i64::from(g.remove_counters(object, CounterKind::Flame, amount_2_0)); } });
 g.end_sentence();
 let count_3: u32 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let mut conjured_3: Vec<ObjectId> = Vec::new(); for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { conjured_3.extend(planned_value!("operation Conjure", Vec::<ObjectId>::new() => cantrip_mechanics::conjure::conjure(g, player, player, asker.source, Conjured::Named("Flamebraider"), count_3, ConjureTo::Battlefield { tapped: false })?)); }
 g.end_sentence();

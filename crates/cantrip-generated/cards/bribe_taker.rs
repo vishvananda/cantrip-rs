@@ -1,6 +1,5 @@
 // Bribe Taker
-// status: planned
-// requires: operation EachCounterKind
+// status: ready
 // Trample
 // When this creature enters, for each kind of counter on permanents you control, you may put your choice of a +1/+1 counter or a counter of that kind on this creature.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -8,7 +7,7 @@
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let decider_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_0, asker.source, Purpose::Optional)? {
-planned!("operation-each-counter-kind" => cantrip_mechanics::counters::each_kind(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, asker.source, { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| Some(asker.controller) == Some(q.controller(id))).collect::<Vec<ObjectId>>() }, "[Put(PowerToughness(1, 1), Source), PutThatKind(Source)]", true)?);
+let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let among_1: Vec<ObjectId> = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| Some(asker.controller) == Some(q.controller(id))).collect::<Vec<ObjectId>>() }; let kinds_1: Vec<CounterKind> = CounterKind::ALL.into_iter().filter(|&kind| among_1.iter().any(|&o| g.state().obj(o).counters(kind) > 0)).collect(); if let Some(object) = { let q: &dyn Query = g; Some(asker.source) } { for kind in kinds_1 { if kind != CounterKind::PlusOne && !cantrip_mechanics::choose::cards(g, player_1, asker.source, Purpose::PutCounters(kind, 1), Vec::from([object]), 1, true)?.is_empty() { g.add_counters(object, kind, 1); continue; } if !cantrip_mechanics::choose::cards(g, player_1, asker.source, Purpose::PutCounters(CounterKind::PlusOne, 1), Vec::from([object]), 1, true)?.is_empty() { g.add_counters(object, CounterKind::PlusOne, 1); } } }
 g.end_sentence();
 }
 g.end_sentence();

@@ -46,7 +46,7 @@ pub static EXTRA: &[&CardDef] = &[&token_6::CARD,&back::emblem_2::CARD];
 pub mod back {
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_0 = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }; let mut cards_0 = Vec::new(); for player in players_0 { cards_0.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_0)?); } let discarded_0 = g.discard_together(&cards_0);
+let amount_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_0: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_0 = Vec::new(); for player in g.state().apnap().filter(|p| players_0.contains(p)).collect::<Vec<PlayerId>>() { cards_0.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_0)?); } let discarded_0 = g.discard_together(&cards_0);
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && (((!(q.chars(id).supertypes.legendary) && q.chars(id).is(CardType::Creature)) && q.announced_x().map_or(true, |x| (i64::from(q.mana_value(id))) == (i64::from(x))) && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(id).owner))))) }

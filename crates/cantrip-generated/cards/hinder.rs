@@ -1,13 +1,13 @@
 // Hinder
-// status: planned
-// requires: counter into OwnersLibraryTopOrBottom
+// status: ready
 // Counter target spell. If that spell is countered this way, put that card on your choice of the top or bottom of its owner's library instead of into that player's graveyard.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Stack) && (true)) }
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0)];
+static TOP_OR_BOTTOM_0: Question = Question::new("PutOnTop", "put it on top of its owner's library?", "If you don't, it goes on the bottom", "Top", "Bottom");
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-planned!("counter-into-owners-library-top-or-bottom" => cantrip_mechanics::effects::counter_onto(g, asker.source, { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }, CounterDestination::OwnersLibraryTopOrBottom)?);
+let objects_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; let top_0 = cantrip_mechanics::effects::ask_may(g, asker.controller, asker.source, Purpose::Ask(&TOP_OR_BOTTOM_0))?; cantrip_api::instruction(g, |g| { for spell in objects_0 { g.counter_to(spell, if top_0 { CounterTo::LibraryTop } else { CounterTo::LibraryBottom }); } });
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

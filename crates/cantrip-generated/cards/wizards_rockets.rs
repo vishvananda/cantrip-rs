@@ -1,6 +1,5 @@
 // Wizard's Rockets
-// status: planned
-// requires: numeric expression AnnouncedX
+// status: ready
 // This artifact enters tapped.
 // {X}, {T}, Sacrifice this artifact: Add X mana in any combination of colors.
 // When this artifact is put into a graveyard from the battlefield, draw a card.
@@ -8,7 +7,7 @@
 #[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); entering.tapped = true;
  Ok(()) }
 fn ability_1_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let mana_players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_1 = { let q: &dyn Query = g; (planned_value!("numeric expression AnnouncedX", 0i64 => i64::from(q.announced_x().unwrap_or(0)))).clamp(0, 255) as u8 };
+let mana_1 = { let q: &dyn Query = g; (i64::from(q.obj(asker.source).x)).clamp(0, 255) as u8 };
 for player in mana_players_1 {
 if mana_1 > 0 { let colors = cantrip_mechanics::choose_colors(g, player, asker.source, ColorSet(31), mana_1)?;
 for color in colors { g.add_mana(player, color.mana(), 1); }

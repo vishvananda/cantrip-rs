@@ -1,12 +1,11 @@
 // Lost in the Maze
-// status: planned
-// requires: target cardinality Exactly
+// status: ready
 // Flash
 // When this enchantment enters, tap X target creatures. Put a stun counter on each of those creatures you don't control. (If a permanent with a stun counter would become untapped, remove one from it instead.)
 // Tapped creatures you control have hexproof.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
-static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0).between(planned_value!("target cardinality Exactly", 1u32 => TargetSpec::read_as_chosen(|q: &dyn Query, asker: &Asker| (q.event_subject().object().map_or(0i64, |o: ObjectId| i64::from(q.state().obj(o).x))).max(0) as u32)), planned_value!("target cardinality Exactly", 1u32 => TargetSpec::read_as_chosen(|q: &dyn Query, asker: &Asker| (q.event_subject().object().map_or(0i64, |o: ObjectId| i64::from(q.state().obj(o).x))).max(0) as u32)))];
+static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0).counted()];
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

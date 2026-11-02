@@ -19,7 +19,8 @@ let asker = &Asker::new(item.object, item.controller);
 let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let objects_1 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((1i64).max(0) as usize).collect::<Vec<ObjectId>>() }; g.look_at(player_1, &objects_1);
 g.end_sentence();
 let payer_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
-let paid_2 = cantrip_mechanics::effects::ask_may(g, payer_2, asker.source, Purpose::Optional)?; if paid_2 {
+let looked_2 = cantrip_mechanics::top_of_library(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, 1); let offered_2 = { let q: &dyn Query = g; looked_2.iter().copied().any(|id| q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Mount))) };
+let paid_2 = offered_2 && cantrip_mechanics::effects::ask_may(g, payer_2, asker.source, Purpose::Optional)?; if paid_2 {
 let player_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let top_3 = cantrip_mechanics::top_of_library(g, player_3, 1);
 g.reveal(player_3, &top_3);
 let matching_3: Vec<ObjectId> = { let q: &dyn Query = g; top_3.iter().copied().filter(|&id| q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Mount))).collect() };
@@ -30,7 +31,7 @@ hoisted_6.extend({ let q: &dyn Query = g; objects_4.iter().copied().filter(|&o| 
 }
 g.end_sentence();
 if { let q: &dyn Query = g; !(((paid_2 as i64) != 0)) } {
-let decider_7 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_7, asker.source, Purpose::Optional)? {
+let decider_7 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if !({ let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((1i64).max(0) as usize).collect::<Vec<ObjectId>>() }).is_empty() && cantrip_mechanics::effects::ask_may(g, decider_7, asker.source, Purpose::Optional)? {
 let objects_8 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((1i64).max(0) as usize).collect::<Vec<ObjectId>>() }; let moved_8 = g.put_into_library(&objects_8, LibraryPlace::Bottom);
 g.end_sentence();
 hoisted_9.extend(moved_8.clone());

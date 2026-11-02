@@ -14,7 +14,7 @@ fn granted_0_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.source).is_so
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let amount_1 = { let q: &dyn Query = g; (5i64).max(0) as u32 }; let mills_1: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_1)).collect(); let milled_1 = g.mill_together(&mills_1);
 g.end_sentence();
-let objects_2 = { let q: &dyn Query = g; (milled_1.clone()).into_iter().filter(|&id| (q.chars(id).is(CardType::Creature) && planned_value!("object filter HasActivatedAbility", false => q.card_of(id).activated.iter().any(|d| matches(d))))).collect::<Vec<ObjectId>>() }; let moved_2 = g.return_to_hand(&objects_2);
+let objects_2 = { let q: &dyn Query = g; (milled_1.clone()).into_iter().filter(|&id| (q.chars(id).is(CardType::Creature) && q.chars(id).abilities().any(|a| q.activated_ability(a).is_some_and(|d| !d.special_action && !(d.is_mana_ability()))))).collect::<Vec<ObjectId>>() }; let moved_2 = g.return_to_hand(&objects_2);
 g.end_sentence();
  Ok(()) }
 

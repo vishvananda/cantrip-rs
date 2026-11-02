@@ -10,7 +10,7 @@ fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mu
 let mut hoisted_3: Vec<ObjectId> = Vec::new();
 let mut hoisted_2: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-let decider_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_0, asker.source, Purpose::Optional)? {
+let decider_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if !({ let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((1i64).max(0) as usize).collect::<Vec<ObjectId>>() }).is_empty() && cantrip_mechanics::effects::ask_may(g, decider_0, asker.source, Purpose::Optional)? {
 let objects_1 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((1i64).max(0) as usize).collect::<Vec<ObjectId>>() }; let moved_1 = g.exile_all(&objects_1);
 g.end_sentence();
 hoisted_2.extend(moved_1.clone());

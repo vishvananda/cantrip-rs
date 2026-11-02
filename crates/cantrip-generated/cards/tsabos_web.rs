@@ -1,6 +1,5 @@
 // Tsabo's Web
-// status: planned
-// requires: object filter HasActivatedAbility
+// status: ready
 // When this artifact enters, draw a card.
 // Each land with an activated ability that isn't a mana ability doesn't untap during its controller's untap step.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -11,8 +10,8 @@ let amount_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_0 = 
 for player in players_0 { g.draw(player, amount_0); }
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_1_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); ((*so_far).is(CardType::Land) && (planned_value!("object filter HasActivatedAbility", false => q.card_of(affected).activated.iter().any(|d| matches(d))) && planned_value!("object filter HasActivatedAbility", false => q.card_of(affected).activated.iter().any(|d| matches(d))))) }
-#[allow(unused_variables)] fn ability_1_0_rule(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { (q.chars(id).is(CardType::Land) && (planned_value!("object filter HasActivatedAbility", false => q.card_of(id).activated.iter().any(|d| matches(d))) && planned_value!("object filter HasActivatedAbility", false => q.card_of(id).activated.iter().any(|d| matches(d))))) }
+#[allow(unused_variables)] fn ability_1_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); ((*so_far).is(CardType::Land) && ((*so_far).abilities().any(|a| matches!(q.cards().ability(a), AbilityDef::Activated(d) if !d.special_action)) && (*so_far).abilities().any(|a| matches!(q.cards().ability(a), AbilityDef::Activated(d) if !d.special_action && !(d.is_mana_ability()))))) }
+#[allow(unused_variables)] fn ability_1_0_rule(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { (q.chars(id).is(CardType::Land) && (q.chars(id).abilities().any(|a| q.activated_ability(a).is_some_and(|d| !d.special_action)) && q.chars(id).abilities().any(|a| q.activated_ability(a).is_some_and(|d| !d.special_action && !(d.is_mana_ability()))))) }
 
 pub static CARD: CardDef = CardDef { name: "Tsabo's Web", token_words: &[], oracle: true, cost: ManaCost { generic: 2, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Artifact]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::ZONE_CHANGE.0), ability_0_event), ability_0, "When this artifact enters, draw a card.").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[ability_1_0_rule], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

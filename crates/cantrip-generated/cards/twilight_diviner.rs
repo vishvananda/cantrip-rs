@@ -1,7 +1,6 @@
 // Twilight Diviner
 // status: planned
 // requires: object collection EventGroup
-// requires: token recipe CopyOne
 // When this creature enters, surveil 2. (Look at the top two cards of your library, then put any number of them into your graveyard and the rest on top of your library in any order.)
 // Whenever one or more other creatures you control enter, if they entered or were cast from a graveyard, create a token that's a copy of one of them. This ability triggers only once each turn.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -15,7 +14,8 @@ fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { (((planned_value!("objec
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && (!(Some(asker.source) == Some(id)) && q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id))) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let created_1: Vec<ObjectId> = planned_value!("token recipe CopyOne", Vec::<ObjectId>::new() => cantrip_mechanics::tokens::create(g, asker, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[({ let q: &dyn Query = g; (1i64).max(0) as u32 }, TokenRecipe::CopyOne({ let q: &dyn Query = g; q.event_objects(item).to_vec() }, &[TokenCopyEffects::NoTokenCopyEffects]))], Arrival { tapped: false, counters: &[], states: &[] })?);
+let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let among_1 = { let q: &dyn Query = g; q.event_objects(item).to_vec() }; let chosen_1 = cantrip_mechanics::choose::select(g, player_1, asker.source, Purpose::CopyWhich, among_1, cantrip_mechanics::select::cards(cantrip_mechanics::select::exactly(1)))?.first().copied();
+let values_1 = { let q: &dyn Query = g; chosen_1.map(|original: ObjectId| q.copiable_values(original)) }; let count_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let created_1 = match values_1 { Some(values) => g.create_token_copies_tapped(values, player_1, count_1, false)?, None => Vec::new() };
 g.end_sentence();
  Ok(()) }
 fn cast_of<'a>(q: &'a dyn Query, id: ObjectId) -> Option<&'a Cast> { let records = q.history().all(); let spell = records.iter().rev().find_map(|r| match r.event { Event::ZoneChange { old, new, reason: ZoneReason::Resolve, .. } if new == id => Some(old), _ => None }).unwrap_or(id); records.iter().rev().find_map(|r| match &r.event { Event::Cast(cast) if cast.spell == spell => Some(cast), _ => None }) }

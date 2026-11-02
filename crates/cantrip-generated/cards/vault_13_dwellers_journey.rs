@@ -1,15 +1,15 @@
 // Vault 13: Dweller's Journey
-// status: planned
-// requires: target cardinality PerPlayer
+// status: ready
 // (As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)
 // I — For each player, exile up to one other target enchantment or creature that player controls until this Saga leaves the battlefield.
 // II — You gain 2 life and scry 2.
 // III — Return two cards exiled with this Saga to the battlefield under their owners' control and put the rest on the bottom of their owners' libraries.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if planned_value!("target cardinality PerPlayer", true => cantrip_mechanics::targets::controlled_by_slot_player(q, id))) && (matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((!(Some(asker.source) == Some(id)) && (q.chars(id).is(CardType::Enchantment) || q.chars(id).is(CardType::Creature)))))) }
-static ABILITY_0_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_0_target_0).between(0, planned_value!("target cardinality PerPlayer", 1u32 => TargetSpec::EACH_PLAYER))];
+#[allow(unused_variables)] fn ability_0_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::controlled_by_slot_opponent(q, id)) && (matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((!(Some(asker.source) == Some(id)) && (q.chars(id).is(CardType::Enchantment) || q.chars(id).is(CardType::Creature)))))) }
+#[allow(unused_variables)] fn ability_0_0_own_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && q.controller(id) == asker.controller) && (matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((!(Some(asker.source) == Some(id)) && (q.chars(id).is(CardType::Enchantment) || q.chars(id).is(CardType::Creature)))))) }
+static ABILITY_0_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_0_target_0).between(0, TargetSpec::EACH_OPPONENT),target(ability_0_0_own_target_0).between(0, 1)];
 fn ability_0_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
+let t_0_raw: Vec<Target> = [announced(g, item, 0, false), announced(g, item, 1, false)].concat(); let t_0: Vec<Target> = [announced(g, item, 0, true), announced(g, item, 1, true)].concat();
 let objects_0 = { let q: &dyn Query = g; t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>() }; let by_0 = g.linked(item); let moved_0 = g.exile_with(&objects_0, by_0, true);
 g.end_sentence();
  Ok(()) }

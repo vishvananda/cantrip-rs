@@ -17,7 +17,7 @@ fn ability_0_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let 
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let objects_0 = { let q: &dyn Query = g; (t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_0 = { let q: &dyn Query = g; Some(asker.source) }; let duration_0 = Duration::WhileSourceOnBattlefield;
 let kind_0_0_0 = { let q: &dyn Query = g; EffectKind::SetPt((0i64) as i16, (4i64) as i16) };
-let kind_0_1_0 = { let q: &dyn Query = g; EffectKind::AddSubtype(q.words(asker.source).subtype(Subtype::Wall)) };
+let kind_0_1_0 = { let q: &dyn Query = g; EffectKind::SetCreatureType(q.words(asker.source).subtype(Subtype::Wall)) };
 let kind_0_2_0 = { let q: &dyn Query = g; EffectKind::AddTypes(TypeSet::of(&[CardType::Artifact])) };
 let kind_0_3_0 = { let q: &dyn Query = g; EffectKind::AddTypes(TypeSet::of(&[CardType::Creature])) };
 let kind_0_4_0 = { let q: &dyn Query = g; EffectKind::AddKeywords(Keywords::of(&[Keyword::Defender])) };
@@ -59,7 +59,7 @@ pub static CARD: CardDef = CardDef { name: "Welcome to . . .", token_words: &[],
 pub static EXTRA: &[&CardDef] = &[&token_2::CARD];
 pub mod back {
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); (q.state().obj(affected).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(affected).owner)) && (*so_far).has_subtype(q.words(asker.source).subtype(Subtype::Dinosaur)) }
+#[allow(unused_variables)] fn ability_0_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); (q.state().obj(affected).became.is_none() && q.state().obj(affected).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(affected).owner)) && (*so_far).has_subtype(q.words(asker.source).subtype(Subtype::Dinosaur)) }
 #[allow(unused_variables)] fn granted_0_way_1(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { !(Some(asker.source) == Some(id)) }
 #[allow(unused_variables)] fn ability_0_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); let card = q.cards().current(q.state().obj(asker.source)); let _ = card; if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) { chars.abilities[slot] = Some(planned_value!("engine: no Escape granted", AbilityRef::delayed(q.cards().current(q.state().obj(asker.source)), 0) => AbilityRef::granted_static(q.cards().current(q.state().obj(asker.source)), 0))); } }
 fn ability_1_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let mana_players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };

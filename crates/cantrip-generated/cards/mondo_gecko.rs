@@ -9,7 +9,7 @@ let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a referen
 g.end_sentence();
 let objects_1 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let duration_1 = Duration::EndOfTurn;
 let kind_1_0_0 = { let q: &dyn Query = g; EffectKind::SetColors(ColorSet::of(chosen_0)) };
-let kind_1_1_0 = { let q: &dyn Query = g; EffectKind::HexproofFrom(planned_value!("keyword HexproofFrom Chosen", HexproofFrom::NONE => HexproofFrom::of(|q: &dyn Query, asker: &Asker, id: ObjectId| Some(chosen_0).is_some_and(|chosen| q.chars(id).colors.has(chosen))))) };
+let kind_1_1_0 = { let q: &dyn Query = g; EffectKind::HexproofFrom(planned_value!("keyword HexproofFrom Chosen", HexproofFrom::NONE => HexproofFrom::color(chosen_0))) };
 if let Some(source) = source_1 { cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.add_effect(source, object, kind_1_0_0, duration_1); g.add_effect(source, object, kind_1_1_0, duration_1);  } }); }
 g.end_sentence();
  Ok(()) }

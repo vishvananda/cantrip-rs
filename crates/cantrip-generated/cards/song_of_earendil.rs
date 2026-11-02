@@ -1,6 +1,5 @@
 // Song of Eärendil
-// status: planned
-// requires: mixed token text origins in one creation batch
+// status: ready
 // (As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)
 // I — Scry 2, then draw two cards.
 // II — Create a Treasure token and a 2/2 blue Bird creature token with flying.
@@ -40,8 +39,8 @@ let count_2_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let def_2_1 = g
 for player in players_2 {
 tokens_2.extend(std::iter::repeat((def_2_0,player)).take(count_2_0 as usize));
 tokens_2.extend(std::iter::repeat((def_2_1,player)).take(count_2_1 as usize));
-} let words_2 = Words::NONE;
-let created_2 = planned_value!("mixed token text origins in one creation batch", g.create_tokens_worded(&tokens_2, false, None, words_2)? => g.create_tokens_each_worded(&tokens_2, false, None, &[(def_2_0, Words::NONE), (def_2_1, g.words(asker.source))])?);
+} let words_2 = g.words(asker.source);
+let created_2 = g.create_tokens_worded(&tokens_2, false, None, words_2)?;
 g.end_sentence();
  Ok(()) }
 fn ability_0_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

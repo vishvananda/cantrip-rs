@@ -25,7 +25,7 @@ g.end_sentence();
 let amount_5 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_5 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_5 { g.draw(player, amount_5); }
 g.end_sentence();
-let amount_6 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_6 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }; let mut cards_6 = Vec::new(); for player in players_6 { cards_6.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_6)?); } let discarded_6 = g.discard_together(&cards_6);
+let amount_6 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_6: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_6 = Vec::new(); for player in g.state().apnap().filter(|p| players_6.contains(p)).collect::<Vec<PlayerId>>() { cards_6.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_6)?); } let discarded_6 = g.discard_together(&cards_6);
 g.end_sentence();
 let source_7 = { let q: &dyn Query = g; Some(asker.source) }; let amount_7 = { let q: &dyn Query = g; (3i64).max(0) as u16 }; let recipients_7 = { let q: &dyn Query = g; t_1.clone() }; if let Some(source) = source_7 { let batch: Vec<(ObjectId, Target, u16)> = recipients_7.iter().map(|t| (source, *t, amount_7)).collect(); g.damage_together(&batch); }
 g.end_sentence();

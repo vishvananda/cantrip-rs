@@ -1,6 +1,5 @@
 // Rusko, Clockmaker
 // status: planned
-// requires: counter kind Hour
 // requires: operation Conjure
 // When Rusko enters, conjure a card named Midnight Clock onto the battlefield.
 // Whenever you cast a noncreature spell, put an hour counter on each permanent you control named Midnight Clock. Each opponent loses 1 life and you gain 1 life.
@@ -15,7 +14,7 @@ g.end_sentence();
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut counters_1: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (Some(asker.controller) == Some(q.controller(id)) && q.chars(id).name == "Midnight Clock")).collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, planned_value!("counter kind Hour", CounterKind::Charge => CounterKind::Hour), amount)); } }
+let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (Some(asker.controller) == Some(q.controller(id)) && q.chars(id).name == "Midnight Clock")).collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, CounterKind::Hour, amount)); } }
 let had_1: Vec<_> = counters_1.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_1); let applied_1: Vec<ObjectId> = counters_1.iter().zip(had_1).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
 let amount_2 = { let q: &dyn Query = g; (1i64).max(0) as i32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };

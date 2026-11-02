@@ -1,6 +1,5 @@
 // Ravenloft Adventurer
-// status: planned
-// requires: counter kind Hit
+// status: ready
 // When this creature enters, you take the initiative.
 // If a creature an opponent controls would die, instead exile it and put a hit counter on it.
 // Whenever this creature attacks, if you've completed a dungeon, defending player loses 1 life for each card they own in exile with a hit counter on it.
@@ -15,7 +14,7 @@ g.end_sentence();
  false }
 #[allow(unused_variables, unused_mut)] fn ability_1_apply(q: &dyn Query, asker: &Asker, proposal: &mut Proposal) { let seen = *proposal; if let Proposal::ZoneChange(seen) = &seen { let z = seen; let id = z.object; let subject = Target::Object(id); let data = [u32::MAX; 2]; if let Proposal::ZoneChange(z) = proposal { z.to = Zone::exile(q.state().obj(z.object).owner); } } }
 #[allow(unused_variables, unused_mut)] fn ability_1_then_steps(g: &mut dyn Game, asker: &Asker, subject: Target, data: [u32; 2]) -> Result<(), Suspend> { let mut counters_1: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (((subject.object().and_then(|o: ObjectId| q.state().obj(o).became).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Exile).collect::<Vec<ObjectId>>()).get(0).copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, planned_value!("counter kind Hit", CounterKind::Charge => CounterKind::Hit), amount)); } }
+let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (((subject.object().and_then(|o: ObjectId| q.state().obj(o).became).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Exile).collect::<Vec<ObjectId>>()).get(0).copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, CounterKind::Hit, amount)); } }
 let had_1: Vec<_> = counters_1.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_1); let applied_1: Vec<ObjectId> = counters_1.iter().zip(had_1).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_then(g: &mut dyn Game, asker: &Asker, before: &Proposal, _: &Proposal) { if let Proposal::ZoneChange(z) = before { let q: &dyn Query = g; let id = z.object; let subject = Target::Object(id); let data = [u32::MAX; 2]; let _ = ability_1_then_steps(g, asker, subject, data); } }
@@ -23,7 +22,7 @@ fn ability_2_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.controller).i
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Attacks { attacker, defending, .. } = event { let id = *attacker; let subject = Target::Object(id); let data = [u32::from(defending.0), u32::MAX]; if Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_2 = { let q: &dyn Query = g; ((((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (item.subject.object().and_then(|o: ObjectId| q.defending_player(o)) == Some(q.state().obj(id).owner) && (i64::from(q.state().obj(id).counters(planned_value!("counter kind Hit", CounterKind::Charge => CounterKind::Hit)))) > (0i64))).collect::<Vec<ObjectId>>()).len() as i64).clamp(0, 2147483647) as i32 }; let players_2 = { let q: &dyn Query = g; item.subject.object().and_then(|o: ObjectId| q.defending_player(o)).into_iter().collect::<Vec<PlayerId>>() };
+let amount_2 = { let q: &dyn Query = g; ((((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (item.subject.object().and_then(|o: ObjectId| q.defending_player(o)) == Some(q.state().obj(id).owner) && (i64::from(q.state().obj(id).counters(CounterKind::Hit))) > (0i64))).collect::<Vec<ObjectId>>()).len() as i64).clamp(0, 2147483647) as i32 }; let players_2 = { let q: &dyn Query = g; item.subject.object().and_then(|o: ObjectId| q.defending_player(o)).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_2 { g.lose_life(player, amount_2); }
 g.end_sentence();
  Ok(()) }

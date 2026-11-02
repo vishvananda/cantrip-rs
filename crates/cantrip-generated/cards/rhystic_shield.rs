@@ -8,9 +8,9 @@ let objects_0 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied(
 let kind_0_0_0 = { let q: &dyn Query = g; EffectKind::Pump((0i64) as i16, (1i64) as i16) };
 if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &object in &objects_0 { g.add_effect(source, object, kind_0_0_0, duration_0);  } }); }
 g.end_sentence();
-let mut paid_1 = false; for bound_1000002 in { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() } {
+let mut paid_1 = false; let mut who_1: Option<PlayerId> = None; for bound_1000002 in { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() } {
 let payer_3 = { let q: &dyn Query = g; Some(bound_1000002).expect("a reference that always names a player") }; let paid_3 = g.may_pay(payer_3, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 2, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })), &PAY_QUESTION)?;
-if paid_3 { paid_1 = true; break; } }
+if paid_3 { paid_1 = true; who_1 = Some(bound_1000002); break; } }
 g.end_sentence();
 if { let q: &dyn Query = g; !(((paid_1 as i64) != 0)) } {
 let objects_4 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_4 = { let q: &dyn Query = g; Some(asker.source) }; let duration_4 = Duration::EndOfTurn;

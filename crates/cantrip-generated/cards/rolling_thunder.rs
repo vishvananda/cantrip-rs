@@ -1,10 +1,8 @@
 // Rolling Thunder
-// status: planned
-// requires: numeric expression AnnouncedX
-// requires: target cardinality UpTo
+// status: ready
 // Rolling Thunder deals X damage divided as you choose among any number of targets.
 #[allow(unused_imports)] use cantrip_api::*;
-static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[cantrip_mechanics::targets::ANY.between(1, planned_value!("target cardinality UpTo", 1u32 => TargetSpec::read_as_chosen(|q: &dyn Query, asker: &Asker| (planned_value!("numeric expression AnnouncedX", 0i64 => i64::from(q.announced_x().unwrap_or(0)))).max(0) as u32)))];
+static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[cantrip_mechanics::targets::ANY.between(1, TargetSpec::COUNTED)];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 cantrip_mechanics::damage_divided(g, item);

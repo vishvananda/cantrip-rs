@@ -1,6 +1,5 @@
 // The Animus
-// status: planned
-// requires: counter kind Memory
+// status: ready
 // At the beginning of your end step, exile up to one target legendary creature card from a graveyard with a memory counter on it.
 // {T}: Until your next turn, target legendary creature you control becomes a copy of target creature card in exile with a memory counter on it. Activate only as a sorcery.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -10,11 +9,11 @@ static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let objects_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; let moved_0 = { let counters: Vec<(CounterKind, i16)> = vec![(planned_value!("counter kind Memory", CounterKind::Charge => CounterKind::Memory), { let q: &dyn Query = g; (1i64).max(0) as i16 })]; let exiled = g.exile_all(&objects_0); let puts: Vec<(ObjectId, CounterKind, i16)> = exiled.iter().flat_map(|&o| counters.iter().map(move |&(kind, n)| (o, kind, n))).collect(); g.add_counters_together(&puts); exiled };
+let objects_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; let moved_0 = { let counters: Vec<(CounterKind, i16)> = vec![(CounterKind::Memory, { let q: &dyn Query = g; (1i64).max(0) as i16 })]; let exiled = g.exile_all(&objects_0); let puts: Vec<(ObjectId, CounterKind, i16)> = exiled.iter().flat_map(|&o| counters.iter().map(move |&(kind, n)| (o, kind, n))).collect(); g.add_counters_together(&puts); exiled };
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).supertypes.legendary && q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id))))) }
-#[allow(unused_variables)] fn ability_1_target_1(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Exile) && !q.state().obj(id).token && ((q.chars(id).is(CardType::Creature) && (i64::from(q.state().obj(id).counters(planned_value!("counter kind Memory", CounterKind::Charge => CounterKind::Memory)))) > (0i64)))) }
+#[allow(unused_variables)] fn ability_1_target_1(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Exile) && !q.state().obj(id).token && ((q.chars(id).is(CardType::Creature) && (i64::from(q.state().obj(id).counters(CounterKind::Memory))) > (0i64)))) }
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0),target(ability_1_target_1)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);

@@ -1,13 +1,14 @@
 // Crashing Wave
 // status: planned
 // requires: engine: waterbend as a required additional cost
-// requires: numeric expression AnnouncedX
-// requires: target cardinality UpTo
 // As an additional cost to cast this spell, waterbend {X}. (While paying a waterbend cost, you can tap your artifacts and creatures to help. Each one pays for {1}.)
 // Tap up to X target creatures, then distribute three stun counters among any number of tapped creatures your opponents control. (If a permanent with a stun counter would become untapped, remove one from it instead.)
 #[allow(unused_imports)] use cantrip_api::*;
+#[allow(unused_variables)] fn ability_1_0_up_to_most(q: &dyn Query, source: ObjectId, chooser: PlayerId, x: u32) -> usize { let asker = &Asker::new(source, chooser); (i64::from(x)).max(0) as u32 as usize }
+fn ability_1_0_up_to(q: &dyn Query, choice: &Choice, x: u32) -> Verdict { let most = ability_1_0_up_to_most(q, choice.source, choice.chooser, x); Verdict { complete: choice.selected.len() <= most, addable: Bits::new(choice.candidates.len(), choice.selected.len() < most) } }
+fn largest_ability_1_0_up_to(q: &dyn Query, choice: &Choice, x: u32) -> Vec<ObjectId> { choice.candidates.iter().copied().take(ability_1_0_up_to_most(q, choice.source, choice.chooser, x)).collect() }
 #[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
-static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0).between(0, planned_value!("target cardinality UpTo", 1u32 => TargetSpec::read_as_chosen(|q: &dyn Query, asker: &Asker| (planned_value!("numeric expression AnnouncedX", 0i64 => i64::from(q.announced_x().unwrap_or(0)))).max(0) as u32)))];
+static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0).between(0, cantrip_api::TargetSpec::ANY_NUMBER).together(cantrip_api::select::set_part(&(ability_1_0_up_to as SelectFn), &(largest_ability_1_0_up_to as cantrip_api::select::LargestFn), TargetSpec::COUNTED, "up to X"))];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let objects_0 = { let q: &dyn Query = g; (t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_0: Vec<ObjectId> = objects_0.iter().copied().filter(|&o| g.state().obj(o).tapped != true).collect(); g.tap_together(&turned_0);

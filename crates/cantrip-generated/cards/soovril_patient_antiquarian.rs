@@ -1,7 +1,6 @@
 // Soovril, Patient Antiquarian
 // status: planned
 // requires: exiled card gains suspend
-// requires: object filter HasKeywordFamily
 // requires: object filter History ExiledFromGraveyard
 // Vigilance
 // {T}: Put two time counters on target nonland card in exile that was put there from your graveyard this turn. If it doesn't have suspend, it gains suspend.
@@ -14,7 +13,7 @@ let mut counters_0: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
 let amount = { let q: &dyn Query = g; (2i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_0.push((object, CounterKind::Time, amount)); } }
 let had_0: Vec<_> = counters_0.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_0); let applied_0: Vec<ObjectId> = counters_0.iter().zip(had_0).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
-if { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).is_some_and(|candidate: ObjectId| !(planned_value!("object filter HasKeywordFamily", false => q.has_keyword_ability(candidate, KeywordAbility::Suspend)))) } {
+if { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).is_some_and(|candidate: ObjectId| !(q.card(q.chars(candidate).card).suspend.is_some())) } {
 let cards_1 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() };
 planned!("exiled-card-gains-suspend" => for card in cards_1 { cantrip_mechanics::suspend::gains_suspend(g, card); });
 g.end_sentence();

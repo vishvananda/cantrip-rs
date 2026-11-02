@@ -13,7 +13,7 @@ g.end_sentence();
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let objects_1 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let destroyed_1 = g.destroy_all(&objects_1);
 g.end_sentence();
-{ let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; g.skip_next_turns(asker.source, player, 1); }
+{ let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let times = 1u32; g.skip_next_turns(asker.source, player, times); }
 g.end_sentence();
  Ok(()) }
 

@@ -1,6 +1,5 @@
 // Argoth, Sanctum of Nature
-// status: planned
-// requires: layout MeldPiece
+// status: ready
 // This land enters tapped unless you control a legendary green creature.
 // {T}: Add {G}.
 // {2}{G}{G}, {T}: Create a 2/2 green Bear creature token, then mill three cards. Activate only as a sorcery.
@@ -33,7 +32,6 @@ g.end_sentence();
 let amount_4 = { let q: &dyn Query = g; (3i64).max(0) as u32 }; let mills_4: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_4)).collect(); let milled_4 = g.mill_together(&mills_4);
 g.end_sentence();
  Ok(()) }
-planned_item!("layout-meld-piece" => melds_into: Some("Titania, Gaea Incarnate"));
 
 pub static CARD: CardDef = CardDef { name: "Argoth, Sanctum of Nature", token_words: &[], oracle: true, cost: ManaCost::ZERO, has_cost: false, types: TypeSet::of(&[CardType::Land]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[mana_ability(Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(Cost { tap: true, ..Cost::NONE }), Adds { pool: ManaPool([0, 0, 0, 0, 1, 0]), ..add_by(ability_1_mana) }, "{T}: Add {G}."),ability(Cost::NONE.and(Cost::mana(ManaCost { generic: 2, x: 0, symbols: [0, 0, 0, 0, 2, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(Cost { tap: true, ..Cost::NONE }), ability_2, "{2}{G}{G}, {T}: Create a 2/2 green Bear creature token, then mill three cards. Activate only as a sorcery.").targets(&[]).sorcery_speed()], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: Some(ability_0_enters), modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[&token_3::CARD];

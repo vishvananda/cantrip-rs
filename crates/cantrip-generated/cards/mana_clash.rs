@@ -1,7 +1,5 @@
 // Mana Clash
-// status: planned
-// requires: condition CoinCameUp
-// requires: numeric expression CoinFlipsWon
+// status: ready
 // You and target opponent each flip a coin. Mana Clash deals 1 damage to each player whose coin comes up tails. Repeat this process until both players' coins come up heads on the same flip.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Player(p) if (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&p)) }
@@ -11,13 +9,13 @@ let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true
 loop { let mut again_0 = false;
 let mut players_1: Vec<PlayerId> = { let q: &dyn Query = g; { let mut all: Vec<PlayerId> = Vec::new(); for p in Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() { if !all.contains(&p) { all.push(p); } } for p in t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() { if !all.contains(&p) { all.push(p); } } all } };
 let mut each_3 = vec![Default::default(); players_1.len()];
- for (index_1, bound_0) in players_1.iter().copied().enumerate() { let player_2 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; let flip_2 = g.flip_coin(player_2);
+ for (index_1, bound_0) in players_1.iter().copied().enumerate() { let player_2 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; let flip_2 = g.flip_coin_for_heads(player_2);
  each_3[index_1] = flip_2;
    } 
 g.end_sentence();
-let source_4 = { let q: &dyn Query = g; Some(asker.source) }; let amount_4 = { let q: &dyn Query = g; (1i64).max(0) as u16 }; let recipients_4 = { let q: &dyn Query = g; (q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition CoinCameUp", false => q.coin_came_up(asker, Some(bound_0), CoinOutcome::Tails))).collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() }; if let Some(source) = source_4 { let batch: Vec<(ObjectId, Target, u16)> = recipients_4.iter().map(|t| (source, *t, amount_4)).collect(); g.damage_together(&batch); }
+let source_4 = { let q: &dyn Query = g; Some(asker.source) }; let amount_4 = { let q: &dyn Query = g; (1i64).max(0) as u16 }; let recipients_4 = { let q: &dyn Query = g; (q.state().apnap().filter(|&bound_0: &PlayerId| players_1.iter().zip(&each_3).any(|(&flipper, &heads)| Some(flipper) == Some(bound_0) && heads == false)).collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() }; if let Some(source) = source_4 { let batch: Vec<(ObjectId, Target, u16)> = recipients_4.iter().map(|t| (source, *t, amount_4)).collect(); g.damage_together(&batch); }
 g.end_sentence();
-if { let q: &dyn Query = g; !((planned_value!("numeric expression CoinFlipsWon", 0i64 => g.coin_flips(asker.controller, false))) == (0i64)) } {
+if { let q: &dyn Query = g; !(((each_3.iter().filter(|&&flip| !flip).count() as i64)) == (0i64)) } {
 again_0 = true;
 g.end_sentence();
 }

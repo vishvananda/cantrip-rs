@@ -1,6 +1,5 @@
 // Fervent Mastery
-// status: planned
-// requires: object filter AlternateCostPaid
+// status: ready
 // You may pay {2}{R}{R} rather than pay this spell's mana cost.
 // If the {2}{R}{R} cost was paid, an opponent discards any number of cards, then draws that many cards.
 // Search your library for up to three cards, put them into your hand, shuffle, then discard three cards at random.
@@ -9,7 +8,7 @@ fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mu
 let mut hoisted_5: Vec<ObjectId> = Vec::new();
 let mut hoisted_4: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-if { let q: &dyn Query = g; Some(asker.source).is_some_and(|candidate: ObjectId| planned_value!("object filter AlternateCostPaid", false => q.state().obj(candidate).alternate_cost_paid(cost))) } {
+if { let q: &dyn Query = g; item.way == 1 } {
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let candidates_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }; let Some(chosen_0) = cantrip_mechanics::choose::player(g, player_0, asker.source, candidates_0, "Choose", 0)? else { return Ok(()) };
 g.end_sentence();
 let selected_1_player = { let q: &dyn Query = g; Some(chosen_0).expect("a reference that always names a player") }; let selected_1_candidates = { let q: &dyn Query = g; ((Some(chosen_0).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>() }; let selected_1_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AnyNumber }; let selected_1 = { cantrip_mechanics::choose::select(g, selected_1_player, asker.source, Purpose::Discard, selected_1_candidates, cantrip_mechanics::select::Selection::of(selected_1_count, &[]))? };

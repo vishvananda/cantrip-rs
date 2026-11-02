@@ -1,6 +1,5 @@
 // Curse of the Pierced Heart
-// status: planned
-// requires: a choice of Recipient
+// status: ready
 // Enchant player
 // At the beginning of enchanted player's upkeep, this Aura deals 1 damage to that player or a planeswalker that player controls.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -8,7 +7,7 @@
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::Upkeep) && Some(asker.source).and_then(|o: ObjectId| q.state().obj(o).attached_player) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let candidates_0: Vec<Target> = { let q: &dyn Query = g; { let mut all: Vec<Target> = Vec::new(); for t in (item.subject.player().into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() { if !all.contains(&t) { all.push(t); } } for t in (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Planeswalker) && item.subject.player() == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() { if !all.contains(&t) { all.push(t); } } all } }; let chosen_0: Target = planned_value!("a choice of Recipient", Target::None => cantrip_mechanics::choose::recipient(g, player_0, asker.source, candidates_0)?);
+let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let candidates_0: Vec<Target> = { let q: &dyn Query = g; { let mut all: Vec<Target> = Vec::new(); for t in (item.subject.player().into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() { if !all.contains(&t) { all.push(t); } } for t in (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Planeswalker) && item.subject.player() == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() { if !all.contains(&t) { all.push(t); } } all } }; let chosen_0: Target = match candidates_0.len() { 0 => Target::None, 1 => candidates_0[0], _ => match g.ask(player_0, RequestKind::ChooseTarget { label: "", slot_player: None, together: None, source: asker.source, purpose: Purpose::Targets, candidates: candidates_0.clone(), optional: false, least: 1, count: 1, any_number: false })? { Answer::Targets(chosen) => chosen.first().copied().unwrap_or(Target::None), _ => Target::None } };
 g.end_sentence();
 let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u16 }; let recipients_1 = { let q: &dyn Query = g; vec![chosen_0] }; if let Some(source) = source_1 { let batch: Vec<(ObjectId, Target, u16)> = recipients_1.iter().map(|t| (source, *t, amount_1)).collect(); g.damage_together(&batch); }
 g.end_sentence();

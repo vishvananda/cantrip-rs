@@ -1,6 +1,5 @@
 // The Mightstone and Weakstone
-// status: planned
-// requires: layout MeldPiece
+// status: ready
 // When The Mightstone and Weakstone enters, choose one —
 // • Draw two cards.
 // • Target creature gets -5/-5 until end of turn.
@@ -25,7 +24,6 @@ g.end_sentence();
  Ok(()) }
 static ABILITY_0_MODES: ModalDef = modes(&[mode(ability_0_mode_0, "Draw two cards.").targets(&[]),mode(ability_0_mode_1, "Target creature gets -5/-5 until end of turn.").targets(ABILITY_0_MODE_1_TARGETS)]).choose(1, 1);
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
-planned_item!("layout-meld-piece" => melds_into: Some("Urza, Planeswalker"));
 
 pub static CARD: CardDef = CardDef { name: "The Mightstone and Weakstone", token_words: &[], oracle: true, cost: ManaCost { generic: 5, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Artifact]), subtypes: SubtypeSet::of(&[Subtype::Powerstone]), supertypes: Supertypes { basic: false, legendary: true, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[modal_triggered(when_asked(EventMask(EventMask::ZONE_CHANGE.0), ability_0_event), &ABILITY_0_MODES, "When The Mightstone and Weakstone enters, choose one — Draw two cards; or Target creature gets -5/-5 until end of turn."),mana_ability(Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(Cost { tap: true, ..Cost::NONE }), Adds { pool: ManaPool([0, 0, 0, 0, 0, 2]), ..add_each(&[]) }.only_for(ManaRestriction::NotNonartifactSpells), "{T}: Add {C}{C}. This mana can't be spent to cast nonartifact spells.")], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

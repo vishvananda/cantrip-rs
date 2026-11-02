@@ -1,12 +1,11 @@
 // Titania, Voice of Gaea
 // status: planned
-// requires: layout MeldPiece
 // requires: operation Meld
 // Reach
 // Whenever one or more land cards are put into your graveyard from anywhere, you gain 2 life.
 // At the beginning of your upkeep, if there are four or more land cards in your graveyard and you both own and control Titania, Voice of Gaea and a land named Argoth, Sanctum of Nature, exile them, then meld them into Titania, Gaea Incarnate.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && ((q.chars(id).is(CardType::Land) && Some(asker.controller) == Some(q.state().obj(id).owner)) && !(q.state().obj(id).token)) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && ((q.chars(id).is(CardType::Land) && Some(asker.controller) == Some(q.state().obj(id).owner)) && !(q.state().obj(id).token)) && !q.state().obj(id).token { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let amount_0 = { let q: &dyn Query = g; (2i64).max(0) as i32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
@@ -24,7 +23,6 @@ let melding_4 = { let q: &dyn Query = g; moved_2.clone() };
 planned!("operation-meld" => g.meld(&melding_4, "Titania, Gaea Incarnate"););
 g.end_sentence();
  Ok(()) }
-planned_item!("layout-meld-piece" => melds_into: Some("Titania, Gaea Incarnate"));
 
 pub static CARD: CardDef = CardDef { name: "Titania, Voice of Gaea", token_words: &[], oracle: true, cost: ManaCost { generic: 1, x: 0, symbols: [0, 0, 0, 0, 2, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Elemental]), supertypes: Supertypes { basic: false, legendary: true, snow: false }, colors: None, power: Some(3), toughness: Some(4), loyalty: None, defense: None, keywords: Keywords::of(&[Keyword::Reach]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::ZONE_CHANGE.0), ability_1_event), ability_1, "Whenever one or more land cards are put into your graveyard from anywhere, you gain 2 life.").targets(&[]).once_per_batch(),triggered(when_asked(EventMask(EventMask::STEP_BEGAN.0), ability_2_event), ability_2, "At the beginning of your upkeep, if there are four or more land cards in your graveyard and you both own and control Titania, Voice of Gaea and a land named Argoth, Sanctum of Nature, exile them, then meld them into Titania, Gaea Incarnate.").targets(&[]).condition(ability_2_if)], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

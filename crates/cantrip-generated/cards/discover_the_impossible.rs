@@ -12,7 +12,7 @@ let library_4 = { let q: &dyn Query = g; Some(asker.controller).expect("a refere
 g.bottom_in_random_order(library_4, &cards_4);
 g.end_sentence();
 let payer_5 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
-let paid_5 = cantrip_mechanics::effects::ask_may(g, payer_5, asker.source, Purpose::Optional)?; if paid_5 {
+let mut paid_5 = cantrip_mechanics::effects::ask_may(g, payer_5, asker.source, Purpose::Optional)?; if paid_5 {
 let caster_6 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let mut pool_6: Vec<ObjectId> = { let q: &dyn Query = g; ((moved_3.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let mut left_6: u32 = 1; let mut played_6: Vec<ObjectId> = Vec::new();
 let limit_6_0: i64 = i64::from({ let q: &dyn Query = g; 2i64 });
 while left_6 > 0 {
@@ -21,9 +21,9 @@ let picked_6 = if open_6.is_empty() { None } else if open_6.len() > 1 || (false 
 let Some(card_6) = picked_6 else { break; };
 let ways_6: Vec<CastWay> = g.cast_ways_during_resolution_by(card_6, caster_6).into_iter().filter(|w| (g.card(w.face).types.has(CardType::Instant) && (i64::from(w.mana_value)) <= (limit_6_0))).collect();
 let done_6 = if ways_6.is_empty() { g.play_land_during_resolution(card_6)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_6, card_6, ways_6)?.map(|w| w.way); g.cast_during_resolution_as(card_6, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(caster_6), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
-if done_6 { left_6 -= 1; played_6.push(g.state().obj(card_6).became.unwrap_or(card_6)); } else if 1i64 == 1 { break; } if done_6 || !(false && false) { pool_6.retain(|&c| c != card_6); }
+if done_6 { left_6 -= 1; played_6.push(g.state().obj(card_6).became.unwrap_or(card_6)); } else if true { break; } if done_6 || !(false && false) { pool_6.retain(|&c| c != card_6); }
 }
-g.end_sentence();
+paid_5 = !played_6.is_empty();
 }
 g.end_sentence();
 if { let q: &dyn Query = g; !(((paid_5 as i64) != 0)) } {

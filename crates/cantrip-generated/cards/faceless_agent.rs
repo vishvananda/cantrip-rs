@@ -1,13 +1,12 @@
 // Faceless Agent
-// status: planned
-// requires: object filter MostCommonCreatureTypeIn
+// status: ready
 // Changeling
 // When this creature enters, seek a creature card of the most prevalent creature type in your library.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let mut pool_0 = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (q.chars(id).is(CardType::Creature) && planned_value!("object filter MostCommonCreatureTypeIn", false => Some(asker.controller).is_some_and(|p: PlayerId| q.most_common_creature_type(Zone::library(p)).iter().any(|&kind| q.chars(id).has_subtype(kind)))))).collect::<Vec<ObjectId>>() }; let count_0 = { let q: &dyn Query = g; (1i64).max(0) as usize }; let mut picked_0: Vec<ObjectId> = Vec::new(); while picked_0.len() < count_0 && !pool_0.is_empty() { let at = g.choose_at_random(pool_0.len()); picked_0.push(pool_0.remove(at)); }
+let mut pool_0 = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (q.chars(id).is(CardType::Creature) && Some(asker.controller).is_some_and(|p: PlayerId| { let kinds: Vec<SubtypeSet> = q.state().zone(Zone::library(p)).iter().map(|&card| q.chars(card).subtypes).collect(); let count = |kind: Subtype| kinds.iter().filter(|set| set.has(kind)).count(); let most = SubtypeSet::CREATURE_TYPES.iter().map(count).max().unwrap_or(0); most > 0 && SubtypeSet::CREATURE_TYPES.iter().any(|kind| q.chars(id).has_subtype(kind) && count(kind) == most) }))).collect::<Vec<ObjectId>>() }; let count_0 = { let q: &dyn Query = g; (1i64).max(0) as usize }; let mut picked_0: Vec<ObjectId> = Vec::new(); while picked_0.len() < count_0 && !pool_0.is_empty() { let at = g.choose_at_random(pool_0.len()); picked_0.push(pool_0.remove(at)); }
 let objects_1 = { let q: &dyn Query = g; picked_0.clone() }; let moved_1 = g.return_to_hand(&objects_1);
 g.end_sentence();
  Ok(()) }

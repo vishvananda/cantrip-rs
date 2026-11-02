@@ -1,6 +1,5 @@
 // March of the Canonized
-// status: planned
-// requires: mana symbols other than a devotion to one color
+// status: ready
 // When this enchantment enters, create X 1/1 white Vampire creature tokens with lifelink.
 // At the beginning of your upkeep, if your devotion to white and black is seven or greater, create a 4/3 white and black Vampire Demon creature token with flying.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -22,7 +21,7 @@ tokens_0.extend(std::iter::repeat((def_0_0,player)).take(count_0_0 as usize));
 let created_0 = g.create_tokens_worded(&tokens_0, false, None, words_0)?;
 g.end_sentence();
  Ok(()) }
-fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { (planned_value!("mana symbols other than a devotion to one color", 0i64 => cantrip_mechanics::devotion::symbols_among(q, q.state().battlefield().iter().copied().filter(|&id| Some(asker.controller) == Some(q.controller(id))).collect::<Vec<ObjectId>>(), &[Color::White, Color::Black]))) >= (7i64) }
+fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { ((q.state().battlefield().iter().copied().filter(|&id| Some(asker.controller) == Some(q.controller(id))).collect::<Vec<ObjectId>>()).into_iter().map(|id: ObjectId| { let cost = q.mana_cost(id); let colors = [Color::White.mana(), Color::Black.mana()]; colors.iter().map(|&m| i64::from(cost.symbols[m as usize]) + i64::from(cost.phyrexian[m as usize]) + i64::from(cost.twobrid[m as usize])).sum::<i64>() + cost.hybrid.iter().flatten().filter(|(a, b)| colors.contains(a) || colors.contains(b)).count() as i64 }).sum::<i64>()) >= (7i64) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::Upkeep) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 pub mod token_3 {

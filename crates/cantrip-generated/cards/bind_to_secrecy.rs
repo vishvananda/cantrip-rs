@@ -1,7 +1,6 @@
 // Bind to Secrecy
 // status: planned
 // requires: engine: no perpetual effects
-// requires: multiple spell bodies
 // requires: operation Conjure
 // requires: operation DraftFromSpellbook
 // Choose one —
@@ -28,7 +27,7 @@ let kind_3_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual:
 for &object in &objects_3 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_3_0); });
 g.end_sentence();
  Ok(()) }
-static ABILITY_0_MODES: ModalDef = modes(&[mode(ability_0_mode_0, "Counter target noncreature spell.").targets(ABILITY_0_MODE_0_TARGETS),mode(ability_0_mode_1, "Conjure a duplicate of target creature card in an opponent's graveyard into your hand. It perpetually gains \"Mana of any type can be spent to cast this spell.\"").targets(ABILITY_0_MODE_1_TARGETS)]).choose(1, 1);
+static ABILITY_0_MODES: ModalDef = modes(&[mode(ability_0_mode_0, "Counter target noncreature spell.").targets(ABILITY_0_MODE_0_TARGETS),mode(ability_0_mode_1, "Conjure a duplicate of target creature card in an opponent's graveyard into your hand. It perpetually gains \"Mana of any type can be spent to cast this spell.\"").targets(ABILITY_0_MODE_1_TARGETS)]).choose(1, 1).shared(ability_1_then);
 fn ability_1_then(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_6: Vec<ObjectId> = Vec::new();
 let mut hoisted_5: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
@@ -41,7 +40,6 @@ hoisted_6.extend(drafted_4.clone());
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
-planned_item!("multiple-spell-bodies" => spell_after: spell(ability_1_then).targets(&[]));
 
 pub static CARD: CardDef = CardDef { name: "Bind to Secrecy", token_words: &[], oracle: true, cost: ManaCost { generic: 0, x: 0, symbols: [0, 1, 1, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Instant]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: Some(SpellDef::MODAL), abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: Some(&ABILITY_0_MODES), enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

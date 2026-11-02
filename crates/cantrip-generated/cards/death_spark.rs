@@ -1,6 +1,5 @@
 // Death Spark
-// status: planned
-// requires: condition GraveyardPosition
+// status: ready
 // Death Spark deals 1 damage to any target.
 // At the beginning of your upkeep, if this card is in your graveyard with a creature card directly above it, you may pay {1}. If you do, return this card to your hand.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -10,7 +9,7 @@ let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true
 let source_0 = { let q: &dyn Query = g; Some(asker.source) }; let amount_0 = { let q: &dyn Query = g; (1i64).max(0) as u16 }; let recipients_0 = { let q: &dyn Query = g; t_0.clone() }; if let Some(source) = source_0 { let batch: Vec<(ObjectId, Target, u16)> = recipients_0.iter().map(|t| (source, *t, amount_0)).collect(); g.damage_together(&batch); }
 g.end_sentence();
  Ok(()) }
-fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { planned_value!("condition GraveyardPosition", false => Some(asker.controller).zip(Some(asker.source)).is_some_and(|(p, card): (PlayerId, ObjectId)| { let cards = q.state().zone(Zone::graveyard(p)); cards.iter().position(|&o| o == card).is_some_and(|at| (cards[..at].iter().copied().filter(|&id| q.chars(id).is(CardType::Creature)).count() as i64) >= (1i64)) })) }
+fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.controller).zip(Some(asker.source)).is_some_and(|(p, card): (PlayerId, ObjectId)| { let cards = q.state().zone(Zone::graveyard(p)); cards.iter().position(|&o| o == card).is_some_and(|at| cards.get(at + 1).copied().is_some_and(|id| q.chars(id).is(CardType::Creature))) }) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::Upkeep) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_4: Vec<ObjectId> = Vec::new();

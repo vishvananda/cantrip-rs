@@ -28,7 +28,7 @@ tokens_1.extend(std::iter::repeat((def_1_0,player)).take(count_1_0 as usize));
 let created_1 = g.create_tokens_worded(&tokens_1, false, None, words_1)?;
 g.end_sentence();
 if { let q: &dyn Query = g; Some(asker.controller).is_some_and(|player: PlayerId| q.state().player(player).monarch) } {
-let originals_3 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }; let player_3 = { let q: &dyn Query = g; Some(asker.controller) }; let created_3 = if let Some(player) = player_3 { let copies: Vec<(Copiable, PlayerId)> = originals_3.iter().map(|&original| (g.copiable_values(original), player)).collect(); g.create_token_copies_together(&copies)? } else { Vec::new() };
+let originals_3 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }; let player_3 = { let q: &dyn Query = g; Some(asker.controller) }; let mut copies_3: Vec<(Copiable, PlayerId)> = Vec::new(); if let Some(player) = player_3 { for &original in &originals_3 { if let Some(values) = { let q: &dyn Query = g; Some(original).map(|original: ObjectId| q.copiable_values(original)) } { copies_3.push((values, player)); } } } let created_3 = g.create_token_copies_together(&copies_3)?;
 g.end_sentence();
 hoisted_4.extend(created_3.clone());
 }

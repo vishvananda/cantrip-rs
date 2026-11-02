@@ -1,6 +1,5 @@
 // Jace, Mirror Mage
-// status: planned
-// requires: copy exception SetLoyalty
+// status: ready
 // Kicker {2}
 // When Jace enters, if Jace was kicked, create a token that's a copy of Jace, except it's not legendary and its starting loyalty is 1.
 // [+1]: Scry 2.
@@ -10,7 +9,7 @@ fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.source).is_so
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let original_0 = { let q: &dyn Query = g; Some(asker.source) }; let values_0 = { let q: &dyn Query = g; original_0.map(|original: ObjectId| planned_value!("copy exception SetLoyalty", q.copiable_values(original).nonlegendary() => q.copiable_values(original).nonlegendary().with_loyalty({ let q: &dyn Query = g; 1i64 }))) }; let count_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let created_0 = match values_0 { Some(values) => g.create_token_copies_tapped(values, player_0, count_0, false)?, None => Vec::new() };
+let original_0 = { let q: &dyn Query = g; Some(asker.source) }; let values_0 = { let q: &dyn Query = g; original_0.map(|original: ObjectId| q.copiable_values(original).nonlegendary().with_loyalty(1)) }; let count_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let created_0 = match values_0 { Some(values) => g.create_token_copies_tapped(values, player_0, count_0, false)?, None => Vec::new() };
 g.end_sentence();
  Ok(()) }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

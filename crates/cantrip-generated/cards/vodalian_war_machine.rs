@@ -1,6 +1,5 @@
 // Vodalian War Machine
-// status: planned
-// requires: object filter History TappedToPayFor
+// status: ready
 // Defender (This creature can't attack.)
 // Tap an untapped Merfolk you control: This creature can attack this turn as though it didn't have defender.
 // Tap an untapped Merfolk you control: This creature gets +2/+1 until end of turn.
@@ -23,7 +22,7 @@ g.end_sentence();
 #[allow(unused_variables)] fn ability_3_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && from.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let objects_4 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Merfolk)) && planned_value!("object filter History TappedToPayFor", false => cantrip_mechanics::history::tapped_to_pay_for(q.history().this_turn().iter(), id, item.subject.object())))).collect::<Vec<ObjectId>>() }; let destroyed_4 = g.destroy_all(&objects_4);
+let objects_4 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Merfolk)) && item.subject.object().is_some_and(|of: ObjectId| { let s = q.state(); let began = q.history().this_turn().first().map_or(u32::MAX, |r| r.serial); s.stack.iter().chain(s.left_stack.iter()).any(|i| i.kind == StackKind::Activated && i.since >= began && (i.object == of || q.obj(i.object).became == Some(of)) && q.cost_objects(i).contains(&id)) }))).collect::<Vec<ObjectId>>() }; let destroyed_4 = g.destroy_all(&objects_4);
 g.end_sentence();
  Ok(()) }
 

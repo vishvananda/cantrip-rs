@@ -1,6 +1,5 @@
 // Fire Nation Salvagers
-// status: planned
-// requires: event value in a target filter beyond its subject
+// status: ready
 // Menace
 // When this creature enters, put a +1/+1 counter on target creature or Vehicle you control.
 // Whenever one or more creatures you control with counters on them deal combat damage to a player, put target creature or Vehicle card from that player's graveyard onto the battlefield under your control.
@@ -16,9 +15,9 @@ let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: 
 let had_0: Vec<_> = counters_0.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_0); let applied_0: Vec<ObjectId> = counters_0.iter().zip(had_0).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && (((q.chars(id).is(CardType::Creature) || q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Vehicle))) && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && Some(PlayerId(planned_value!("event value in a target filter beyond its subject", [u32::MAX; 2] => q.event_data())[1] as u8)) == Some(q.state().obj(id).owner))))) }
+#[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && (((q.chars(id).is(CardType::Creature) || q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Vehicle))) && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && q.event_subject().player() == Some(q.state().obj(id).owner))))) }
 static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target_0)];
-#[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Damage { source, target, amount, kind, .. } = event { let (source, amount, combat) = (*source, *amount, kind.is_combat()); let subject = Target::Object(source); let data = [u32::from(amount), match target { Target::Player(p) => u32::from(p.0), _ => u32::MAX }]; if combat && !q.state().obj(source).zone.is(ZoneKind::Stack) && (q.chars(source).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(source)) && (CounterKind::ALL.iter().map(|k| i64::from(q.state().obj(source).counters(*k))).sum::<i64>()) > (0i64)) && matches!(*target, Target::Player(p) if true) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Damage { source, target, amount, kind, .. } = event { let (source, amount, combat) = (*source, *amount, kind.is_combat()); let subject = *target; let data = [u32::from(amount), match target { Target::Player(p) => u32::from(p.0), _ => u32::MAX }]; if combat && !q.state().obj(source).zone.is(ZoneKind::Stack) && (q.chars(source).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(source)) && (CounterKind::ALL.iter().map(|k| i64::from(q.state().obj(source).counters(*k))).sum::<i64>()) > (0i64)) && matches!(*target, Target::Player(p) if true) { return Some(Fired { subject, data }); } }
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);

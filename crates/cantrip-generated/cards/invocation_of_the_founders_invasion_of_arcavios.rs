@@ -1,7 +1,7 @@
 // Invocation of the Founders // Invasion of Arcavios
 // status: planned
 // requires: condition Searched
-// requires: operation Search
+// requires: search with cards from outside the game
 // Whenever you cast an instant or sorcery spell from your hand, you may copy that spell. You may choose new targets for the copy.
 // (As a Siege enters, choose an opponent to protect it. You and others can attack it. When it's defeated, exile it, then cast it transformed.)
 // When this Siege enters, search your library, graveyard, and/or outside the game for an instant or sorcery card you own, reveal it, and put it into your hand. If you search your library this way, shuffle.
@@ -9,7 +9,7 @@
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let found_0: Vec<ObjectId> = planned_value!("operation Search", Vec::<ObjectId>::new() => cantrip_mechanics::library::search_zones(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, asker.source, Searched { top: None, also: &[Zone::Graveyard], either: true, outside: true, finds: &[Find { filter: |q: &dyn Query, asker: &Asker, id: ObjectId| ((q.chars(id).is(CardType::Instant) || q.chars(id).is(CardType::Sorcery)) && Some(asker.controller) == Some(q.state().obj(id).owner)), count: { let q: &dyn Query = g; cantrip_mechanics::select::Count::UpTo((1i64).max(0) as u32) }, rules: &[] }] })?);
+let found_0: Vec<ObjectId> = planned_value!("search with cards from outside the game", Vec::<ObjectId>::new() => cantrip_mechanics::library::search_zones(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, asker.source, Searched { top: None, also: &[Zone::Graveyard], either: true, outside: true, finds: &[Find { filter: |q: &dyn Query, asker: &Asker, id: ObjectId| ((q.chars(id).is(CardType::Instant) || q.chars(id).is(CardType::Sorcery)) && Some(asker.controller) == Some(q.state().obj(id).owner)), count: { let q: &dyn Query = g; cantrip_mechanics::select::Count::UpTo((1i64).max(0) as u32) }, rules: &[] }] })?);
 let objects_1 = { let q: &dyn Query = g; found_0.clone() }; let mut owners_1: Vec<PlayerId> = objects_1.iter().map(|o| g.state().obj(*o).owner).collect(); owners_1.dedup(); for owner in owners_1 { let cards: Vec<ObjectId> = objects_1.iter().copied().filter(|o| g.state().obj(*o).owner == owner).collect(); g.reveal(owner, &cards); }
 let objects_2 = { let q: &dyn Query = g; found_0.clone() }; let moved_2 = g.return_to_hand_revealed(&objects_2);
 if planned_value!("condition Searched", false => "(kind:Searched,args:(0))") {

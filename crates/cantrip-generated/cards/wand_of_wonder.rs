@@ -29,7 +29,7 @@ let picked_8 = if open_8.is_empty() { None } else if open_8.len() > 1 || (true &
 let Some(card_8) = picked_8 else { break; };
 let ways_8: Vec<CastWay> = g.cast_ways_during_resolution_by(card_8, caster_8).into_iter().filter(|w| (g.card(w.face).types.has(CardType::Instant) || g.card(w.face).types.has(CardType::Sorcery))).collect();
 let done_8 = if ways_8.is_empty() { g.play_land_during_resolution(card_8)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_8, card_8, ways_8)?.map(|w| w.way); g.cast_during_resolution_as(card_8, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(caster_8), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
-if done_8 { left_8 -= 1; played_8.push(g.state().obj(card_8).became.unwrap_or(card_8)); } else if 1i64 == 1 { break; } if done_8 || !(true && true) { pool_8.retain(|&c| c != card_8); }
+if done_8 { left_8 -= 1; played_8.push(g.state().obj(card_8).became.unwrap_or(card_8)); } else if true { break; } if done_8 || !(true && true) { pool_8.retain(|&c| c != card_8); }
 }
 g.end_sentence();
 }
@@ -41,7 +41,7 @@ let picked_9 = if open_9.is_empty() { None } else if open_9.len() > 1 || (true &
 let Some(card_9) = picked_9 else { break; };
 let ways_9: Vec<CastWay> = g.cast_ways_during_resolution_by(card_9, caster_9).into_iter().filter(|w| (g.card(w.face).types.has(CardType::Instant) || g.card(w.face).types.has(CardType::Sorcery))).collect();
 let done_9 = if ways_9.is_empty() { g.play_land_during_resolution(card_9)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_9, card_9, ways_9)?.map(|w| w.way); g.cast_during_resolution_as(card_9, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(caster_9), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
-if done_9 { left_9 -= 1; played_9.push(g.state().obj(card_9).became.unwrap_or(card_9)); } else if 2i64 == 1 { break; } if done_9 || !(true && true) { pool_9.retain(|&c| c != card_9); }
+if done_9 { left_9 -= 1; played_9.push(g.state().obj(card_9).became.unwrap_or(card_9)); } else if false { break; } if done_9 || !(true && true) { pool_9.retain(|&c| c != card_9); }
 }
 g.end_sentence();
 }
@@ -53,7 +53,7 @@ let picked_10 = if open_10.is_empty() { None } else if open_10.len() > 1 || (tru
 let Some(card_10) = picked_10 else { break; };
 let ways_10: Vec<CastWay> = g.cast_ways_during_resolution_by(card_10, caster_10).into_iter().filter(|w| (g.card(w.face).types.has(CardType::Instant) || g.card(w.face).types.has(CardType::Sorcery))).collect();
 let done_10 = if ways_10.is_empty() { g.play_land_during_resolution(card_10)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_10, card_10, ways_10)?.map(|w| w.way); g.cast_during_resolution_as(card_10, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(caster_10), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
-if done_10 { left_10 -= 1; played_10.push(g.state().obj(card_10).became.unwrap_or(card_10)); } else if 3i64 == 1 { break; } if done_10 || !(true && true) { pool_10.retain(|&c| c != card_10); }
+if done_10 { left_10 -= 1; played_10.push(g.state().obj(card_10).became.unwrap_or(card_10)); } else if false { break; } if done_10 || !(true && true) { pool_10.retain(|&c| c != card_10); }
 }
 g.end_sentence();
 }

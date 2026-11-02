@@ -1,6 +1,5 @@
 // Hauken's Insight // Jacob Hauken, Inspector
 // status: planned
-// requires: a card a player may look at for a while
 // requires: a land played by what it is as a spell
 // requires: player rule SpecialAction
 // At the beginning of your upkeep, exile the top card of your library face down. You may look at that card for as long as it remains exiled.
@@ -14,7 +13,7 @@ g.end_sentence();
 let selected_1_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_1_candidates = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>() }; let selected_1_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let selected_1 = { cantrip_mechanics::choose::select(g, selected_1_player, asker.source, Purpose::Exile, selected_1_candidates, cantrip_mechanics::select::Selection::of(selected_1_count, &[]))? };
 let objects_2 = { let q: &dyn Query = g; selected_1.clone() }; let by_2 = Some(g.linked(item)); let moved_2 = g.exile_face_down(&objects_2, by_2);
 g.end_sentence();
-planned!("a-card-a-player-may-look-at-for-a-while" => let cards_3_0 = { let q: &dyn Query = g; (moved_2.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_3_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &card in &cards_3_0 { for &player in &players_3_0 { g.allow_look(card, player, Expiry::Never); } });
+let cards_3_0 = { let q: &dyn Query = g; (moved_2.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_3_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &player in &players_3_0 { g.look_at(player, &cards_3_0); }
 g.end_sentence();
 let payer_4 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let paid_4 = g.may_pay(payer_4, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 4, x: 0, symbols: [0, 2, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })), &PAY_QUESTION)?;
 g.end_sentence();
@@ -35,7 +34,7 @@ pub mod back {
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let objects_0 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((1i64).max(0) as usize).collect::<Vec<ObjectId>>() }; let by_0 = Some(g.linked(item)); let moved_0 = g.exile_face_down(&objects_0, by_0);
 g.end_sentence();
-planned!("a-card-a-player-may-look-at-for-a-while" => let cards_1_0 = { let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_1_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &card in &cards_1_0 { for &player in &players_1_0 { g.allow_look(card, player, Expiry::Never); } });
+let cards_1_0 = { let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_1_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &player in &players_1_0 { g.look_at(player, &cards_1_0); }
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_0_applies(q: &dyn Query, asker: &Asker, player: PlayerId) -> bool { player == asker.controller }

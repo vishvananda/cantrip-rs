@@ -31,7 +31,7 @@ g.end_sentence();
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::End) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_4 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_4 = Vec::new(); for player in players_4 { cards_4.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_4)?); } let discarded_4 = g.discard_together(&cards_4);
+let amount_4 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_4: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_4 = Vec::new(); for player in players_4 { cards_4.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_4)?); } let discarded_4 = g.discard_together(&cards_4);
 g.end_sentence();
 let amount_5 = { let q: &dyn Query = g; (2i64).max(0) as i32 }; let players_5 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_5 { g.lose_life(player, amount_5); }
@@ -44,7 +44,7 @@ g.end_sentence();
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if from.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_7 = { let q: &dyn Query = g; (3i64).max(0) as u32 }; let players_7 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_7 = Vec::new(); for player in players_7 { cards_7.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_7)?); } let discarded_7 = g.discard_together(&cards_7);
+let amount_7 = { let q: &dyn Query = g; (3i64).max(0) as u32 }; let players_7: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_7 = Vec::new(); for player in players_7 { cards_7.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_7)?); } let discarded_7 = g.discard_together(&cards_7);
 g.end_sentence();
 let amount_8 = { let q: &dyn Query = g; (6i64).max(0) as i32 }; let players_8 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_8 { g.lose_life(player, amount_8); }

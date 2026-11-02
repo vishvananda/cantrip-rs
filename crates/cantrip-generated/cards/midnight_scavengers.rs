@@ -1,6 +1,5 @@
 // Midnight Scavengers
-// status: planned
-// requires: layout MeldPiece
+// status: ready
 // When this creature enters, you may return target creature card with mana value 3 or less from your graveyard to your hand.
 // (Melds with Graf Rats.)
 #[allow(unused_imports)] use cantrip_api::*;
@@ -21,7 +20,6 @@ hoisted_3.extend({ let q: &dyn Query = g; objects_1.iter().copied().filter(|&o| 
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
-planned_item!("layout-meld-piece" => melds_into: Some("Chittering Host"));
 
 pub static CARD: CardDef = CardDef { name: "Midnight Scavengers", token_words: &[], oracle: true, cost: ManaCost { generic: 4, x: 0, symbols: [0, 0, 1, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Human,Subtype::Rogue]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: Some(3), toughness: Some(3), loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::ZONE_CHANGE.0), ability_0_event), ability_0, "When this creature enters, you may return target creature card with mana value 3 or less from your graveyard to your hand.").targets(ABILITY_0_TARGETS)], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

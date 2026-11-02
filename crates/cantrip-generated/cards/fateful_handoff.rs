@@ -1,6 +1,5 @@
 // Fateful Handoff
-// status: planned
-// requires: operation GiveControl
+// status: ready
 // Draw cards equal to the mana value of target artifact or creature you control. An opponent gains control of that permanent.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (((q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Creature)) && Some(asker.controller) == Some(q.controller(id))))) }
@@ -10,7 +9,7 @@ let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true
 let amount_0 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().and_then(|t: Target| t.object()).map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o)))).max(0) as u32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_0 { g.draw(player, amount_0); }
 g.end_sentence();
-planned!("operation-give-control" => cantrip_mechanics::control::give(g, asker.source, { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }, { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }, None));
+let players_1: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }; let objects_1 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; let who_1 = match players_1.as_slice() { [one] => Some(*one), _ => cantrip_mechanics::choose::player(g, asker.controller, asker.source, players_1.clone(), "GainControl", 0)? }; if let Some(who) = who_1 { cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.gain_control(asker.source, object, who, Duration::Indefinite); } }); }
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

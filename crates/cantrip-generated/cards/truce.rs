@@ -1,6 +1,5 @@
 // Truce
-// status: planned
-// requires: object collection MovedBy
+// status: ready
 // Each player may draw up to two cards. For each card less than two a player draws this way, that player gains 2 life.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
@@ -13,7 +12,7 @@ done_total_2 += done_1;
    } 
 g.end_sentence();
 let mut players_3: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
- for (index_3, bound_9000) in players_3.iter().copied().enumerate() { let amount_4 = { let q: &dyn Query = g; ((2i64 * (2i64 - (planned_value!("object collection MovedBy", Vec::<ObjectId>::new() => q.moved_by(result_0, Some(bound_9000)))).len() as i64))).max(0) as i32 }; let players_4 = { let q: &dyn Query = g; Some(bound_9000).into_iter().collect::<Vec<PlayerId>>() };
+ for (index_3, bound_9000) in players_3.iter().copied().enumerate() { let amount_4 = { let q: &dyn Query = g; ((2i64 * (2i64 - players_0.iter().position(|&p| Some(p) == Some(bound_9000)).map_or(0i64, |at| each_2[at])))).max(0) as i32 }; let players_4 = { let q: &dyn Query = g; Some(bound_9000).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_4 { g.gain_life(player, amount_4); }
     } 
 g.end_sentence();

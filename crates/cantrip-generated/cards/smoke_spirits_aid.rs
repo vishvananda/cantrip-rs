@@ -1,11 +1,12 @@
 // Smoke Spirits' Aid
-// status: planned
-// requires: numeric expression AnnouncedX
-// requires: target cardinality UpTo
+// status: ready
 // For each of up to X target creatures, create a red Aura enchantment token named Smoke Blessing attached to that creature. Those tokens have enchant creature and "When enchanted creature dies, it deals 1 damage to its controller and you create a Treasure token."
 #[allow(unused_imports)] use cantrip_api::*;
+#[allow(unused_variables)] fn ability_0_0_up_to_most(q: &dyn Query, source: ObjectId, chooser: PlayerId, x: u32) -> usize { let asker = &Asker::new(source, chooser); (i64::from(x)).max(0) as u32 as usize }
+fn ability_0_0_up_to(q: &dyn Query, choice: &Choice, x: u32) -> Verdict { let most = ability_0_0_up_to_most(q, choice.source, choice.chooser, x); Verdict { complete: choice.selected.len() <= most, addable: Bits::new(choice.candidates.len(), choice.selected.len() < most) } }
+fn largest_ability_0_0_up_to(q: &dyn Query, choice: &Choice, x: u32) -> Vec<ObjectId> { choice.candidates.iter().copied().take(ability_0_0_up_to_most(q, choice.source, choice.chooser, x)).collect() }
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
-static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0).between(0, planned_value!("target cardinality UpTo", 1u32 => TargetSpec::read_as_chosen(|q: &dyn Query, asker: &Asker| (planned_value!("numeric expression AnnouncedX", 0i64 => i64::from(q.announced_x().unwrap_or(0)))).max(0) as u32)))];
+static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0).between(0, cantrip_api::TargetSpec::ANY_NUMBER).together(cantrip_api::select::set_part(&(ability_0_0_up_to as SelectFn), &(largest_ability_0_0_up_to as cantrip_api::select::LargestFn), TargetSpec::COUNTED, "up to X"))];
 pub mod token_1 {
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_enchant(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }

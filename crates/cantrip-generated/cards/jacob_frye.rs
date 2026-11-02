@@ -1,10 +1,9 @@
 // Jacob Frye
-// status: planned
-// requires: object filter HasKeywordFamily
+// status: ready
 // Partner with Evie Frye (When this creature enters, target player may put Evie into their hand from their library, then shuffle.)
 // Whenever one or more Assassins you control deal combat damage to a player, exile up to one target Assassin card or card with freerunning from your graveyard. If you do, copy it. You may cast the copy.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && (((q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Assassin)) || planned_value!("object filter HasKeywordFamily", false => q.has_keyword_ability(id, KeywordAbility::Freerunning))) && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(id).owner))))) }
+#[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && (((q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Assassin)) || q.card(q.chars(id).card).ways.iter().any(|w| w.kind == WayKind::Freerunning)) && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(id).owner))))) }
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0).between(0, 1)];
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Damage { source, target, amount, kind, .. } = event { let (source, amount, combat) = (*source, *amount, kind.is_combat()); let subject = Target::Object(source); let data = [u32::from(amount), match target { Target::Player(p) => u32::from(p.0), _ => u32::MAX }]; if combat && !q.state().obj(source).zone.is(ZoneKind::Stack) && (q.chars(source).has_subtype(q.words(asker.source).subtype(Subtype::Assassin)) && Some(asker.controller) == Some(q.controller(source))) && matches!(*target, Target::Player(p) if true) { return Some(Fired { subject, data }); } }
  None }
@@ -24,7 +23,7 @@ let picked_2 = if open_2.is_empty() { None } else if open_2.len() > 1 || (true &
 let Some(card_2) = picked_2 else { break; };
 let ways_2: Vec<CastWay> = g.cast_ways_during_resolution_by(card_2, caster_2).into_iter().filter(|w| true).collect();
 let done_2 = if ways_2.is_empty() { g.play_land_during_resolution(card_2)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_2, card_2, ways_2)?.map(|w| w.way); g.cast_during_resolution_as(card_2, CastTerms { instead: None, way, caster: Some(caster_2), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
-if done_2 { left_2 -= 1; played_2.push(g.state().obj(card_2).became.unwrap_or(card_2)); } else if 1i64 == 1 { break; } if done_2 || !(true && true) { pool_2.retain(|&c| c != card_2); }
+if done_2 { left_2 -= 1; played_2.push(g.state().obj(card_2).became.unwrap_or(card_2)); } else if true { break; } if done_2 || !(true && true) { pool_2.retain(|&c| c != card_2); }
 }
 g.end_sentence();
 hoisted_3.extend(copies_1.clone());

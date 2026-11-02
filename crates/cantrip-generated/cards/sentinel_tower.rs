@@ -1,6 +1,5 @@
 // Sentinel Tower
-// status: planned
-// requires: numeric expression AsOf
+// status: ready
 // Whenever an instant or sorcery spell is cast during your turn, this artifact deals damage to any target equal to 1 plus the number of instant and sorcery spells cast before that spell this turn.
 #[allow(unused_imports)] use cantrip_api::*;
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[cantrip_mechanics::targets::ANY];
@@ -8,7 +7,7 @@ static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[cantrip_mechanics::targ
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let source_0 = { let q: &dyn Query = g; Some(asker.source) }; let amount_0 = { let q: &dyn Query = g; ((1i64 + planned_value!("numeric expression AsOf", 0i64 => q.as_of(asker, AsOf { moment: Cast(EventSubject), value: EventHistory { event: Spell { event: Cast, players: All, spells: Either([CardType(Instant), CardType(Sorcery)]) }, window: ThisTurn, measure: Occurrences } })))).clamp(0, 65535) as u16 }; let recipients_0 = { let q: &dyn Query = g; t_0.clone() }; if let Some(source) = source_0 { let batch: Vec<(ObjectId, Target, u16)> = recipients_0.iter().map(|t| (source, *t, amount_0)).collect(); g.damage_together(&batch); }
+let source_0 = { let q: &dyn Query = g; Some(asker.source) }; let amount_0 = { let q: &dyn Query = g; ((1i64 + q.history().casts().take_while(|cast| Some(cast.spell) != item.subject.object()).filter(|cast| true && (cast.chars(q).is(CardType::Instant) || cast.chars(q).is(CardType::Sorcery))).count() as i64)).clamp(0, 65535) as u16 }; let recipients_0 = { let q: &dyn Query = g; t_0.clone() }; if let Some(source) = source_0 { let batch: Vec<(ObjectId, Target, u16)> = recipients_0.iter().map(|t| (source, *t, amount_0)).collect(); g.damage_together(&batch); }
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

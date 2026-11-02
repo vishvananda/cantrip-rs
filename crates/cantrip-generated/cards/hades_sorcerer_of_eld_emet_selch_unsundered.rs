@@ -14,7 +14,7 @@ fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let amount_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_0 { g.draw(player, amount_0); }
 g.end_sentence();
-let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_1 = Vec::new(); for player in players_1 { cards_1.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_1)?); } let discarded_1 = g.discard_together(&cards_1);
+let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_1 = Vec::new(); for player in players_1 { cards_1.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_1)?); } let discarded_1 = g.discard_together(&cards_1);
 g.end_sentence();
  Ok(()) }
 fn ability_2_if(q: &dyn Query, asker: &Asker) -> bool { ((((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).len() as i64) >= (14i64) }
@@ -32,7 +32,7 @@ pub static CARD: CardDef = CardDef { name: "Emet-Selch, Unsundered", token_words
 pub static EXTRA: &[&CardDef] = &[];
 pub mod back {
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_1_0_0_cost(q: &dyn Query, asker: &Asker, card: ObjectId, player: PlayerId) -> Option<Cost> { (player == asker.controller && (Some(asker.controller) == Some(q.state().turn.active)) && (q.state().obj(card).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(card).owner))).then(|| Cost::mana(q.card(q.chars(card).card).cost)) }
+#[allow(unused_variables)] fn ability_1_0_0_cost(q: &dyn Query, asker: &Asker, card: ObjectId, player: PlayerId) -> Option<Cost> { (player == asker.controller && (Some(asker.controller) == Some(q.state().turn.active)) && (q.state().obj(card).became.is_none() && q.state().obj(card).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(card).owner))).then(|| Cost::mana(q.card(q.chars(card).card).cost)) }
 #[allow(unused_variables)] fn ability_2_applies(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool { if let Proposal::ZoneChange(z) = proposal { let id = z.object; let subject = Target::Object(id); let data = [u32::MAX; 2]; if z.to.is(ZoneKind::Graveyard) && (true && Some(asker.controller) == Some(q.state().obj(id).owner)) { return true; } }
  false }
 #[allow(unused_variables, unused_mut)] fn ability_2_apply(q: &dyn Query, asker: &Asker, proposal: &mut Proposal) { let seen = *proposal; if let Proposal::ZoneChange(seen) = &seen { let z = seen; let id = z.object; let subject = Target::Object(id); let data = [u32::MAX; 2]; if let Proposal::ZoneChange(z) = proposal { z.to = Zone::exile(q.state().obj(z.object).owner); } } }

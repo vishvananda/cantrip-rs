@@ -8,8 +8,8 @@
 // Cards in graveyards can't be the targets of spells or abilities.
 // Disturb {2}{W}{U} (You may cast this card from your graveyard transformed for its disturb cost.)
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_1_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); (q.state().obj(affected).zone.kind() == ZoneKind::Graveyard && true) && true }
-#[allow(unused_variables)] fn ability_1_0_rule_on(q: &dyn LayerQuery, source: ObjectId, subject: ObjectId) -> bool { let asker = &Asker::new(source, q.controller(source)); (q.state().obj(subject).zone.kind() == ZoneKind::Graveyard && true) && true }
+#[allow(unused_variables)] fn ability_1_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); (q.state().obj(affected).became.is_none() && q.state().obj(affected).zone.kind() == ZoneKind::Graveyard && true) && true }
+#[allow(unused_variables)] fn ability_1_0_rule_on(q: &dyn LayerQuery, source: ObjectId, subject: ObjectId) -> bool { let asker = &Asker::new(source, q.controller(source)); (q.state().obj(subject).became.is_none() && q.state().obj(subject).zone.kind() == ZoneKind::Graveyard && true) && true }
 #[allow(unused_variables)] fn ability_1_0_rule_by(q: &dyn LayerQuery, source: ObjectId, by: &Asker, by_source: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); true }
 planned_item!("engine-no-disturb" => ways: cantrip_mechanics::disturb::way(ManaCost { generic: 2, x: 0, symbols: [1, 1, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, "Disturb {2}{W}{U}"));
 
@@ -17,7 +17,7 @@ pub static CARD: CardDef = CardDef { name: "Dennick, Pious Apprentice", token_wo
 pub static EXTRA: &[&CardDef] = &[&cantrip_mechanics::tokens::CLUE];
 pub mod back {
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && (q.chars(id).is(CardType::Creature) && true && !(q.state().obj(id).token)) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && (q.chars(id).is(CardType::Creature) && true && !(q.state().obj(id).token)) && !q.state().obj(id).token { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 { let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let times = 1u32; for _ in 0..times { cantrip_mechanics::tokens::investigate(g, player)?; }; }

@@ -1,7 +1,5 @@
 // Ingenious Mastery
-// status: planned
-// requires: object filter AlternateCostPaid
-// requires: operation PlayersDo
+// status: ready
 // You may pay {2}{U} rather than pay this spell's mana cost.
 // If the {2}{U} cost was paid, you draw three cards, then an opponent creates two Treasure tokens and they scry 2. If that cost wasn't paid, you draw X cards.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -22,11 +20,12 @@ fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mu
 let mut hoisted_6: Vec<ObjectId> = Vec::new();
 let mut hoisted_4: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-if { let q: &dyn Query = g; Some(asker.source).is_some_and(|candidate: ObjectId| planned_value!("object filter AlternateCostPaid", false => q.state().obj(candidate).alternate_cost_paid(cost))) } {
+if { let q: &dyn Query = g; item.way == 1 } {
 let amount_0 = { let q: &dyn Query = g; (3i64).max(0) as u32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 let mut done_0: i64 = 0; let mut drawn_0: Vec<ObjectId> = Vec::new(); for player in players_0 { let before = g.history().drawn(player) as i64; let held = g.state().zone(Zone::hand(player)).to_vec(); g.draw(player, amount_0); done_0 += g.history().drawn(player) as i64 - before; drawn_0.extend(g.state().zone(Zone::hand(player)).iter().copied().filter(|c| !held.contains(c))); }
 g.end_sentence();
-planned!("operation-players-do" => cantrip_mechanics::players::do_this(g, asker, { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }, PlayersDo { any_one: true, optional: false, once_each_turn: false }, &[|g: &mut dyn Game| -> Result<(), Suspend> { let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_2 = Vec::new();
+let among_1: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }; let Some(doer_1) = (if among_1.len() > 1 { cantrip_mechanics::choose::player(g, asker.controller, asker.source, among_1, "Choose", 0)? } else { among_1.first().copied() }) else { return Ok(()); }; { let asker = &Asker::new(asker.source, doer_1);
+let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_2 = Vec::new();
 let count_2_0 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let def_2_0 = g.card_id(&token_3::CARD);
 for player in players_2 {
 tokens_2.extend(std::iter::repeat((def_2_0,player)).take(count_2_0 as usize));
@@ -34,9 +33,9 @@ tokens_2.extend(std::iter::repeat((def_2_0,player)).take(count_2_0 as usize));
 let created_2 = g.create_tokens_worded(&tokens_2, false, None, words_2)?;
 g.end_sentence();
 hoisted_4.extend(created_2.clone());
- Ok(()) }, |g: &mut dyn Game| -> Result<(), Suspend> { let amount_5 = { let q: &dyn Query = g; (2i64).max(0) as usize }; let player_5 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; cantrip_mechanics::scry(g, player_5, asker.source, amount_5)?;
+let amount_5 = { let q: &dyn Query = g; (2i64).max(0) as usize }; let player_5 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; cantrip_mechanics::scry(g, player_5, asker.source, amount_5)?;
 g.end_sentence();
- Ok(()) }], &[])?);
+}
 g.end_sentence();
 hoisted_6.extend(drawn_0.clone());
 hoisted_7.extend(hoisted_4.clone());

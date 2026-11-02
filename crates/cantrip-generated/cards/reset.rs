@@ -1,10 +1,9 @@
 // Reset
-// status: planned
-// requires: turn window AfterUpkeep
+// status: ready
 // Cast this spell only during an opponent's turn after their upkeep step.
 // Untap all lands you control.
 #[allow(unused_imports)] use cantrip_api::*;
-fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { ((Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).into_iter().any(|bound_0: PlayerId| Some(bound_0) == Some(q.state().turn.active)) && planned_value!("turn window AfterUpkeep", false => q.state().turn.is_in(TurnWindow::AfterUpkeep))) }
+fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { ((Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).into_iter().any(|bound_0: PlayerId| Some(bound_0) == Some(q.state().turn.active)) && (q.state().turn.step() as u8) > (Step::Upkeep as u8)) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let objects_0 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Land) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_0: Vec<ObjectId> = objects_0.iter().copied().filter(|&o| g.state().obj(o).tapped != false).collect(); cantrip_api::instruction(g, |g| { for &object in &turned_0 { g.untap(object); } });
 g.end_sentence();

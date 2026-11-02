@@ -1,13 +1,12 @@
 // Become Anonymous
-// status: planned
-// requires: operation Move
+// status: ready
 // Exile target nontoken creature you own and the top two cards of your library in a face-down pile, shuffle that pile, then cloak those cards. They enter tapped. (To cloak a card, put it onto the battlefield face down as a 2/2 creature with ward {2}. Turn it face up any time for its mana cost if it's a creature card.)
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((!(q.state().obj(id).token) && q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.state().obj(id).owner)))) }
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0)];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let objects_0: Vec<ObjectId> = { let q: &dyn Query = g; { let mut all: Vec<ObjectId> = Vec::new(); for id in t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() { if !all.contains(&id) { all.push(id); } } for id in (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((2i64).max(0) as usize).collect::<Vec<ObjectId>>() { if !all.contains(&id) { all.push(id); } } all } }; let moved_0: Vec<ObjectId> = planned_value!("operation Move", Vec::<ObjectId>::new() => cantrip_mechanics::enter::in_state(g, asker, &objects_0, Destination::Exile, Arrival { tapped: false, counters: &[], states: &[ArrivalState::ExilePile { shuffled: true }] }, true)?);
+let mut pool_0 = { let q: &dyn Query = g; { let mut all: Vec<ObjectId> = Vec::new(); for id in t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() { if !all.contains(&id) { all.push(id); } } for id in (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((2i64).max(0) as usize).collect::<Vec<ObjectId>>() { if !all.contains(&id) { all.push(id); } } all } }; let mut objects_0: Vec<ObjectId> = Vec::new(); while !pool_0.is_empty() { let at = g.choose_at_random(pool_0.len()); objects_0.push(pool_0.remove(at)); } let moved_0 = g.exile_face_down(&objects_0, None);
 g.end_sentence();
 let controller_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
 let cards_1 = { let q: &dyn Query = g; moved_0.clone() }; let entered_1: Vec<ObjectId> = g.put_all_onto_battlefield_face_down(&cards_1, controller_1, FaceDown::Cloaked, true)?.into_iter().flatten().collect();

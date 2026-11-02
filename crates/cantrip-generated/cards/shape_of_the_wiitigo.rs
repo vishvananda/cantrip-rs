@@ -1,6 +1,5 @@
 // Shape of the Wiitigo
-// status: planned
-// requires: history window SinceLastUpkeepOf
+// status: ready
 // Enchant creature
 // When this Aura enters, put six +1/+1 counters on enchanted creature.
 // At the beginning of your upkeep, put a +1/+1 counter on enchanted creature if it attacked or blocked since your last upkeep. Otherwise, remove a +1/+1 counter from it.
@@ -18,7 +17,7 @@ g.end_sentence();
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_2: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-if { let q: &dyn Query = g; Some(asker.source).and_then(|o: ObjectId| q.state().obj(o).attached_to).is_some_and(|candidate: ObjectId| (planned_value!("history window SinceLastUpkeepOf", q.history().all().iter() => cantrip_mechanics::history::since_last_upkeep_of(q, Some(asker.controller)).iter()).any(|r| matches!(r.event, Event::Attacks { attacker, .. } if attacker == candidate)) || planned_value!("history window SinceLastUpkeepOf", q.history().all().iter() => cantrip_mechanics::history::since_last_upkeep_of(q, Some(asker.controller)).iter()).any(|r| matches!(r.event, Event::Blocks { blocker, .. } if blocker == candidate)))) } {
+if { let q: &dyn Query = g; Some(asker.source).and_then(|o: ObjectId| q.state().obj(o).attached_to).is_some_and(|candidate: ObjectId| ({ let history = q.history(); let upkeeping = q.state().turn.step() == Step::Upkeep; history.all()[history.select(EventQuery::kind(EventMask::STEP_BEGAN).step(Step::Upkeep)).rev().find(|r| Some(r.active) == Some(asker.controller) && !(upkeeping && r.turn == history.turn)).map_or(0, |r| r.serial as usize + 1)..].iter() }.any(|r| matches!(r.event, Event::Attacks { attacker, .. } if attacker == candidate)) || { let history = q.history(); let upkeeping = q.state().turn.step() == Step::Upkeep; history.all()[history.select(EventQuery::kind(EventMask::STEP_BEGAN).step(Step::Upkeep)).rev().find(|r| Some(r.active) == Some(asker.controller) && !(upkeeping && r.turn == history.turn)).map_or(0, |r| r.serial as usize + 1)..].iter() }.any(|r| matches!(r.event, Event::Blocks { blocker, .. } if blocker == candidate)))) } {
 let mut counters_1: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
 let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (Some(asker.source).and_then(|o: ObjectId| q.state().obj(o).attached_to).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, CounterKind::PlusOne, amount)); } }
 let had_1: Vec<_> = counters_1.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_1); let applied_1: Vec<ObjectId> = counters_1.iter().zip(had_1).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();

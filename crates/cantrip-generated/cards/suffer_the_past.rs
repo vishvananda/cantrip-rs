@@ -3,7 +3,7 @@
 // Exile X target cards from target player's graveyard. For each card exiled this way, that player loses 1 life and you gain 1 life.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Player(p) if true) }
-#[allow(unused_variables)] fn ability_0_target_1(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && ((q.state().obj(id).zone.kind() == ZoneKind::Graveyard && q.chosen_targets().get(0).copied().and_then(|t: Target| t.player()) == Some(q.state().obj(id).owner)))) }
+#[allow(unused_variables)] fn ability_0_target_1(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && ((q.state().obj(id).zone.kind() == ZoneKind::Graveyard && (q.chosen_targets().is_empty() || q.chosen_targets().get(0).copied().and_then(|t: Target| t.player()) == Some(q.state().obj(id).owner))))) }
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0),target(ability_0_target_1).counted()];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);

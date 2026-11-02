@@ -1,11 +1,10 @@
 // Kasla, the Broken Halo
-// status: planned
-// requires: object filter HasKeywordFamily
+// status: ready
 // Convoke (Your creatures can help cast this spell. Each creature you tap while casting this spell pays for {1} or one mana of that creature's color.)
 // Flying, vigilance, haste
 // Whenever you cast another spell that has convoke, scry 2, then draw a card.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_4_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && planned_value!("object filter HasKeywordFamily", false => q.has_keyword_ability(id, KeywordAbility::Convoke)) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_4_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && (q.card(q.chars(id).card).pay_with.convoke || q.state().battlefield().iter().any(|&p| !q.lost_all_abilities(p) && q.card(q.chars(p).card).grants_pay_with.iter().any(|g| g(q, p, q.controller(id), id).convoke))) { return Some(Fired { subject, data }); } }
  None }
 fn ability_4(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let amount_0 = { let q: &dyn Query = g; (2i64).max(0) as usize }; let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; cantrip_mechanics::scry(g, player_0, asker.source, amount_0)?;

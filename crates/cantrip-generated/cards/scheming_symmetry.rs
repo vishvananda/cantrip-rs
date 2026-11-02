@@ -6,7 +6,7 @@
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0).between(2, 2)];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; t_0.iter().filter_map(|t| t.player()).collect::<Vec<PlayerId>>() };
+let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().filter(|&p| t_0.iter().any(|t| t.player() == Some(p))).collect::<Vec<PlayerId>>() };
 let mut each_2: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut all_2: Vec<ObjectId> = Vec::new();
  for (index_0, bound_0) in players_0.iter().copied().enumerate() { let searcher_1 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; let owner_1 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; let rule_count_1 = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let shown_1 = cantrip_mechanics::library::searched_cards(g, owner_1); let can_1: Vec<ObjectId> = { let q: &dyn Query = g; shown_1.iter().copied().filter(|&id| true).collect() }; let found_1 = cantrip_mechanics::library::search(g, searcher_1, owner_1, asker.source, SearchDestination::Hand, cantrip_mechanics::select::Selection::listed(rule_count_1, &shown_1, can_1))?;
  each_2[index_0] = found_1.clone(); all_2.extend(each_2[index_0].iter().copied());

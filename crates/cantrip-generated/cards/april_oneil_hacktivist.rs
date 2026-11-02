@@ -1,12 +1,11 @@
 // April O'Neil, Hacktivist
-// status: planned
-// requires: history measure Distinct
+// status: ready
 // At the beginning of your end step, draw a card for each card type among spells you've cast this turn.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::End) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_0 = { let q: &dyn Query = g; (planned_value!("history measure Distinct", 0i64 => cantrip_mechanics::history::distinct(q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if true && cast_of(q, id).is_some_and(|cast| Some(asker.controller).into_iter().collect::<Vec<PlayerId>>().contains(&cast.player)) { return Some(Fired { subject, data }); } }  None }), DistinctProperty::CardTypes))).max(0) as u32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_0 = { let q: &dyn Query = g; (q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if true && cast_of(q, id).is_some_and(|cast| Some(asker.controller).into_iter().collect::<Vec<PlayerId>>().contains(&cast.player)) { return Some(Fired { subject, data }); } }  None }).filter_map(|f: Fired| f.subject.object()).filter_map(|id| cast_of(q, id)).fold(TypeSet::NONE, |all, cast| cast.types.iter().fold(all, |all, t| all.with(t))).iter().count() as i64).max(0) as u32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_0 { g.draw(player, amount_0); }
 g.end_sentence();
  Ok(()) }

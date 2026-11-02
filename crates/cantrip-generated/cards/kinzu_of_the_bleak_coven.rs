@@ -2,7 +2,6 @@
 // status: planned
 // requires: copy exception AddAbility
 // requires: engine: no Toxic granted
-// requires: move cost Exile from One
 // Flying
 // Whenever another nontoken creature you control dies, you may pay 2 life and exile it. If you do, create a token that's a copy of that creature, except it's 1/1 and has toxic 1. (Players dealt combat damage by it also get a poison counter.)
 #[allow(unused_imports)] use cantrip_api::*;
@@ -10,7 +9,7 @@
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_4: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-let payer_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let paid_0 = g.may_pay(payer_0, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(life(2)).and(planned_value!("move cost Exile from One", Cost::NONE => Cost::moves(&[Selection { objects: Picks::These(|q: &dyn Query, asker: &Asker| ((Some(ObjectId(item.data[0])).filter(|o| *o != ObjectId::NONE).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Graveyard).collect::<Vec<ObjectId>>()).get(0).copied().into_iter().collect::<Vec<ObjectId>>()), count: Count::Each }], Destination::Exile, Arrival { tapped: false, face_down: false, states: &[] }))), &PAY_QUESTION)?;
+let payer_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let it_0: Option<ObjectId> = { let q: &dyn Query = g; ((Some(ObjectId(item.data[0])).filter(|o| *o != ObjectId::NONE).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Graveyard).collect::<Vec<ObjectId>>()).get(0).copied() }; let paid_0 = match it_0 { Some(o) => g.may_pay(payer_0, asker.source, o, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(life(2)), &PAY_QUESTION)?, None => false }; let mut moved_0: Vec<ObjectId> = Vec::new(); if let (true, Some(o)) = (paid_0, it_0) { moved_0.push(g.exile(o)); }
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
 let original_1 = { let q: &dyn Query = g; item.subject.object() }; let values_1 = { let q: &dyn Query = g; original_1.map(|original: ObjectId| planned_value!("copy exception AddAbility", q.copiable_values(original).sized(1, 1) => q.copiable_values(original).sized(1, 1).with_ability(planned_value!("engine: no Toxic granted", AbilityRef::delayed({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, 0) => AbilityRef::granted_static({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, 0))))) }; let count_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let created_1 = match values_1 { Some(values) => g.create_token_copies_tapped(values, player_1, count_1, false)?, None => Vec::new() };

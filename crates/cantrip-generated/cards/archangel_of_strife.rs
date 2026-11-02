@@ -7,8 +7,12 @@
 // Creatures controlled by players who chose peace get +0/+3.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables, unused_mut)] fn ability_1_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
+let mut each_chosen_1 = Vec::new();
+let mut each_chosen_1_who: Vec<PlayerId> = Vec::new();
  for (index_0, bound_0) in players_0.iter().copied().enumerate() { cantrip_mechanics::choose::option_as_enters(g, entering, &CARD, 0..2)?; let chosen_1: u8 = entering.chosen_option.map_or(0, |chosen| chosen.index);
-    } 
+ each_chosen_1.push(chosen_1);
+each_chosen_1_who.push(bound_0);
+   } 
  Ok(()) }
 #[allow(unused_variables)] fn ability_2_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); ((*so_far).is(CardType::Creature) && (q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => g.votes().voted(option))).collect::<Vec<PlayerId>>()).contains(&q.controller(affected))) }
 #[allow(unused_variables)] fn ability_2_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); let (p, t) = ((3i64) as i16, (0i64) as i16); chars.power = chars.power.map(|v| v.saturating_add(p)); chars.toughness = chars.toughness.map(|v| v.saturating_add(t)); }

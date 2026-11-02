@@ -18,7 +18,7 @@ let picked_3 = if open_3.is_empty() { None } else if open_3.len() > 1 || (true &
 let Some(card_3) = picked_3 else { break; };
 let ways_3: Vec<CastWay> = g.cast_ways_during_resolution_by(card_3, caster_3).into_iter().filter(|w| true).collect();
 let done_3 = if ways_3.is_empty() { g.play_land_during_resolution(card_3)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_3, card_3, ways_3)?.map(|w| w.way); g.cast_during_resolution_as(card_3, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(caster_3), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
-if done_3 { left_3 -= 1; played_3.push(g.state().obj(card_3).became.unwrap_or(card_3)); } else if 1i64 == 1 { break; } if done_3 || !(true && true) { pool_3.retain(|&c| c != card_3); }
+if done_3 { left_3 -= 1; played_3.push(g.state().obj(card_3).became.unwrap_or(card_3)); } else if true { break; } if done_3 || !(true && true) { pool_3.retain(|&c| c != card_3); }
 }
 let library_4 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let cards_4: Vec<ObjectId> = { let q: &dyn Query = g; (objects_2.clone()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Library).collect::<Vec<ObjectId>>() }.into_iter().filter(|&o| g.state().obj(o).became.is_none() && g.state().obj(o).zone == Zone::library(library_4)).collect(); let placed_4 = cards_4.clone();
 g.bottom_in_random_order(library_4, &cards_4);

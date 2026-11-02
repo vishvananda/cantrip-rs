@@ -1,9 +1,8 @@
 // Magewright's Stone
-// status: planned
-// requires: object filter HasActivatedAbility
+// status: ready
 // {1}, {T}: Untap target creature that has an activated ability with {T} in its cost.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && (planned_value!("object filter HasActivatedAbility", false => q.card_of(id).activated.iter().any(|d| matches(d))) && planned_value!("object filter HasActivatedAbility", false => q.card_of(id).activated.iter().any(|d| matches(d))))))) }
+#[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && (q.chars(id).abilities().any(|a| q.activated_ability(a).is_some_and(|d| !d.special_action)) && q.chars(id).abilities().any(|a| q.activated_ability(a).is_some_and(|d| !d.special_action && d.cost.tap)))))) }
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0)];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);

@@ -1,6 +1,5 @@
 // Yusri, Fortune's Flame
 // status: planned
-// requires: numeric expression CoinFlipsWon
 // requires: play permission on an open set of cards
 // Flying
 // Whenever Yusri attacks, choose a number between 1 and 5. Flip that many coins. For each flip you win, draw a card. For each flip you lose, Yusri deals 2 damage to you. If you won five flips this way, you may cast spells from your hand this turn without paying their mana costs.
@@ -12,12 +11,12 @@ let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a referen
 g.end_sentence();
 let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let count_1 = { let q: &dyn Query = g; (i64::from(chosen_0)).max(0) as u32 }; let mut done_1: i64 = 0; for _ in 0..count_1 { if g.flip_coin(player_1) { done_1 += 1; } }
 g.end_sentence();
-let amount_2 = { let q: &dyn Query = g; (planned_value!("numeric expression CoinFlipsWon", 0i64 => g.coin_flips(asker.controller, true))).max(0) as u32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_2 = { let q: &dyn Query = g; (done_1).max(0) as u32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_2 { g.draw(player, amount_2); }
 g.end_sentence();
-let source_3 = { let q: &dyn Query = g; Some(asker.source) }; let amount_3 = { let q: &dyn Query = g; ((2i64 * planned_value!("numeric expression CoinFlipsWon", 0i64 => g.coin_flips(asker.controller, false)))).clamp(0, 65535) as u16 }; let recipients_3 = { let q: &dyn Query = g; (Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() }; if let Some(source) = source_3 { let batch: Vec<(ObjectId, Target, u16)> = recipients_3.iter().map(|t| (source, *t, amount_3)).collect(); g.damage_together(&batch); }
+let source_3 = { let q: &dyn Query = g; Some(asker.source) }; let amount_3 = { let q: &dyn Query = g; ((2i64 * (i64::from(count_1) - done_1))).clamp(0, 65535) as u16 }; let recipients_3 = { let q: &dyn Query = g; (Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() }; if let Some(source) = source_3 { let batch: Vec<(ObjectId, Target, u16)> = recipients_3.iter().map(|t| (source, *t, amount_3)).collect(); g.damage_together(&batch); }
 g.end_sentence();
-if { let q: &dyn Query = g; (planned_value!("numeric expression CoinFlipsWon", 0i64 => g.coin_flips(asker.controller, true))) == (5i64) } {
+if { let q: &dyn Query = g; (done_1) == (5i64) } {
 planned!("play-permission-on-an-open-set-of-cards" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.add_player_effect(player, source, EffectKind::PlayerRule(PlayerRule::Play { zone: ZoneKind::Hand, cards: CardsOfRule::kept(move |q: &dyn Query, asker: &Asker, card: ObjectId| (((Some(player).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).contains(&card)), grant: PlayGrant { instead: Some(ManaCost::ZERO), ..PlayGrant::CAST } }), Duration::EndOfTurn); } });
 g.end_sentence();
 }

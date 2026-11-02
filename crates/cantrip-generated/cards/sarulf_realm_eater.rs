@@ -2,7 +2,6 @@
 // status: planned
 // requires: engine: no cost removes counters this way
 // requires: numeric expression PaidCountersRemoved
-// requires: objects that paid a cost at resolution
 // Whenever a permanent an opponent controls is put into a graveyard from the battlefield, put a +1/+1 counter on Sarulf.
 // At the beginning of your upkeep, if Sarulf has one or more +1/+1 counters on it, you may remove all of them. If you do, exile each other nonland permanent with mana value less than or equal to the number of counters removed this way.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -21,7 +20,6 @@ fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mu
 let mut hoisted_3: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let payer_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let paid_1 = g.may_pay(payer_1, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(planned_value!("engine: no cost removes counters this way", Cost::NONE => Cost { remove_all_counters: Some(Some(CounterKind::PlusOne)), ..Cost::NONE })), &PAY_QUESTION)?;
-let paid_objects_1: Vec<ObjectId> = planned_value!("objects that paid a cost at resolution", Vec::<ObjectId>::new() => g.objects_that_paid());
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_1 as i64) != 0) } {
 let objects_2 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (!(Some(asker.source) == Some(id)) && !(q.chars(id).is(CardType::Land)) && (i64::from(q.mana_value(id))) < (planned_value!("numeric expression PaidCountersRemoved", 0i64 => i64::from(q.counters_paid(item)))))).collect::<Vec<ObjectId>>() }; let moved_2 = g.exile_all(&objects_2);

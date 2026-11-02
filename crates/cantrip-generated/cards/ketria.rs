@@ -1,7 +1,6 @@
 // Ketria
 // status: planned
 // requires: card type Plane
-// requires: instruction ChooseOne
 // requires: layout Planar
 // requires: subtype Ikoria
 // requires: trigger event Player ChaosEnsues
@@ -17,7 +16,8 @@ let mut hoisted_4: Vec<ObjectId> = Vec::new();
 let mut hoisted_2: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let decider_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; match planned_value!("instruction ChooseOne", 0u8 => cantrip_mechanics::choose::one_of(g, decider_0, asker.source, vec![Label::Card(card_0, 0), Label::Card(card_0, 1), Label::Card(card_0, 2)])?) {
+let decider_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
+let offered_0: Vec<u8> = [(0u8, true), (1u8, true), (2u8, true)].into_iter().filter(|option| option.1).map(|option| option.0).collect(); let card_0 = item.ability.card; let picked_0 = if offered_0.len() > 1 { offered_0[cantrip_mechanics::choose::one_of(g, decider_0, asker.source, offered_0.iter().map(|&option| Label::Card(card_0, option)).collect())? as usize] } else { offered_0.first().copied().unwrap_or(u8::MAX) }; match picked_0 {
 0 => {
 let mut counters_1: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
 let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, CounterKind::Vigilance, amount)); } }
@@ -32,13 +32,14 @@ let had_3: Vec<_> = counters_3.iter().map(|c| g.state().obj(c.0).counters(c.1)).
 g.end_sentence();
 hoisted_4.extend(applied_3.clone());
 }
-_ => {
+2 => {
 let mut counters_5: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
 let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_5.push((object, CounterKind::Trample, amount)); } }
 let had_5: Vec<_> = counters_5.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_5); let applied_5: Vec<ObjectId> = counters_5.iter().zip(had_5).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
 hoisted_6.extend(applied_5.clone());
 }
+_ => {}
 }
 g.end_sentence();
  Ok(()) }
@@ -51,20 +52,22 @@ let asker = &Asker::new(item.object, item.controller);
 let owner_7 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let count_7 = { let q: &dyn Query = g; (1i64).max(0) as usize }; let (found_7, rest_7) = cantrip_mechanics::library::reveal_until_n(g, owner_7, count_7, &|q: &dyn Query, id: ObjectId| (!(q.chars(id).is(CardType::Land)) && (q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Battle) || q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Enchantment) || q.chars(id).is(CardType::Land) || q.chars(id).is(CardType::Planeswalker)))); let shown_7 = found_7.len() + rest_7.len(); let objects_7: Vec<ObjectId> = g.state().zone(Zone::library(owner_7)).iter().copied().take(shown_7).collect();
 let objects_8 = { let q: &dyn Query = g; objects_7.clone() }; let moved_8 = g.exile_all(&objects_8);
 g.end_sentence();
-let decider_9 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; match planned_value!("instruction ChooseOne", 0u8 => cantrip_mechanics::choose::one_of(g, decider_9, asker.source, vec![Label::Card(card_9, 0), Label::Card(card_9, 1)])?) {
-0 => {
+let decider_9 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
+let offered_9: Vec<u8> = [(3u8, !{ let q: &dyn Query = g; (((moved_8.clone()).into_iter().filter(|&id| (!(q.chars(id).is(CardType::Land)) && (q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Battle) || q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Enchantment) || q.chars(id).is(CardType::Land) || q.chars(id).is(CardType::Planeswalker)))).collect::<Vec<ObjectId>>()).get(0).copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Exile).collect::<Vec<ObjectId>>() }.is_empty()), (4u8, !{ let q: &dyn Query = g; (((moved_8.clone()).into_iter().filter(|&id| (!(q.chars(id).is(CardType::Land)) && (q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Battle) || q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Enchantment) || q.chars(id).is(CardType::Land) || q.chars(id).is(CardType::Planeswalker)))).collect::<Vec<ObjectId>>()).get(0).copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Exile).collect::<Vec<ObjectId>>() }.is_empty())].into_iter().filter(|option| option.1).map(|option| option.0).collect(); let card_9 = item.ability.card; let picked_9 = if offered_9.len() > 1 { offered_9[cantrip_mechanics::choose::one_of(g, decider_9, asker.source, offered_9.iter().map(|&option| Label::Card(card_9, option)).collect())? as usize] } else { offered_9.first().copied().unwrap_or(u8::MAX) }; match picked_9 {
+3 => {
 let objects_10 = { let q: &dyn Query = g; (((moved_8.clone()).into_iter().filter(|&id| (!(q.chars(id).is(CardType::Land)) && (q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Battle) || q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Enchantment) || q.chars(id).is(CardType::Land) || q.chars(id).is(CardType::Planeswalker)))).collect::<Vec<ObjectId>>()).get(0).copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Exile).collect::<Vec<ObjectId>>() }; let moved_10 = g.return_to_hand_revealed(&objects_10);
 g.end_sentence();
 hoisted_11.extend(moved_10.clone());
 hoisted_12.extend({ let q: &dyn Query = g; objects_10.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() });
 }
-_ => {
+4 => {
 let player_13 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
 let objects_13 = ({ let q: &dyn Query = g; (((moved_8.clone()).into_iter().filter(|&id| (!(q.chars(id).is(CardType::Land)) && (q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Battle) || q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Enchantment) || q.chars(id).is(CardType::Land) || q.chars(id).is(CardType::Planeswalker)))).collect::<Vec<ObjectId>>()).get(0).copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Exile).collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_13 = { let rows_13: Vec<(ObjectId, PlayerId, bool)> = objects_13.iter().map(|&o| (o, player_13, false)).collect(); let came_13 = g.put_all_onto_battlefield_as(&rows_13)?; came_13.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
 g.end_sentence();
 hoisted_14.extend(moved_13.clone());
 hoisted_15.extend({ let q: &dyn Query = g; objects_13.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() });
 }
+_ => {}
 }
 g.end_sentence();
  Ok(()) }
@@ -76,5 +79,5 @@ planned_item!("trigger-event-player-chaos-ensues" => matcher: #[allow(unused_var
  None });
 planned_item!("layout-planar" => variant: Some(Variant::Planechase));
 
-pub static CARD: CardDef = CardDef { name: "Ketria", token_words: &[], oracle: true, cost: ManaCost::ZERO, has_cost: false, types: TypeSet::of(&[planned_value!("card type Plane", CardType::Land => CardType::Plane)]), subtypes: SubtypeSet::of(&[planned_value!("subtype Ikoria", Subtype::Plains => Subtype::Ikoria)]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(planned_value!("trigger event Player Planeswalks", EventMask(0) => EventMask(EventMask::PLANESWALKED.0 | EventMask::STEP_BEGAN.0)), ability_0_event), ability_0, "When you planeswalk to Ketria and at the beginning of your upkeep, put your choice of a vigilance, menace, or trample counter on target creature you control.").targets(ABILITY_0_TARGETS),triggered(when_asked(planned_value!("trigger event Player ChaosEnsues", EventMask(0) => EventMask(EventMask::CHAOS_ENSUED.0)), ability_1_event), ability_1, "Whenever chaos ensues, exile cards from the top of your library until you exile a nonland permanent card. Put that card onto the battlefield or into your hand.").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
+pub static CARD: CardDef = CardDef { name: "Ketria", token_words: &[], oracle: true, cost: ManaCost::ZERO, has_cost: false, types: TypeSet::of(&[planned_value!("card type Plane", CardType::Land => CardType::Plane)]), subtypes: SubtypeSet::of(&[planned_value!("subtype Ikoria", Subtype::Plains => Subtype::Ikoria)]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(planned_value!("trigger event Player Planeswalks", EventMask(0) => EventMask(EventMask::PLANESWALKED.0 | EventMask::STEP_BEGAN.0)), ability_0_event), ability_0, "When you planeswalk to Ketria and at the beginning of your upkeep, put your choice of a vigilance, menace, or trample counter on target creature you control.").targets(ABILITY_0_TARGETS),triggered(when_asked(planned_value!("trigger event Player ChaosEnsues", EventMask(0) => EventMask(EventMask::CHAOS_ENSUED.0)), ability_1_event), ability_1, "Whenever chaos ensues, exile cards from the top of your library until you exile a nonland permanent card. Put that card onto the battlefield or into your hand.").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, labels: &["Vigilance", "Menace", "Trample", "Onto the battlefield", "Into your hand"], ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

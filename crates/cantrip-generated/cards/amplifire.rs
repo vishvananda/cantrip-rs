@@ -1,6 +1,5 @@
 // Amplifire
-// status: planned
-// requires: engine: no effect sets power or toughness alone
+// status: ready
 // At the beginning of your upkeep, reveal cards from the top of your library until you reveal a creature card. Until your next turn, this creature's base power becomes twice that card's power and its base toughness becomes twice that card's toughness. Put the revealed cards on the bottom of your library in a random order.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::Upkeep) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
@@ -8,9 +7,8 @@
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let owner_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let count_0 = { let q: &dyn Query = g; (1i64).max(0) as usize }; let (found_0, rest_0) = cantrip_mechanics::library::reveal_until_n(g, owner_0, count_0, &|q: &dyn Query, id: ObjectId| q.chars(id).is(CardType::Creature)); let shown_0 = found_0.len() + rest_0.len(); let objects_0: Vec<ObjectId> = g.state().zone(Zone::library(owner_0)).iter().copied().take(shown_0).collect();
 let objects_1 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let duration_1 = Duration::UntilNextTurnOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") });
-let kind_1_0_0 = { let q: &dyn Query = g; planned_value!("engine: no effect sets power or toughness alone", EffectKind::Pump(0, 0) => EffectKind::SetPower(((2i64 * (found_0.clone()).into_iter().next().map_or(0i64, |id: ObjectId| i64::from(q.chars(id).power.unwrap_or(0))))).clamp(-32768, 32767) as i16)) };
-let kind_1_1_0 = { let q: &dyn Query = g; planned_value!("engine: no effect sets power or toughness alone", EffectKind::Pump(0, 0) => EffectKind::SetToughness(((2i64 * (found_0.clone()).into_iter().next().map_or(0i64, |id: ObjectId| i64::from(q.chars(id).toughness.unwrap_or(0))))).clamp(-32768, 32767) as i16)) };
-if let Some(source) = source_1 { cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.add_effect(source, object, kind_1_0_0, duration_1); g.add_effect(source, object, kind_1_1_0, duration_1);  } }); }
+let kind_1_0_0 = { let q: &dyn Query = g; EffectKind::SetPt(((2i64 * (found_0.clone()).into_iter().next().map_or(0i64, |id: ObjectId| i64::from(q.chars(id).power.unwrap_or(0))))).clamp(-32768, 32767) as i16, ((2i64 * (found_0.clone()).into_iter().next().map_or(0i64, |id: ObjectId| i64::from(q.chars(id).toughness.unwrap_or(0))))).clamp(-32768, 32767) as i16) };
+if let Some(source) = source_1 { cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.add_effect(source, object, kind_1_0_0, duration_1);  } }); }
 let library_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let cards_2: Vec<ObjectId> = { let q: &dyn Query = g; (objects_0.clone()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Library).collect::<Vec<ObjectId>>() }.into_iter().filter(|&o| g.state().obj(o).became.is_none() && g.state().obj(o).zone == Zone::library(library_2)).collect(); let placed_2 = cards_2.clone();
 g.bottom_in_random_order(library_2, &cards_2);
 g.end_sentence();

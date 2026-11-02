@@ -1,6 +1,5 @@
 // The Elder Dragon War
-// status: planned
-// requires: engine: no ReadAhead
+// status: ready
 // Read ahead (Choose a chapter and start with that many lore counters. Add one after your draw step. Skipped chapters don't trigger. Sacrifice after III.)
 // I — This Saga deals 2 damage to each creature and each opponent.
 // II — Discard any number of cards, then draw that many cards.
@@ -34,7 +33,6 @@ tokens_4.extend(std::iter::repeat((def_4_0,player)).take(count_4_0 as usize));
 let created_4 = g.create_tokens_worded(&tokens_4, false, None, words_4)?;
 g.end_sentence();
  Ok(()) }
-planned_item!("engine-no-read-ahead" => enters: cantrip_mechanics::read_ahead::enters);
 
 pub static CARD: CardDef = CardDef { name: "The Elder Dragon War", token_words: &[], oracle: true, cost: ManaCost { generic: 2, x: 0, symbols: [0, 0, 0, 2, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Enchantment]), subtypes: SubtypeSet::of(&[Subtype::Saga]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[chapter(1, ability_1_0, "I — This Saga deals 2 damage to each creature and each opponent.").targets(&[]),chapter(2, ability_1_1, "II — Discard any number of cards, then draw that many cards.").targets(&[]),chapter(3, ability_1_2, "III — Create a 4/4 red Dragon creature token with flying.").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[&token_5::CARD];

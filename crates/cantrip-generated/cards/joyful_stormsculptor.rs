@@ -1,6 +1,5 @@
 // Joyful Stormsculptor
-// status: planned
-// requires: object filter HasKeywordFamily
+// status: ready
 // When this creature enters, create two 1/1 blue and red Elemental creature tokens.
 // Whenever you cast a spell that has convoke, this creature deals 1 damage to each opponent and each battle they protect.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -22,7 +21,7 @@ tokens_0.extend(std::iter::repeat((def_0_0,player)).take(count_0_0 as usize));
 let created_0 = g.create_tokens_worded(&tokens_0, false, None, words_0)?;
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && planned_value!("object filter HasKeywordFamily", false => q.has_keyword_ability(id, KeywordAbility::Convoke)) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && (q.card(q.chars(id).card).pay_with.convoke || q.state().battlefield().iter().any(|&p| !q.lost_all_abilities(p) && q.card(q.chars(p).card).grants_pay_with.iter().any(|g| g(q, p, q.controller(id), id).convoke))) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let source_2 = { let q: &dyn Query = g; Some(asker.source) }; let amount_2 = { let q: &dyn Query = g; (1i64).max(0) as u16 }; let recipients_2 = { let q: &dyn Query = g; { let mut all: Vec<Target> = Vec::new(); for t in (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() { if !all.contains(&t) { all.push(t); } } for t in (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Battle) && q.state().obj(id).marks.protector.is_some_and(|protector: PlayerId| (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&protector)))).collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() { if !all.contains(&t) { all.push(t); } } all } }; if let Some(source) = source_2 { let batch: Vec<(ObjectId, Target, u16)> = recipients_2.iter().map(|t| (source, *t, amount_2)).collect(); g.damage_together(&batch); }

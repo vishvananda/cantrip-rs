@@ -1,6 +1,5 @@
 // Thunderous Orator
-// status: planned
-// requires: continuous change GainAbilitiesOf
+// status: ready
 // Vigilance
 // Whenever this creature attacks, it gains flying until end of turn if you control a creature with flying. The same is true for first strike, double strike, deathtouch, indestructible, lifelink, menace, and trample.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -8,7 +7,7 @@
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let objects_0 = { let q: &dyn Query = g; (item.subject.object().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_0 = { let q: &dyn Query = g; Some(asker.source) }; let duration_0 = Duration::EndOfTurn;
-let kind_0_0_0 = { let q: &dyn Query = g; planned_value!("continuous change GainAbilitiesOf", EffectKind::Pump(0, 0) => EffectKind::AddAbilitiesOf(AbilitiesOf { objects: { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }, kinds: &[CheckHasable::Flying, CheckHasable::FirstStrike, CheckHasable::DoubleStrike, CheckHasable::Deathtouch, CheckHasable::Indestructible, CheckHasable::Lifelink, CheckHasable::Menace, CheckHasable::Trample], once_each_turn: false, spend_as: None })) };
+let kind_0_0_0 = { let q: &dyn Query = g; { let those = q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>(); let had: Vec<Keyword> = [Keyword::Flying, Keyword::FirstStrike, Keyword::DoubleStrike, Keyword::Deathtouch, Keyword::Indestructible, Keyword::Lifelink, Keyword::Menace, Keyword::Trample].into_iter().filter(|k: &Keyword| those.iter().any(|&o: &ObjectId| g.chars(o).has(*k))).collect(); EffectKind::AddKeywords(Keywords::of(&had)) } };
 if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &object in &objects_0 { g.add_effect(source, object, kind_0_0_0, duration_0);  } }); }
 g.end_sentence();
  Ok(()) }

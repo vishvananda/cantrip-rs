@@ -1,6 +1,6 @@
 // Agrus Kos, Eternal Soldier
 // status: planned
-// requires: operation CopyOnStack
+// requires: a copy of a spell for each object it could target
 // requires: targeted by TargetsOnlySinglePermanent
 // requires: the ability an event is about
 // Vigilance
@@ -12,7 +12,7 @@ fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let payer_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let paid_0 = g.may_pay(payer_0, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 1, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [Some((Mana::R, Mana::W)),None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })), &PAY_QUESTION)?;
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
-planned!("operation-copy-on-stack" => if let Some(spell) = { let q: &dyn Query = g; planned_value!("the ability an event is about", None::<ObjectId> => q.ability_on_stack({ let q: &dyn Query = g; Target::Ability(q.state().stack.get((item.data[1] >> 8) as usize).map_or(u32::MAX, |e| e.serial)) })) } { cantrip_mechanics::copy::on_stack(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, spell, { let q: &dyn Query = g; (1i64).max(0) as u32 }, NewTargets::Each({ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (!(Some(asker.source) == Some(id)) && (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id))))).collect::<Vec<ObjectId>>() }))?; });
+planned!("a-copy-of-a-spell-for-each-object-it-could-target" => if let Some(spell) = { let q: &dyn Query = g; planned_value!("the ability an event is about", None::<ObjectId> => q.ability_on_stack({ let q: &dyn Query = g; Target::Ability(q.state().stack.get((item.data[1] >> 8) as usize).map_or(u32::MAX, |e| e.serial)) })) } { cantrip_mechanics::copy::on_stack(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, spell, { let q: &dyn Query = g; (1i64).max(0) as u32 }, NewTargets::Each({ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (!(Some(asker.source) == Some(id)) && (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id))))).collect::<Vec<ObjectId>>() }))?; });
 g.end_sentence();
 }
 g.end_sentence();

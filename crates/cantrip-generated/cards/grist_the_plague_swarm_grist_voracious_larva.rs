@@ -1,6 +1,5 @@
 // Grist, the Plague Swarm // Grist, Voracious Larva
-// status: planned
-// requires: adjusted token copy
+// status: ready
 // [+1]: Create a 1/1 black and green Insect creature token, then mill two cards. Put a deathtouch counter on the token if a black card was milled this way.
 // [−2]: Destroy target artifact or enchantment.
 // [−6]: For each creature card in your graveyard, create a token that's a copy of it, except it's a 1/1 black and green Insect.
@@ -71,7 +70,7 @@ let objects_5 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.
 g.end_sentence();
  Ok(()) }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let created_6: Vec<ObjectId> = planned_value!("adjusted token copy", Vec::<ObjectId>::new() => cantrip_mechanics::tokens::create(g, asker, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[({ let q: &dyn Query = g; (1i64).max(0) as u32 }, TokenRecipe::CopyEach({ let q: &dyn Query = g; ((q.state().apnap().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (q.chars(id).is(CardType::Creature) && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(id).owner)))).collect::<Vec<ObjectId>>() }, &[TokenCopyEffects::TokenCopyEffects(TokenCopyEffect::SetPT(PT::PT(1, 1)), TokenCopyEffect::SetColor(SettableColor::SimpleColorList(SimpleColor::Black, SimpleColor::Green)), TokenCopyEffect::SetCreatureTypes(CreatureType::Insect))]))], Arrival { tapped: false, counters: &[], states: &[] })?);
+let originals_6 = { let q: &dyn Query = g; ((q.state().apnap().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (q.chars(id).is(CardType::Creature) && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(id).owner)))).collect::<Vec<ObjectId>>() }; let player_6 = { let q: &dyn Query = g; Some(asker.controller) }; let mut copies_6: Vec<(Copiable, PlayerId)> = Vec::new(); if let Some(player) = player_6 { for &original in &originals_6 { if let Some(values) = { let q: &dyn Query = g; Some(original).map(|original: ObjectId| q.copiable_values(original).sized(1, 1).colored(ColorSet::NONE.with(q.words(asker.source).color(Color::Black)).with(q.words(asker.source).color(Color::Green))).typed(TypeSet::of(&[CardType::Creature]), SubtypeSet::of(&[q.words(asker.source).subtype(Subtype::Insect)]))) } { copies_6.push((values, player)); } } } let created_6 = g.create_token_copies_together(&copies_6)?;
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

@@ -1,12 +1,12 @@
 // Mindstorm Crown
 // status: planned
-// requires: numeric expression AsOf
+// requires: engine: no record of the board as the turn began
 // At the beginning of your upkeep, draw a card if you had no cards in hand at the beginning of this turn. If you had a card in hand, this artifact deals 1 damage to you.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::Upkeep) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-if { let q: &dyn Query = g; (planned_value!("numeric expression AsOf", 0i64 => q.as_of(asker, AsOf { moment: TurnBegan, value: PlayerNumber { player: AbilityController, number: CardsInHand } }))) == (0i64) } {
+if { let q: &dyn Query = g; (planned_value!("engine: no record of the board as the turn began", 0i64 => q.as_of(asker, AsOf { moment: TurnBegan, value: PlayerNumber { player: AbilityController, number: CardsInHand } }))) == (0i64) } {
 let amount_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_0 { g.draw(player, amount_0); }
 g.end_sentence();

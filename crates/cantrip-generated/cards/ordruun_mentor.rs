@@ -1,12 +1,11 @@
 // Ordruun Mentor
-// status: planned
-// requires: event value in a target filter beyond its subject
+// status: ready
 // Mentor (Whenever this creature attacks, put a +1/+1 counter on target attacking creature with lesser power.)
 // Whenever you attack a player, target creature that's attacking that player gains first strike until end of turn.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && q.state().attackers.iter().any(|a| a.id == id && { let defender = &a.target; match *defender { Target::Player(p) => Some(PlayerId(planned_value!("event value in a target filter beyond its subject", [u32::MAX; 2] => q.event_data())[1] as u8)) == Some(p), _ => false } })))) }
+#[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && q.state().attackers.iter().any(|a| a.id == id && { let defender = &a.target; match *defender { Target::Player(p) => q.event_subject().player() == Some(p), _ => false } })))) }
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
-#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Attacks { attacker, defender, defending, .. } = event { let id = *attacker; let subject = Target::Object(id); let data = [u32::from(q.controller(id).0), u32::from(defending.0)]; if true && Some(asker.controller) == Some(q.controller(id)) && match *defender { Target::Player(p) => true, _ => false } { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Attacks { attacker, defender, defending, .. } = event { let id = *attacker; let subject = Target::Player(*defending); let data = [u32::from(q.controller(id).0), u32::from(defending.0)]; if true && Some(asker.controller) == Some(q.controller(id)) && match *defender { Target::Player(p) => true, _ => false } { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);

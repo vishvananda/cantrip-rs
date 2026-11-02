@@ -1,6 +1,5 @@
 // Valakut Exploration
-// status: planned
-// requires: numeric object property ExiledCount
+// status: ready
 // Landfall — Whenever a land you control enters, exile the top card of your library. You may play that card for as long as it remains exiled.
 // At the beginning of your end step, if there are cards exiled with this enchantment, put them into their owner's graveyard, then this enchantment deals that much damage to each opponent.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -12,7 +11,7 @@ g.end_sentence();
 let cards_1_0 = { let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_1_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_1_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_1_0 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::Never, ..PlayGrant::CAST }); } } } });
 g.end_sentence();
  Ok(()) }
-fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.source).is_some_and(|candidate: ObjectId| (planned_value!("numeric object property ExiledCount", 0i64 => q.exiled_with(q.linked_to(&Asker::of(candidate))).len() as i64)) >= (1i64)) }
+fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.source).is_some_and(|candidate: ObjectId| (q.exiled_with(if candidate == asker.source { q.linked_to(asker) } else { q.text_linked(candidate) }).len() as i64) >= (1i64)) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::End) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

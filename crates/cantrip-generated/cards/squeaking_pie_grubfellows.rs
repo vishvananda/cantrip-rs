@@ -16,7 +16,7 @@ g.end_sentence();
 let payer_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let paid_2 = { let mut revealed = false; if let Some(card) = { let q: &dyn Query = g; q.state().zone(Zone::library(payer_2)).first().copied() } { if { let q: &dyn Query = g; Some(asker.source).is_some_and(|o: ObjectId| { let (a, b) = (&q.chars(card), &q.chars(o)); a.subtypes.iter().any(|s| SubtypeSet::CREATURE_TYPES.has(s) && b.subtypes.has(s)) }) } && cantrip_mechanics::effects::ask_may(g, payer_2, asker.source, Purpose::Optional)? { g.reveal(payer_2, &[card]); revealed = true; } } revealed };
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_2 as i64) != 0) } {
-let amount_3 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }; let mut cards_3 = Vec::new(); for player in players_3 { cards_3.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_3)?); } let discarded_3 = g.discard_together(&cards_3);
+let amount_3 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_3: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_3 = Vec::new(); for player in g.state().apnap().filter(|p| players_3.contains(p)).collect::<Vec<PlayerId>>() { cards_3.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_3)?); } let discarded_3 = g.discard_together(&cards_3);
 g.end_sentence();
 hoisted_4.extend(discarded_3.clone());
 hoisted_5.extend({ let q: &dyn Query = g; discarded_3.clone() });

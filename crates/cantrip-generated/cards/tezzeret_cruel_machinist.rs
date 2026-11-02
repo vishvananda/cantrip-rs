@@ -1,6 +1,6 @@
 // Tezzeret, Cruel Machinist
 // status: planned
-// requires: operation ChangeZone
+// requires: put onto the battlefield face down as a stated creature
 // [+1]: Draw a card.
 // [0]: Until your next turn, target artifact you control becomes a 5/5 creature in addition to its other types.
 // [−7]: Put any number of cards from your hand onto the battlefield face down. They're 5/5 artifact creatures.
@@ -21,7 +21,7 @@ if let Some(source) = source_1 { cantrip_api::instruction(g, |g| { for &object i
 g.end_sentence();
  Ok(()) }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let moved_2: Vec<ObjectId> = planned_value!("operation ChangeZone", Vec::<ObjectId>::new() => cantrip_mechanics::enter::change_zone(g, asker, ZoneChange { actor: { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, cards: { let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>() }, count: Some({ let q: &dyn Query = g; cantrip_mechanics::select::Count::AnyNumber }), random: false, group: None, destination: Destination::OwnersBattlefield, entry: &[], face_down: Some(FaceDownAs { shape: PT::PT(5, 5), creature_type: None, artifact: true }) })?);
+let moved_2: Vec<ObjectId> = planned_value!("put onto the battlefield face down as a stated creature", Vec::<ObjectId>::new() => cantrip_mechanics::enter::change_zone(g, asker, ZoneChange { actor: { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, cards: { let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>() }, count: Some({ let q: &dyn Query = g; cantrip_mechanics::select::Count::AnyNumber }), random: false, group: None, destination: Destination::OwnersBattlefield, entry: &[], face_down: Some(FaceDownAs { shape: PT::PT(5, 5), creature_type: None, artifact: true }) })?);
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

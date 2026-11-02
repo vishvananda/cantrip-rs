@@ -1,6 +1,5 @@
 // Baleful Mastery
-// status: planned
-// requires: object filter AlternateCostPaid
+// status: ready
 // You may pay {1}{B} rather than pay this spell's mana cost.
 // If the {1}{B} cost was paid, an opponent draws a card.
 // Exile target creature or planeswalker.
@@ -9,7 +8,7 @@
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-if { let q: &dyn Query = g; Some(asker.source).is_some_and(|candidate: ObjectId| planned_value!("object filter AlternateCostPaid", false => q.state().obj(candidate).alternate_cost_paid(cost))) } {
+if { let q: &dyn Query = g; item.way == 1 } {
 let among: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
 let Some(picked_0) = (if among.len() > 1 { cantrip_mechanics::choose::player(g, asker.controller, asker.source, among, "ChooseRevealedCard", 0)? } else { among.first().copied() }) else { return Ok(()); };
 let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; Some(picked_0).into_iter().collect::<Vec<PlayerId>>() };

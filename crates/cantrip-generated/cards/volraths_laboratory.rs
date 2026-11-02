@@ -2,7 +2,6 @@
 // status: planned
 // requires: a choice of Color outside its body
 // requires: a choice of CreatureType outside its body
-// requires: condition ValueChosen
 // requires: token of the chosen color
 // As this artifact enters, choose a color and a creature type.
 // {5}, {T}: Create a 2/2 creature token of the chosen color and type.
@@ -20,7 +19,7 @@ pub static EXTRA: &[&CardDef] = &[];
 }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_4: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-if { let q: &dyn Query = g; (planned_value!("condition ValueChosen", false => q.state().chosen_value(q.linked(item), ChoiceKind::Color).is_some()) && planned_value!("condition ValueChosen", false => q.state().chosen_value(q.linked(item), ChoiceKind::CreatureType).is_some())) } {
+if { let q: &dyn Query = g; (q.state().chosen_color(q.linked(item)).is_some() && q.state().chosen_subtype(q.linked(item)).is_some()) } {
 let created_2: Vec<ObjectId> = planned_value!("token of the chosen color", Vec::<ObjectId>::new() => cantrip_mechanics::tokens::create(g, asker, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[({ let q: &dyn Query = g; (1i64).max(0) as u32 }, TokenRecipe::Filled(g.card_id(&token_3::CARD), TokenFill { color: Some({ let q: &dyn Query = g; planned_value!("a choice of Color outside its body", Color::White => q.state().chosen_color(q.linked(item)).expect("it chose one")) }), creature_type: Some({ let q: &dyn Query = g; planned_value!("a choice of CreatureType outside its body", Subtype::Plains => q.state().chosen_subtype(q.linked(item)).expect("it chose one")) }), power_toughness: None, abilities_of: None }))], Arrival { tapped: false, counters: &[], states: &[] })?);
 g.end_sentence();
 hoisted_4.extend(created_2.clone());

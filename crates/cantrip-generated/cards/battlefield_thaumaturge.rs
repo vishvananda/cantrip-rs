@@ -1,11 +1,9 @@
 // Battlefield Thaumaturge
-// status: planned
-// requires: object collection TargetsOf
-// requires: object reference Affected
+// status: ready
 // Each instant and sorcery spell you cast costs {1} less to cast for each creature it targets.
 // Heroic — Whenever you cast a spell that targets this creature, this creature gains hexproof until end of turn.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_0_rule(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, q.controller(source)); let Costed::Spell(spell) = costed else { return CostDelta::NONE; }; if player == asker.controller && (q.chars(spell).is(CardType::Instant) || q.chars(spell).is(CardType::Sorcery)) { CostDelta::less((((planned_value!("object collection TargetsOf", Vec::<ObjectId>::new() => planned_value!("object reference Affected", None::<ObjectId> => asker.affected()).map_or_else(Vec::new, |o: ObjectId| q.targets_of(o)))).into_iter().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>()).len() as i64).clamp(0, 255) as u8) } else { CostDelta::NONE } }
+#[allow(unused_variables)] fn ability_0_0_rule(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, q.controller(source)); let Costed::Spell(spell) = costed else { return CostDelta::NONE; }; if player == asker.controller && (q.chars(spell).is(CardType::Instant) || q.chars(spell).is(CardType::Sorcery)) { CostDelta::less(((({ let mut objects: Vec<ObjectId> = Vec::new(); for o in targets.iter().filter_map(|t| t.object()) { if !objects.contains(&o) { objects.push(o); } } objects }).into_iter().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>()).len() as i64).clamp(0, 255) as u8) } else { CostDelta::NONE } }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && q.state().stack.iter().find(|i| i.kind == StackKind::Spell && i.object == id).is_some_and(|i| q.state().targets(i).iter().any(|t| t.object().is_some_and(|o| (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).contains(&o)))) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

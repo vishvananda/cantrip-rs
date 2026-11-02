@@ -2,7 +2,6 @@
 // status: planned
 // requires: engine: no effect adds colors
 // requires: engine: no perpetual effects
-// requires: event value in a target filter beyond its subject
 // requires: operation Conjure
 // Whenever this creature attacks, exile up to one target creature card from a graveyard. If you do, conjure a duplicate of it into your graveyard. The duplicate perpetually becomes a black Skeleton with base power and toughness 3/1 in addition to its other colors and types.
 // When this creature dies, return another target creature card with power or toughness 1 from your graveyard to the battlefield.
@@ -33,7 +32,7 @@ hoisted_5.extend(conjured_1.clone());
 }
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && ((!(((Some(ObjectId(planned_value!("event value in a target filter beyond its subject", [u32::MAX; 2] => q.event_data())[0])).filter(|o| *o != ObjectId::NONE).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Graveyard).collect::<Vec<ObjectId>>()).get(0).copied() == Some(id)) && (q.chars(id).is(CardType::Creature) && (q.chars(id).power.is_some_and(|v| (i64::from(v)) == (1i64)) || q.chars(id).toughness.is_some_and(|v| (i64::from(v)) == (1i64)))) && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(id).owner))))) }
+#[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && ((!(q.event_subject().object().is_some_and(|o: ObjectId| o == id || q.found_all_after_move(o).contains(&id))) && (q.chars(id).is(CardType::Creature) && (q.chars(id).power.is_some_and(|v| (i64::from(v)) == (1i64)) || q.chars(id).toughness.is_some_and(|v| (i64::from(v)) == (1i64)))) && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(id).owner))))) }
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && from.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }

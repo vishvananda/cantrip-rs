@@ -1,6 +1,5 @@
 // Eureka
-// status: planned
-// requires: condition PlayerTook
+// status: ready
 // Starting with you, each player may put a permanent card from their hand onto the battlefield. Repeat this process until no one puts a card onto the battlefield.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_8: Vec<ObjectId> = Vec::new();
@@ -20,7 +19,7 @@ let selected_2_player = { let q: &dyn Query = g; Some(bound_0).expect("a referen
 g.end_sentence();
 let objects_4 = ({ let q: &dyn Query = g; all_3.clone() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_4 = { let rows_4: Vec<(ObjectId, PlayerId, bool)> = objects_4.iter().map(|&o| (o, g.state().obj(o).owner, false)).collect(); let came_4 = g.put_all_onto_battlefield_as(&rows_4)?; came_4.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
 g.end_sentence();
-if { let q: &dyn Query = g; !(((q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition PlayerTook", false => q.took_part(asker, Some(bound_0), 1))).collect::<Vec<PlayerId>>()).len() as i64) == (0i64)) } {
+if { let q: &dyn Query = g; !(((q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0).and_then(|p: PlayerId| players_1.iter().position(|&next| next == p)).is_some_and(|at| !each_3[at].is_empty())).collect::<Vec<PlayerId>>()).len() as i64) == (0i64)) } {
 again_0 = true;
 g.end_sentence();
 }

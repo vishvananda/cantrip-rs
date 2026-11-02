@@ -33,7 +33,7 @@ let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true
 let amount_3 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_3 { g.draw(player, amount_3); }
 g.end_sentence();
-let amount_4 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_4 = Vec::new(); for player in players_4 { cards_4.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_4)?); } let discarded_4 = g.discard_together(&cards_4);
+let amount_4 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_4: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_4 = Vec::new(); for player in players_4 { cards_4.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_4)?); } let discarded_4 = g.discard_together(&cards_4);
 g.end_sentence();
 if { let q: &dyn Query = g; ((((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && q.chars(id).is(CardType::Artifact)).collect::<Vec<ObjectId>>()).len() as i64) >= (15i64) } {
 if let Some(player) = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()) } { g.lose_game(player); if g.state().is_over() { return Ok(()); }; }

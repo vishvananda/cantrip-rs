@@ -1,6 +1,5 @@
 // Dance of Many
-// status: planned
-// requires: object filter MadeBy
+// status: ready
 // When this enchantment enters, create a token that's a copy of target nontoken creature.
 // When this enchantment leaves the battlefield, exile the token.
 // When the token leaves the battlefield, sacrifice this enchantment.
@@ -12,16 +11,16 @@ static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let original_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) }; let count_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let created_0 = match original_0 { Some(original) => g.create_token_copies(original, player_0, count_0)?, None => Vec::new() };
+let original_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()) }; let count_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let created_0 = match original_0 { Some(original) => g.create_token_copies(original, player_0, count_0)?, None => Vec::new() };
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if from.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let objects_1 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| planned_value!("object filter MadeBy", false => q.state().obj(id).made_by == Some(asker.source))).collect::<Vec<ObjectId>>() }; let moved_1 = g.exile_all(&objects_1);
+let objects_1 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| Some(asker.source).is_some_and(|m: ObjectId| q.state().obj(id).entered_with == Some(m) || q.history().all().iter().any(|r| matches!(r.event, Event::Entered { permanent, .. } if permanent == id) && (r.cause == Cause::Spell(m) || matches!(r.cause, Cause::Ability { source, .. } if source == m))))).collect::<Vec<ObjectId>>() }; let moved_1 = g.exile_all(&objects_1);
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if from.is(ZoneKind::Battlefield) && planned_value!("object filter MadeBy", false => q.state().obj(id).made_by == Some(asker.source)) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if from.is(ZoneKind::Battlefield) && Some(asker.source).is_some_and(|m: ObjectId| q.state().obj(id).entered_with == Some(m) || q.history().all().iter().any(|r| matches!(r.event, Event::Entered { permanent, .. } if permanent == id) && (r.cause == Cause::Spell(m) || matches!(r.cause, Cause::Ability { source, .. } if source == m)))) { return Some(Fired { subject, data }); } }
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let objects_2 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut picks_2: Vec<(PlayerId, ObjectId)> = Vec::new();

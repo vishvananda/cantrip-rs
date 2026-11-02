@@ -1,6 +1,5 @@
 // Vault 101: Birthday Party
-// status: planned
-// requires: mixed token text origins in one creation batch
+// status: ready
 // (As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)
 // I — Create a 1/1 white Human Soldier creature token and a Food token. (A Food token is an artifact with "{2}, {T}, Sacrifice this token: You gain 3 life.")
 // II, III — You may put an Aura or Equipment card from your hand or graveyard onto the battlefield. If an Equipment is put onto the battlefield this way, you may attach it to a creature you control.
@@ -32,7 +31,7 @@ for player in players_0 {
 tokens_0.extend(std::iter::repeat((def_0_0,player)).take(count_0_0 as usize));
 tokens_0.extend(std::iter::repeat((def_0_1,player)).take(count_0_1 as usize));
 } let words_0 = g.words(asker.source);
-let created_0 = planned_value!("mixed token text origins in one creation batch", g.create_tokens_worded(&tokens_0, false, None, words_0)? => g.create_tokens_each_worded(&tokens_0, false, None, &[(def_0_0, g.words(asker.source)), (def_0_1, Words::NONE)])?);
+let created_0 = g.create_tokens_worded(&tokens_0, false, None, words_0)?;
 g.end_sentence();
  Ok(()) }
 fn ability_0_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_12: Vec<ObjectId> = Vec::new();

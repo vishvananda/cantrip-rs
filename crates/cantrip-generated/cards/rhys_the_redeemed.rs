@@ -20,7 +20,7 @@ let created_0 = g.create_tokens_worded(&tokens_0, false, None, words_0)?;
 g.end_sentence();
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let originals_2 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && q.state().obj(id).token && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }; let player_2 = { let q: &dyn Query = g; Some(asker.controller) }; let created_2 = if let Some(player) = player_2 { let copies: Vec<(Copiable, PlayerId)> = originals_2.iter().map(|&original| (g.copiable_values(original), player)).collect(); g.create_token_copies_together(&copies)? } else { Vec::new() };
+let originals_2 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && q.state().obj(id).token && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }; let player_2 = { let q: &dyn Query = g; Some(asker.controller) }; let mut copies_2: Vec<(Copiable, PlayerId)> = Vec::new(); if let Some(player) = player_2 { for &original in &originals_2 { if let Some(values) = { let q: &dyn Query = g; Some(original).map(|original: ObjectId| q.copiable_values(original)) } { copies_2.push((values, player)); } } } let created_2 = g.create_token_copies_together(&copies_2)?;
 g.end_sentence();
  Ok(()) }
 

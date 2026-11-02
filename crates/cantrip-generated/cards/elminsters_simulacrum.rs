@@ -6,7 +6,7 @@
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0).between(0, TargetSpec::EACH_OPPONENT)];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let originals_0 = { let q: &dyn Query = g; t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>() }; let player_0 = { let q: &dyn Query = g; Some(asker.controller) }; let created_0 = if let Some(player) = player_0 { let copies: Vec<(Copiable, PlayerId)> = originals_0.iter().map(|&original| (g.copiable_values(original), player)).collect(); g.create_token_copies_together(&copies)? } else { Vec::new() };
+let originals_0 = { let q: &dyn Query = g; t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>() }; let player_0 = { let q: &dyn Query = g; Some(asker.controller) }; let mut copies_0: Vec<(Copiable, PlayerId)> = Vec::new(); if let Some(player) = player_0 { for &original in &originals_0 { if let Some(values) = { let q: &dyn Query = g; Some(original).map(|original: ObjectId| q.copiable_values(original)) } { copies_0.push((values, player)); } } } let created_0 = g.create_token_copies_together(&copies_0)?;
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

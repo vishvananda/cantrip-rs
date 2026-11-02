@@ -1,13 +1,12 @@
 // Primeval Spawn
 // status: planned
 // requires: as-enters replacement of another event
-// requires: object filter ManaSpent
 // requires: operation PlayWith
 // If this creature would enter and it wasn't cast or no mana was spent to cast it, exile it instead.
 // Vigilance, trample, lifelink
 // When this creature leaves the battlefield, exile the top ten cards of your library. You may cast any number of spells with total mana value 10 or less from among them without paying their mana costs.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); if { let q: &dyn Query = g; Some(asker.source).is_some_and(|candidate: ObjectId| (!(cast_of(q, candidate).is_some_and(|cast| true)) || planned_value!("object filter ManaSpent", false => (q.history().mana_spent(candidate, None, |_: ObjectId| true, |_: PlayerId| true)) == (0i64)))) } {
+#[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); if { let q: &dyn Query = g; Some(asker.source).is_some_and(|candidate: ObjectId| (!(cast_of(q, candidate).is_some_and(|cast| true)) || (cast_of(q, candidate).map_or(0i64, |cast| q.history().mana_spent_to_cast(cast.spell).filter(|&(source, _)| true).map(|(_, spent)| i64::from(spent.total())).sum::<i64>())) == (0i64))) } {
 entering.instead = Some(Zone::exile(g.obj(entering.object).owner));
 }
  Ok(()) }

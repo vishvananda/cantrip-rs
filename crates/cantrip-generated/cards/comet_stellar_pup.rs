@@ -1,6 +1,5 @@
 // Comet, Stellar Pup
 // status: planned
-// requires: a choice of Recipient
 // requires: player rule for a while ActivationGrant
 // requires: resolution cost Loyalty
 // [0]: Roll a six-sided die.
@@ -52,7 +51,7 @@ hoisted_11.extend(selected_8.clone());
 hoisted_12.extend({ let q: &dyn Query = g; objects_9.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() });
 }
 if { let q: &dyn Query = g; ((value_0) >= (4i64) && (value_0) <= (5i64)) } {
-let player_13 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let candidates_13: Vec<Target> = { let q: &dyn Query = g; { let mut all: Vec<Target> = Vec::new(); for t in (q.state().apnap().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() { if !all.contains(&t) { all.push(t); } } for t in (q.state().battlefield().iter().copied().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() { if !all.contains(&t) { all.push(t); } } all } }; let chosen_13: Target = planned_value!("a choice of Recipient", Target::None => cantrip_mechanics::choose::recipient(g, player_13, asker.source, candidates_13)?);
+let player_13 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let candidates_13: Vec<Target> = { let q: &dyn Query = g; { let mut all: Vec<Target> = Vec::new(); for t in (q.state().apnap().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() { if !all.contains(&t) { all.push(t); } } for t in (q.state().battlefield().iter().copied().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() { if !all.contains(&t) { all.push(t); } } all } }; let chosen_13: Target = match candidates_13.len() { 0 => Target::None, 1 => candidates_13[0], _ => match g.ask(player_13, RequestKind::ChooseTarget { label: "", slot_player: None, together: None, source: asker.source, purpose: Purpose::Targets, candidates: candidates_13.clone(), optional: false, least: 1, count: 1, any_number: false })? { Answer::Targets(chosen) => chosen.first().copied().unwrap_or(Target::None), _ => Target::None } };
 g.end_sentence();
 let source_14 = { let q: &dyn Query = g; Some(asker.source) }; let amount_14 = { let q: &dyn Query = g; ((Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.state().obj(o).counters(CounterKind::Loyalty))).sum::<i64>()).clamp(0, 65535) as u16 }; let recipients_14 = { let q: &dyn Query = g; vec![chosen_13] }; if let Some(source) = source_14 { let batch: Vec<(ObjectId, Target, u16)> = recipients_14.iter().map(|t| (source, *t, amount_14)).collect(); g.damage_together(&batch); }
 g.end_sentence();

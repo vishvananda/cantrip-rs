@@ -1,6 +1,5 @@
 // Rhys, the Evermore
-// status: planned
-// requires: counters of a kind chosen as the effect resolves
+// status: ready
 // Flash
 // When Rhys enters, another target creature you control gains persist until end of turn. (When it dies, if it had no -1/-1 counters on it, return it to the battlefield under its owner's control with a -1/-1 counter on it.)
 // {W}, {T}: Remove any number of counters from target creature you control. Activate only as a sorcery.
@@ -22,7 +21,7 @@ fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let mut removed_2: i64 = 0;
 let objects_2_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() };
-planned!("counters-of-a-kind-chosen-as-the-effect-resolves" => removed_2 += i64::from(cantrip_mechanics::effects::remove_chosen_counters(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, asker.source, &objects_2_0, None, RemovedCounters::Each(cantrip_mechanics::select::Count::AnyNumber))?););
+let player_2_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; for object in objects_2_0.iter().copied() { removed_2 += i64::from(g.remove_counters_up_to(player_2_0, asker.source, object, u8::MAX)?); }
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

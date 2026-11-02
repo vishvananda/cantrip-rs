@@ -1,10 +1,9 @@
 // Sala, Deck Boss
-// status: planned
-// requires: object filter HasKeywordFamily
+// status: ready
 // Each creature you control with an exhaust ability has haste.
 // Whenever you activate an exhaust ability that isn't a mana ability, copy it. You may choose new targets for the copy.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); ((*so_far).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(affected)) && planned_value!("object filter HasKeywordFamily", false => q.has_keyword_ability(affected, KeywordAbility::Exhaust))) }
+#[allow(unused_variables)] fn ability_0_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); ((*so_far).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(affected)) && (*so_far).abilities().any(|a| matches!(q.cards().ability(a), AbilityDef::Activated(d) if d.exhaust))) }
 #[allow(unused_variables)] fn ability_0_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); chars.keywords = chars.keywords.with(Keyword::Haste); }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::AbilityActivated { source, ability, player, .. } = event { let id = *source; let def = q.activated_ability(*ability); let subject = Target::Player(*player); let serial = match cantrip_mechanics::triggers::activated_ability_on_stack(q, event) { Some(Target::Ability(serial)) => serial, _ => 0 }; let data = [id.0, serial]; if def.is_some() && Some(asker.controller) == Some(*player) && (def.is_some_and(|d| d.exhaust) && !(def.is_some_and(|d| d.is_mana_ability()))) { return Some(Fired { subject, data }); } }
  None }

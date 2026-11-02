@@ -9,7 +9,7 @@ let amount_0 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let players_0 = 
 for player in players_0 { g.draw(player, amount_0); }
 g.end_sentence();
 if { let q: &dyn Query = g; !(({ let mut seen = Vec::new(); for id in ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>() { let value = q.mana_value(id); if !seen.contains(&value) { seen.push(value); } } seen.len() as i64 }) >= (5i64)) } {
-let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_1 = Vec::new(); for player in players_1 { cards_1.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_1)?); } let discarded_1 = g.discard_together(&cards_1);
+let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_1 = Vec::new(); for player in players_1 { cards_1.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_1)?); } let discarded_1 = g.discard_together(&cards_1);
 g.end_sentence();
 hoisted_2.extend(discarded_1.clone());
 hoisted_3.extend({ let q: &dyn Query = g; discarded_1.clone() });

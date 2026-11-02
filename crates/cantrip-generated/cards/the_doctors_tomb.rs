@@ -2,7 +2,6 @@
 // status: planned
 // requires: card type Plane
 // requires: layout Planar
-// requires: operation RedistributeLife
 // requires: subtype Trenzalore
 // requires: trigger event Player ChaosEnsues
 // If a creature would die, instead exile it and that creature's controller loses 2 life.
@@ -17,7 +16,7 @@ for player in players_0 { g.lose_life(player, amount_0); }
 #[allow(unused_variables)] fn ability_0_then(g: &mut dyn Game, asker: &Asker, before: &Proposal, _: &Proposal) { if let Proposal::ZoneChange(z) = before { let q: &dyn Query = g; let id = z.object; let subject = Target::Object(id); let data = [u32::MAX; 2]; let _ = ability_0_then_steps(g, asker, subject, data); } }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-redistribute-life" => cantrip_mechanics::exchange::redistribute_life(g, asker.source, { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() })?);
+let players_1: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }; let totals_1: Vec<i32> = players_1.iter().map(|&p| g.state().player(p).life).collect(); let mut open_1 = players_1.clone(); let mut sets_1: Vec<(PlayerId, i32)> = Vec::new(); for &total in &totals_1 { let who = match open_1.as_slice() { [one] => Some(*one), _ => cantrip_mechanics::choose::player(g, asker.controller, asker.source, open_1.clone(), "GetLifeTotal", total.clamp(0, 65535) as u16)? }; if let Some(who) = who { open_1.retain(|&p| p != who); sets_1.push((who, total)); } } cantrip_api::instruction(g, |g| { for &(who, total) in &sets_1 { g.set_life_total(who, total); } });
 g.end_sentence();
  Ok(()) }
 planned_item!("trigger-event-player-chaos-ensues" => matcher: #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ChaosEnsued { player } = event { let subject = Target::Player(*player); let data = [0u32; 2]; if true { return Some(Fired { subject, data }); } }

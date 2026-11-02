@@ -17,7 +17,7 @@ let picked_0 = if open_0.is_empty() { None } else if open_0.len() > 1 || (true &
 let Some(card_0) = picked_0 else { break; };
 let ways_0: Vec<CastWay> = g.cast_ways_during_resolution_by(card_0, caster_0).into_iter().filter(|w| ((g.card(w.face).types.has(CardType::Instant) || g.card(w.face).types.has(CardType::Sorcery)) && (i64::from(w.mana_value)) <= (limit_0_0))).collect();
 let done_0 = if ways_0.is_empty() { g.play_land_during_resolution(card_0)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_0, card_0, ways_0)?.map(|w| w.way); g.cast_during_resolution_as(card_0, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(caster_0), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
-if done_0 { left_0 -= 1; played_0.push(g.state().obj(card_0).became.unwrap_or(card_0)); } else if 1i64 == 1 { break; } if done_0 || !(true && true) { pool_0.retain(|&c| c != card_0); }
+if done_0 { left_0 -= 1; played_0.push(g.state().obj(card_0).became.unwrap_or(card_0)); } else if true { break; } if done_0 || !(true && true) { pool_0.retain(|&c| c != card_0); }
 }
 g.end_sentence();
  Ok(()) }
@@ -25,7 +25,7 @@ g.end_sentence();
 static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target_0)];
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let attachments_1 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let host_1 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) }; if let Some(host) = host_1 { cantrip_api::instruction(g, |g| { for attachment in attachments_1 { g.attach(attachment, host); } }); }
+let attachments_1 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let host_1 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()) }; if let Some(host) = host_1 { cantrip_api::instruction(g, |g| { for attachment in attachments_1 { g.attach(attachment, host); } }); }
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

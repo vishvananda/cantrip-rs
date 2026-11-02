@@ -10,7 +10,7 @@
 static ASK_1: Question = Question::new("SearchLibrary", "search your library as well as your hand?", "Then shuffle. If you don't, you search only your hand", "Search both", "Hand only");
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_4: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-let decider_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_0, asker.source, Purpose::Optional)? {
+let decider_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if g.may_search(decider_0, decider_0) && cantrip_mechanics::effects::ask_may(g, decider_0, asker.source, Purpose::Optional)? {
 let searcher_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let owner_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
 let rule_count_1 = { let q: &dyn Query = g; cantrip_mechanics::select::Count::UpTo((1i64).max(0) as u32) }; let zone_1 = Zone::hand(searcher_1); let mut shown_1 = cantrip_mechanics::library::searched_cards(g, searcher_1); shown_1.extend(g.state().zone(zone_1).iter().copied()); let can_1: Vec<ObjectId> = { let q: &dyn Query = g; shown_1.iter().copied().filter(|&id| planned_value!("object filter DraftNoted", false => q.draft_notes(id, DraftNoted(DraftNote { kind: Name, player: AbilityController, card: "Aether Searcher" })))).collect() }; let (found_1, searched_1) = cantrip_mechanics::library::search_zone_and_or_library(g, searcher_1, asker.source, zone_1, SearchDestination::Hand, Purpose::PutIntoHand, &ASK_1, cantrip_mechanics::select::Selection::listed(rule_count_1, &shown_1, can_1))?;
 let caster_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let mut pool_2: Vec<ObjectId> = { let q: &dyn Query = g; (found_1.clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let mut left_2: u32 = 4294967295; let mut played_2: Vec<ObjectId> = Vec::new();
@@ -20,7 +20,7 @@ let picked_2 = if open_2.is_empty() { None } else if open_2.len() > 1 || (false 
 let Some(card_2) = picked_2 else { break; };
 let ways_2: Vec<CastWay> = g.cast_ways_during_resolution_by(card_2, caster_2).into_iter().filter(|w| true).collect();
 let done_2 = if ways_2.is_empty() { g.play_land_during_resolution(card_2)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_2, card_2, ways_2)?.map(|w| w.way); g.cast_during_resolution_as(card_2, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(caster_2), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
-if done_2 { left_2 -= 1; played_2.push(g.state().obj(card_2).became.unwrap_or(card_2)); } else if 4294967295i64 == 1 { break; } if done_2 || !(true && false) { pool_2.retain(|&c| c != card_2); }
+if done_2 { left_2 -= 1; played_2.push(g.state().obj(card_2).became.unwrap_or(card_2)); } else if false { break; } if done_2 || !(true && false) { pool_2.retain(|&c| c != card_2); }
 }
 if { let q: &dyn Query = g; searched_1 } {
 for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.shuffle(player); }

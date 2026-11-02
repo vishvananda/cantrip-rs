@@ -2,7 +2,6 @@
 // status: planned
 // requires: card type Plane
 // requires: layout Planar
-// requires: mixed token text origins in one creation batch
 // requires: subtype AndrozaniMinor
 // requires: trigger event Player ChaosEnsues
 // requires: trigger event Player Planeswalks
@@ -62,8 +61,8 @@ let count_3_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let def_3_1 = g
 for player in players_3 {
 tokens_3.extend(std::iter::repeat((def_3_0,player)).take(count_3_0 as usize));
 tokens_3.extend(std::iter::repeat((def_3_1,player)).take(count_3_1 as usize));
-} let words_3 = Words::NONE;
-let created_3 = planned_value!("mixed token text origins in one creation batch", g.create_tokens_worded(&tokens_3, false, None, words_3)? => g.create_tokens_each_worded(&tokens_3, false, None, &[(def_3_0, Words::NONE), (def_3_1, g.words(asker.source))])?);
+} let words_3 = g.words(asker.source);
+let created_3 = g.create_tokens_worded(&tokens_3, false, None, words_3)?;
 g.end_sentence();
  Ok(()) }
 planned_item!("trigger-event-player-planeswalks" => matcher: #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Planeswalked { player, object, .. } = event { let id = *object; let subject = Target::Object(id); let data = [u32::from(player.0), 0]; if Some(asker.controller) == Some(*player) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }

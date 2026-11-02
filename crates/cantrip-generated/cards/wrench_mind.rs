@@ -14,7 +14,7 @@ let discarded_1 = g.discard_together(&selected_2); let paid_1 = !discarded_1.is_
 (paid_1, { let q: &dyn Query = g; (discarded_1).clone() }, { let q: &dyn Query = g; (discarded_1.clone()).clone() }, { let q: &dyn Query = g; (selected_2).clone() }) } else { (false, Vec::new(), Vec::new(), Vec::new()) };
 g.end_sentence();
 if { let q: &dyn Query = g; !(((paid_0 as i64) != 0)) } {
-let amount_3 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let players_3 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_3 = Vec::new(); for player in players_3 { cards_3.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_3)?); } let discarded_3 = g.discard_together(&cards_3);
+let amount_3 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let players_3: Vec<PlayerId> = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_3 = Vec::new(); for player in players_3 { cards_3.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_3)?); } let discarded_3 = g.discard_together(&cards_3);
 g.end_sentence();
 hoisted_4.extend(discarded_3.clone());
 hoisted_5.extend({ let q: &dyn Query = g; discarded_3.clone() });

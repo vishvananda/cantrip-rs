@@ -6,9 +6,9 @@
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let mut paid_0 = false; for bound_1000001 in { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() } {
+let mut paid_0 = false; let mut who_0: Option<PlayerId> = None; for bound_1000001 in { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() } {
 let payer_2 = { let q: &dyn Query = g; Some(bound_1000001).expect("a reference that always names a player") }; let paid_2 = g.state().zone(Zone::hand(payer_2)).len() >= 3 && g.may_pay(payer_2, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(discard_cards(3)), &PAY_QUESTION)?;
-if paid_2 { paid_0 = true; break; } }
+if paid_2 { paid_0 = true; who_0 = Some(bound_1000001); break; } }
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
 let objects_3 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; cantrip_api::instruction(g, |g| { for spell in objects_3 { g.counter(spell); } });

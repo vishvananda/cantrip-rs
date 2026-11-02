@@ -1,7 +1,6 @@
 // Genesis of the Daleks
 // status: planned
 // requires: history measure Property
-// requires: instruction ChooseOne
 // requires: villainous choice
 // (As this Saga enters and after your draw step, add a lore counter. Sacrifice after IV.)
 // I, II, III — Create a 3/3 black Dalek artifact creature token with menace for each lore counter on Genesis of the Daleks.
@@ -62,7 +61,8 @@ let mut hoisted_10: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 planned!("villainous-choice" => cantrip_mechanics::choose::villainous(g, { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.player()).expect("a reference that always names a player") }, asker.source, &["Destroy the chosen permanents. Lose life.", "Destroy the chosen permanents."])?);
-let decider_7 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.player()).expect("a reference that always names a player") }; match planned_value!("instruction ChooseOne", 0u8 => cantrip_mechanics::choose::one_of(g, decider_7, asker.source, vec![Label::Card(card_7, 0), Label::Card(card_7, 1)])?) {
+let decider_7 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.player()).expect("a reference that always names a player") };
+let offered_7: Vec<u8> = [(0u8, true), (1u8, true)].into_iter().filter(|option| option.1).map(|option| option.0).collect(); let card_7 = item.ability.card; let picked_7 = if offered_7.len() > 1 { offered_7[cantrip_mechanics::choose::one_of(g, decider_7, asker.source, offered_7.iter().map(|&option| Label::Card(card_7, option)).collect())? as usize] } else { offered_7.first().copied().unwrap_or(u8::MAX) }; match picked_7 {
 0 => {
 let objects_8 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Dalek)) && q.chars(id).is(CardType::Creature))).collect::<Vec<ObjectId>>() }; let destroyed_8 = g.destroy_all(&objects_8);
 g.end_sentence();
@@ -72,14 +72,15 @@ g.end_sentence();
 hoisted_10.extend(destroyed_8.clone());
 hoisted_11.extend({ let q: &dyn Query = g; objects_8.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() });
 }
-_ => {
+1 => {
 let objects_12 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (!(q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Dalek))) && q.chars(id).is(CardType::Creature))).collect::<Vec<ObjectId>>() }; let destroyed_12 = g.destroy_all(&objects_12);
 g.end_sentence();
 }
+_ => {}
 }
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
 
-pub static CARD: CardDef = CardDef { name: "Genesis of the Daleks", token_words: &[], oracle: true, cost: ManaCost { generic: 4, x: 0, symbols: [0, 0, 2, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Enchantment]), subtypes: SubtypeSet::of(&[Subtype::Saga]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[chapter(1, ability_0_0, "I, II, III — Create a 3/3 black Dalek artifact creature token with menace for each lore counter on Genesis of the Daleks.").targets(&[]),chapter(2, ability_0_1, "I, II, III — Create a 3/3 black Dalek artifact creature token with menace for each lore counter on Genesis of the Daleks.").targets(&[]),chapter(3, ability_0_2, "I, II, III — Create a 3/3 black Dalek artifact creature token with menace for each lore counter on Genesis of the Daleks.").targets(&[]),chapter(4, ability_0_3, "IV — Target opponent faces a villainous choice — Destroy all Dalek creatures and each of your opponents loses life equal to the total power of Daleks that died this turn, or destroy all non-Dalek creatures.").targets(ABILITY_0_3_TARGETS)], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
+pub static CARD: CardDef = CardDef { name: "Genesis of the Daleks", token_words: &[], oracle: true, cost: ManaCost { generic: 4, x: 0, symbols: [0, 0, 2, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Enchantment]), subtypes: SubtypeSet::of(&[Subtype::Saga]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[chapter(1, ability_0_0, "I, II, III — Create a 3/3 black Dalek artifact creature token with menace for each lore counter on Genesis of the Daleks.").targets(&[]),chapter(2, ability_0_1, "I, II, III — Create a 3/3 black Dalek artifact creature token with menace for each lore counter on Genesis of the Daleks.").targets(&[]),chapter(3, ability_0_2, "I, II, III — Create a 3/3 black Dalek artifact creature token with menace for each lore counter on Genesis of the Daleks.").targets(&[]),chapter(4, ability_0_3, "IV — Target opponent faces a villainous choice — Destroy all Dalek creatures and each of your opponents loses life equal to the total power of Daleks that died this turn, or destroy all non-Dalek creatures.").targets(ABILITY_0_3_TARGETS)], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, labels: &["Destroy all Dalek creatures and each of your opponents loses life equal to the total power of Daleks that died this turn", "Destroy all non-Dalek creatures"], ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[&token_1::CARD,&token_3::CARD,&token_5::CARD];

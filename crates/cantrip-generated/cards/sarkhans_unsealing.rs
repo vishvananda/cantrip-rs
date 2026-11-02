@@ -1,11 +1,10 @@
 // Sarkhan's Unsealing
-// status: planned
-// requires: numeric expression AnyOf
+// status: ready
 // Whenever you cast a creature spell with power 4, 5, or 6, this enchantment deals 4 damage to any target.
 // Whenever you cast a creature spell with power 7 or greater, this enchantment deals 4 damage to each opponent and each creature and planeswalker they control.
 #[allow(unused_imports)] use cantrip_api::*;
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[cantrip_mechanics::targets::ANY];
-#[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && (q.chars(id).is(CardType::Creature) && q.chars(id).power.is_some_and(|v| (i64::from(v)) == (planned_value!("numeric expression AnyOf", 0i64 => cantrip_mechanics::numbers::AnyOf(&[4i64, 5i64, 6i64]))))) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && (q.chars(id).is(CardType::Creature) && (q.chars(id).power.is_some_and(|v| (i64::from(v)) == (4i64)) || q.chars(id).power.is_some_and(|v| (i64::from(v)) == (5i64)) || q.chars(id).power.is_some_and(|v| (i64::from(v)) == (6i64)))) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);

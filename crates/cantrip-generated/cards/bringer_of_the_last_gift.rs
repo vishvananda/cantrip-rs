@@ -1,6 +1,5 @@
 // Bringer of the Last Gift
-// status: planned
-// requires: earlier objects PutInGraveyard
+// status: ready
 // Flying
 // When this creature enters, if you cast it, each player sacrifices all other creatures they control. Then each player returns all creature cards from their graveyard that weren't put there this way to the battlefield.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -13,7 +12,7 @@ let sacrificed_0 = g.sacrifice_each(&picks_0);
 g.end_sentence();
 let mut players_1: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
 let mut gathered_2: Vec<ObjectId> = Vec::new();
- for (index_1, bound_0) in players_1.iter().copied().enumerate() { gathered_2.extend({ let q: &dyn Query = g; ((Some(bound_0).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (q.chars(id).is(CardType::Creature) && !((planned_value!("earlier objects PutInGraveyard", Vec::<ObjectId>::new() => q.acted_on(asker, Acted::PutInGraveyard))).contains(&id)))).collect::<Vec<ObjectId>>() });
+ for (index_1, bound_0) in players_1.iter().copied().enumerate() { gathered_2.extend({ let q: &dyn Query = g; ((Some(bound_0).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (q.chars(id).is(CardType::Creature) && !((sacrificed_0.clone()).contains(&id)))).collect::<Vec<ObjectId>>() });
     } 
 let objects_4 = ({ let q: &dyn Query = g; gathered_2.clone() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_4 = { let rows_4: Vec<(ObjectId, PlayerId, bool)> = objects_4.iter().map(|&o| (o, g.state().obj(o).owner, false)).collect(); let came_4 = g.put_all_onto_battlefield_as(&rows_4)?; came_4.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
 g.end_sentence();

@@ -19,7 +19,7 @@ let paid_1 = done_2 > 0;
 (paid_1, { let q: &dyn Query = g; (drawn_2).clone() }, Vec::new(), Vec::new()) } else { (false, Vec::new(), Vec::new(), Vec::new()) };
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
-let amount_3 = { let q: &dyn Query = g; (planned_value!("amount of an event its trigger does not carry", 0i64 => q.event_total(item))).max(0) as u32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_3 = Vec::new(); for player in players_3 { cards_3.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_3)?); } let discarded_3 = g.discard_together(&cards_3);
+let amount_3 = { let q: &dyn Query = g; (planned_value!("amount of an event its trigger does not carry", 0i64 => q.event_total(item))).max(0) as u32 }; let players_3: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_3 = Vec::new(); for player in players_3 { cards_3.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_3)?); } let discarded_3 = g.discard_together(&cards_3);
 g.end_sentence();
 hoisted_4.extend(discarded_3.clone());
 hoisted_5.extend({ let q: &dyn Query = g; discarded_3.clone() });

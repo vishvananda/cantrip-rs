@@ -1,6 +1,5 @@
 // Ixhel, Scion of Atraxa
 // status: planned
-// requires: a card a player may look at for a while
 // requires: play permission with mana as though any color
 // Flying, vigilance, toxic 2
 // Corrupted — At the beginning of your end step, each opponent who has three or more poison counters exiles the top card of their library face down. You may look at and play those cards for as long as they remain exiled, and you may spend mana as though it were mana of any color to cast those spells.
@@ -14,7 +13,7 @@ let mut gathered_1: Vec<ObjectId> = Vec::new();
     } 
 let objects_3 = { let q: &dyn Query = g; gathered_1.clone() }; let by_3 = None; let moved_3 = g.exile_face_down(&objects_3, by_3);
 g.end_sentence();
-planned!("a-card-a-player-may-look-at-for-a-while" => let cards_4_0 = { let q: &dyn Query = g; moved_3.clone() }; let players_4_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &card in &cards_4_0 { for &player in &players_4_0 { g.allow_look(card, player, Expiry::Never); } });
+let cards_4_0 = { let q: &dyn Query = g; moved_3.clone() }; let players_4_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &player in &players_4_0 { g.look_at(player, &cards_4_0); }
 planned!("play-permission-with-mana-as-though-any-color" => let cards_4_1 = { let q: &dyn Query = g; moved_3.clone() }; let players_4_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_4_1 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_4_1 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::Never, any_color: true, ..PlayGrant::CAST }); } } } }););
 g.end_sentence();
  Ok(()) }

@@ -1,6 +1,5 @@
 // Eumidian Hatchery
-// status: planned
-// requires: counter kind Hatchling
+// status: ready
 // {T}, Pay 1 life: Add {B}. Put a hatchling counter on this land.
 // When this land is put into a graveyard from the battlefield, for each hatchling counter on it, create a 1/1 black Insect creature token with flying.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -9,7 +8,7 @@ let mana_0_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 };
 for player in mana_players_0 {
 g.add_mana(player, Mana::B, mana_0_0);}
 let mut counters_1: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, planned_value!("counter kind Hatchling", CounterKind::Charge => CounterKind::Hatchling), amount)); } }
+let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, CounterKind::Hatchling, amount)); } }
 let had_1: Vec<_> = counters_1.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_1); let applied_1: Vec<ObjectId> = counters_1.iter().zip(had_1).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && from.is(ZoneKind::Battlefield) && (Some(asker.source) == Some(id) && true) { return Some(Fired { subject, data }); } }
@@ -23,7 +22,7 @@ pub static EXTRA: &[&CardDef] = &[];
 }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_2 = Vec::new();
-let count_2_0 = { let q: &dyn Query = g; ((item.subject.object().into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.state().obj(o).counters(planned_value!("counter kind Hatchling", CounterKind::Charge => CounterKind::Hatchling)))).sum::<i64>()).max(0) as u32 }; let def_2_0 = g.card_id(&token_3::CARD);
+let count_2_0 = { let q: &dyn Query = g; ((item.subject.object().into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.state().obj(o).counters(CounterKind::Hatchling))).sum::<i64>()).max(0) as u32 }; let def_2_0 = g.card_id(&token_3::CARD);
 for player in players_2 {
 tokens_2.extend(std::iter::repeat((def_2_0,player)).take(count_2_0 as usize));
 } let words_2 = g.words(asker.source);

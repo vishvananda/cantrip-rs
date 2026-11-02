@@ -26,7 +26,7 @@ let mut guard_4_0 = vec![false; players_4.len()];
 let mut each_6: Vec<Vec<ObjectId>> = vec![Vec::new(); players_4.len()]; let mut all_6: Vec<ObjectId> = Vec::new();
 let mut each_7 = vec![Default::default(); players_4.len()];
 let mut done_total_7: i64 = 0;
- for (index_4, bound_0) in players_4.iter().copied().enumerate() { if cantrip_mechanics::effects::ask_may(g, bound_0, asker.source, Purpose::Optional)? { guard_4_0[index_4] = true;
+ for (index_4, bound_0) in players_4.iter().copied().enumerate() { if !cant_draw(g, bound_0, 1) && cantrip_mechanics::effects::ask_may(g, bound_0, asker.source, Purpose::Optional)? { guard_4_0[index_4] = true;
 let amount_5 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_5 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
 let mut done_5: i64 = 0; let mut drawn_5: Vec<ObjectId> = Vec::new(); for player in players_5 { let before = g.history().drawn(player) as i64; let held = g.state().zone(Zone::hand(player)).to_vec(); g.draw(player, amount_5); done_5 += g.history().drawn(player) as i64 - before; drawn_5.extend(g.state().zone(Zone::hand(player)).iter().copied().filter(|c| !held.contains(c))); }
  each_6[index_4] = drawn_5.clone(); all_6.extend(each_6[index_4].iter().copied());

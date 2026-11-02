@@ -1,6 +1,5 @@
 // Yidaro, Wandering Monster
-// status: planned
-// requires: condition PlayerDid Cycled
+// status: ready
 // Trample, haste
 // Cycling {1}{R}
 // When you cycle this card, shuffle it into your library from your graveyard. If you've cycled a card named Yidaro, Wandering Monster four or more times this game, put it onto the battlefield from your graveyard instead. (Do this before you draw.)
@@ -17,7 +16,7 @@ let mut hoisted_5: Vec<ObjectId> = Vec::new();
 let mut hoisted_3: Vec<ObjectId> = Vec::new();
 let mut hoisted_2: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-if { let q: &dyn Query = g; planned_value!("condition PlayerDid Cycled", false => q.player_did(q.history().all().iter(), Some(asker.controller), PlayerDeed::Cycled(Comparison::GreaterOrEqual, 4i64, |q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).name == "Yidaro, Wandering Monster"))) } {
+if { let q: &dyn Query = g; (q.history().all().iter().filter_map(|r: &Record| match r.event { Event::Cycled { card, player } if Some(player) == Some(asker.controller) => Some(card), _ => None }).filter(|&id: &ObjectId| q.chars(id).name == "Yidaro, Wandering Monster").count() as i64) >= (4i64) } {
 let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
 let objects_1 = ({ let q: &dyn Query = g; ((item.subject.object().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Graveyard).collect::<Vec<ObjectId>>()).get(0).copied().into_iter().collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_1 = { let rows_1: Vec<(ObjectId, PlayerId, bool)> = objects_1.iter().map(|&o| (o, player_1, false)).collect(); let came_1 = g.put_all_onto_battlefield_as(&rows_1)?; came_1.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
 g.end_sentence();

@@ -1,6 +1,5 @@
 // Karn, Scion of Urza
-// status: planned
-// requires: operation ChangeZone
+// status: ready
 // [+1]: Reveal the top two cards of your library. An opponent chooses one of them. Put that card into your hand and exile the other with a silver counter on it.
 // [−1]: Put a card you own with a silver counter on it from exile into your hand.
 // [−2]: Create a 0/0 colorless Construct artifact creature token with "This token gets +1/+1 for each artifact you control."
@@ -12,7 +11,7 @@ let Some(picked_0) = (if among.len() > 1 { cantrip_mechanics::choose::player(g, 
 let selected_2_player = { let q: &dyn Query = g; Some(picked_0).expect("a reference that always names a player") }; let selected_2_candidates = { let q: &dyn Query = g; (objects_0.clone()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Library).collect::<Vec<ObjectId>>() }; let selected_2_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let selected_2 = { cantrip_mechanics::choose::select(g, selected_2_player, asker.source, Purpose::PutIntoHand, selected_2_candidates, cantrip_mechanics::select::Selection::of(selected_2_count, &[]))? };
 
 let objects_3 = { let q: &dyn Query = g; selected_2.clone() }; let moved_3 = g.return_to_hand_revealed(&objects_3);
-let moved_4: Vec<ObjectId> = planned_value!("operation ChangeZone", Vec::<ObjectId>::new() => cantrip_mechanics::enter::change_zone(g, asker, ZoneChange { actor: { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, cards: { let q: &dyn Query = g; ({ let without: Vec<ObjectId> = { let mut all: Vec<ObjectId> = Vec::new(); for id in objects_3.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() { if !all.contains(&id) { all.push(id); } } all }; (objects_0.clone()).into_iter().filter(|id| !without.contains(id)).collect::<Vec<ObjectId>>() }).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Library).collect::<Vec<ObjectId>>() }, count: None, random: false, group: None, destination: Destination::Exile, entry: &[CounterType::SilverCounter], face_down: None })?);
+let objects_4 = { let q: &dyn Query = g; ({ let without: Vec<ObjectId> = { let mut all: Vec<ObjectId> = Vec::new(); for id in objects_3.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() { if !all.contains(&id) { all.push(id); } } all }; (objects_0.clone()).into_iter().filter(|id| !without.contains(id)).collect::<Vec<ObjectId>>() }).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Library).collect::<Vec<ObjectId>>() }; let moved_4 = g.exile_all(&objects_4); for &exiled in &moved_4 { g.add_counters(exiled, CounterKind::Silver, 1); }
 g.end_sentence();
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

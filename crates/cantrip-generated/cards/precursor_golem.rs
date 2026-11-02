@@ -1,7 +1,6 @@
 // Precursor Golem
 // status: planned
-// requires: object reference SoleTargetOf
-// requires: operation CopyOnStack
+// requires: a copy of a spell for each object it could target
 // When this creature enters, create two 3/3 colorless Golem artifact creature tokens.
 // Whenever a player casts an instant or sorcery spell that targets only a single Golem, that player copies that spell for each other Golem that spell could target. Each copy targets a different one of those Golems.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -23,10 +22,10 @@ tokens_0.extend(std::iter::repeat((def_0_0,player)).take(count_0_0 as usize));
 let created_0 = g.create_tokens_worded(&tokens_0, false, None, words_0)?;
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if true && ((q.chars(id).is(CardType::Instant) || q.chars(id).is(CardType::Sorcery)) && (q.state().stack.iter().find(|i| i.object == id).is_some_and(|i| q.state().targets(i).len() == 1) && q.state().stack.iter().find(|i| i.kind == StackKind::Spell && i.object == id).is_some_and(|i| q.state().targets(i).iter().any(|t| t.object().is_some_and(|o| (q.state().battlefield().iter().copied().filter(|&id| q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Golem))).collect::<Vec<ObjectId>>()).contains(&o)))))) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if true && ((q.chars(id).is(CardType::Instant) || q.chars(id).is(CardType::Sorcery)) && (q.state().stack.iter().find(|i| i.object == id).is_some_and(|i| { let chosen = q.state().targets(i); !chosen.is_empty() && chosen.iter().all(|t| *t == chosen[0]) }) && q.state().stack.iter().find(|i| i.kind == StackKind::Spell && i.object == id).is_some_and(|i| q.state().targets(i).iter().any(|t| t.object().is_some_and(|o| (q.state().battlefield().iter().copied().filter(|&id| q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Golem))).collect::<Vec<ObjectId>>()).contains(&o)))))) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-copy-on-stack" => if let Some(spell) = { let q: &dyn Query = g; item.subject.object() } { cantrip_mechanics::copy::on_stack(g, { let q: &dyn Query = g; Some(PlayerId(item.data[0] as u8)).expect("a reference that always names a player") }, spell, { let q: &dyn Query = g; (1i64).max(0) as u32 }, NewTargets::Each({ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (!(planned_value!("object reference SoleTargetOf", None::<ObjectId> => item.subject.object().and_then(|o: ObjectId| q.sole_target(o))) == Some(id)) && q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Golem)))).collect::<Vec<ObjectId>>() }))?; });
+planned!("a-copy-of-a-spell-for-each-object-it-could-target" => if let Some(spell) = { let q: &dyn Query = g; item.subject.object() } { cantrip_mechanics::copy::on_stack(g, { let q: &dyn Query = g; Some(PlayerId(item.data[0] as u8)).expect("a reference that always names a player") }, spell, { let q: &dyn Query = g; (1i64).max(0) as u32 }, NewTargets::Each({ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (!(item.subject.object().and_then(|spell: ObjectId| { let state = q.state(); let item = state.stack.iter().find(|i| i.kind == StackKind::Spell && i.object == spell).or_else(|| state.left_stack(spell))?; let mut chosen = state.targets(item).iter(); let first = chosen.next()?.object()?; match chosen.any(|t| t.object() != Some(first)) { true => None, false => Some(first) } }) == Some(id)) && q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Golem)))).collect::<Vec<ObjectId>>() }))?; });
 g.end_sentence();
  Ok(()) }
 

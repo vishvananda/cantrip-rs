@@ -1,8 +1,8 @@
 // A Killer Among Us
 // status: planned
 // requires: a choice of CreatureType outside its body
+// requires: a value chosen in secret
 // requires: cost part RevealChoice
-// requires: operation ChooseValueWith
 // When this enchantment enters, create a 1/1 white Human creature token, a 1/1 blue Merfolk creature token, and a 1/1 red Goblin creature token. Then secretly choose Human, Merfolk, or Goblin.
 // Sacrifice this enchantment, Reveal the creature type you chose: If target attacking creature token is the chosen type, put three +1/+1 counters on it and it gains deathtouch until end of turn.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -41,7 +41,7 @@ tokens_0.extend(std::iter::repeat((def_0_2,player)).take(count_0_2 as usize));
 } let words_0 = g.words(asker.source);
 let created_0 = g.create_tokens_worded(&tokens_0, false, None, words_0)?;
 g.end_sentence();
-let chosen_4 = planned_value!("operation ChooseValueWith", Subtype::Plains => cantrip_mechanics::choose::value(g, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, asker.source, ChoiceKind::CreatureType, ChoiceTerms { options: &[CreatureType::Human, CreatureType::Merfolk, CreatureType::Goblin], except: &[], count: None, secret: true, unchosen: false, random: false, ordered: false, up_to: false })?);
+let chosen_4 = planned_value!("a value chosen in secret", Subtype::Plains => cantrip_mechanics::choose::value(g, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, asker.source, ChoiceKind::CreatureType, ChoiceTerms { options: &[CreatureType::Human, CreatureType::Merfolk, CreatureType::Goblin], except: &[], count: None, secret: true, unchosen: false, random: false, ordered: false, up_to: false })?);
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (((q.state().attackers.iter().any(|a| a.id == id) || q.was_attacking(id)) && q.chars(id).is(CardType::Creature) && q.state().obj(id).token))) }

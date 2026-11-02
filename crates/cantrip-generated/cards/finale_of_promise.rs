@@ -1,6 +1,5 @@
 // Finale of Promise
-// status: planned
-// requires: operation CopyEach
+// status: ready
 // You may cast up to one target instant card and/or up to one target sorcery card from your graveyard each with mana value X or less without paying their mana costs. If a spell cast this way would be put into your graveyard, exile it instead. If X is 10 or more, copy each of those spells twice. You may choose new targets for the copies.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && ((q.chars(id).is(CardType::Instant) && q.announced_x().map_or(true, |x| (i64::from(q.mana_value(id))) <= (i64::from(x))) && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(id).owner))))) }
@@ -16,13 +15,12 @@ let picked_0 = if open_0.is_empty() { None } else if open_0.len() > 1 || (true &
 let Some(card_0) = picked_0 else { break; };
 let ways_0: Vec<CastWay> = g.cast_ways_during_resolution_by(card_0, caster_0).into_iter().filter(|w| true).collect();
 let done_0 = if ways_0.is_empty() { g.play_land_during_resolution(card_0)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_0, card_0, ways_0)?.map(|w| w.way); g.cast_during_resolution_as(card_0, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(caster_0), exile_instead: ExileInstead::Spell, ..CastTerms::default() })? };
-if done_0 { left_0 -= 1; played_0.push(g.state().obj(card_0).became.unwrap_or(card_0)); } else if 4294967295i64 == 1 { break; } if done_0 || !(true && true) { pool_0.retain(|&c| c != card_0); }
+if done_0 { left_0 -= 1; played_0.push(g.state().obj(card_0).became.unwrap_or(card_0)); } else if false { break; } if done_0 || !(true && true) { pool_0.retain(|&c| c != card_0); }
 }
 g.end_sentence();
 if { let q: &dyn Query = g; (Some(asker.source).map_or(0i64, |o: ObjectId| i64::from(q.state().obj(o).x))) >= (10i64) } {
-planned!("operation-copy-each" => cantrip_mechanics::copy::on_stack_each(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, |q: &dyn Query, asker: &Asker, id: ObjectId| (q.state().stack.iter().find(|i| i.object == id).is_some_and(|i| i.kind == StackKind::Spell) && (played_0.clone()).contains(&id)), NewTargets::May)?);
+let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let mut open_1: Vec<ObjectId> = { let q: &dyn Query = g; q.state().stack.iter().filter(|i| i.kind == StackKind::Spell).map(|i| i.object).filter(|&id| (q.state().stack.iter().find(|i| i.object == id).is_some_and(|i| i.kind == StackKind::Spell) && (played_0.clone()).contains(&id))).collect::<Vec<ObjectId>>() }; open_1.extend(open_1.clone()); while let Some(&first) = open_1.first() { let spell = if open_1.iter().all(|&o| o == first) { Some(first) } else { let mut distinct = open_1.clone(); distinct.sort(); distinct.dedup(); cantrip_mechanics::choose::card(g, player_1, asker.source, Purpose::CopyWhich, distinct)? }; let Some(spell) = spell else { break; }; if let Some(at) = open_1.iter().position(|&o| o == spell) { open_1.remove(at); } g.copy_spell(spell, player_1, true)?; }
 g.end_sentence();
-planned!("operation-copy-each" => cantrip_mechanics::copy::on_stack_each(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, |q: &dyn Query, asker: &Asker, id: ObjectId| (q.state().stack.iter().find(|i| i.object == id).is_some_and(|i| i.kind == StackKind::Spell) && (played_0.clone()).contains(&id)), NewTargets::May)?);
 g.end_sentence();
 }
 g.end_sentence();

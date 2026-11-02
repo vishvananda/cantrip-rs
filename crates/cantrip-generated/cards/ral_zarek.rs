@@ -1,6 +1,5 @@
 // Ral Zarek
-// status: planned
-// requires: numeric expression HeadsFlipped
+// status: ready
 // [+1]: Tap target permanent, then untap another target permanent.
 // [−2]: Ral Zarek deals 3 damage to any target.
 // [−7]: Flip five coins. Take an extra turn after this one for each coin that comes up heads.
@@ -23,9 +22,9 @@ let source_2 = { let q: &dyn Query = g; Some(asker.source) }; let amount_2 = { l
 g.end_sentence();
  Ok(()) }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let player_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let count_3 = { let q: &dyn Query = g; (5i64).max(0) as u32 }; let mut done_3: i64 = 0; for _ in 0..count_3 { if g.flip_coin(player_3) { done_3 += 1; } }
+let player_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let count_3 = { let q: &dyn Query = g; (5i64).max(0) as u32 }; let mut done_3: i64 = 0; for _ in 0..count_3 { if g.flip_coin_for_heads(player_3) { done_3 += 1; } }
 g.end_sentence();
-planned!("numeric-expression-heads-flipped" => for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { for _ in 0..result_0.iter().filter(|won| **won).count() { g.take_extra_turn(player); } });
+{ let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let times = { let q: &dyn Query = g; (done_3).clamp(0, 255) as u32 }; g.add_extra_turns(player, times); }
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

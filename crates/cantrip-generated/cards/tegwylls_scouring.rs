@@ -1,10 +1,10 @@
 // Tegwyll's Scouring
-// status: planned
-// requires: engine: no flash for an additional cost
+// status: ready
 // You may cast this spell as though it had flash by tapping three untapped creatures you control with flying in addition to paying its other costs.
 // Destroy all creatures. Create three 1/1 black Faerie Rogue creature tokens with flying.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_0(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { (!(q.state().obj(id).tapped) && q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)) && q.chars(id).keywords.has(Keyword::Flying)) }
+#[allow(unused_variables)] fn ability_0_of_flash(q: &dyn Query, asker: &Asker, targets: &[Target]) -> Cost { if q.state().obj(asker.source).marks.untimely_by_own_flash { Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(tap_untapped(3, ability_0_0)) } else { Cost::NONE } }
 pub mod token_3 {
 #[allow(unused_imports)] use cantrip_api::*;
 
@@ -23,7 +23,6 @@ tokens_2.extend(std::iter::repeat((def_2_0,player)).take(count_2_0 as usize));
 let created_2 = g.create_tokens_worded(&tokens_2, false, None, words_2)?;
 g.end_sentence();
  Ok(()) }
-planned_item!("engine-no-flash-for-an-additional-cost" => flash_for: Some(Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(tap_untapped(3, ability_0_0))));
 
-pub static CARD: CardDef = CardDef { name: "Tegwyll's Scouring", token_words: &[], oracle: true, cost: ManaCost { generic: 4, x: 0, symbols: [0, 0, 2, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Sorcery]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: spell(&[], ability_1), abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
+pub static CARD: CardDef = CardDef { name: "Tegwyll's Scouring", token_words: &[], oracle: true, cost: ManaCost { generic: 4, x: 0, symbols: [0, 0, 2, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Sorcery]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: spell(&[], ability_1), abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, cast_as_though_flash: true, cost_of_targets: Some(ability_0_of_flash), untimely_cleanup_rider: true, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[&token_3::CARD];

@@ -1,6 +1,5 @@
 // Curse of Bounty
-// status: planned
-// requires: per-player Tap
+// status: ready
 // Enchant player
 // Whenever enchanted player is attacked, untap all nonland permanents you control. Each opponent attacking that player untaps all nonland permanents they control.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -11,16 +10,10 @@ fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let objects_0 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (!(q.chars(id).is(CardType::Land)) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_0: Vec<ObjectId> = objects_0.iter().copied().filter(|&o| g.state().obj(o).tapped != false).collect(); cantrip_api::instruction(g, |g| { for &object in &turned_0 { g.untap(object); } });
 g.end_sentence();
 let mut players_1: Vec<PlayerId> = { let q: &dyn Query = g; { let mut all = Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>(); let other = q.state().apnap().filter(|&bound_0: &PlayerId| { let (by, at) = (Some(bound_0), Some(PlayerId(item.data[1] as u8))); q.state().attackers.iter().any(|a| Some(q.controller(a.id)) == by && Some(a.defending) == at) }).collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all } };
-planned!("per-player-tap" => g.begin_batch(););
-let mut each_3: Vec<Vec<ObjectId>> = vec![Vec::new(); players_1.len()]; let mut all_3: Vec<ObjectId> = Vec::new();
-let mut each_4: Vec<Vec<ObjectId>> = vec![Vec::new(); players_1.len()]; let mut all_4: Vec<ObjectId> = Vec::new();
-let mut each_5: Vec<Vec<ObjectId>> = vec![Vec::new(); players_1.len()]; let mut all_5: Vec<ObjectId> = Vec::new();
- for (index_1, bound_0) in players_1.iter().copied().enumerate() { let objects_2 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (!(q.chars(id).is(CardType::Land)) && Some(bound_0) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_2: Vec<ObjectId> = objects_2.iter().copied().filter(|&o| g.state().obj(o).tapped != false).collect(); cantrip_api::instruction(g, |g| { for &object in &turned_2 { g.untap(object); } });
- each_3[index_1] = objects_2.clone(); all_3.extend(each_3[index_1].iter().copied());
-each_4[index_1] = turned_2.clone(); all_4.extend(each_4[index_1].iter().copied());
-each_5[index_1] = { let q: &dyn Query = g; turned_2.clone() }; all_5.extend(each_5[index_1].iter().copied());
-   } 
-planned!("per-player-tap" => g.end_batch(););
+let mut gathered_2: Vec<ObjectId> = Vec::new();
+ for (index_1, bound_0) in players_1.iter().copied().enumerate() { gathered_2.extend({ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (!(q.chars(id).is(CardType::Land)) && Some(bound_0) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() });
+    } 
+let objects_4 = { let q: &dyn Query = g; (gathered_2.clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_4: Vec<ObjectId> = objects_4.iter().copied().filter(|&o| g.state().obj(o).tapped != false).collect(); cantrip_api::instruction(g, |g| { for &object in &turned_4 { g.untap(object); } });
 g.end_sentence();
  Ok(()) }
 

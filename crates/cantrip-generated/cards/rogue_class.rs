@@ -1,6 +1,5 @@
 // Rogue Class
 // status: planned
-// requires: a card a player may look at for a while
 // requires: play permission with mana as though any color
 // (Gain the next level as a sorcery to add its ability.)
 // Whenever a creature you control deals combat damage to a player, exile the top card of that player's library face down. You may look at it for as long as it remains exiled.
@@ -14,7 +13,7 @@
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let objects_0 = { let q: &dyn Query = g; (((Some(PlayerId(item.data[1] as u8)).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((1i64).max(0) as usize).collect::<Vec<ObjectId>>() }; let by_0 = Some(g.linked(item)); let moved_0 = g.exile_face_down(&objects_0, by_0);
 g.end_sentence();
-planned!("a-card-a-player-may-look-at-for-a-while" => let cards_1_0 = { let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_1_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &card in &cards_1_0 { for &player in &players_1_0 { g.allow_look(card, player, Expiry::Never); } });
+let cards_1_0 = { let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_1_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &player in &players_1_0 { g.look_at(player, &cards_1_0); }
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_level_2_0_0_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); (q.state().obj(source).class_level >= 2) && (((*so_far).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(affected)))) }

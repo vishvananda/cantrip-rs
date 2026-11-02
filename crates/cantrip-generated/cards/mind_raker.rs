@@ -24,7 +24,7 @@ hoisted_5.extend({ let q: &dyn Query = g; objects_2.iter().copied().filter(|&o| 
 }
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
-let amount_6 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_6 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }; let mut cards_6 = Vec::new(); for player in players_6 { cards_6.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_6)?); } let discarded_6 = g.discard_together(&cards_6);
+let amount_6 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_6: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_6 = Vec::new(); for player in g.state().apnap().filter(|p| players_6.contains(p)).collect::<Vec<PlayerId>>() { cards_6.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_6)?); } let discarded_6 = g.discard_together(&cards_6);
 g.end_sentence();
 hoisted_7.extend(discarded_6.clone());
 hoisted_8.extend({ let q: &dyn Query = g; discarded_6.clone() });

@@ -10,7 +10,7 @@ let mana_players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter()
 let mana_2 = { let q: &dyn Query = g; (4i64).max(0) as u8 };
 for player in mana_players_2 {
 if mana_2 > 0 { let colors = cantrip_mechanics::choose_colors(g, player, asker.source, ColorSet(31), mana_2)?;
-for color in colors { g.add_restricted_mana(player, color.mana(), 1, ManaRestriction::Subtypes(SubtypeSpells::of(Subtype::Dragon))); }
+for color in colors { g.add_restricted_mana(player, color.mana(), 1, ManaRestriction::Subtypes(SubtypeSpells::of(g.words(asker.source).subtype(Subtype::Dragon)))); }
 }
 }
 g.end_sentence();

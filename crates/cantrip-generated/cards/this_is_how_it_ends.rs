@@ -1,6 +1,5 @@
 // This Is How It Ends
 // status: planned
-// requires: instruction ChooseOne
 // requires: villainous choice
 // Target creature's owner shuffles it into their library, then faces a villainous choice — They lose 5 life, or they shuffle another creature they own into their library.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -14,13 +13,14 @@ let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true
 let objects_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; let moved_0 = g.put_into_library(&objects_0, LibraryPlace::ShuffledIn);
 g.end_sentence();
 planned!("villainous-choice" => cantrip_mechanics::choose::villainous(g, { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).map(|o: ObjectId| q.state().obj(o).owner).expect("a reference that always names a player") }, asker.source, &["Lose 5 life.", " Return the chosen permanents to their owners' hands."])?);
-let decider_2 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).map(|o: ObjectId| q.state().obj(o).owner).expect("a reference that always names a player") }; match planned_value!("instruction ChooseOne", 0u8 => cantrip_mechanics::choose::one_of(g, decider_2, asker.source, vec![Label::Card(card_2, 0), Label::Card(card_2, 1)])?) {
+let decider_2 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).map(|o: ObjectId| q.state().obj(o).owner).expect("a reference that always names a player") };
+let offered_2: Vec<u8> = [(0u8, true), (1u8, !{ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && t_0_raw.get(0).copied().and_then(|t: Target| t.object()).map(|o: ObjectId| q.state().obj(o).owner) == Some(q.state().obj(id).owner))).collect::<Vec<ObjectId>>() }.is_empty())].into_iter().filter(|option| option.1).map(|option| option.0).collect(); let card_2 = item.ability.card; let picked_2 = if offered_2.len() > 1 { offered_2[cantrip_mechanics::choose::one_of(g, decider_2, asker.source, offered_2.iter().map(|&option| Label::Card(card_2, option)).collect())? as usize] } else { offered_2.first().copied().unwrap_or(u8::MAX) }; match picked_2 {
 0 => {
 let amount_3 = { let q: &dyn Query = g; (5i64).max(0) as i32 }; let players_3 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).map(|o: ObjectId| q.state().obj(o).owner).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_3 { g.lose_life(player, amount_3); }
 g.end_sentence();
 }
-_ => {
+1 => {
 let selected_4_player = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).map(|o: ObjectId| q.state().obj(o).owner).expect("a reference that always names a player") }; let selected_4_candidates = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && t_0_raw.get(0).copied().and_then(|t: Target| t.object()).map(|o: ObjectId| q.state().obj(o).owner) == Some(q.state().obj(id).owner))).collect::<Vec<ObjectId>>() }; let selected_4_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let selected_4 = { cantrip_mechanics::choose::select(g, selected_4_player, asker.source, Purpose::PutOnLibrary, selected_4_candidates, cantrip_mechanics::select::Selection::of(selected_4_count, &[]))? };
 let objects_5 = { let q: &dyn Query = g; selected_4.clone() }; let moved_5 = g.put_into_library(&objects_5, LibraryPlace::ShuffledIn);
 g.end_sentence();
@@ -28,10 +28,11 @@ hoisted_6.extend(moved_5.clone());
 hoisted_7.extend(selected_4.clone());
 hoisted_8.extend({ let q: &dyn Query = g; objects_5.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() });
 }
+_ => {}
 }
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
 
-pub static CARD: CardDef = CardDef { name: "This Is How It Ends", token_words: &[], oracle: true, cost: ManaCost { generic: 3, x: 0, symbols: [0, 0, 1, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Instant]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: spell(ABILITY_0_TARGETS, ability_0), abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
+pub static CARD: CardDef = CardDef { name: "This Is How It Ends", token_words: &[], oracle: true, cost: ManaCost { generic: 3, x: 0, symbols: [0, 0, 1, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Instant]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: spell(ABILITY_0_TARGETS, ability_0), abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, labels: &["They lose 5 life", "They shuffle another creature they own into their library"], ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

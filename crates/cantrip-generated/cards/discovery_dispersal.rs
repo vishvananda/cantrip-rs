@@ -29,7 +29,7 @@ let mut each_2: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut 
 g.end_sentence();
 let objects_3 = { let q: &dyn Query = g; all_2.clone() }; let moved_3 = g.return_to_hand(&objects_3);
 g.end_sentence();
-let amount_4 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }; let mut cards_4 = Vec::new(); for player in players_4 { cards_4.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_4)?); } let discarded_4 = g.discard_together(&cards_4);
+let amount_4 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_4: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_4 = Vec::new(); for player in g.state().apnap().filter(|p| players_4.contains(p)).collect::<Vec<PlayerId>>() { cards_4.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_4)?); } let discarded_4 = g.discard_together(&cards_4);
 g.end_sentence();
  Ok(()) }
 

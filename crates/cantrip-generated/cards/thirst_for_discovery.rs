@@ -14,7 +14,7 @@ let discarded_3 = g.discard_together(&selected_4); let paid_3 = !discarded_3.is_
 (paid_3, { let q: &dyn Query = g; (discarded_3).clone() }, { let q: &dyn Query = g; (discarded_3.clone()).clone() }, { let q: &dyn Query = g; (selected_4).clone() }) } else { (false, Vec::new(), Vec::new(), Vec::new()) };
 g.end_sentence();
 if { let q: &dyn Query = g; !(((paid_2 as i64) != 0)) } {
-let amount_5 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let players_5 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_5 = Vec::new(); for player in players_5 { cards_5.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_5)?); } let discarded_5 = g.discard_together(&cards_5);
+let amount_5 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let players_5: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_5 = Vec::new(); for player in players_5 { cards_5.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_5)?); } let discarded_5 = g.discard_together(&cards_5);
 g.end_sentence();
 hoisted_6.extend(discarded_5.clone());
 hoisted_7.extend({ let q: &dyn Query = g; discarded_5.clone() });

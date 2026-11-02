@@ -3,7 +3,7 @@
 // If a player drawing a card causes a triggered ability of a permanent you control to trigger, that ability triggers an additional time.
 // Whenever a player draws their second card each turn, put a +1/+1 counter on Krang.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_trigger_rule(q: &dyn Query, asker: &Asker, event: &Event, triggering: &Triggering) -> bool { (triggering.permanent && Some(asker.controller) == Some(triggering.controller)) && (|| -> bool { if let Event::Drew { player, .. } = event { let subject = Target::Player(*player); let data = [0u32; 2]; if true { return true; } }  false })() }
+#[allow(unused_variables)] fn ability_0_trigger_rule(q: &dyn Query, asker: &Asker, event: &Event, triggering: &Triggering) -> bool { true && (triggering.permanent && Some(asker.controller) == Some(triggering.controller)) && (|| -> bool { if let Event::Drew { player, .. } = event { let subject = Target::Player(*player); let data = [0u32; 2]; if true { return true; } }  false })() }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Drew { player, .. } = event { let subject = Target::Player(*player); let data = [0u32; 2]; if true && (q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::Drew { player, .. } = event { let subject = Target::Player(*player); let data = [0u32; 2]; if true { return Some(Fired { subject, data }); } }  None }).filter(|f: &Fired| f.subject == subject).count() as i64 + 1) == (2i64) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

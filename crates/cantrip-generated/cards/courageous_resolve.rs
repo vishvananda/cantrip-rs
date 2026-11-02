@@ -1,6 +1,5 @@
 // Courageous Resolve
 // status: planned
-// requires: engine: no protection from this quality
 // requires: player rule for a while can't lose life
 // requires: player rule for a while can't lose the game
 // requires: player rule for a while can't win the game
@@ -12,8 +11,8 @@ static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let objects_0 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_0 = { let q: &dyn Query = g; Some(asker.source) }; let duration_0 = Duration::EndOfTurn;
-let kind_0_0_0 = { let q: &dyn Query = g; planned_value!("engine: no protection from this quality", EffectKind::Pump(0, 0) => EffectKind::ProtectionFrom(ProtectionQuality::Players(|q, asker| Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()))) };
-if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &object in &objects_0 { g.add_effect(source, object, kind_0_0_0, duration_0);  } }); }
+let players_0_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &object in &objects_0 { for &player in &players_0_0 { g.add_effect(source, object, EffectKind::ProtectionFromPlayer(player), duration_0); }  } }); }
 g.end_sentence();
 let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_1 { g.draw(player, amount_1); }

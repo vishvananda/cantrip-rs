@@ -1,13 +1,12 @@
 // Spider-Man 2099
-// status: planned
-// requires: condition PlayerDid PlayedLandNotFromHand
+// status: ready
 // From the Future — You can't cast Spider-Man 2099 during your first, second, or third turns of the game.
 // Double strike, vigilance
 // At the beginning of your end step, if you've played a land or cast a spell this turn from anywhere other than your hand, Spider-Man 2099 deals damage equal to his power to any target.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { !(((Some(asker.controller).map_or(0i64, |p: PlayerId| q.history().all().iter().filter(|r| matches!(r.event, Event::TurnBegan { player, .. } if player == p)).count() as i64)) == (1i64) || (Some(asker.controller).map_or(0i64, |p: PlayerId| q.history().all().iter().filter(|r| matches!(r.event, Event::TurnBegan { player, .. } if player == p)).count() as i64)) == (2i64) || (Some(asker.controller).map_or(0i64, |p: PlayerId| q.history().all().iter().filter(|r| matches!(r.event, Event::TurnBegan { player, .. } if player == p)).count() as i64)) == (3i64))) }
 static ABILITY_3_TARGETS: &[cantrip_api::TargetSpec] = &[cantrip_mechanics::targets::ANY];
-fn ability_3_if(q: &dyn Query, asker: &Asker) -> bool { (planned_value!("condition PlayerDid PlayedLandNotFromHand", false => q.player_did(q.history().this_turn().iter(), Some(asker.controller), PlayerDeed::PlayedLandNotFromHand)) || q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && (true && !(cast_of(q, id).is_some_and(|cast| cast.from == ZoneKind::Hand && true))) { return Some(Fired { subject, data }); } }  None }).next().is_some()) }
+fn ability_3_if(q: &dyn Query, asker: &Asker) -> bool { (q.history().this_turn().iter().any(|r| matches!(r.event, Event::LandPlayed { land, player, .. } if Some(player) == Some(asker.controller) && q.history().all().iter().any(|m| matches!(m.event, Event::ZoneChange { new, from, .. } if new == land && from != Zone::hand(player))))) || q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && (true && !(cast_of(q, id).is_some_and(|cast| cast.from == ZoneKind::Hand && true))) { return Some(Fired { subject, data }); } }  None }).next().is_some()) }
 #[allow(unused_variables)] fn ability_3_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::End) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

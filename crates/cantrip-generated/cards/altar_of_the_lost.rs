@@ -1,19 +1,18 @@
 // Altar of the Lost
 // status: planned
 // requires: mana spending predicate
-// requires: object filter HasKeywordFamily
 // This artifact enters tapped.
 // {T}: Add two mana in any combination of colors. Spend this mana only to cast spells with flashback from a graveyard.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); entering.tapped = true;
  Ok(()) }
-#[allow(dead_code, unused_variables)] fn mana_use_224(q: &dyn Query, asker: &Asker, spending: &Spending) -> bool { spending.purpose == SpendingFor::Casting && spending.source.is_some_and(|spell| (planned_value!("object filter HasKeywordFamily", false => q.has_keyword_ability(spell, KeywordAbility::Flashback)) && cast_of(q, spell).is_some_and(|cast| cast.from == ZoneKind::Graveyard && true))) }
-#[allow(dead_code, unused_variables)] fn mana_use_621(q: &dyn Query, asker: &Asker, spending: &Spending) -> bool { spending.purpose == SpendingFor::Casting && spending.source.is_some_and(|spell| (planned_value!("object filter HasKeywordFamily", false => q.has_keyword_ability(spell, KeywordAbility::Flashback)) && cast_of(q, spell).is_some_and(|cast| cast.from == ZoneKind::Graveyard && true))) }
+#[allow(dead_code, unused_variables)] fn mana_use_224(q: &dyn Query, asker: &Asker, spending: &Spending) -> bool { spending.purpose == SpendingFor::Casting && spending.source.is_some_and(|spell| ((q.card(q.chars(spell).card).ways.iter().any(|w| w.exile_after && w.from == ZoneKind::Graveyard && !w.cost.tap_to_reduce && !matches!(w.cost.permanents, Some(PermanentCost { action: PermanentAction::BeamUp, .. }))) || q.state().permissions.iter().any(|p| p.grant.flashback && q.state().permission_covers(p, spell)) || q.state().battlefield().iter().any(|&p| !q.lost_all_abilities(p) && q.card(q.chars(p).card).granted_ways.iter().any(|w| w.flashback && q.state().obj(spell).zone.is(w.from) && (w.cost)(q, &Asker::new(p, q.controller(p)), spell, q.state().obj(spell).owner).is_some()))) && cast_of(q, spell).is_some_and(|cast| cast.from == ZoneKind::Graveyard && true))) }
+#[allow(dead_code, unused_variables)] fn mana_use_1092(q: &dyn Query, asker: &Asker, spending: &Spending) -> bool { spending.purpose == SpendingFor::Casting && spending.source.is_some_and(|spell| ((q.card(q.chars(spell).card).ways.iter().any(|w| w.exile_after && w.from == ZoneKind::Graveyard && !w.cost.tap_to_reduce && !matches!(w.cost.permanents, Some(PermanentCost { action: PermanentAction::BeamUp, .. }))) || q.state().permissions.iter().any(|p| p.grant.flashback && q.state().permission_covers(p, spell)) || q.state().battlefield().iter().any(|&p| !q.lost_all_abilities(p) && q.card(q.chars(p).card).granted_ways.iter().any(|w| w.flashback && q.state().obj(spell).zone.is(w.from) && (w.cost)(q, &Asker::new(p, q.controller(p)), spell, q.state().obj(spell).owner).is_some()))) && cast_of(q, spell).is_some_and(|cast| cast.from == ZoneKind::Graveyard && true))) }
 fn ability_1_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let mana_players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 let mana_1 = { let q: &dyn Query = g; (2i64).max(0) as u8 };
 for player in mana_players_1 {
 if mana_1 > 0 { let colors = cantrip_mechanics::choose_colors(g, player, asker.source, ColorSet(31), mana_1)?;
-for color in colors { g.add_restricted_mana(player, color.mana(), 1, planned_value!("mana spending predicate", ManaRestriction::ABILITIES => ManaRestriction::Rule(&ManaRule { spend: mana_use_621, spent: None }))); }
+for color in colors { g.add_restricted_mana(player, color.mana(), 1, planned_value!("mana spending predicate", ManaRestriction::ABILITIES => ManaRestriction::Rule(&ManaRule { spend: mana_use_1092, spent: None }))); }
 }
 }
  Ok(()) }

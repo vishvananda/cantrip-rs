@@ -1,6 +1,5 @@
 // Compleat Devotion
-// status: planned
-// requires: object filter HasKeywordFamily
+// status: ready
 // Target creature you control gets +2/+2 until end of turn. If that creature has toxic, draw a card.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id))))) }
@@ -11,7 +10,7 @@ let objects_0 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0
 let kind_0_0_0 = { let q: &dyn Query = g; EffectKind::Pump((2i64) as i16, (2i64) as i16) };
 if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &object in &objects_0 { g.add_effect(source, object, kind_0_0_0, duration_0);  } }); }
 g.end_sentence();
-if { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).is_some_and(|candidate: ObjectId| planned_value!("object filter HasKeywordFamily", false => q.has_keyword_ability(candidate, KeywordAbility::Toxic))) } {
+if { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).is_some_and(|candidate: ObjectId| q.chars(candidate).toxic > 0) } {
 let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_1 { g.draw(player, amount_1); }
 g.end_sentence();

@@ -3,7 +3,7 @@
 // For each token you control, create a token that's a copy of that permanent.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let originals_0 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.state().obj(id).token && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }; let player_0 = { let q: &dyn Query = g; Some(asker.controller) }; let created_0 = if let Some(player) = player_0 { let copies: Vec<(Copiable, PlayerId)> = originals_0.iter().map(|&original| (g.copiable_values(original), player)).collect(); g.create_token_copies_together(&copies)? } else { Vec::new() };
+let originals_0 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.state().obj(id).token && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }; let player_0 = { let q: &dyn Query = g; Some(asker.controller) }; let mut copies_0: Vec<(Copiable, PlayerId)> = Vec::new(); if let Some(player) = player_0 { for &original in &originals_0 { if let Some(values) = { let q: &dyn Query = g; Some(original).map(|original: ObjectId| q.copiable_values(original)) } { copies_0.push((values, player)); } } } let created_0 = g.create_token_copies_together(&copies_0)?;
 g.end_sentence();
  Ok(()) }
 

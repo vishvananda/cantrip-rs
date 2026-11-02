@@ -17,7 +17,7 @@ let kind_2_0_0 = { let q: &dyn Query = g; EffectKind::AddKeywords(Keywords::of(&
 if let Some(source) = source_2 { cantrip_api::instruction(g, |g| { for &object in &objects_2 { g.add_effect(source, object, kind_2_0_0, duration_2);  } }); }
 g.end_sentence();
 let payer_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let (paid_3, after_3, before_3, picked_3): (bool, Vec<ObjectId>, Vec<ObjectId>, Vec<ObjectId>) = if true {
-let amount_5 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_5 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_5 = Vec::new(); for player in players_5 { cards_5.extend({ let hand = g.state().zone(Zone::hand(player)).to_vec(); cantrip_mechanics::choose::cards(g, player, asker.source, Purpose::Discard, hand, amount_5, true)? }); } let discarded_5 = g.discard_together(&cards_5);
+let amount_5 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_5: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_5 = Vec::new(); for player in players_5 { cards_5.extend({ let hand = g.state().zone(Zone::hand(player)).to_vec(); cantrip_mechanics::choose::cards(g, player, asker.source, Purpose::Discard, hand, amount_5, true)? }); } let discarded_5 = g.discard_together(&cards_5);
 let paid_4 = !discarded_5.clone().is_empty();
 (paid_4, { let q: &dyn Query = g; (discarded_5).clone() }, { let q: &dyn Query = g; (discarded_5.clone()).clone() }, Vec::new()) } else { (false, Vec::new(), Vec::new(), Vec::new()) };
 g.end_sentence();

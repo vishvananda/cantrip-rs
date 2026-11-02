@@ -1,6 +1,6 @@
 // Strangling Grasp // Vengeful Strangler
 // status: planned
-// requires: move arrival state
+// requires: returns transformed and attached
 // Enchant creature or planeswalker an opponent controls
 // At the beginning of your upkeep, enchanted permanent's controller sacrifices a nonland permanent of their choice, then that player loses 1 life.
 // This creature can't block.
@@ -13,7 +13,7 @@ static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
-let objects_0 = ({ let q: &dyn Query = g; ((Some(ObjectId(item.data[0])).filter(|o| *o != ObjectId::NONE).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Graveyard).collect::<Vec<ObjectId>>()).get(0).copied().into_iter().collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_0 = { let mut moved: Vec<ObjectId> = Vec::new(); for &o in &objects_0 { let controller = player_0; moved.extend(planned_value!("move arrival state", None::<ObjectId> => cantrip_mechanics::enter::in_state(g, o, controller, item, "[Transformed, AttachedTo(Target { slot: Slot(0), index: 0 })]", &[], false)?)); } moved };
+let objects_0 = ({ let q: &dyn Query = g; ((Some(ObjectId(item.data[0])).filter(|o| *o != ObjectId::NONE).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Graveyard).collect::<Vec<ObjectId>>()).get(0).copied().into_iter().collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_0 = { let mut moved: Vec<ObjectId> = Vec::new(); for &o in &objects_0 { let controller = player_0; moved.extend(planned_value!("returns transformed and attached", None::<ObjectId> => cantrip_mechanics::enter::in_state(g, o, controller, item, "[Transformed, AttachedTo(Target { slot: Slot(0), index: 0 })]", &[], false)?)); } moved };
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

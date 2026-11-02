@@ -1,6 +1,5 @@
 // Fiendish Panda
-// status: planned
-// requires: event value in a target filter beyond its subject
+// status: ready
 // Whenever you gain life, put a +1/+1 counter on this creature.
 // When this creature dies, return another target non-Bear creature card with mana value less than or equal to this creature's power from your graveyard to the battlefield.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -12,7 +11,7 @@ let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: 
 let had_0: Vec<_> = counters_0.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_0); let applied_0: Vec<ObjectId> = counters_0.iter().zip(had_0).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && ((!(((Some(ObjectId(planned_value!("event value in a target filter beyond its subject", [u32::MAX; 2] => q.event_data())[0])).filter(|o| *o != ObjectId::NONE).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Graveyard).collect::<Vec<ObjectId>>()).get(0).copied() == Some(id)) && (!(q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Bear))) && q.chars(id).is(CardType::Creature)) && (i64::from(q.mana_value(id))) <= (q.event_subject().object().map_or(0i64, |o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0)))) && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(id).owner))))) }
+#[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && ((!(q.event_subject().object().is_some_and(|o: ObjectId| o == id || q.found_all_after_move(o).contains(&id))) && (!(q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Bear))) && q.chars(id).is(CardType::Creature)) && (i64::from(q.mana_value(id))) <= (q.event_subject().object().map_or(0i64, |o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0)))) && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(id).owner))))) }
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && from.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }

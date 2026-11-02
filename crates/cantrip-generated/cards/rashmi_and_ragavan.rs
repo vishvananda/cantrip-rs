@@ -31,7 +31,7 @@ tokens_1.extend(std::iter::repeat((def_1_0,player)).take(count_1_0 as usize));
 let created_1 = g.create_tokens_worded(&tokens_1, false, None, words_1)?;
 g.end_sentence();
 let payer_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
-let paid_3 = cantrip_mechanics::effects::ask_may(g, payer_3, asker.source, Purpose::Optional)?; if paid_3 {
+let mut paid_3 = cantrip_mechanics::effects::ask_may(g, payer_3, asker.source, Purpose::Optional)?; if paid_3 {
 let caster_4 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let mut pool_4: Vec<ObjectId> = { let q: &dyn Query = g; ((moved_0.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let mut left_4: u32 = 1; let mut played_4: Vec<ObjectId> = Vec::new();
 let limit_4_0: i64 = i64::from({ let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Artifact) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64 });
 while left_4 > 0 {
@@ -40,9 +40,9 @@ let picked_4 = if open_4.is_empty() { None } else if open_4.len() > 1 || (false 
 let Some(card_4) = picked_4 else { break; };
 let ways_4: Vec<CastWay> = g.cast_ways_during_resolution_by(card_4, caster_4).into_iter().filter(|w| (i64::from(w.mana_value)) < (limit_4_0)).collect();
 let done_4 = if ways_4.is_empty() { g.play_land_during_resolution(card_4)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_4, card_4, ways_4)?.map(|w| w.way); g.cast_during_resolution_as(card_4, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(caster_4), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
-if done_4 { left_4 -= 1; played_4.push(g.state().obj(card_4).became.unwrap_or(card_4)); } else if 1i64 == 1 { break; } if done_4 || !(false && false) { pool_4.retain(|&c| c != card_4); }
+if done_4 { left_4 -= 1; played_4.push(g.state().obj(card_4).became.unwrap_or(card_4)); } else if true { break; } if done_4 || !(false && false) { pool_4.retain(|&c| c != card_4); }
 }
-g.end_sentence();
+paid_3 = !played_4.is_empty();
 }
 g.end_sentence();
 if { let q: &dyn Query = g; !(((paid_3 as i64) != 0)) } {

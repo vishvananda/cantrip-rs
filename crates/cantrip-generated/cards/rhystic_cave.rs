@@ -3,9 +3,9 @@
 // {T}: Choose a color. Add one mana of that color unless any player pays {1}. Activate only as an instant.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let Some(chosen_0) = chosen else { return Ok(()) };
-let mut paid_1 = false; for bound_1000002 in { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() } {
+let mut paid_1 = false; let mut who_1: Option<PlayerId> = None; for bound_1000002 in { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() } {
 let payer_3 = { let q: &dyn Query = g; Some(bound_1000002).expect("a reference that always names a player") }; let paid_3 = g.may_pay(payer_3, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 1, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })), &PAY_QUESTION)?;
-if paid_3 { paid_1 = true; break; } }
+if paid_3 { paid_1 = true; who_1 = Some(bound_1000002); break; } }
 if { let q: &dyn Query = g; !(((paid_1 as i64) != 0)) } {
 let mana_players_5 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 let mana_5_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 };

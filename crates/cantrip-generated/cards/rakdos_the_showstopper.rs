@@ -1,15 +1,14 @@
 // Rakdos, the Showstopper
-// status: planned
-// requires: condition CoinCameUp
+// status: ready
 // Flying, trample
 // When Rakdos enters, flip a coin for each creature that isn't a Demon, Devil, or Imp. Destroy each creature whose coin comes up tails.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let times_0: Option<u32> = Some({ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && !((q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Demon)) || q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Devil)) || q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Imp)))))).collect::<Vec<ObjectId>>() }.len() as u32); let mut done_0: i64 = 0; let mut flips_0: u32 = 0; while times_0.map_or(true, |n| flips_0 < n) { flips_0 += 1; if g.flip_coin(player_0) { done_0 += 1; } else if false { break; } }
+let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let mut flips_0: Vec<(ObjectId, bool)> = Vec::new(); let mut done_0: i64 = 0; for object in { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && !((q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Demon)) || q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Devil)) || q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Imp)))))).collect::<Vec<ObjectId>>() } { let flip = g.flip_coin_for_heads(player_0); if flip { done_0 += 1; } flips_0.push((object, flip)); }
 g.end_sentence();
-let objects_1 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && planned_value!("condition CoinCameUp", false => q.coin_came_up(asker, None, CoinOutcome::Tails)))).collect::<Vec<ObjectId>>() }; let destroyed_1 = g.destroy_all(&objects_1);
+let objects_1 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && flips_0.iter().any(|&(flipped, heads)| flipped == id && heads == false))).collect::<Vec<ObjectId>>() }; let destroyed_1 = g.destroy_all(&objects_1);
 g.end_sentence();
  Ok(()) }
 

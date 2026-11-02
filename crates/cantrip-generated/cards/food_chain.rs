@@ -1,10 +1,9 @@
 // Food Chain
-// status: planned
-// requires: cost objects outside a resolving ability
+// status: ready
 // Exile a creature you control: Add X mana of any one color, where X is 1 plus the exiled creature's mana value. Spend this mana only to cast creature spells.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let mana_players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_0 = { let q: &dyn Query = g; ((1i64).saturating_add(((planned_value!("cost objects outside a resolving ability", Vec::<ObjectId>::new() => q.paid_for(asker))).into_iter().filter_map(|o: ObjectId| q.state().obj(o).became).collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.mana_value(o))).sum::<i64>())).clamp(0, 4294967295) as u32 };
+let mana_0 = { let q: &dyn Query = g; ((1i64).saturating_add(((q.events().iter().rev().find_map(|r| match r.event { Event::ZoneChange { old, from, part: false, .. } if from.is(ZoneKind::Battlefield) => Some(old), _ => None }).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| q.state().obj(o).became.unwrap_or(o)).collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.mana_value(o))).sum::<i64>())).clamp(0, 4294967295) as u32 };
 for player in mana_players_0 {
 let color = chosen.expect("mana activation selected a color");
 g.add_restricted_mana(player, color.mana(), mana_0, ManaRestriction::CREATURE_SPELLS);}

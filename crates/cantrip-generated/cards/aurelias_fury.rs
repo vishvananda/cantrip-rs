@@ -1,18 +1,15 @@
 // Aurelia's Fury
 // status: planned
-// requires: numeric expression AnnouncedX
-// requires: object filter DamagedBy
 // requires: player collection DamagedBy
 // requires: player rule for a while can't cast some spells
-// requires: target cardinality UpTo
 // Aurelia's Fury deals X damage divided as you choose among any number of targets. Tap each creature dealt damage this way. Players dealt damage this way can't cast noncreature spells this turn.
 #[allow(unused_imports)] use cantrip_api::*;
-static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[cantrip_mechanics::targets::ANY.between(1, planned_value!("target cardinality UpTo", 1u32 => TargetSpec::read_as_chosen(|q: &dyn Query, asker: &Asker| (planned_value!("numeric expression AnnouncedX", 0i64 => i64::from(q.announced_x().unwrap_or(0)))).max(0) as u32)))];
+static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[cantrip_mechanics::targets::ANY.between(1, TargetSpec::COUNTED)];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 cantrip_mechanics::damage_divided(g, item);
 g.end_sentence();
-let objects_1 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && planned_value!("object filter DamagedBy", false => cantrip_mechanics::history::permanents_dealt_damage_by(q.history(), asker.source, since).contains(&id)))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_1: Vec<ObjectId> = objects_1.iter().copied().filter(|&o| g.state().obj(o).tapped != true).collect(); g.tap_together(&turned_1);
+let objects_1 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && cantrip_mechanics::history::permanents_dealt_damage_by(q.history(), asker.source, 0).contains(&id))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_1: Vec<ObjectId> = objects_1.iter().copied().filter(|&o| g.state().obj(o).tapped != true).collect(); g.tap_together(&turned_1);
 g.end_sentence();
 planned!("player-rule-for-a-while-can-t-cast-some-spells" => let players_2_0 = { let q: &dyn Query = g; planned_value!("player collection DamagedBy", Vec::<PlayerId>::new() => q.players_damaged_by(asker, 0)) }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_2_0 { g.add_player_effect(asker.controller, source, EffectKind::CantCast { player, spells: SpellSet::matching(move |q, spell| !(q.chars(spell).is(CardType::Creature))) }, Duration::EndOfTurn); } });
 g.end_sentence();

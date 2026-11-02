@@ -8,7 +8,7 @@ fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let chosen_0 = cantrip_mechanics::chosen_type::creature_type_now(g, player_0, asker.source)?;
 g.end_sentence();
 let objects_1 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let duration_1 = Duration::EndOfTurn;
-let kind_1_0_0 = { let q: &dyn Query = g; EffectKind::AddSubtype(chosen_0) };
+let kind_1_0_0 = { let q: &dyn Query = g; EffectKind::SetCreatureType(chosen_0) };
 if let Some(source) = source_1 { cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.add_effect(source, object, kind_1_0_0, duration_1);  } }); }
 g.end_sentence();
  Ok(()) }
@@ -16,7 +16,7 @@ fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let chosen_2 = cantrip_mechanics::chosen_type::creature_type_now(g, player_2, asker.source)?;
 g.end_sentence();
 let objects_3 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_3 = { let q: &dyn Query = g; Some(asker.source) }; let duration_3 = Duration::EndOfTurn;
-let kind_3_0_0 = { let q: &dyn Query = g; EffectKind::AddSubtype(chosen_2) };
+let kind_3_0_0 = { let q: &dyn Query = g; EffectKind::SetCreatureType(chosen_2) };
 if let Some(source) = source_3 { cantrip_api::instruction(g, |g| { for &object in &objects_3 { g.add_effect(source, object, kind_3_0_0, duration_3);  } }); }
 g.end_sentence();
  Ok(()) }

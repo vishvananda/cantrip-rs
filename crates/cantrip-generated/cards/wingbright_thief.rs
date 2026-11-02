@@ -12,6 +12,7 @@ static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target
  None }
 fn perpetual_4(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let amount_5 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_5 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+let drawing_5: Vec<PlayerId> = players_5.into_iter().collect(); let players_5: Vec<PlayerId> = g.state().apnap().filter(|p| drawing_5.contains(p)).collect();
 for player in players_5 { g.draw(player, amount_5); }
 g.end_sentence();
 let amount_6 = { let q: &dyn Query = g; (3i64).max(0) as i32 }; let players_6 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };

@@ -1,6 +1,5 @@
 // Haunting Voyage
-// status: planned
-// requires: object state Foretold
+// status: ready
 // Choose a creature type. Return up to two creature cards of that type from your graveyard to the battlefield. If this spell was foretold, return all creature cards of that type from your graveyard to the battlefield instead.
 // Foretell {5}{B}{B} (During your turn, you may pay {2} and exile this card from your hand face down. Cast it on a later turn for its foretell cost.)
 #[allow(unused_imports)] use cantrip_api::*;
@@ -11,7 +10,7 @@ let mut hoisted_2: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let chosen_0 = cantrip_mechanics::chosen_type::creature_type_now(g, player_0, asker.source)?;
 g.end_sentence();
-if { let q: &dyn Query = g; Some(asker.source).is_some_and(|candidate: ObjectId| planned_value!("object state Foretold", false => cantrip_mechanics::foretell::foretold(q.state(), candidate))) } {
+if { let q: &dyn Query = g; Some(asker.source).is_some_and(|candidate: ObjectId| { let id = candidate; let o = q.state().obj(id); let own = AbilityRef::spell(o.card); q.card(o.card).foretell.is_some() && (q.state().permissions.iter().any(|p| p.by.object == id && p.by.ability == own) || q.history().cast_of(id).is_some_and(|cast| cast.granted_by().is_some_and(|by| by.ability == own))) }) } {
 let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
 let objects_1 = ({ let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (q.chars(id).is(CardType::Creature) && Some(chosen_0).is_some_and(|chosen| q.chars(id).has_subtype(chosen)))).collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_1 = { let rows_1: Vec<(ObjectId, PlayerId, bool)> = objects_1.iter().map(|&o| (o, player_1, false)).collect(); let came_1 = g.put_all_onto_battlefield_as(&rows_1)?; came_1.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
 g.end_sentence();

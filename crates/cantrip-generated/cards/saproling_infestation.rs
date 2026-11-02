@@ -2,7 +2,7 @@
 // status: ready
 // Whenever a player kicks a spell, you create a 1/1 green Saproling creature token.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if true && (true && q.state().obj(id).kicked > 0) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if true && (true && (q.state().obj(id).kicked > 0 || (q.state().obj(id).paid > 0 && q.card(q.state().obj(id).card).kicker.is_some()))) { return Some(Fired { subject, data }); } }
  None }
 pub mod token_1 {
 #[allow(unused_imports)] use cantrip_api::*;

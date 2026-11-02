@@ -8,9 +8,9 @@
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_6: Vec<ObjectId> = Vec::new();
 let mut hoisted_5: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-let mut paid_0 = false; for bound_1000001 in { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() } {
+let mut paid_0 = false; let mut who_0: Option<PlayerId> = None; for bound_1000001 in { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() } {
 let payer_2 = { let q: &dyn Query = g; Some(bound_1000001).expect("a reference that always names a player") }; let paid_2 = ({ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>() }).into_iter().filter(|&o| g.controller(o) == payer_2 && g.can_sacrifice(payer_2, o)).count() >= 2 && g.may_pay(payer_2, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(sacrifice(2, paid_3)), &PAY_QUESTION)?;
-if paid_2 { paid_0 = true; break; } }
+if paid_2 { paid_0 = true; who_0 = Some(bound_1000001); break; } }
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
 let objects_4 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut picks_4: Vec<(PlayerId, ObjectId)> = Vec::new();

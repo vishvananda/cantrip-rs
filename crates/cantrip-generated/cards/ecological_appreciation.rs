@@ -1,7 +1,6 @@
 // Ecological Appreciation
 // status: planned
 // requires: search constraint DifferentNames
-// requires: shuffle around cards that stay where they are
 // Search your library and graveyard for up to four creature cards with different names that each have mana value X or less and reveal them. An opponent chooses two of those cards. Shuffle the chosen cards into your library and put the rest onto the battlefield. Exile Ecological Appreciation.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
@@ -11,7 +10,7 @@ let among: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_
 let Some(picked_0) = (if among.len() > 1 { cantrip_mechanics::choose::player(g, asker.controller, asker.source, among, "ChooseRevealedCard", 0)? } else { among.first().copied() }) else { return Ok(()); };
 let selected_3_player = { let q: &dyn Query = g; Some(picked_0).expect("a reference that always names a player") }; let selected_3_candidates = { let q: &dyn Query = g; found_0.clone() }; let selected_3_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((2i64).max(0) as u32) }; let selected_3 = { cantrip_mechanics::choose::select(g, selected_3_player, asker.source, Purpose::Keep, selected_3_candidates, cantrip_mechanics::select::Selection::of(selected_3_count, &[]))? };
 
-planned!("shuffle-around-cards-that-stay-where-they-are" => for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { cantrip_mechanics::library::shuffle_around(g, player, &{ let q: &dyn Query = g; { let chosen: Vec<ObjectId> = selected_3.clone(); (found_0.clone()).into_iter().filter(|o| !chosen.contains(o)).collect::<Vec<ObjectId>>() } }); });
+for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.shuffle(player); }
 let player_4 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
 let objects_4 = ({ let q: &dyn Query = g; { let chosen: Vec<ObjectId> = selected_3.clone(); (found_0.clone()).into_iter().filter(|o| !chosen.contains(o)).collect::<Vec<ObjectId>>() } }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_4 = { let rows_4: Vec<(ObjectId, PlayerId, bool)> = objects_4.iter().map(|&o| (o, player_4, false)).collect(); let came_4 = g.put_all_onto_battlefield_as(&rows_4)?; came_4.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
 g.end_sentence();

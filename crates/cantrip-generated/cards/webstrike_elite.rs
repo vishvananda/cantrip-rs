@@ -1,6 +1,5 @@
 // Webstrike Elite
-// status: planned
-// requires: numeric expression EventActivationX
+// status: ready
 // Reach
 // Cycling {X}{G}{G} ({X}{G}{G}, Discard this card: Draw a card.)
 // When you cycle this card, destroy up to one target artifact or enchantment with mana value X.
@@ -10,7 +9,7 @@ let amount_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_0 = 
 for player in players_0 { g.draw(player, amount_0); }
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (((q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Enchantment)) && (i64::from(q.mana_value(id))) == (planned_value!("numeric expression EventActivationX", 0i64 => q.event_activation_x(item)))))) }
+#[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (((q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Enchantment)) && (i64::from(q.mana_value(id))) == (q.state().stack.iter().chain(q.state().left_stack.iter()).rev().find(|i| i.kind == StackKind::Activated && q.obj(i.object).became == Some(asker.source)).map_or(0i64, |i| i64::from(i.x)))))) }
 static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target_0).between(0, 1)];
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Cycled { card, player } = event { let id = *card; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && true && id == asker.source { return Some(Fired { subject, data }); } }
  None }

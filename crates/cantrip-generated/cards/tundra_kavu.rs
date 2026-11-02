@@ -1,5 +1,6 @@
 // Tundra Kavu
-// status: ready
+// status: planned
+// requires: engine: no resolving effect sets land types
 // {T}: Target land becomes a Plains or an Island until end of turn.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Land))) }
@@ -9,7 +10,7 @@ let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let choices_0 = vec![Subtype::Plains, Subtype::Island]; let Answer::Subtype(chosen_0) = g.ask(player_0, RequestKind::ChooseSubtype { source: asker.source, choices: choices_0, purpose: WordUse::Chosen })? else { return Ok(()) };
 g.end_sentence();
 let objects_1 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let duration_1 = Duration::EndOfTurn;
-let kind_1_0_0 = { let q: &dyn Query = g; EffectKind::AddSubtype(chosen_0) };
+let kind_1_0_0 = { let q: &dyn Query = g; planned_value!("engine: no resolving effect sets land types", EffectKind::Pump(0, 0) => EffectKind::SetLandType(chosen_0)) };
 if let Some(source) = source_1 { cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.add_effect(source, object, kind_1_0_0, duration_1);  } }); }
 g.end_sentence();
  Ok(()) }

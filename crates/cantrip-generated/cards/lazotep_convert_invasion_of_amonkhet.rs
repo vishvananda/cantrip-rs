@@ -1,6 +1,5 @@
 // Lazotep Convert // Invasion of Amonkhet
-// status: planned
-// requires: copy exception AddColor
+// status: ready
 // You may have this creature enter as a copy of any creature card in a graveyard, except it's a 4/4 black Zombie in addition to its other colors and types.
 // (As a Siege enters, choose an opponent to protect it. You and others can attack it. When it's defeated, exile it, then cast it transformed.)
 // When this Siege enters, each player mills three cards, then each opponent discards a card and you draw a card. (To mill three cards, a player puts the top three cards of their library into their graveyard.)
@@ -10,7 +9,7 @@
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let amount_0 = { let q: &dyn Query = g; (3i64).max(0) as u32 }; let mills_0: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_0)).collect(); let milled_0 = g.mill_together(&mills_0);
 g.end_sentence();
-let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }; let mut cards_1 = Vec::new(); for player in players_1 { cards_1.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_1)?); } let discarded_1 = g.discard_together(&cards_1);
+let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_1 = Vec::new(); for player in g.state().apnap().filter(|p| players_1.contains(p)).collect::<Vec<PlayerId>>() { cards_1.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_1)?); } let discarded_1 = g.discard_together(&cards_1);
 g.end_sentence();
 let amount_2 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_2 { g.draw(player, amount_2); }
@@ -22,7 +21,7 @@ pub static EXTRA: &[&CardDef] = &[];
 pub mod back {
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); const ASK_0: Question = Question::new("CopyAsEnters", "enter as a copy?", "You choose what it copies next. If you don't, it enters as itself", "Choose a copy", "Enter as itself"); let candidates_0: Vec<ObjectId> = ({ let q: &dyn Query = g; ((q.state().apnap().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>() }).into_iter().filter(|&id| id != entering.object).collect(); if let Some(chosen_0) = cantrip_mechanics::copy::choose_copy_of_one_of(g, entering, &candidates_0, &ASK_0)? {
-entering.copy = { let q: &dyn Query = g; Some(chosen_0).map(|original: ObjectId| planned_value!("copy exception AddColor", q.copiable_values(original).sized(4, 4) => q.copiable_values(original).sized(4, 4).with_colors(&[Color::Black])).with_subtype(Subtype::Zombie)) }; let picked_0 = vec![chosen_0];
+entering.copy = { let q: &dyn Query = g; Some(chosen_0).map(|original: ObjectId| { let plain = q.copiable_values(original).sized(4, 4); let had = plain.colors.unwrap_or(q.card(plain.card).colors()); plain.colored([Color::Black].into_iter().fold(had, |set: ColorSet, color: Color| set.with(q.words(asker.source).color(color)))) }.with_subtype(q.words(asker.source).subtype(Subtype::Zombie))) }; let picked_0 = vec![chosen_0];
 }
  Ok(()) }
 

@@ -1,13 +1,13 @@
 // Kambal, Profiteering Mayor
 // status: planned
-// requires: adjusted token copy
+// requires: tapped token copies of several objects at once
 // Whenever one or more tokens your opponents control enter, for each of them, create a tapped token that's a copy of it. This ability triggers only once each turn.
 // Whenever one or more tokens you control enter, each opponent loses 1 life and you gain 1 life.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && (q.state().obj(id).token && (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&q.controller(id))) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let created_0: Vec<ObjectId> = planned_value!("adjusted token copy", Vec::<ObjectId>::new() => cantrip_mechanics::tokens::create(g, asker, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[({ let q: &dyn Query = g; (1i64).max(0) as u32 }, TokenRecipe::CopyEach({ let q: &dyn Query = g; q.event_objects(item).to_vec() }, &[TokenCopyEffects::NoTokenCopyEffects]))], Arrival { tapped: true, counters: &[], states: &[] })?);
+planned!("tapped-token-copies-of-several-objects-at-once", CreateTokens, "entry" = "{\"counters\":[],\"states\":[],\"tapped\":true}", "players" = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, "tokens" = "[{\"amount\":{\"args\":1,\"kind\":\"Constant\"},\"recipe\":{\"CopyEach\":{\"adjustments\":[{\"args\":{\"family\":\"TokenCopyEffects\",\"form\":\"NoTokenCopyEffects\",\"operands\":[]},\"kind\":\"Term\"}],\"objects\":{\"kind\":\"EventGroup\"}}},\"words\":\"CreatingEffect\"}]");
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && (q.state().obj(id).token && Some(asker.controller) == Some(q.controller(id))) { return Some(Fired { subject, data }); } }

@@ -6,7 +6,7 @@
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0).between(0, cantrip_api::TargetSpec::ANY_NUMBER)];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let amount_0 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| Some(asker.controller) == Some(q.controller(id))).collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.mana_value(o))).max().unwrap_or(0)).clamp(0, 2147483647) as i32 }; let players_0 = { let q: &dyn Query = g; t_0.iter().filter_map(|t| t.player()).collect::<Vec<PlayerId>>() };
+let amount_0 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| Some(asker.controller) == Some(q.controller(id))).collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.mana_value(o))).max().unwrap_or(0)).clamp(0, 2147483647) as i32 }; let players_0 = { let q: &dyn Query = g; q.state().apnap().filter(|&p| t_0.iter().any(|t| t.player() == Some(p))).collect::<Vec<PlayerId>>() };
 for player in players_0 { g.gain_life(player, amount_0); }
 g.end_sentence();
  Ok(()) }

@@ -1,6 +1,5 @@
 // Visions of Phyrexia
-// status: planned
-// requires: condition PlayerDid PlayedFromExile
+// status: ready
 // At the beginning of your upkeep, exile the top card of your library. You may play that card this turn.
 // At the beginning of your end step, if you didn't play a card from exile this turn, create a tapped Powerstone token. (It's an artifact with "{T}: Add {C}. This mana can't be spent to cast a nonartifact spell.")
 #[allow(unused_imports)] use cantrip_api::*;
@@ -12,7 +11,7 @@ g.end_sentence();
 let cards_1_0 = { let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_1_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_1_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_1_0 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::EndOfTurn, ..PlayGrant::CAST }); } } } });
 g.end_sentence();
  Ok(()) }
-fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { !(planned_value!("condition PlayerDid PlayedFromExile", false => q.player_did(q.history().this_turn().iter(), Some(asker.controller), PlayerDeed::PlayedFromExile(|q: &dyn Query, asker: &Asker, id: ObjectId| true)))) }
+fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { !(q.history().this_turn().iter().any(|r| matches!(r.event, Event::LandPlayed { land, player, .. } if Some(player) == Some(asker.controller) && q.history().all().iter().any(|m| matches!(m.event, Event::ZoneChange { new, from, .. } if new == land && from.is(ZoneKind::Exile)))) || matches!(r.event, Event::Cast(c) if Some(c.player) == Some(asker.controller) && c.from == ZoneKind::Exile))) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::End) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 pub mod token_3 {

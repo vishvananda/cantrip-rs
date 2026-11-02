@@ -29,14 +29,14 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mu
 let mut hoisted_7: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let mut runs_0: u32 = { let q: &dyn Query = g; (3i64).max(0) as u32 }; while runs_0 > 0 { runs_0 -= 1; let mut again_0 = false;
-let mut paid_1 = false; for bound_1000002 in { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() } {
+let mut paid_1 = false; let mut who_1: Option<PlayerId> = None; for bound_1000002 in { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() } {
 let payer_3 = { let q: &dyn Query = g; Some(bound_1000002).expect("a reference that always names a player") };
 let paid_3 = cantrip_mechanics::effects::ask_may(g, payer_3, asker.source, Purpose::Optional)?; if paid_3 {
 let amount_4 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_4 { g.draw(player, amount_4); }
 g.end_sentence();
 }
-if paid_3 { paid_1 = true; break; } }
+if paid_3 { paid_1 = true; who_1 = Some(bound_1000002); break; } }
 g.end_sentence();
 if { let q: &dyn Query = g; !(((paid_1 as i64) != 0)) } {
 let players_5 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_5 = Vec::new();

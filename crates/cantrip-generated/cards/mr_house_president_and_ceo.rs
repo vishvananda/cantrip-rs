@@ -1,7 +1,6 @@
 // Mr. House, President and CEO
 // status: planned
 // requires: keyword action RollDie(6) with an amount
-// requires: mixed token text origins in one creation batch
 // Whenever you roll a 4 or higher, create a 3/3 colorless Robot artifact creature token. If you rolled 6 or higher, instead create that token and a Treasure token.
 // {4}, {T}: Roll a six-sided die plus an additional six-sided die for each mana from Treasures spent to activate this ability.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -45,7 +44,7 @@ for player in players_0 {
 tokens_0.extend(std::iter::repeat((def_0_0,player)).take(count_0_0 as usize));
 tokens_0.extend(std::iter::repeat((def_0_1,player)).take(count_0_1 as usize));
 } let words_0 = g.words(asker.source);
-let created_0 = planned_value!("mixed token text origins in one creation batch", g.create_tokens_worded(&tokens_0, false, None, words_0)? => g.create_tokens_each_worded(&tokens_0, false, None, &[(def_0_0, g.words(asker.source)), (def_0_1, Words::NONE)])?);
+let created_0 = g.create_tokens_worded(&tokens_0, false, None, words_0)?;
 g.end_sentence();
 hoisted_3.extend(created_0.clone());
 } else {

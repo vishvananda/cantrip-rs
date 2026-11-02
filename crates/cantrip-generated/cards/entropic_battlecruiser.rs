@@ -31,7 +31,7 @@ let mut players_3: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controlle
 let mut each_6: Vec<Vec<ObjectId>> = vec![Vec::new(); players_3.len()]; let mut all_6: Vec<ObjectId> = Vec::new();
 let mut each_7: Vec<Vec<ObjectId>> = vec![Vec::new(); players_3.len()]; let mut all_7: Vec<ObjectId> = Vec::new();
 let mut each_8 = vec![Default::default(); players_3.len()];
- for (index_3, bound_0) in players_3.iter().copied().enumerate() { let amount_5 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_5 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_5 = Vec::new(); for player in players_5 { cards_5.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_5)?); } let discarded_5 = g.discard_together(&cards_5);
+ for (index_3, bound_0) in players_3.iter().copied().enumerate() { let amount_5 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_5: Vec<PlayerId> = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_5 = Vec::new(); for player in players_5 { cards_5.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_5)?); } let discarded_5 = g.discard_together(&cards_5);
 let paid_4 = !discarded_5.clone().is_empty();
  each_6[index_3] = discarded_5.clone(); all_6.extend(each_6[index_3].iter().copied());
 each_7[index_3] = { let q: &dyn Query = g; discarded_5.clone() }; all_7.extend(each_7[index_3].iter().copied());

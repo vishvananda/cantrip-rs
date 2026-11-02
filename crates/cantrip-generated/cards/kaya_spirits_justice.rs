@@ -1,6 +1,5 @@
 // Kaya, Spirits' Justice
-// status: planned
-// requires: target cardinality PerPlayer
+// status: ready
 // Whenever one or more creatures you control and/or creature cards in your graveyard are put into exile, you may choose a creature card from among them. Until end of turn, target token you control becomes a copy of it, except it has flying.
 // [+2]: Surveil 2, then exile a card from a graveyard.
 // [+1]: Create a 1/1 white and black Spirit creature token with flying.
@@ -50,8 +49,8 @@ let created_6 = g.create_tokens_worded(&tokens_6, false, None, words_6)?;
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_3_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id))))) }
-#[allow(unused_variables)] fn ability_3_target_1(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if planned_value!("target cardinality PerPlayer", true => cantrip_mechanics::targets::controlled_by_slot_player(q, id))) && (matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature)))) }
-static ABILITY_3_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_3_target_0),target(ability_3_target_1).between(0, planned_value!("target cardinality PerPlayer", 1u32 => TargetSpec::EACH_PLAYER))];
+#[allow(unused_variables)] fn ability_3_target_1(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::controlled_by_slot_opponent(q, id)) && (matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature)))) }
+static ABILITY_3_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_3_target_0),target(ability_3_target_1).between(0, TargetSpec::EACH_OPPONENT)];
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let t_1_raw = announced(g, item, 1, false); let t_1 = announced(g, item, 1, true);

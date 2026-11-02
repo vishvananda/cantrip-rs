@@ -1,6 +1,5 @@
 // Havengul Mystery // Havengul Laboratory
-// status: planned
-// requires: object filter MadeBy
+// status: ready
 // When this land transforms into Havengul Mystery, return target creature card from your graveyard to the battlefield.
 // When the creature put onto the battlefield with Havengul Mystery leaves the battlefield, transform Havengul Mystery.
 // {T}, Pay 1 life: Add {B}.
@@ -39,7 +38,7 @@ let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a referen
 let objects_0 = ({ let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_0 = { let rows_0: Vec<(ObjectId, PlayerId, bool)> = objects_0.iter().map(|&o| (o, player_0, false)).collect(); let came_0 = g.put_all_onto_battlefield_as(&rows_0)?; came_0.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if from.is(ZoneKind::Battlefield) && planned_value!("object filter MadeBy", false => q.state().obj(id).made_by == Some(asker.source)) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if from.is(ZoneKind::Battlefield) && Some(asker.source).is_some_and(|m: ObjectId| q.state().obj(id).entered_with == Some(m) || q.history().all().iter().any(|r| matches!(r.event, Event::Entered { permanent, .. } if permanent == id) && (r.cause == Cause::Spell(m) || matches!(r.cause, Cause::Ability { source, .. } if source == m)))) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 if let Some(object) = ({ let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied() { g.transform_by(object, item)?; }

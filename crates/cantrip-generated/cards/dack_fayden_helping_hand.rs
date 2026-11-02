@@ -15,7 +15,7 @@ let objects_3 = { let q: &dyn Query = g; (moved_1.clone()).into_iter().filter(|&
 g.end_sentence();
 let mut players_4: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
 let mut each_6: Vec<Vec<ObjectId>> = vec![Vec::new(); players_4.len()]; let mut all_6: Vec<ObjectId> = Vec::new();
- for (index_4, bound_0) in players_4.iter().copied().enumerate() { let selected_5_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_5_candidates = { let q: &dyn Query = g; moved_1.clone() }; let selected_5_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let selected_5 = { cantrip_mechanics::choose::select(g, selected_5_player, asker.source, Purpose::ChooseAsEnters, selected_5_candidates, cantrip_mechanics::select::Selection::of(selected_5_count, &[]))? };
+ for (index_4, _) in players_4.iter().copied().enumerate() { let selected_5_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_5_candidates = { let q: &dyn Query = g; moved_1.clone() }; let selected_5_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let selected_5 = { cantrip_mechanics::choose::select(g, selected_5_player, asker.source, Purpose::ChooseAsEnters, selected_5_candidates, cantrip_mechanics::select::Selection::of(selected_5_count, &[]))? };
  each_6[index_4] = selected_5.clone(); all_6.extend(each_6[index_4].iter().copied());
    } 
 g.end_sentence();

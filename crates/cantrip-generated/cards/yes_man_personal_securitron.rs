@@ -1,6 +1,5 @@
 // Yes Man, Personal Securitron
 // status: planned
-// requires: operation GiveControl
 // requires: operation WithReflexive
 // {T}: Target opponent gains control of Yes Man. When they do, you draw two cards and put a quest counter on Yes Man. Activate only during your turn.
 // Wild Card — When Yes Man leaves the battlefield, its owner creates a tapped 1/1 white Soldier creature token for each quest counter on it.
@@ -10,7 +9,7 @@ static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_5: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-planned!("operation-give-control" => cantrip_mechanics::control::give(g, asker.source, { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() }, { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }, None));
+let players_2: Vec<PlayerId> = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() }; let objects_2 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let who_2 = match players_2.as_slice() { [one] => Some(*one), _ => cantrip_mechanics::choose::player(g, asker.controller, asker.source, players_2.clone(), "GainControl", 0)? }; if let Some(who) = who_2 { cantrip_api::instruction(g, |g| { for &object in &objects_2 { g.gain_control(asker.source, object, who, Duration::Indefinite); } }); }
 planned!("operation-with-reflexive" => cantrip_mechanics::delayed::reflexive_on(g, item, ReflexiveWhen::YouDo, |g: &mut dyn Game| -> Result<(), Suspend> { let amount_3 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_3 { g.draw(player, amount_3); }
 g.end_sentence();

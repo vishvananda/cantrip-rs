@@ -1,12 +1,11 @@
 // Crystalline Giant
-// status: planned
-// requires: operation PutChosenCounters
+// status: ready
 // At the beginning of combat on your turn, choose a kind of counter at random that this creature doesn't have on it from among flying, first strike, deathtouch, hexproof, lifelink, menace, reach, trample, vigilance, and +1/+1. Put a counter of that kind on this creature.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::BeginCombat) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-put-chosen-counters" => cantrip_mechanics::counters::chosen(g, asker, { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }, "RandomMissing([Named(FlyingCounter), Named(FirstStrikeCounter), Named(DeathtouchCounter), Named(HexproofCounter), Named(LifelinkCounter), Named(MenaceCounter), Named(ReachCounter), Named(TrampleCounter), Named(VigilanceCounter), PowerToughness(1, 1)])")?);
+let objects_0 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; for object in objects_0 { let missing: Vec<CounterKind> = [CounterKind::Flying, CounterKind::FirstStrike, CounterKind::Deathtouch, CounterKind::Hexproof, CounterKind::Lifelink, CounterKind::Menace, CounterKind::Reach, CounterKind::Trample, CounterKind::Vigilance, CounterKind::PlusOne].into_iter().filter(|&kind| g.state().obj(object).counters(kind) == 0).collect(); if !missing.is_empty() { let at = g.choose_at_random(missing.len()); g.add_counters(object, missing[at], 1); } }
 g.end_sentence();
  Ok(()) }
 

@@ -1,6 +1,5 @@
 // Canoptek Wraith
-// status: planned
-// requires: cost part Sacrifice
+// status: ready
 // Wraith Form — This creature can't be blocked.
 // Transdimensional Scout — When this creature deals combat damage to a player, you may pay {3} and sacrifice it. If you do, choose a land you control. Then search your library for up to two basic land cards which have the same name as the chosen land, put them onto the battlefield tapped, then shuffle.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -11,7 +10,7 @@ let mut hoisted_7: Vec<ObjectId> = Vec::new();
 let mut hoisted_6: Vec<ObjectId> = Vec::new();
 let mut hoisted_5: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-let payer_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let paid_0 = g.may_pay(payer_0, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 3, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(planned_value!("cost part Sacrifice", Cost::NONE => Cost::sacrifices(Selection { objects: Picks::These(|q: &dyn Query, asker: &Asker| item.subject.object().into_iter().collect::<Vec<ObjectId>>()), count: Count::Each }))), &PAY_QUESTION)?;
+let payer_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let paid_0 = match { let q: &dyn Query = g; item.subject.object() } { Some(o) => g.may_pay(payer_0, o, o, (Cost::NONE.and(Cost::mana(ManaCost { generic: 3, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }))).and(SACRIFICE_THIS), &PAY_QUESTION)?, None => false };
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
 let selected_1_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_1_candidates = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Land) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }; let selected_1_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let selected_1 = { cantrip_mechanics::choose::select(g, selected_1_player, asker.source, Purpose::ChooseAsEnters, selected_1_candidates, cantrip_mechanics::select::Selection::of(selected_1_count, &[]))? };

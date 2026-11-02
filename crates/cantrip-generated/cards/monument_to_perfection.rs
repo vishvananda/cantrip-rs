@@ -1,6 +1,5 @@
 // Monument to Perfection
-// status: planned
-// requires: engine: no Toxic granted
+// status: ready
 // {3}, {T}: Search your library for a basic, Sphere, or Locus land card, reveal it, put it into your hand, then shuffle.
 // {3}: This artifact becomes a 9/9 Phyrexian Construct artifact creature, loses all abilities, and gains indestructible and toxic 9. Activate only if there are nine or more lands with different names among the basic, Sphere, and Locus lands you control.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -16,15 +15,14 @@ let objects_4 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect
 let kind_4_0_0 = { let q: &dyn Query = g; EffectKind::SetPt((9i64) as i16, (9i64) as i16) };
 let kind_4_1_0 = { let q: &dyn Query = g; EffectKind::SetCreatureType(q.words(asker.source).subtype(Subtype::Phyrexian)) };
 let kind_4_2_1 = { let q: &dyn Query = g; EffectKind::AddSubtype(q.words(asker.source).subtype(Subtype::Construct)) };
-let kind_4_3_0 = { let q: &dyn Query = g; EffectKind::SetTypes(TypeSet::of(&[CardType::Artifact, CardType::Creature])) };
+let kind_4_3_0 = { let q: &dyn Query = g; EffectKind::AddTypes(TypeSet::of(&[CardType::Artifact, CardType::Creature])) };
 let kind_4_4_0 = { let q: &dyn Query = g; EffectKind::LoseAllAbilities };
 let kind_4_5_0 = { let q: &dyn Query = g; EffectKind::AddKeywords(Keywords::of(&[Keyword::Indestructible])) };
-let kind_4_6_0 = { let q: &dyn Query = g; EffectKind::AddAbility(planned_value!("engine: no Toxic granted", AbilityRef::delayed({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, 0) => AbilityRef::granted_static({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, 0))) };
+let kind_4_6_0 = { let q: &dyn Query = g; EffectKind::Toxic(9) };
 if let Some(source) = source_4 { cantrip_api::instruction(g, |g| { for &object in &objects_4 { g.add_effect(source, object, kind_4_0_0, duration_4); g.add_effect(source, object, kind_4_1_0, duration_4); g.add_effect(source, object, kind_4_2_1, duration_4); g.add_effect(source, object, kind_4_3_0, duration_4); g.add_effect(source, object, kind_4_4_0, duration_4); g.add_effect(source, object, kind_4_5_0, duration_4); g.add_effect(source, object, kind_4_6_0, duration_4);  } }); }
 g.end_sentence();
  Ok(()) }
 fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { ({ let mut seen = Vec::new(); for id in q.state().battlefield().iter().copied().filter(|&id| (((q.chars(id).supertypes.basic || q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Sphere)) || q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Locus))) && Some(asker.controller) == Some(q.controller(id))) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() { let value = q.chars(id).name; if !seen.contains(&value) { seen.push(value); } } seen.len() as i64 }) >= (9i64) }
-planned_item!("engine-no-toxic-granted" => granted_rules: CardDef { keywords: Keywords::of(&[]), abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], enters: None, toxic: 9, ..CardDef::BLANK });
 
 pub static CARD: CardDef = CardDef { name: "Monument to Perfection", token_words: &[], oracle: true, cost: ManaCost { generic: 2, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Artifact]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[ability(Cost::NONE.and(Cost::mana(ManaCost { generic: 3, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(Cost { tap: true, ..Cost::NONE }), ability_0, "{3}, {T}: Search your library for a basic, Sphere, or Locus land card, reveal it, put it into your hand, then shuffle.").targets(&[]),ability(Cost::NONE.and(Cost::mana(ManaCost { generic: 3, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })), ability_1, "{3}: This artifact becomes a 9/9 Phyrexian Construct artifact creature, loses all abilities, and gains indestructible and toxic 9. Activate only if there are nine or more lands with different names among the basic, Sphere, and Locus lands you control.").targets(&[]).condition(ability_1_if)], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

@@ -1,6 +1,5 @@
 // Memory of Toshiro // Life of Toshiro Umezawa
-// status: planned
-// requires: modal announcement
+// status: ready
 // {T}, Pay 1 life: Add {B}. Spend this mana only to cast an instant or sorcery spell.
 // (As this Saga enters and after your draw step, add a lore counter.)
 // I, II — Choose one —
@@ -70,7 +69,7 @@ g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
 
-pub static CARD: CardDef = CardDef { name: "Life of Toshiro Umezawa", token_words: &[], oracle: true, cost: ManaCost { generic: 1, x: 0, symbols: [0, 0, 1, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Enchantment]), subtypes: SubtypeSet::of(&[Subtype::Saga]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[planned_value!("modal announcement", chapter(1, ability_0_0, "I, II — Choose one —").targets(&[]) => chapter(1, ability_0_0, "I, II — Choose one —").targets(&[]).modes(&ABILITY_0_0_MODES_MODES)),planned_value!("modal announcement", chapter(2, ability_0_1, "I, II — Choose one —").targets(&[]) => chapter(2, ability_0_1, "I, II — Choose one —").targets(&[]).modes(&ABILITY_0_1_MODES_MODES)),chapter(3, ability_0_2, "III — Exile this Saga, then return it to the battlefield transformed under your control.").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, back: Some(&back::CARD), ..CardDef::BLANK };
+pub static CARD: CardDef = CardDef { name: "Life of Toshiro Umezawa", token_words: &[], oracle: true, cost: ManaCost { generic: 1, x: 0, symbols: [0, 0, 1, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Enchantment]), subtypes: SubtypeSet::of(&[Subtype::Saga]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[chapter(1, ability_0_0, "I, II — Choose one —").targets(&[]).modal(&ABILITY_0_0_MODES_MODES),chapter(2, ability_0_1, "I, II — Choose one —").targets(&[]).modal(&ABILITY_0_1_MODES_MODES),chapter(3, ability_0_2, "III — Exile this Saga, then return it to the battlefield transformed under your control.").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, back: Some(&back::CARD), ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];
 pub mod back {
 #[allow(unused_imports)] use cantrip_api::*;

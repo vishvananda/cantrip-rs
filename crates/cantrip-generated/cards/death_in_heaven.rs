@@ -1,6 +1,6 @@
 // Death in Heaven
 // status: planned
-// requires: operation ChangeZone
+// requires: put onto the battlefield face down as a stated creature
 // (As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)
 // I, II — Target player mills two cards, then exiles their graveyard.
 // III — Put all creature cards exiled with this enchantment onto the battlefield face down under your control. They're 2/2 Cyberman artifact creatures.
@@ -24,7 +24,7 @@ let objects_3 = { let q: &dyn Query = g; ((q.state().apnap().collect::<Vec<Playe
 g.end_sentence();
  Ok(()) }
 fn ability_0_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let moved_4: Vec<ObjectId> = planned_value!("operation ChangeZone", Vec::<ObjectId>::new() => cantrip_mechanics::enter::change_zone(g, asker, ZoneChange { actor: { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, cards: { let q: &dyn Query = g; ((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (q.chars(id).is(CardType::Creature) && q.exiled_with(q.linked_to(asker)).contains(&id))).collect::<Vec<ObjectId>>() }, count: None, random: false, group: None, destination: Destination::OwnersBattlefield, entry: &[], face_down: Some(FaceDownAs { shape: PT::PT(2, 2), creature_type: Some(CreatureType::Cyberman), artifact: true }) })?);
+let moved_4: Vec<ObjectId> = planned_value!("put onto the battlefield face down as a stated creature", Vec::<ObjectId>::new() => cantrip_mechanics::enter::change_zone(g, asker, ZoneChange { actor: { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, cards: { let q: &dyn Query = g; ((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (q.chars(id).is(CardType::Creature) && q.exiled_with(q.linked_to(asker)).contains(&id))).collect::<Vec<ObjectId>>() }, count: None, random: false, group: None, destination: Destination::OwnersBattlefield, entry: &[], face_down: Some(FaceDownAs { shape: PT::PT(2, 2), creature_type: Some(CreatureType::Cyberman), artifact: true }) })?);
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

@@ -1,6 +1,5 @@
 // Scarwood Hag
-// status: planned
-// requires: losing ability Landwalk
+// status: ready
 // {G}{G}{G}{G}, {T}: Target creature gains forestwalk until end of turn. (It can't be blocked as long as defending player controls a Forest.)
 // {T}: Target creature loses forestwalk until end of turn.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -18,7 +17,7 @@ static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let objects_1 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let duration_1 = Duration::EndOfTurn;
-let kind_1_0_0 = { let q: &dyn Query = g; planned_value!("losing ability Landwalk", EffectKind::Pump(0, 0) => EffectKind::LosesAbility(Lost::Landwalk(Subtype::Forest))) };
+let kind_1_0_0 = { let q: &dyn Query = g; EffectKind::LoseKeywords(Keywords::of(&[Keyword::Forestwalk])) };
 if let Some(source) = source_1 { cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.add_effect(source, object, kind_1_0_0, duration_1);  } }); }
 g.end_sentence();
  Ok(()) }

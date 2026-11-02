@@ -12,6 +12,7 @@ let copier_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a referen
 if let Some(spell) = spell_1 { g.copy_spell(spell, copier_1, true)?; }
 g.end_sentence();
 let amount_2 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+let drawing_2: Vec<PlayerId> = players_2.into_iter().collect(); let players_2: Vec<PlayerId> = g.state().apnap().filter(|p| drawing_2.contains(p)).collect();
 for player in players_2 { g.draw(player, amount_2); }
 g.end_sentence();
 } else {

@@ -34,7 +34,7 @@ let mut hoisted_7: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let payer_5 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
 let paid_5 = cantrip_mechanics::effects::ask_may(g, payer_5, asker.source, Purpose::Optional)?; if paid_5 {
-let amount_6 = { let q: &dyn Query = g; ((((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }; let players_6 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_6 = Vec::new(); for player in players_6 { cards_6.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_6)?); } let discarded_6 = g.discard_together(&cards_6);
+let players_6 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_6 = Vec::new(); for player in players_6 { cards_6.extend(g.state().zone(Zone::hand(player)).to_vec()); } let discarded_6 = g.discard_together(&cards_6);
 g.end_sentence();
 hoisted_7.extend(discarded_6.clone());
 hoisted_8.extend({ let q: &dyn Query = g; discarded_6.clone() });

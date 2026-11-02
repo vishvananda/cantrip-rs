@@ -1,7 +1,5 @@
 // Nebuchadnezzar
-// status: planned
-// requires: earlier objects Revealed
-// requires: operation Together
+// status: ready
 // {X}, {T}: Choose a card name. Target opponent reveals X cards at random from their hand. Then that player discards all cards with that name revealed this way. Activate only during your turn.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Player(p) if (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&p)) }
@@ -10,12 +8,10 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let Answer::Name(Some(chosen_0)) = g.ask(player_0, RequestKind::ChooseName { source: asker.source, looked_at: Vec::new(), suggestion: None, kind: NameKind::ANY })? else { return Ok(()) };
 g.end_sentence();
-planned!("operation-together" => g.begin_simultaneous());
 let player_2 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.player()).expect("a reference that always names a player") }; let mut pool_2: Vec<ObjectId> = { let q: &dyn Query = g; q.state().zone(Zone::hand(player_2)).iter().copied().filter(|&id| true).collect::<Vec<ObjectId>>() };
 let count_2 = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as usize }; let mut shown_2: Vec<ObjectId> = Vec::new(); while shown_2.len() < count_2 && !pool_2.is_empty() { let at = g.choose_at_random(pool_2.len()); shown_2.push(pool_2.remove(at)); }
 g.reveal(player_2, &shown_2);
-let cards_3 = { let q: &dyn Query = g; (planned_value!("earlier objects Revealed", Vec::<ObjectId>::new() => q.acted_on(asker, Acted::Revealed))).into_iter().filter(|&id| Some(chosen_0).is_some_and(|chosen| cantrip_mechanics::library::object_has_name(q, id, chosen))).collect::<Vec<ObjectId>>() }; let discarded_3 = g.discard_together(&cards_3);
-planned!("operation-together" => g.end_simultaneous());
+let cards_3 = { let q: &dyn Query = g; (shown_2.clone()).into_iter().filter(|&id| Some(chosen_0).is_some_and(|chosen| cantrip_mechanics::library::object_has_name(q, id, chosen))).collect::<Vec<ObjectId>>() }; let discarded_3 = g.discard_together(&cards_3);
 g.end_sentence();
  Ok(()) }
 fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.controller) == Some(q.state().turn.active) }

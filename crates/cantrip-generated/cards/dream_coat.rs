@@ -1,15 +1,14 @@
 // Dream Coat
-// status: planned
-// requires: a choice of several values
+// status: ready
 // Enchant creature
 // {0}: Enchanted creature becomes the color or colors of your choice. Activate only once each turn.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_enchant(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let chosen_0 = planned_value!("a choice of several values", Color::White => cantrip_mechanics::choose::values(g, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, asker.source, ChoiceKind::Color, 0)?);
+let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let Answer::Colors(picked_0) = g.ask(player_0, RequestKind::ChooseColors { source: asker.source, choices: ColorSet(0b11111), count: 5, purpose: ColorUse::Any })? else { unreachable!("the core answers a color choice with colors") }; let colors_0 = picked_0.into_iter().fold(ColorSet::NONE, |set, color| set.with(color));
 g.end_sentence();
 let objects_1 = { let q: &dyn Query = g; (Some(asker.source).and_then(|o: ObjectId| q.state().obj(o).attached_to).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let duration_1 = Duration::Indefinite;
-let kind_1_0_0 = { let q: &dyn Query = g; EffectKind::SetColors(ColorSet::of(chosen_0)) };
+let kind_1_0_0 = { let q: &dyn Query = g; EffectKind::SetColors(colors_0) };
 if let Some(source) = source_1 { cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.add_effect(source, object, kind_1_0_0, duration_1);  } }); }
 g.end_sentence();
  Ok(()) }

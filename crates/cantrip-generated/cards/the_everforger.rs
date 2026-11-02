@@ -1,18 +1,15 @@
 // The Everforger
 // status: planned
 // requires: a deck rule a commander sets
-// requires: operation PlayersDo
 // Rulebreaker — A deck with this commander can have artifact creature and Equipment cards of any color identity and any basic land cards.
 // Whenever you cast an artifact creature or Equipment spell, you may copy that spell. Do this only once each turn. (The copy becomes a token.)
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && ((q.chars(id).is(CardType::Artifact) && q.chars(id).is(CardType::Creature)) || q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Equipment))) && !q.history().done(asker.source, AbilityRef { card: q.chars(asker.source).card, index: 200 }, asker.controller) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && ((q.chars(id).is(CardType::Artifact) && q.chars(id).is(CardType::Creature)) || q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Equipment))) && !q.history().this_turn().iter().any(|r| matches!(r.event, Event::Done { ability, player, .. } if ability == AbilityRef { card: q.chars(asker.source).card, index: 200 } && player == asker.controller)) { return Some(Fired { subject, data }); } }
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let decider_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if !g.history().done(asker.source, AbilityRef { card: g.chars(asker.source).card, index: 200 }, decider_1) && cantrip_mechanics::effects::ask_may(g, decider_1, asker.source, Purpose::Optional)? { g.note_done(asker.source, AbilityRef { card: g.chars(asker.source).card, index: 200 }, decider_1);
-planned!("operation-players-do" => cantrip_mechanics::players::do_this(g, asker, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, PlayersDo { any_one: false, optional: true, once_each_turn: true }, &[|g: &mut dyn Game| -> Result<(), Suspend> { let copier_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let spell_3: Option<ObjectId> = ({ let q: &dyn Query = g; (item.subject.object().into_iter().collect::<Vec<ObjectId>>()) }).first().copied();
-if let Some(spell) = spell_3 { g.copy_spell(spell, copier_3, false)?; }
-g.end_sentence();
- Ok(()) }], &[])?);
+let copier_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let spell_2: Option<ObjectId> = ({ let q: &dyn Query = g; (item.subject.object().into_iter().collect::<Vec<ObjectId>>()) }).first().copied();
+if let Some(spell) = spell_2 { g.copy_spell(spell, copier_2, false)?; }
 g.end_sentence();
 }
 g.end_sentence();

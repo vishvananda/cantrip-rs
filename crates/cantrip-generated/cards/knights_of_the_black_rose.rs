@@ -1,6 +1,5 @@
 // Knights of the Black Rose
-// status: planned
-// requires: condition PlayerDid WasMonarch
+// status: ready
 // When this creature enters, you become the monarch.
 // Whenever an opponent becomes the monarch, if you were the monarch as the turn began, that player loses 2 life and you gain 2 life.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -10,7 +9,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 { let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; g.become_monarch(player); }
 g.end_sentence();
  Ok(()) }
-fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { planned_value!("condition PlayerDid WasMonarch", false => q.player_did(q.history().this_turn().iter(), Some(asker.controller), PlayerDeed::WasMonarch)) }
+fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { q.history().all().iter().rev().find_map(|r| match r.event { Event::BecameMonarch { player } if r.turn < q.state().turn.number => Some(player), _ => None }).is_some_and(|was: PlayerId| Some(was) == Some(asker.controller)) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::BecameMonarch { player } = event { let subject = Target::Player(*player); let data = [0u32; 2]; if (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&*player) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

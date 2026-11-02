@@ -1,6 +1,5 @@
 // Praetor's Grasp
-// status: planned
-// requires: a card a player may look at for a while
+// status: ready
 // Search target opponent's library for a card and exile it face down. Then that player shuffles. You may play that card for as long as it remains exiled.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Player(p) if (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&p)) }
@@ -11,7 +10,7 @@ let searcher_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a refer
 let objects_1 = { let q: &dyn Query = g; found_0.clone() }; let by_1 = None; let moved_1 = g.exile_face_down(&objects_1, by_1);
 for player in { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() } { g.shuffle(player); }
 g.end_sentence();
-planned!("a-card-a-player-may-look-at-for-a-while" => let cards_3_0 = { let q: &dyn Query = g; (moved_1.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_3_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &card in &cards_3_0 { for &player in &players_3_0 { g.allow_look(card, player, Expiry::Never); } });
+let cards_3_0 = { let q: &dyn Query = g; (moved_1.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_3_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &player in &players_3_0 { g.look_at(player, &cards_3_0); }
 let cards_3_1 = { let q: &dyn Query = g; (moved_1.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_3_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_3_1 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_3_1 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::Never, ..PlayGrant::CAST }); } } } });
 g.end_sentence();
  Ok(()) }

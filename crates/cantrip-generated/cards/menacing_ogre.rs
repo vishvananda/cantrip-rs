@@ -1,8 +1,8 @@
 // Menacing Ogre
 // status: planned
+// requires: a value chosen in secret
 // requires: condition ChoseExtreme
 // requires: numeric expression PlayerNumber ChosenNumber
-// requires: operation ChooseValueWith
 // requires: operation RevealChoices
 // Trample, haste
 // When this creature enters, each player secretly chooses a number. Then those numbers are revealed. Each player with the highest number loses that much life. If you are one of those players, put two +1/+1 counters on this creature.
@@ -13,8 +13,10 @@ fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mu
 let asker = &Asker::new(item.object, item.controller);
 let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
 let mut each_2 = vec![Default::default(); players_0.len()];
- for (index_0, bound_0) in players_0.iter().copied().enumerate() { let chosen_1 = planned_value!("operation ChooseValueWith", 0u32 => cantrip_mechanics::choose::value(g, { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() }, asker.source, ChoiceKind::Number, ChoiceTerms { options: &[], except: &[], count: None, secret: true, unchosen: false, random: false, ordered: false, up_to: false })?);
+let mut each_chosen_1 = Vec::new();
+ for (index_0, bound_0) in players_0.iter().copied().enumerate() { let chosen_1 = planned_value!("a value chosen in secret", 0u32 => cantrip_mechanics::choose::value(g, { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() }, asker.source, ChoiceKind::Number, ChoiceTerms { options: &[], except: &[], count: None, secret: true, unchosen: false, random: false, ordered: false, up_to: false })?);
  each_2[index_0] = i64::from(chosen_1);
+each_chosen_1.push(chosen_1);
    } 
 g.end_sentence();
 planned!("operation-reveal-choices" => cantrip_mechanics::secret::reveal_choices(g, asker.source, ChoiceKind::Number));

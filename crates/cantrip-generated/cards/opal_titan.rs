@@ -1,6 +1,5 @@
 // Opal Titan
-// status: planned
-// requires: engine: no protection from this quality
+// status: ready
 // When an opponent casts a creature spell, if this permanent is an enchantment, it becomes a 4/4 Giant creature with protection from each of that spell's colors.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.source).is_some_and(|candidate: ObjectId| q.chars(candidate).is(CardType::Enchantment)) }
@@ -11,7 +10,7 @@ let objects_0 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect
 let kind_0_0_0 = { let q: &dyn Query = g; EffectKind::SetPt((4i64) as i16, (4i64) as i16) };
 let kind_0_1_0 = { let q: &dyn Query = g; EffectKind::SetCreatureType(q.words(asker.source).subtype(Subtype::Giant)) };
 let kind_0_2_0 = { let q: &dyn Query = g; EffectKind::SetTypes(TypeSet::of(&[CardType::Creature])) };
-let kind_0_3_0 = { let q: &dyn Query = g; planned_value!("engine: no protection from this quality", EffectKind::Pump(0, 0) => EffectKind::ProtectionFrom(ProtectionQuality::Matching(|q, asker, id| item.subject.object().is_some_and(|o: ObjectId| q.chars(o).colors.intersects(q.chars(id).colors))))) };
+let kind_0_3_0 = { let q: &dyn Query = g; EffectKind::Protection(item.subject.object().map_or(ColorSet::NONE, |o: ObjectId| q.chars(o).colors)) };
 if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &object in &objects_0 { g.add_effect(source, object, kind_0_0_0, duration_0); g.add_effect(source, object, kind_0_1_0, duration_0); g.add_effect(source, object, kind_0_2_0, duration_0); g.add_effect(source, object, kind_0_3_0, duration_0);  } }); }
 g.end_sentence();
  Ok(()) }

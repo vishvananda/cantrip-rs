@@ -1,6 +1,5 @@
 // Bronzehide Lion
-// status: planned
-// requires: move arrival state
+// status: ready
 // {G}{W}: This creature gains indestructible until end of turn.
 // When this creature dies, return it to the battlefield. It's an Aura enchantment with enchant creature you control and "{G}{W}: Enchanted creature gains indestructible until end of turn," and it loses all other abilities.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -19,8 +18,10 @@ let kind_4_0_0 = { let q: &dyn Query = g; EffectKind::AddKeywords(Keywords::of(&
 if let Some(source) = source_4 { cantrip_api::instruction(g, |g| { for &object in &objects_4 { g.add_effect(source, object, kind_4_0_0, duration_4);  } }); }
 g.end_sentence();
  Ok(()) }
+static ENTERS_1: EntersAs = EntersAs { types: Some(TypeSet::of(&[CardType::Enchantment])), aura: true, loses_other_abilities: true, abilities: &[0], ..EntersAs::NONE };
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let objects_1: Vec<ObjectId> = { let q: &dyn Query = g; ((Some(ObjectId(item.data[0])).filter(|o| *o != ObjectId::NONE).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Graveyard).collect::<Vec<ObjectId>>()).get(0).copied().into_iter().collect::<Vec<ObjectId>>() }; let moved_1: Vec<ObjectId> = planned_value!("move arrival state", Vec::<ObjectId>::new() => cantrip_mechanics::enter::in_state(g, asker, &objects_1, Destination::Battlefield({ let q: &dyn Query = g; Some(asker.controller) }), Arrival { tapped: false, counters: &[], states: &[ArrivalState::Changes(&[EffectKind::SetTypes(TypeSet::of(&[CardType::Enchantment])), EffectKind::AddSubtype(Subtype::Aura), EffectKind::LoseAllAbilities, EffectKind::Enchant({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }), EffectKind::AddAbility(AbilityRef::delayed({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, 0))])] }, false)?);
+let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
+let objects_1 = ({ let q: &dyn Query = g; ((Some(ObjectId(item.data[0])).filter(|o| *o != ObjectId::NONE).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Graveyard).collect::<Vec<ObjectId>>()).get(0).copied().into_iter().collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_1 = { let rows: Vec<(ObjectId, PlayerId)> = objects_1.iter().map(|&o| (o, player_1)).collect(); let counters: Vec<(CounterKind, i16)> = vec![]; g.put_all_onto_battlefield_becoming(&rows, item, &ENTERS_1, &counters)? };
 g.end_sentence();
  Ok(()) }
 

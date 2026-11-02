@@ -1,7 +1,6 @@
 // I Bask in Your Silent Awe
 // status: planned
 // requires: card type Scheme
-// requires: history window SinceLastTurnOf
 // requires: layout Scheme
 // requires: operation AbandonScheme
 // requires: supertype Ongoing
@@ -10,7 +9,7 @@
 // At the beginning of your upkeep, if no opponent cast a spell since your last turn ended, abandon this scheme.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_0_rule(q: &dyn Query, asker: &Asker, player: PlayerId, spell: ObjectId) -> bool { !(player != asker.controller && true && q.history().casts_by(player).filter(|c| c.spell != spell && true).count() >= 1) }
-fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { (({ let mut all = Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>(); let other = q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("history window SinceLastTurnOf", q.history().all().iter() => cantrip_mechanics::history::since_last_turn_of(q, Some(asker.controller)).iter()).filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(bound_0) == Some(*player) && true { return Some(Fired { subject, data }); } }  None }).next().is_some()).collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all }).len() as i64) == (0i64) }
+fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { (({ let mut all = Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>(); let other = q.state().apnap().filter(|&bound_0: &PlayerId| { let history = q.history(); history.all()[history.all().iter().rposition(|r| Some(r.active) == Some(asker.controller) && r.turn != history.turn).map_or(0, |at| at + 1)..].iter() }.filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(bound_0) == Some(*player) && true { return Some(Fired { subject, data }); } }  None }).next().is_some()).collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all }).len() as i64) == (0i64) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::Upkeep) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

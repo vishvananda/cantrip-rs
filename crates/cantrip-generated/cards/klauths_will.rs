@@ -1,8 +1,6 @@
 // Klauth's Will
 // status: planned
 // requires: engine: no commander
-// requires: numeric expression AnnouncedX
-// requires: target cardinality UpTo
 // Choose one. If you control a commander as you cast this spell, you may choose both instead.
 // • Breathe Flame — Klauth's Will deals X damage to each creature without flying.
 // • Smash Relics — Destroy up to X target artifacts and/or enchantments.
@@ -11,8 +9,11 @@ fn ability_0_mode_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 let source_0 = { let q: &dyn Query = g; Some(asker.source) }; let amount_0 = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as u16 }; let recipients_0 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && !(q.chars(id).keywords.has(Keyword::Flying)))).collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() }; if let Some(source) = source_0 { let batch: Vec<(ObjectId, Target, u16)> = recipients_0.iter().map(|t| (source, *t, amount_0)).collect(); g.damage_together(&batch); }
 g.end_sentence();
  Ok(()) }
+#[allow(unused_variables)] fn ability_0_mode_1_0_up_to_most(q: &dyn Query, source: ObjectId, chooser: PlayerId, x: u32) -> usize { let asker = &Asker::new(source, chooser); (i64::from(x)).max(0) as u32 as usize }
+fn ability_0_mode_1_0_up_to(q: &dyn Query, choice: &Choice, x: u32) -> Verdict { let most = ability_0_mode_1_0_up_to_most(q, choice.source, choice.chooser, x); Verdict { complete: choice.selected.len() <= most, addable: Bits::new(choice.candidates.len(), choice.selected.len() < most) } }
+fn largest_ability_0_mode_1_0_up_to(q: &dyn Query, choice: &Choice, x: u32) -> Vec<ObjectId> { choice.candidates.iter().copied().take(ability_0_mode_1_0_up_to_most(q, choice.source, choice.chooser, x)).collect() }
 #[allow(unused_variables)] fn ability_0_mode_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Enchantment)))) }
-static ABILITY_0_MODE_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_mode_1_target_0).between(0, planned_value!("target cardinality UpTo", 1u32 => TargetSpec::read_as_chosen(|q: &dyn Query, asker: &Asker| (planned_value!("numeric expression AnnouncedX", 0i64 => i64::from(q.announced_x().unwrap_or(0)))).max(0) as u32)))];
+static ABILITY_0_MODE_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_mode_1_target_0).between(0, cantrip_api::TargetSpec::ANY_NUMBER).together(cantrip_api::select::set_part(&(ability_0_mode_1_0_up_to as SelectFn), &(largest_ability_0_mode_1_0_up_to as cantrip_api::select::LargestFn), TargetSpec::COUNTED, "up to X"))];
 fn ability_0_mode_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let objects_1 = { let q: &dyn Query = g; t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>() }; let destroyed_1 = g.destroy_all(&objects_1);

@@ -1,6 +1,5 @@
 // Oversimplify
-// status: planned
-// requires: per-player PutCounters
+// status: ready
 // Exile all creatures. Each player creates a 0/0 green and blue Fractal creature token and puts a number of +1/+1 counters on it equal to the total power of creatures they controlled that were exiled this way.
 #[allow(unused_imports)] use cantrip_api::*;
 pub mod token_2 {
@@ -21,14 +20,12 @@ tokens_1.extend(std::iter::repeat((def_1_0,player)).take(count_1_0 as usize));
 let created_1 = g.create_tokens_worded(&tokens_1, false, None, words_1)?;
 g.end_sentence();
 let mut players_3: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
-planned!("per-player-put-counters" => g.begin_batch(););
-let mut each_5: Vec<Vec<ObjectId>> = vec![Vec::new(); players_3.len()]; let mut all_5: Vec<ObjectId> = Vec::new();
- for (index_3, bound_0) in players_3.iter().copied().enumerate() { let mut counters_4: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; (((objects_0.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(bound_0) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0))).sum::<i64>()).clamp(0, 32767) as i16 }; for t in { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (created_1.clone()).contains(&id)).collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_4.push((object, CounterKind::PlusOne, amount)); } }
-let had_4: Vec<_> = counters_4.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_4); let applied_4: Vec<ObjectId> = counters_4.iter().zip(had_4).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
- each_5[index_3] = applied_4.clone(); all_5.extend(each_5[index_3].iter().copied());
-   } 
-planned!("per-player-put-counters" => g.end_batch(););
+let mut gathered_4: Vec<(PlayerId, ObjectId, CounterKind, i16)> = Vec::new();
+ for (index_3, bound_0) in players_3.iter().copied().enumerate() { let mut counters_6: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
+let amount = { let q: &dyn Query = g; (((objects_0.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(bound_0) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0))).sum::<i64>()).clamp(0, 32767) as i16 }; for t in { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (created_1.clone()).contains(&id)).collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_6.push((object, CounterKind::PlusOne, amount)); } }
+gathered_4.extend(counters_6.iter().filter(|c| g.state().obj(c.0).controller == bound_0).map(|c| (bound_0, c.0, c.1, c.2)));
+    } 
+let had_4: Vec<_> = gathered_4.iter().map(|c| g.state().obj(c.1).counters(c.2)).collect(); g.add_counters_together_by(&gathered_4); let applied_4: Vec<ObjectId> = gathered_4.iter().zip(had_4).filter(|(c, had)| g.state().obj(c.1).counters(c.2) > *had).map(|(c, _)| c.1).collect();
 g.end_sentence();
  Ok(()) }
 

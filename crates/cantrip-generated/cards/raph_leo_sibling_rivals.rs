@@ -1,11 +1,10 @@
 // Raph & Leo, Sibling Rivals
-// status: planned
-// requires: engine: no combat phase count
+// status: ready
 // Whenever Raph & Leo attack, if it's the first combat phase of the turn, untap one or two target attacking creatures. After this phase, there is an additional combat phase.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (((q.state().attackers.iter().any(|a| a.id == id) || q.was_attacking(id)) && q.chars(id).is(CardType::Creature)))) }
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0).between(1, 2)];
-fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { planned_value!("engine: no combat phase count", false => q.state().turn.combat_phase == 1) }
+fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { ((q.state().turn.step() as u8) >= (Step::BeginCombat as u8) && (q.state().turn.step() as u8) <= (Step::EndOfCombat as u8) && q.history().this_turn().iter().filter(|r| matches!(r.event, Event::StepBegan { step: Step::BeginCombat })).count() == 1) }
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Attacks { attacker, defending, .. } = event { let id = *attacker; let subject = Target::Object(id); let data = [u32::from(defending.0), u32::MAX]; if Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

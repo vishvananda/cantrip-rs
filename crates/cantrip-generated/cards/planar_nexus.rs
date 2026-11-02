@@ -1,11 +1,10 @@
 // Planar Nexus
-// status: planned
-// requires: static change LandTypes
+// status: ready
 // This land is every nonbasic land type. (Nonbasic land types include Cave, Desert, Gate, Lair, Locus, Mine, Power-Plant, Sphere, Tower, and Urza's.)
 // {T}: Add {C}.
 // {1}, {T}: Add one mana of any color.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); planned_value!("static change LandTypes", () => chars.subtypes = chars.subtypes.union(SubtypeSet::NONBASIC_LAND_TYPES)); }
+#[allow(unused_variables)] fn ability_0_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); chars.subtypes = chars.subtypes.union(SubtypeSet::LAND_TYPES.minus(SubtypeSet::of(&[Subtype::Plains, Subtype::Island, Subtype::Swamp, Subtype::Mountain, Subtype::Forest]))); }
 fn ability_1_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let mana_players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 let mana_0_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 };
 for player in mana_players_0 {

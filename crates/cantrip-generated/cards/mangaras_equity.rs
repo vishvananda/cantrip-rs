@@ -1,11 +1,11 @@
 // Mangara's Equity
-// status: planned
-// requires: color choice ColorList
+// status: ready
 // As this enchantment enters, choose black or red.
 // At the beginning of your upkeep, sacrifice this enchantment unless you pay {1}{W}.
 // Whenever a creature of the chosen color deals damage to you or a white creature you control, this enchantment deals that much damage to that creature.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); planned!("color-choice-color-list" => cantrip_mechanics::choose::value(g, asker.source, { let q: &dyn Query = g; Target::Object(asker.source).object().map(|o: ObjectId| q.controller(o)).into_iter().collect::<Vec<PlayerId>>() }, ChoiceKind::Color, 1, &[ChoosableColor::ColorList(Color::Black, Color::Red)])?);
+#[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let player_0 = entering.controller; let Answer::Colors(colors_0) = g.ask(player_0, RequestKind::ChooseColors { source: entering.object, choices: ColorSet(12), count: 1, purpose: ColorUse::Any })? else { return Ok(()) }; let chosen_0 = colors_0[0];
+entering.chosen_color = Some(chosen_0);
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::Upkeep) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }

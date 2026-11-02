@@ -1,6 +1,5 @@
 // Invert Polarity
-// status: planned
-// requires: operation TakeSpell
+// status: ready
 // Choose target spell, then flip a coin. If you win the flip, gain control of that spell and you may choose new targets for it. If you lose the flip, counter that spell.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Stack) && (true)) }
@@ -9,7 +8,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let flip_0 = g.flip_coin(player_0);
 if { let q: &dyn Query = g; flip_0 } {
-planned!("operation-take-spell" => if let Some(spell) = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) } { g.change_controller(spell, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }); cantrip_mechanics::copy::retarget(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, spell, NewTargets::May)?; });
+let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if let Some(spell) = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) } { g.change_controller(spell, player_1); g.choose_new_targets(spell, player_1)?; }
 g.end_sentence();
 } else {
 let objects_2 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; cantrip_api::instruction(g, |g| { for spell in objects_2 { g.counter(spell); } });

@@ -1,6 +1,5 @@
 // Arcane Artisan
-// status: planned
-// requires: object filter MadeBy
+// status: ready
 // {2}{U}, {T}: Target player draws a card, then exiles a card from their hand. If a creature card is exiled this way, that player creates a token that's a copy of that card.
 // When this creature leaves the battlefield, exile all tokens created with it at the beginning of the next end step.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -24,7 +23,7 @@ g.end_sentence();
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if from.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn delayed_6(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let objects_7 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| planned_value!("object filter MadeBy", false => q.state().obj(id).made_by == Some(asker.source))).collect::<Vec<ObjectId>>() }; let moved_7 = g.exile_all(&objects_7);
+let objects_7 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| Some(asker.source).is_some_and(|m: ObjectId| q.state().obj(id).entered_with == Some(m) || q.history().all().iter().any(|r| matches!(r.event, Event::Entered { permanent, .. } if permanent == id) && (r.cause == Cause::Spell(m) || matches!(r.cause, Cause::Ability { source, .. } if source == m))))).collect::<Vec<ObjectId>>() }; let moved_7 = g.exile_all(&objects_7);
 g.end_sentence();
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

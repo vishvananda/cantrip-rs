@@ -1,14 +1,17 @@
 // Selective Obliteration
-// status: planned
-// requires: object filter ChosenBy
+// status: ready
 // Each player chooses a color. Then exile each permanent unless it's colorless or it's only the color its controller chose.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
+let mut each_chosen_1 = Vec::new();
+let mut each_chosen_1_who: Vec<PlayerId> = Vec::new();
  for (index_0, bound_0) in players_0.iter().copied().enumerate() { let player_1 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; let Answer::Colors(colors_1) = g.ask(player_1, RequestKind::ChooseColors { source: asker.source, choices: ColorSet(31), count: 1, purpose: ColorUse::Any })? else { return Ok(()) }; let chosen_1 = colors_1[0];
-    } 
+ each_chosen_1.push(chosen_1);
+each_chosen_1_who.push(bound_0);
+   } 
 g.end_sentence();
-let objects_2 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| ((q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Battle) || q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Enchantment) || q.chars(id).is(CardType::Land) || q.chars(id).is(CardType::Planeswalker)) && !((q.chars(id).colors.is_empty() || ((q.chars(id).colors.iter().count() as i64) == (1i64) && planned_value!("object filter ChosenBy", false => Some(id).map(|o: ObjectId| q.controller(o)).is_some_and(|p: PlayerId| q.chosen_by(asker, p, ChoiceKind::Color).matches(id)))))))).collect::<Vec<ObjectId>>() }; let moved_2 = g.exile_all(&objects_2);
+let objects_2 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| ((q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Battle) || q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Enchantment) || q.chars(id).is(CardType::Land) || q.chars(id).is(CardType::Planeswalker)) && !((q.chars(id).colors.is_empty() || ((q.chars(id).colors.iter().count() as i64) == (1i64) && each_chosen_1.iter().zip(&each_chosen_1_who).any(|(&chosen, &who)| Some(who) == Some(id).map(|o: ObjectId| q.controller(o)) && q.chars(id).colors.has(chosen))))))).collect::<Vec<ObjectId>>() }; let moved_2 = g.exile_all(&objects_2);
 g.end_sentence();
  Ok(()) }
 

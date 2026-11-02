@@ -1,6 +1,5 @@
 // Treasure Cove // Treasure Map
-// status: planned
-// requires: counter kind Landmark
+// status: ready
 // (Transforms from Treasure Map.)
 // {T}: Add {C}.
 // {T}, Sacrifice a Treasure: Draw a card.
@@ -25,13 +24,13 @@ let amount_0 = { let q: &dyn Query = g; (1i64).max(0) as usize }; let player_0 =
 let happened_1: bool = true;
 g.end_sentence();
 let mut counters_2: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_2.push((object, planned_value!("counter kind Landmark", CounterKind::Charge => CounterKind::Landmark), amount)); } }
+let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_2.push((object, CounterKind::Landmark, amount)); } }
 let had_2: Vec<_> = counters_2.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_2); let applied_2: Vec<ObjectId> = counters_2.iter().zip(had_2).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
-if { let q: &dyn Query = g; Some(asker.source).is_some_and(|candidate: ObjectId| (i64::from(q.state().obj(candidate).counters(planned_value!("counter kind Landmark", CounterKind::Charge => CounterKind::Landmark)))) >= (3i64)) } {
+if { let q: &dyn Query = g; Some(asker.source).is_some_and(|candidate: ObjectId| (i64::from(q.state().obj(candidate).counters(CounterKind::Landmark))) >= (3i64)) } {
 let mut removed_3: i64 = 0;
 let objects_3_0 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() };
-let amount_3_0 = i16::MAX; cantrip_api::instruction(g, |g| { for object in objects_3_0 { removed_3 += i64::from(g.remove_counters(object, planned_value!("counter kind Landmark", CounterKind::Charge => CounterKind::Landmark), amount_3_0)); } });
+let amount_3_0 = i16::MAX; cantrip_api::instruction(g, |g| { for object in objects_3_0 { removed_3 += i64::from(g.remove_counters(object, CounterKind::Landmark, amount_3_0)); } });
 g.end_sentence();
 if let Some(object) = ({ let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied() { g.transform_by(object, item)?; }
 g.end_sentence();

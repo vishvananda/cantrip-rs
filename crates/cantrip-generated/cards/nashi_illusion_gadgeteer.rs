@@ -1,7 +1,7 @@
 // Nashi, Illusion Gadgeteer
 // status: planned
+// requires: a value chosen in secret
 // requires: engine: no perpetual effects
-// requires: operation ChooseValueWith
 // requires: operation Conjure
 // Flash
 // Menace, Ward {2}
@@ -10,7 +10,7 @@
 #[allow(unused_variables)] fn ability_3_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("operation-choose-value-with" => cantrip_mechanics::choose::value(g, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, asker.source, ChoiceKind::Object, ChoiceTerms { options: &[|q: &dyn Query, asker: &Asker, id: ObjectId| (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(id).owner))], except: &[], count: None, secret: true, unchosen: false, random: false, ordered: false, up_to: false })?);
+planned!("a-value-chosen-in-secret" => cantrip_mechanics::choose::value(g, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, asker.source, ChoiceKind::Object, ChoiceTerms { options: &[|q: &dyn Query, asker: &Asker, id: ObjectId| (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(id).owner))], except: &[], count: None, secret: true, unchosen: false, random: false, ordered: false, up_to: false })?);
 g.end_sentence();
 let duplicated_1 = { let q: &dyn Query = g; (planned_value!("depends on an instruction with a gap", Vec::<ObjectId>::new() => result_0)).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() };
 let count_1: u32 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let mut conjured_1: Vec<ObjectId> = Vec::new(); for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { conjured_1.extend(planned_value!("operation Conjure", Vec::<ObjectId>::new() => cantrip_mechanics::conjure::conjure(g, player, player, asker.source, Conjured::DuplicateOf(&duplicated_1), count_1, ConjureTo::Hand)?)); }

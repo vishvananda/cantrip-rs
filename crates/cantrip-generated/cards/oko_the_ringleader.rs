@@ -24,12 +24,12 @@ let amount_1 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let players_1 = 
 for player in players_1 { g.draw(player, amount_1); }
 g.end_sentence();
 if { let q: &dyn Query = g; Some(asker.controller).is_some_and(|player: PlayerId| q.history().any(EventQuery::kind(EventMask::CRIME).this_turn().player(player))) } {
-let amount_2 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_2 = Vec::new(); for player in players_2 { cards_2.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_2)?); } let discarded_2 = g.discard_together(&cards_2);
+let amount_2 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_2: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_2 = Vec::new(); for player in players_2 { cards_2.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_2)?); } let discarded_2 = g.discard_together(&cards_2);
 g.end_sentence();
 hoisted_3.extend(discarded_2.clone());
 hoisted_4.extend({ let q: &dyn Query = g; discarded_2.clone() });
 } else {
-let amount_5 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let players_5 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_5 = Vec::new(); for player in players_5 { cards_5.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_5)?); } let discarded_5 = g.discard_together(&cards_5);
+let amount_5 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let players_5: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_5 = Vec::new(); for player in players_5 { cards_5.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_5)?); } let discarded_5 = g.discard_together(&cards_5);
 g.end_sentence();
 hoisted_6.extend(discarded_5.clone());
 hoisted_7.extend({ let q: &dyn Query = g; discarded_5.clone() });
@@ -53,7 +53,7 @@ let created_8 = g.create_tokens_worded(&tokens_8, false, None, words_8)?;
 g.end_sentence();
  Ok(()) }
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let originals_10 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (!(Some(asker.source) == Some(id)) && (!(q.chars(id).is(CardType::Land)) && Some(asker.controller) == Some(q.controller(id))))).collect::<Vec<ObjectId>>() }; let player_10 = { let q: &dyn Query = g; Some(asker.controller) }; let created_10 = if let Some(player) = player_10 { let copies: Vec<(Copiable, PlayerId)> = originals_10.iter().map(|&original| (g.copiable_values(original), player)).collect(); g.create_token_copies_together(&copies)? } else { Vec::new() };
+let originals_10 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (!(Some(asker.source) == Some(id)) && (!(q.chars(id).is(CardType::Land)) && Some(asker.controller) == Some(q.controller(id))))).collect::<Vec<ObjectId>>() }; let player_10 = { let q: &dyn Query = g; Some(asker.controller) }; let mut copies_10: Vec<(Copiable, PlayerId)> = Vec::new(); if let Some(player) = player_10 { for &original in &originals_10 { if let Some(values) = { let q: &dyn Query = g; Some(original).map(|original: ObjectId| q.copiable_values(original)) } { copies_10.push((values, player)); } } } let created_10 = g.create_token_copies_together(&copies_10)?;
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

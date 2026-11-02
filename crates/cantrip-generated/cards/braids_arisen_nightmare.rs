@@ -1,7 +1,5 @@
 // Braids, Arisen Nightmare
-// status: planned
-// requires: condition PlayerTook
-// requires: earlier objects Sacrificed
+// status: ready
 // At the beginning of your end step, you may sacrifice an artifact, creature, enchantment, land, or planeswalker. If you do, each opponent may sacrifice a permanent of their choice that shares a card type with it. For each opponent who doesn't, that player loses 2 life and you draw a card.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::End) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
@@ -21,19 +19,19 @@ let mut players_2: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controlle
 let mut guard_2_0 = vec![false; players_2.len()];
 let mut gathered_3: Vec<(PlayerId, ObjectId)> = Vec::new();
  for (index_2, bound_0) in players_2.iter().copied().enumerate() { if true { guard_2_0[index_2] = true;
-let objects_4 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (planned_value!("earlier objects Sacrificed", Vec::<ObjectId>::new() => q.acted_on(asker, Acted::Sacrificed))).first().copied().is_some_and(|o: ObjectId| { let (a, b) = (&q.chars(id), &q.chars(o)); a.types.iter().any(|t| b.types.has(t)) })).collect::<Vec<ObjectId>>() }; let players_4 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() }; let mut picks_4: Vec<(PlayerId, ObjectId)> = Vec::new();
+let objects_4 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (before_0.clone()).first().copied().is_some_and(|o: ObjectId| { let (a, b) = (&q.chars(id), &q.chars(o)); a.types.iter().any(|t| b.types.has(t)) })).collect::<Vec<ObjectId>>() }; let players_4 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() }; let mut picks_4: Vec<(PlayerId, ObjectId)> = Vec::new();
 let count_4 = { let q: &dyn Query = g; cantrip_mechanics::select::Count::UpTo((1i64).max(0) as u32) }; for player in players_4 { let eligible: Vec<ObjectId> = objects_4.iter().copied().filter(|&o| g.controller(o) == player && g.can_sacrifice(player, o)).collect(); let taken = match count_4.clone() { cantrip_mechanics::select::Count::Exactly(n) | cantrip_mechanics::select::Count::AsManyAsCan(n) if eligible.len() <= n as usize => eligible, _ => cantrip_mechanics::choose::select(g, player, asker.source, Purpose::Sacrifice, eligible, cantrip_mechanics::select::Selection::of(count_4.clone(), &[]))? }; for object in taken { picks_4.push((player, object)); } }
 gathered_3.extend(picks_4.iter().copied());
    }
  } 
 let sacrificed_3 = g.sacrifice_each(&gathered_3);
 g.end_sentence();
-let mut players_5: Vec<PlayerId> = { let q: &dyn Query = g; { let mut all = Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>(); let other = q.state().apnap().filter(|&bound_0: &PlayerId| !(planned_value!("condition PlayerTook", false => q.took_part(asker, Some(bound_0), 1)))).collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all } };
+let mut players_5: Vec<PlayerId> = { let q: &dyn Query = g; { let mut all = Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>(); let other = q.state().apnap().filter(|&bound_0: &PlayerId| !(Some(bound_0).and_then(|p: PlayerId| players_2.iter().position(|&next| next == p)).is_some_and(|at| gathered_3.iter().any(|(who, _)| *who == players_2[at])))).collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all } };
  for (index_5, bound_0) in players_5.iter().copied().enumerate() { let amount_6 = { let q: &dyn Query = g; (2i64).max(0) as i32 }; let players_6 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_6 { g.lose_life(player, amount_6); }
     } 
 g.end_sentence();
- for (index_5, bound_0) in players_5.iter().copied().enumerate() { let amount_7 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_7 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+ for (index_5, _) in players_5.iter().copied().enumerate() { let amount_7 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_7 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_7 { g.draw(player, amount_7); }
     } 
 g.end_sentence();

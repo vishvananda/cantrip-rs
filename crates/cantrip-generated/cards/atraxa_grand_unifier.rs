@@ -1,6 +1,5 @@
 // Atraxa, Grand Unifier
-// status: planned
-// requires: operation ChangeZone
+// status: ready
 // Flying, vigilance, deathtouch, lifelink
 // When Atraxa enters, reveal the top ten cards of your library. For each card type, you may put a card of that type from among the revealed cards into your hand. Put the rest on the bottom of your library in a random order. (Artifact, battle, creature, enchantment, instant, land, planeswalker, and sorcery are card types.)
 #[allow(unused_imports)] use cantrip_api::*;
@@ -8,9 +7,11 @@
  None }
 fn ability_4(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let objects_0 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((10i64).max(0) as usize).collect::<Vec<ObjectId>>() }; let mut owners_0: Vec<PlayerId> = objects_0.iter().map(|o| g.state().obj(*o).owner).collect(); owners_0.dedup(); for owner in owners_0 { let cards: Vec<ObjectId> = objects_0.iter().copied().filter(|o| g.state().obj(*o).owner == owner).collect(); g.reveal(owner, &cards); }
-let moved_1: Vec<ObjectId> = planned_value!("operation ChangeZone", Vec::<ObjectId>::new() => cantrip_mechanics::enter::change_zone(g, asker, ZoneChange { actor: { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, cards: { let q: &dyn Query = g; (objects_0.clone()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Library).collect::<Vec<ObjectId>>() }, count: Some({ let q: &dyn Query = g; cantrip_mechanics::select::Count::AnyNumber }), random: false, group: Some(GroupFilter::OnePerCardType), destination: Destination::OwnersHand, entry: &[], face_down: None })?);
-let library_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let cards_2: Vec<ObjectId> = { let q: &dyn Query = g; (objects_0.clone()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Library).collect::<Vec<ObjectId>>() }.into_iter().filter(|&o| g.state().obj(o).became.is_none() && g.state().obj(o).zone == Zone::library(library_2)).collect(); let placed_2 = cards_2.clone();
-g.bottom_in_random_order(library_2, &cards_2);
+let chooser_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let pool_1: Vec<ObjectId> = { let q: &dyn Query = g; (objects_0.clone()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Library).collect::<Vec<ObjectId>>() }; let mut picked_1: Vec<ObjectId> = Vec::new();
+let types_1 = CardType::ALL.to_vec(); for t in types_1 { let eligible: Vec<ObjectId> = pool_1.iter().copied().filter(|&c| !picked_1.contains(&c) && g.chars(c).is(t)).collect(); if eligible.is_empty() { continue; } picked_1.extend(cantrip_mechanics::choose::cards_from(g, chooser_1, asker.source, Purpose::PutIntoHand, pool_1.clone(), eligible, 1, true)?); }
+let objects_2 = { let q: &dyn Query = g; picked_1.clone() }; let moved_2 = g.return_to_hand_revealed(&objects_2);
+let library_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let cards_3: Vec<ObjectId> = { let q: &dyn Query = g; (objects_0.clone()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Library).collect::<Vec<ObjectId>>() }.into_iter().filter(|&o| g.state().obj(o).became.is_none() && g.state().obj(o).zone == Zone::library(library_3)).collect(); let placed_3 = cards_3.clone();
+g.bottom_in_random_order(library_3, &cards_3);
 g.end_sentence();
  Ok(()) }
 

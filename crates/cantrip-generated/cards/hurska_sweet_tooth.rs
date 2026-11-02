@@ -1,6 +1,5 @@
 // Hurska Sweet-Tooth
-// status: planned
-// requires: amount of an event its trigger does not carry
+// status: ready
 // Whenever Hurska attacks, create a Food token. (It's an artifact with "{2}, {T}, Sacrifice this token: You gain 3 life.")
 // Whenever you gain life, you may pay {G/W}. When you do, target creature gets +X/+X until end of turn, where X is the amount of life you gained.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -34,14 +33,14 @@ static REFLEXIVE_5_TARGETS: &[cantrip_api::TargetSpec] = &[target(reflexive_5_ta
 fn reflexive_5(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let objects_6 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_6 = { let q: &dyn Query = g; Some(asker.source) }; let duration_6 = Duration::EndOfTurn;
-let kind_6_0_0 = { let q: &dyn Query = g; EffectKind::Pump((planned_value!("amount of an event its trigger does not carry", 0i64 => q.event_total(item))).clamp(-32768, 32767) as i16, (planned_value!("amount of an event its trigger does not carry", 0i64 => q.event_total(item))).clamp(-32768, 32767) as i16) };
+let kind_6_0_0 = { let q: &dyn Query = g; EffectKind::Pump((i64::from(item.x)).clamp(-32768, 32767) as i16, (i64::from(item.x)).clamp(-32768, 32767) as i16) };
 if let Some(source) = source_6 { cantrip_api::instruction(g, |g| { for &object in &objects_6 { g.add_effect(source, object, kind_6_0_0, duration_6);  } }); }
 g.end_sentence();
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 'optional_2: {
 let payer_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let paid_3 = g.may_pay(payer_3, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [Some((Mana::G, Mana::W)),None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })), &PAY_QUESTION)?; if !paid_3 { break 'optional_2; }
-if paid_3 && true { g.reflexive_trigger(item.object, item.controller, AbilityRef::delayed(item.ability.card, 0), Target::None); }
+if paid_3 && true { g.reflexive_trigger_counted(item.object, item.controller, AbilityRef::delayed(item.ability.card, 0), Target::None, (({ let q: &dyn Query = g; i64::from(item.data[0]) } as i64)).clamp(0, i64::from(u16::MAX)) as u16); }
 g.end_sentence();
 }
 g.end_sentence();
@@ -49,5 +48,5 @@ g.end_sentence();
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
 static PAY_QUESTION: Question = Question::new("Pay", "pay {cost}?", "", "Pay {cost}", "Decline");
 
-pub static CARD: CardDef = CardDef { name: "Hurska Sweet-Tooth", token_words: &[], oracle: true, cost: ManaCost { generic: 2, x: 0, symbols: [0, 0, 0, 0, 1, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Bear]), supertypes: Supertypes { basic: false, legendary: true, snow: false }, colors: None, power: Some(3), toughness: Some(3), loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::ATTACKS.0), ability_0_event), ability_0, "Whenever Hurska attacks, create a Food token.").targets(&[]),triggered(when_asked(EventMask(EventMask::LIFE_CHANGE.0), ability_1_event), ability_1, "Whenever you gain life, you may pay {G/W}. When you do, target creature gets +X/+X until end of turn, where X is the amount of life you gained.").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[delayed_trigger(reflexive_5, "Whenever you gain life, you may pay {G/W}. When you do, target creature gets +X/+X until end of turn, where X is the amount of life you gained.").targets(REFLEXIVE_5_TARGETS)], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
+pub static CARD: CardDef = CardDef { name: "Hurska Sweet-Tooth", token_words: &[], oracle: true, cost: ManaCost { generic: 2, x: 0, symbols: [0, 0, 0, 0, 1, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Bear]), supertypes: Supertypes { basic: false, legendary: true, snow: false }, colors: None, power: Some(3), toughness: Some(3), loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::ATTACKS.0), ability_0_event), ability_0, "Whenever Hurska attacks, create a Food token.").targets(&[]),triggered(when_asked(EventMask(EventMask::LIFE_CHANGE.0), ability_1_event), ability_1, "Whenever you gain life, you may pay {G/W}. When you do, target creature gets +X/+X until end of turn, where X is the amount of life you gained.").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[delayed_trigger(reflexive_5, "When you do, target creature gets +X/+X until end of turn, where X is the amount of life you gained.").targets(REFLEXIVE_5_TARGETS)], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[&token_1::CARD];

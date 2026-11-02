@@ -3,7 +3,7 @@
 // At the beginning of your upkeep, if this creature isn't prepared, it becomes prepared. (While it's prepared, you may cast a copy of its spell. Doing so unprepares it.)
 // Create a Heartwood token. (It's a red and green artifact with "{T}: Add {R} or {G}.")
 #[allow(unused_imports)] use cantrip_api::*;
-fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.source).is_some_and(|candidate: ObjectId| !(q.state().obj(candidate).prepared)) }
+fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.source).is_some_and(|candidate: ObjectId| !((q.state().obj(candidate).prepared || q.state().obj(candidate).zone.is(ZoneKind::Stack) && cantrip_mechanics::prepare::is_prepare_spell(q, candidate)))) }
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::Upkeep) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

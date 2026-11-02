@@ -4,12 +4,12 @@
 // requires: comparison with any one value
 // requires: engine: no rule on an ability's X
 // requires: object filter DraftNoted
-// requires: token recipe CopyOne
 // Before you shuffle your deck to start the game, you may reveal this card from your deck and exile a creature card you drafted that isn't in your deck.
 // {X}, {T}: Create a token that's a copy of a card you exiled with cards named Caller of the Untamed. X is the mana value of that card.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let created_0: Vec<ObjectId> = planned_value!("token recipe CopyOne", Vec::<ObjectId>::new() => cantrip_mechanics::tokens::create(g, asker, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[({ let q: &dyn Query = g; (1i64).max(0) as u32 }, TokenRecipe::CopyOne({ let q: &dyn Query = g; ((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (planned_value!("object filter DraftNoted", false => q.draft_notes(id, DraftNoted(DraftNote { kind: Exiled, player: AbilityController, card: "Caller of the Untamed" }))) && (i64::from(q.mana_value(id))) == (i64::from(item.x)))).collect::<Vec<ObjectId>>() }, &[TokenCopyEffects::NoTokenCopyEffects]))], Arrival { tapped: false, counters: &[], states: &[] })?);
+let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let among_0 = { let q: &dyn Query = g; ((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (planned_value!("object filter DraftNoted", false => q.draft_notes(id, DraftNoted(DraftNote { kind: Exiled, player: AbilityController, card: "Caller of the Untamed" }))) && (i64::from(q.mana_value(id))) == (i64::from(item.x)))).collect::<Vec<ObjectId>>() }; let chosen_0 = cantrip_mechanics::choose::select(g, player_0, asker.source, Purpose::CopyWhich, among_0, cantrip_mechanics::select::cards(cantrip_mechanics::select::exactly(1)))?.first().copied();
+let values_0 = { let q: &dyn Query = g; chosen_0.map(|original: ObjectId| q.copiable_values(original)) }; let count_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let created_0 = match values_0 { Some(values) => g.create_token_copies_tapped(values, player_0, count_0, false)?, None => Vec::new() };
 g.end_sentence();
  Ok(()) }
 planned_item!("ability-draft-rule" => draft_rules: cantrip_mechanics::draft::rule(&[PregameAction::MayActions(PregameAction::RevealCardFromDeck, PregameAction::ExileADraftedCardNotInDeck)]));

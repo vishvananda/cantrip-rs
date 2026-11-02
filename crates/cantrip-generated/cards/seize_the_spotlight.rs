@@ -21,8 +21,10 @@ pub static EXTRA: &[&CardDef] = &[];
 }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+let mut each_chosen_1 = Vec::new();
  for (index_0, bound_0) in players_0.iter().copied().enumerate() { let player_1 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; let card_1 = g.card_id(&CARD); let chosen_1: u8 = cantrip_mechanics::choose::option(g, player_1, asker.source, card_1, 0..2)?;
-    } 
+ each_chosen_1.push(chosen_1);
+   } 
 g.end_sentence();
 let mut players_2: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition VotedFor", false => g.votes().voted(option))).collect::<Vec<PlayerId>>() };
 planned!("per-player-each-player" => g.begin_batch(););

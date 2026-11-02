@@ -1,6 +1,5 @@
 // Ambassador Blorpityblorpboop
 // status: planned
-// requires: engine: no effect sets power or toughness alone
 // requires: engine: no tickets
 // requires: operation PutSticker
 // requires: stickers
@@ -25,9 +24,8 @@ fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mu
 let asker = &Asker::new(item.object, item.controller);
 let decider_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_3, asker.source, Purpose::Optional)? {
 let objects_4 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_4 = { let q: &dyn Query = g; Some(asker.source) }; let duration_4 = Duration::Indefinite;
-let kind_4_0_0 = { let q: &dyn Query = g; planned_value!("engine: no effect sets power or toughness alone", EffectKind::Pump(0, 0) => EffectKind::SetPower((planned_value!("stickers", 0i64 => cantrip_mechanics::stickers::measure(q, &q.state().battlefield().iter().copied().filter(|&id| Some(asker.controller) == Some(q.controller(id))).collect::<Vec<ObjectId>>(), StickerMeasure::TotalPower))).clamp(-32768, 32767) as i16)) };
-let kind_4_1_0 = { let q: &dyn Query = g; planned_value!("engine: no effect sets power or toughness alone", EffectKind::Pump(0, 0) => EffectKind::SetToughness((planned_value!("stickers", 0i64 => cantrip_mechanics::stickers::measure(q, &q.state().battlefield().iter().copied().filter(|&id| Some(asker.controller) == Some(q.controller(id))).collect::<Vec<ObjectId>>(), StickerMeasure::TotalToughness))).clamp(-32768, 32767) as i16)) };
-if let Some(source) = source_4 { cantrip_api::instruction(g, |g| { for &object in &objects_4 { g.add_effect(source, object, kind_4_0_0, duration_4); g.add_effect(source, object, kind_4_1_0, duration_4);  } }); }
+let kind_4_0_0 = { let q: &dyn Query = g; EffectKind::SetPt((planned_value!("stickers", 0i64 => cantrip_mechanics::stickers::measure(q, &q.state().battlefield().iter().copied().filter(|&id| Some(asker.controller) == Some(q.controller(id))).collect::<Vec<ObjectId>>(), StickerMeasure::TotalPower))).clamp(-32768, 32767) as i16, (planned_value!("stickers", 0i64 => cantrip_mechanics::stickers::measure(q, &q.state().battlefield().iter().copied().filter(|&id| Some(asker.controller) == Some(q.controller(id))).collect::<Vec<ObjectId>>(), StickerMeasure::TotalToughness))).clamp(-32768, 32767) as i16) };
+if let Some(source) = source_4 { cantrip_api::instruction(g, |g| { for &object in &objects_4 { g.add_effect(source, object, kind_4_0_0, duration_4);  } }); }
 g.end_sentence();
 hoisted_5.extend(objects_4.clone());
 }

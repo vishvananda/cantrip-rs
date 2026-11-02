@@ -1,15 +1,12 @@
 // Catastrophe
 // status: planned
-// requires: operation Together
+// requires: destroyed together, some that can't be regenerated
 // Destroy all lands or all creatures. Creatures destroyed this way can't be regenerated.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let chosen_0 = cantrip_mechanics::choose::option(g, player_0, asker.source, item.ability.card, 0..2)? - 0;
 g.end_sentence();
-planned!("operation-together" => g.begin_simultaneous());
-let objects_2 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| match chosen_0 { 0 => q.chars(id).is(CardType::Land), _ => q.chars(id).is(CardType::Creature) }).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>() }; let destroyed_2 = g.destroy_all_no_regen(&objects_2);
-let objects_3 = { let q: &dyn Query = g; { let without: Vec<ObjectId> = q.state().battlefield().iter().copied().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>(); (q.state().battlefield().iter().copied().filter(|&id| match chosen_0 { 0 => q.chars(id).is(CardType::Land), _ => q.chars(id).is(CardType::Creature) }).collect::<Vec<ObjectId>>()).into_iter().filter(|id| !without.contains(id)).collect::<Vec<ObjectId>>() } }; let destroyed_3 = g.destroy_all(&objects_3);
-planned!("operation-together" => g.end_simultaneous());
+planned!("destroyed-together-some-that-can-t-be-regenerated", Together, "value" = "[{\"args\":{\"objects\":{\"args\":{\"filter\":{\"args\":\"Creature\",\"kind\":\"CardType\"},\"objects\":{\"args\":{\"kind\":\"ChosenFilter\"},\"kind\":\"Battlefield\"}},\"kind\":\"Matching\"},\"regeneration\":false},\"kind\":\"Destroy\"},{\"args\":{\"objects\":{\"args\":{\"excluding\":{\"args\":{\"args\":\"Creature\",\"kind\":\"CardType\"},\"kind\":\"Battlefield\"},\"objects\":{\"args\":{\"kind\":\"ChosenFilter\"},\"kind\":\"Battlefield\"}},\"kind\":\"Difference\"},\"regeneration\":true},\"kind\":\"Destroy\"}]");
 g.end_sentence();
  Ok(()) }
 

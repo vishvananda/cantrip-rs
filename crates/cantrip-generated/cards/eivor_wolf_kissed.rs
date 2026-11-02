@@ -11,13 +11,14 @@ let asker = &Asker::new(item.object, item.controller);
 let amount_0 = { let q: &dyn Query = g; (i64::from(item.data[0])).max(0) as u32 }; let mills_0: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_0)).collect(); let milled_0 = g.mill_together(&mills_0);
 g.end_sentence();
 {
-let selected_2_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_2_candidates = { let q: &dyn Query = g; (milled_0.clone()).into_iter().filter(|&id| (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Saga)) || q.chars(id).is(CardType::Land))).collect::<Vec<ObjectId>>() }; let selected_2_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::UpTo((2i64).max(0) as u32) }; let selected_2 = { cantrip_mechanics::choose::select(g, selected_2_player, asker.source, Purpose::PutOntoBattlefield, selected_2_candidates, cantrip_mechanics::select::Selection::of(selected_2_count, &[]))? };
-if !selected_2.is_empty() { 
-let objects_3 = ({ let q: &dyn Query = g; selected_2.clone() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_3 = { let rows_3: Vec<(ObjectId, PlayerId, bool)> = objects_3.iter().map(|&o| (o, g.state().obj(o).owner, false)).collect(); let came_3 = g.put_all_onto_battlefield_as(&rows_3)?; came_3.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
+let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let pool_2 = { let q: &dyn Query = g; (milled_0.clone()).into_iter().filter(|&id| (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Saga)) || q.chars(id).is(CardType::Land))).collect::<Vec<ObjectId>>() }; let mut picked_2: Vec<ObjectId> = Vec::new();
+{ let open = { let q: &dyn Query = g; pool_2.iter().copied().filter(|id| !picked_2.contains(id)).filter(|&id| q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Saga))).collect::<Vec<ObjectId>>() }; let one = cantrip_mechanics::choose::cards(g, player_2, asker.source, Purpose::PutOntoBattlefield, open, 1, true)?; for o in one { if !picked_2.contains(&o) { picked_2.push(o); } } }
+{ let open = { let q: &dyn Query = g; pool_2.iter().copied().filter(|id| !picked_2.contains(id)).filter(|&id| q.chars(id).is(CardType::Land)).collect::<Vec<ObjectId>>() }; let one = cantrip_mechanics::choose::cards(g, player_2, asker.source, Purpose::PutOntoBattlefield, open, 1, true)?; for o in one { if !picked_2.contains(&o) { picked_2.push(o); } } }
+let objects_3 = ({ let q: &dyn Query = g; picked_2.clone() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_3 = { let rows_3: Vec<(ObjectId, PlayerId, bool)> = objects_3.iter().map(|&o| (o, g.state().obj(o).owner, false)).collect(); let came_3 = g.put_all_onto_battlefield_as(&rows_3)?; came_3.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
 g.end_sentence();
 hoisted_4.extend(moved_3.clone());
 hoisted_5.extend({ let q: &dyn Query = g; objects_3.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() });
-}
+
 }
 g.end_sentence();
  Ok(()) }

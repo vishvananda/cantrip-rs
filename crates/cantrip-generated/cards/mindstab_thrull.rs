@@ -10,7 +10,7 @@ let asker = &Asker::new(item.object, item.controller);
 let payer_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let paid_0 = ({ let q: &dyn Query = g; item.subject.object() }).is_some_and(|o| g.can_sacrifice(payer_0, o)) && match { let q: &dyn Query = g; item.subject.object() } { Some(o) => g.may_pay(payer_0, o, o, SACRIFICE_THIS, &PAY_QUESTION)?, None => false };
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
-let amount_1 = { let q: &dyn Query = g; (3i64).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; item.subject.object().and_then(|o: ObjectId| q.defending_player(o)).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_1 = Vec::new(); for player in players_1 { cards_1.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_1)?); } let discarded_1 = g.discard_together(&cards_1);
+let amount_1 = { let q: &dyn Query = g; (3i64).max(0) as u32 }; let players_1: Vec<PlayerId> = { let q: &dyn Query = g; item.subject.object().and_then(|o: ObjectId| q.defending_player(o)).into_iter().collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_1 = Vec::new(); for player in players_1 { cards_1.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_1)?); } let discarded_1 = g.discard_together(&cards_1);
 g.end_sentence();
 hoisted_2.extend(discarded_1.clone());
 hoisted_3.extend({ let q: &dyn Query = g; discarded_1.clone() });

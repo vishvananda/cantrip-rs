@@ -1,6 +1,6 @@
 // Deathmist Raptor
 // status: planned
-// requires: move arrival state
+// requires: may enter face down
 // Deathtouch
 // Whenever a permanent you control is turned face up, you may return this card from your graveyard to the battlefield face up or face down.
 // Megamorph {4}{G} (You may cast this card face down as a 2/2 creature for {3}. Turn it face up any time for its megamorph cost and put a +1/+1 counter on it.)
@@ -12,7 +12,7 @@ let mut hoisted_2: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let decider_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if g.state().obj(asker.source).became.is_none() && cantrip_mechanics::effects::ask_may(g, decider_0, asker.source, Purpose::Optional)? {
 let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
-let objects_1 = ({ let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_1 = { let mut moved: Vec<ObjectId> = Vec::new(); for &o in &objects_1 { let controller = player_1; moved.extend(planned_value!("move arrival state", None::<ObjectId> => cantrip_mechanics::enter::in_state(g, o, controller, item, "[May([Term { family: \"EnterFlag\", form: \"EntersFaceDown\", operands: [] }])]", &[], false)?)); } moved };
+let objects_1 = ({ let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_1 = { let mut moved: Vec<ObjectId> = Vec::new(); for &o in &objects_1 { let controller = player_1; moved.extend(planned_value!("may enter face down", None::<ObjectId> => cantrip_mechanics::enter::in_state(g, o, controller, item, "[May([Term { family: \"EnterFlag\", form: \"EntersFaceDown\", operands: [] }])]", &[], false)?)); } moved };
 g.end_sentence();
 hoisted_2.extend(moved_1.clone());
 hoisted_3.extend({ let q: &dyn Query = g; objects_1.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() });

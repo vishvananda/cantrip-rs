@@ -1,6 +1,5 @@
 // The Dalek Emperor
 // status: planned
-// requires: instruction ChooseOne
 // requires: villainous choice
 // Affinity for Daleks (This spell costs {1} less to cast for each Dalek you control.)
 // Other Daleks you control have haste.
@@ -27,7 +26,8 @@ let mut each_9: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut 
 let mut each_10: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut all_10: Vec<ObjectId> = Vec::new();
 let mut each_11: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut all_11: Vec<ObjectId> = Vec::new();
  for (index_0, bound_0) in players_0.iter().copied().enumerate() { planned!("villainous-choice" => cantrip_mechanics::choose::villainous(g, { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }, asker.source, &["", "Create tokens."])?);
-let decider_2 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; match planned_value!("instruction ChooseOne", 0u8 => cantrip_mechanics::choose::one_of(g, decider_2, asker.source, vec![Label::Card(card_2, 0), Label::Card(card_2, 1)])?) {
+let decider_2 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") };
+let offered_2: Vec<u8> = [(0u8, { let q: &dyn Query = g; { let players: Vec<PlayerId> = Some(bound_0).into_iter().collect::<Vec<PlayerId>>(); (q.state().battlefield().iter().copied().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>()).into_iter().any(|o: ObjectId| players.contains(&q.obj(o).controller)) } }), (1u8, true)].into_iter().filter(|option| option.1).map(|option| option.0).collect(); let card_2 = item.ability.card; let picked_2 = if offered_2.len() > 1 { offered_2[cantrip_mechanics::choose::one_of(g, decider_2, asker.source, offered_2.iter().map(|&option| Label::Card(card_2, option)).collect())? as usize] } else { offered_2.first().copied().unwrap_or(u8::MAX) }; match picked_2 {
 0 => {
 let objects_3 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>() }; let players_3 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() }; let mut picks_3: Vec<(PlayerId, ObjectId)> = Vec::new();
 let count_3 = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; for player in players_3 { let eligible: Vec<ObjectId> = objects_3.iter().copied().filter(|&o| g.controller(o) == player && g.can_sacrifice(player, o)).collect(); let taken = match count_3.clone() { cantrip_mechanics::select::Count::Exactly(n) | cantrip_mechanics::select::Count::AsManyAsCan(n) if eligible.len() <= n as usize => eligible, _ => cantrip_mechanics::choose::select(g, player, asker.source, Purpose::Sacrifice, eligible, cantrip_mechanics::select::Selection::of(count_3.clone(), &[]))? }; for object in taken { picks_3.push((player, object)); } }
@@ -36,7 +36,7 @@ g.end_sentence();
 hoisted_4.extend(sacrificed_3.clone());
 hoisted_5.extend({ let q: &dyn Query = g; objects_3.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() });
 }
-_ => {
+1 => {
 let players_6 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_6 = Vec::new();
 let count_6_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let def_6_0 = g.card_id(&token_7::CARD);
 for player in players_6 {
@@ -46,6 +46,7 @@ let created_6 = g.create_tokens_worded(&tokens_6, false, None, words_6)?;
 g.end_sentence();
 hoisted_8.extend(created_6.clone());
 }
+_ => {}
 }
  each_9[index_0] = hoisted_4.clone(); all_9.extend(each_9[index_0].iter().copied());
 each_10[index_0] = hoisted_8.clone(); all_10.extend(each_10[index_0].iter().copied());
@@ -54,5 +55,5 @@ each_11[index_0] = { let q: &dyn Query = g; hoisted_5.clone() }; all_11.extend(e
 g.end_sentence();
  Ok(()) }
 
-pub static CARD: CardDef = CardDef { name: "The Dalek Emperor", token_words: &[], oracle: true, cost: ManaCost { generic: 5, x: 0, symbols: [0, 0, 1, 1, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Artifact,CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Dalek]), supertypes: Supertypes { basic: false, legendary: true, snow: false }, colors: None, power: Some(6), toughness: Some(6), loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::STEP_BEGAN.0), ability_2_event), ability_2, "At the beginning of combat on your turn, each opponent faces a villainous choice — That player sacrifices a creature of their choice, or you create a 3/3 black Dalek artifact creature token with menace.").targets(&[])], statics: &[static_ability(Layer::Ability, ability_1_affects, ability_1_apply_0, "Other Daleks you control have haste.")], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, own_cost_changes: &[ability_0_affinity], ..CardDef::BLANK };
+pub static CARD: CardDef = CardDef { name: "The Dalek Emperor", token_words: &[], oracle: true, cost: ManaCost { generic: 5, x: 0, symbols: [0, 0, 1, 1, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Artifact,CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Dalek]), supertypes: Supertypes { basic: false, legendary: true, snow: false }, colors: None, power: Some(6), toughness: Some(6), loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::STEP_BEGAN.0), ability_2_event), ability_2, "At the beginning of combat on your turn, each opponent faces a villainous choice — That player sacrifices a creature of their choice, or you create a 3/3 black Dalek artifact creature token with menace.").targets(&[])], statics: &[static_ability(Layer::Ability, ability_1_affects, ability_1_apply_0, "Other Daleks you control have haste.")], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, own_cost_changes: &[ability_0_affinity], labels: &["That player sacrifices a creature of their choice", "You create a 3/3 black Dalek artifact creature token with menace"], ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[&token_7::CARD];

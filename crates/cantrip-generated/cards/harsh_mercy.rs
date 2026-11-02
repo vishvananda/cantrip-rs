@@ -1,15 +1,15 @@
 // Harsh Mercy
-// status: planned
-// requires: a choice of CreatureType outside its body
+// status: ready
 // Each player chooses a creature type. Destroy all creatures that aren't of a type chosen this way. They can't be regenerated.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
+let mut each_chosen_1 = Vec::new();
  for (index_0, bound_0) in players_0.iter().copied().enumerate() { let player_1 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; let chosen_1 = cantrip_mechanics::chosen_type::creature_type_now(g, player_1, asker.source)?;
-planned!("a-choice-of-creature-type-outside-its-body" => let by = { let q: &dyn Query = g; q.linked(item) }; g.remember_chosen(by, ChosenValue::Subtype(chosen_1)););
-    } 
+ each_chosen_1.push(chosen_1);
+   } 
 g.end_sentence();
-let objects_2 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && !(planned_value!("a choice of CreatureType outside its body", None::<Subtype> => q.state().chosen_subtype(q.linked(item))).is_some_and(|chosen| q.chars(id).has_subtype(chosen))))).collect::<Vec<ObjectId>>() }; let destroyed_2 = g.destroy_all_no_regen(&objects_2);
+let objects_2 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && !(each_chosen_1.iter().any(|&chosen| q.chars(id).has_subtype(chosen))))).collect::<Vec<ObjectId>>() }; let destroyed_2 = g.destroy_all_no_regen(&objects_2);
 g.end_sentence();
  Ok(()) }
 

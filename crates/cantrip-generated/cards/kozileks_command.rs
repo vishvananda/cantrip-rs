@@ -1,7 +1,5 @@
 // Kozilek's Command
-// status: planned
-// requires: numeric expression AnnouncedX
-// requires: target cardinality UpTo
+// status: ready
 // Choose two —
 // • Target player creates X 0/1 colorless Eldrazi Spawn creature tokens with "Sacrifice this token: Add {C}."
 // • Target player scries X, then draws a card.
@@ -49,8 +47,11 @@ let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true
 let objects_4 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; let moved_4 = g.exile_all(&objects_4);
 g.end_sentence();
  Ok(()) }
+#[allow(unused_variables)] fn ability_0_mode_3_0_up_to_most(q: &dyn Query, source: ObjectId, chooser: PlayerId, x: u32) -> usize { let asker = &Asker::new(source, chooser); (i64::from(x)).max(0) as u32 as usize }
+fn ability_0_mode_3_0_up_to(q: &dyn Query, choice: &Choice, x: u32) -> Verdict { let most = ability_0_mode_3_0_up_to_most(q, choice.source, choice.chooser, x); Verdict { complete: choice.selected.len() <= most, addable: Bits::new(choice.candidates.len(), choice.selected.len() < most) } }
+fn largest_ability_0_mode_3_0_up_to(q: &dyn Query, choice: &Choice, x: u32) -> Vec<ObjectId> { choice.candidates.iter().copied().take(ability_0_mode_3_0_up_to_most(q, choice.source, choice.chooser, x)).collect() }
 #[allow(unused_variables)] fn ability_0_mode_3_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && (true)) }
-static ABILITY_0_MODE_3_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_mode_3_target_0).between(0, planned_value!("target cardinality UpTo", 1u32 => TargetSpec::read_as_chosen(|q: &dyn Query, asker: &Asker| (planned_value!("numeric expression AnnouncedX", 0i64 => i64::from(q.announced_x().unwrap_or(0)))).max(0) as u32)))];
+static ABILITY_0_MODE_3_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_mode_3_target_0).between(0, cantrip_api::TargetSpec::ANY_NUMBER).together(cantrip_api::select::set_part(&(ability_0_mode_3_0_up_to as SelectFn), &(largest_ability_0_mode_3_0_up_to as cantrip_api::select::LargestFn), TargetSpec::COUNTED, "up to X"))];
 fn ability_0_mode_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let objects_5 = { let q: &dyn Query = g; t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>() }; let moved_5 = g.exile_all(&objects_5);

@@ -1,6 +1,5 @@
 // Shape Stealer
-// status: planned
-// requires: engine: no effect sets power or toughness alone
+// status: ready
 // Whenever this creature blocks or becomes blocked by a creature, this creature's base power and toughness become equal to that creature's power and toughness until end of turn.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Blocks { blocker, attacker, .. } = event { let id = *blocker; let other = *attacker; let subject = Target::Object(id); let data = [other.0, u32::MAX]; if Some(asker.source) == Some(id) && q.chars(other).is(CardType::Creature) { return Some(Fired { subject, data }); } }
@@ -8,9 +7,8 @@ if let Event::Blocks { blocker, attacker, .. } = event { let id = *attacker; let
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let objects_0 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_0 = { let q: &dyn Query = g; Some(asker.source) }; let duration_0 = Duration::EndOfTurn;
-let kind_0_0_0 = { let q: &dyn Query = g; planned_value!("engine: no effect sets power or toughness alone", EffectKind::Pump(0, 0) => EffectKind::SetPower((Some(ObjectId(item.data[0])).filter(|o| *o != ObjectId::NONE).map_or(0i64, |o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0)))) as i16)) };
-let kind_0_1_0 = { let q: &dyn Query = g; planned_value!("engine: no effect sets power or toughness alone", EffectKind::Pump(0, 0) => EffectKind::SetToughness((Some(ObjectId(item.data[0])).filter(|o| *o != ObjectId::NONE).map_or(0i64, |o: ObjectId| i64::from(q.chars(o).toughness.unwrap_or(0)))) as i16)) };
-if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &object in &objects_0 { g.add_effect(source, object, kind_0_0_0, duration_0); g.add_effect(source, object, kind_0_1_0, duration_0);  } }); }
+let kind_0_0_0 = { let q: &dyn Query = g; EffectKind::SetPt((Some(ObjectId(item.data[0])).filter(|o| *o != ObjectId::NONE).map_or(0i64, |o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0)))) as i16, (Some(ObjectId(item.data[0])).filter(|o| *o != ObjectId::NONE).map_or(0i64, |o: ObjectId| i64::from(q.chars(o).toughness.unwrap_or(0)))) as i16) };
+if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &object in &objects_0 { g.add_effect(source, object, kind_0_0_0, duration_0);  } }); }
 g.end_sentence();
  Ok(()) }
 

@@ -1,11 +1,10 @@
 // Hulking Metamorph
-// status: planned
-// requires: copy exception KeepPT
+// status: ready
 // Prototype {2}{U}{U} — 3/3 (You may cast this spell with different mana cost, color, and size. It keeps its abilities and types.)
 // You may have this creature enter as a copy of an artifact or creature you control, except it's an artifact creature in addition to its other types, and its power and toughness are equal to this creature's power and toughness.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables, unused_mut)] fn ability_1_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); const ASK_0: Question = Question::new("CopyAsEnters", "enter as a copy?", "You choose what it copies next. If you don't, it enters as itself", "Choose a copy", "Enter as itself"); let candidates_0: Vec<ObjectId> = ({ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| ((q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Creature)) && Target::Object(asker.source).object().map(|o: ObjectId| q.controller(o)) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }).into_iter().filter(|&id| id != entering.object).collect(); if let Some(chosen_0) = cantrip_mechanics::copy::choose_copy_of_one_of(g, entering, &candidates_0, &ASK_0)? {
-entering.copy = { let q: &dyn Query = g; Some(chosen_0).map(|original: ObjectId| planned_value!("copy exception KeepPT", q.copiable_values(original).with_type(CardType::Artifact).with_type(CardType::Creature) => q.copiable_values(original).with_type(CardType::Artifact).with_type(CardType::Creature).keeping_power_toughness())) }; let picked_0 = vec![chosen_0];
+entering.copy = { let q: &dyn Query = g; Some(chosen_0).map(|original: ObjectId| { let own = q.card(q.chars(asker.source).card); q.copiable_values(original).with_type(CardType::Artifact).with_type(CardType::Creature).sized(own.power.unwrap_or(0), own.toughness.unwrap_or(0)) }) }; let picked_0 = vec![chosen_0];
 }
  Ok(()) }
 

@@ -2,7 +2,6 @@
 // status: planned
 // requires: engine: no cost removes counters this way
 // requires: numeric expression PaidCountersRemoved
-// requires: objects that paid a cost at resolution
 // Trample
 // When this creature enters, you may remove any number of +1/+1 counters from among creatures you control. If you do, put twice that many +1/+1 counters on this creature.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -12,7 +11,6 @@
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_3: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let payer_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let paid_0 = g.may_pay(payer_0, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(planned_value!("engine: no cost removes counters this way", Cost::NONE => Cost { remove_counters_from: Some(CountersFrom { filter: paid_1, kind: Some(CounterKind::PlusOne), size: CountersTaken::AnyNumber }), ..Cost::NONE })), &PAY_QUESTION)?;
-let paid_objects_0: Vec<ObjectId> = planned_value!("objects that paid a cost at resolution", Vec::<ObjectId>::new() => g.objects_that_paid());
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
 let mut counters_2: Vec<(ObjectId, CounterKind, i16)> = Vec::new();

@@ -1,6 +1,5 @@
 // Captured by the Consulate
-// status: planned
-// requires: operation Retarget
+// status: ready
 // Enchant creature you don't control
 // Enchanted creature can't attack.
 // Whenever an opponent casts a spell, if it has a single target, change the target to enchanted creature if able.
@@ -10,7 +9,7 @@
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&*player) && true && subject.object().is_some_and(|candidate: ObjectId| q.state().stack.iter().find(|i| i.object == candidate).is_some_and(|i| q.state().targets(i).len() == 1)) { return Some(Fired { subject, data }); } }
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller); if !{ let q: &dyn Query = g; item.subject.object().is_some_and(|candidate: ObjectId| q.state().stack.iter().find(|i| i.object == candidate).is_some_and(|i| q.state().targets(i).len() == 1)) } { return Ok(()); } let asker = &Asker::new(item.object, item.controller);
-planned!("operation-retarget" => if let Some(spell) = { let q: &dyn Query = g; item.subject.object() } { cantrip_mechanics::copy::retarget(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, spell, NewTargets::To({ let q: &dyn Query = g; Some(asker.source).and_then(|o: ObjectId| q.state().obj(o).attached_to).into_iter().collect::<Vec<ObjectId>>() }))?; });
+let chooser_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let spell_0: Option<ObjectId> = { let q: &dyn Query = g; item.subject.object() }; let mut open_0: Vec<ObjectId> = { let q: &dyn Query = g; Some(asker.source).and_then(|o: ObjectId| q.state().obj(o).attached_to).into_iter().collect::<Vec<ObjectId>>() }; if let Some(spell) = spell_0 { while !open_0.is_empty() { let to = match open_0.as_slice() { [one] => Some(*one), _ => cantrip_mechanics::choose::card(g, chooser_0, asker.source, Purpose::Choose, open_0.clone())? }; let Some(to) = to else { break; }; open_0.retain(|&o| o != to); g.change_a_target_to(Target::Object(spell), to, chooser_0)?; let changed = { let q: &dyn Query = g; q.state().stack.iter().find(|i| i.kind == StackKind::Spell && i.object == spell).is_some_and(|i| q.state().targets(i).contains(&Target::Object(to))) }; if changed { break; } } }
 g.end_sentence();
  Ok(()) }
 

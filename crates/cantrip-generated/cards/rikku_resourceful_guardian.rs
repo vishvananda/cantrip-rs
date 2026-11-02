@@ -1,10 +1,9 @@
 // Rikku, Resourceful Guardian
-// status: planned
-// requires: move counters of kinds the mover chooses
+// status: ready
 // Whenever you put one or more counters on a creature, until end of turn, that creature can't be blocked by creatures your opponents control.
 // Steal — {1}, {T}: Move a counter from target creature an opponent controls onto target creature you control. Activate only as a sorcery.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::CountersPut { object, kind, amount, by, .. } = event { let id = *object; let subject = Target::Object(id); let data = [*amount as u32, id.0]; if q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(*by) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::CountersPut { object, kind, amount, by, types, .. } = event { let id = *object; let subject = Target::Object(id); let data = [*amount as u32, id.0]; if types.has(CardType::Creature) && Some(asker.controller) == Some(*by) { return Some(Fired { subject, data }); } }
  None }
 #[allow(unused_variables)] fn block_rule_0(q: &dyn Query, source: ObjectId, blocker: ObjectId, attacker: ObjectId) -> bool { let asker = &Asker::new(source, q.controller(source)); !(attacker == source && (q.chars(blocker).is(CardType::Creature) && (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&q.controller(blocker)))) }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
@@ -19,9 +18,7 @@ static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let t_1_raw = announced(g, item, 1, false); let t_1 = announced(g, item, 1, true);
-let mut done_1: i64 = 0; let actor_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let sources_1 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let to_1: Option<ObjectId> = ({ let q: &dyn Query = g; (t_1_raw.get(0).copied().filter(|t| t_1.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied(); if let (Some(&from), Some(to)) = (sources_1.first(), to_1) {
-planned!("move-counters-of-kinds-the-mover-chooses" => done_1 += cantrip_mechanics::counters::move_chosen(g, actor_1, from, to, 1, 1)?);
-}
+let mut done_1: i64 = 0; let actor_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let sources_1 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let to_1: Option<ObjectId> = ({ let q: &dyn Query = g; (t_1_raw.get(0).copied().filter(|t| t_1.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied(); if let (Some(&from), Some(to)) = (sources_1.first(), to_1) { if let Some(kind) = g.choose_counter_kind(actor_1, asker.source, from)? { let amount = 1i16; done_1 += i64::from(g.move_counters(from, to, kind, amount)); } }
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

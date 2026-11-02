@@ -13,7 +13,7 @@ fn ability_1_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Res
 let mana_1 = { let q: &dyn Query = g; (2i64).max(0) as u8 };
 for player in mana_players_1 {
 if mana_1 > 0 { let colors = cantrip_mechanics::choose_colors(g, player, asker.source, ColorSet(31), mana_1)?;
-for color in colors { g.add_restricted_mana(player, color.mana(), 1, ManaRestriction::Subtypes(SubtypeSpells::of(Subtype::Lesson))); }
+for color in colors { g.add_restricted_mana(player, color.mana(), 1, ManaRestriction::Subtypes(SubtypeSpells::of(g.words(asker.source).subtype(Subtype::Lesson)))); }
 }
 }
  Ok(()) }

@@ -1,9 +1,8 @@
 // Premature Burial
-// status: planned
-// requires: history window SinceLastTurnOf
+// status: ready
 // Destroy target nonblack creature that entered since your last turn ended.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((!(q.chars(id).colors.has(q.words(asker.source).color(Color::Black))) && q.chars(id).is(CardType::Creature) && planned_value!("history window SinceLastTurnOf", q.history().all().iter() => cantrip_mechanics::history::since_last_turn_of(q, Some(asker.controller)).iter()).any(|r| matches!(r.event, Event::ZoneChange { new, to, .. } if new == id && to.is(ZoneKind::Battlefield)))))) }
+#[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((!(q.chars(id).colors.has(q.words(asker.source).color(Color::Black))) && q.chars(id).is(CardType::Creature) && { let history = q.history(); history.all()[history.all().iter().rposition(|r| Some(r.active) == Some(asker.controller) && r.turn != history.turn).map_or(0, |at| at + 1)..].iter() }.any(|r| matches!(r.event, Event::ZoneChange { new, to, .. } if new == id && to.is(ZoneKind::Battlefield)))))) }
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0)];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);

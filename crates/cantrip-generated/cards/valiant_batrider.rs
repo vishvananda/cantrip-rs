@@ -13,6 +13,7 @@ let payer_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a referenc
 g.end_sentence();
 if { let q: &dyn Query = g; !(((paid_2 as i64) != 0)) } {
 let amount_3 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+let drawing_3: Vec<PlayerId> = players_3.into_iter().collect(); let players_3: Vec<PlayerId> = g.state().apnap().filter(|p| drawing_3.contains(p)).collect();
 for player in players_3 { g.draw(player, amount_3); }
 g.end_sentence();
 }

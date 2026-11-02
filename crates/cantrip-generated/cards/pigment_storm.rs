@@ -1,13 +1,12 @@
 // Pigment Storm
-// status: planned
-// requires: operation DealDamageWith
+// status: ready
 // Pigment Storm deals 5 damage to target creature. Excess damage is dealt to that creature's controller instead.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0)];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-planned!("operation-deal-damage-with" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { cantrip_mechanics::damage::excess_to(g, source, &{ let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() }, { let q: &dyn Query = g; (5i64).max(0) as u16 }, { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).map(|o: ObjectId| q.controller(o)).expect("a reference that always names a player") }); });
+let source_0 = { let q: &dyn Query = g; Some(asker.source) }; let targets_0 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() }; let amount_0: u16 = { let q: &dyn Query = g; (5i64).max(0) as u16 }; let player_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).map(|o: ObjectId| q.controller(o)).expect("a reference that always names a player") }; if let (Some(source), Some(&target)) = (source_0, targets_0.first()) { let lethal_0 = { let q: &dyn Query = g; target.object().map_or(amount_0, |o: ObjectId| { let chars = q.chars(o); let left = u16::try_from(chars.toughness.unwrap_or(0).max(0)).unwrap_or(0).saturating_sub(q.state().obj(o).damage); match q.chars(source).has(Keyword::Deathtouch) { true => left.min(1), false => left } }) }; let dealt_0 = amount_0.min(lethal_0); g.damage_together(&[(source, target, dealt_0), (source, Target::Player(player_0), amount_0 - dealt_0)]); }
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

@@ -1,7 +1,6 @@
 // Power Sink
 // status: planned
 // requires: engine: no effect empties a mana pool
-// requires: object filter HasActivatedAbility
 // Counter target spell unless its controller pays {X}. If that player doesn't, they tap all lands with mana abilities they control and lose all unspent mana.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Stack) && (true)) }
@@ -16,7 +15,7 @@ g.end_sentence();
 if { let q: &dyn Query = g; !(((paid_0 as i64) != 0)) } {
 let objects_1 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; cantrip_api::instruction(g, |g| { for spell in objects_1 { g.counter(spell); } });
 g.end_sentence();
-let objects_2 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Land) && planned_value!("object filter HasActivatedAbility", false => q.card_of(id).activated.iter().any(|d| matches(d))) && t_0_raw.get(0).copied().and_then(|t: Target| t.object()).map(|o: ObjectId| q.controller(o)) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_2: Vec<ObjectId> = objects_2.iter().copied().filter(|&o| g.state().obj(o).tapped != true).collect(); g.tap_together(&turned_2);
+let objects_2 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Land) && (q.chars(id).abilities().any(|a| q.activated_ability(a).is_some_and(|d| !d.special_action && d.is_mana_ability())) || q.chars(id).abilities().any(|a| q.triggered_ability(a).is_some_and(|t| t.mana_ability))) && t_0_raw.get(0).copied().and_then(|t: Target| t.object()).map(|o: ObjectId| q.controller(o)) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_2: Vec<ObjectId> = objects_2.iter().copied().filter(|&o| g.state().obj(o).tapped != true).collect(); g.tap_together(&turned_2);
 planned!("engine-no-effect-empties-a-mana-pool" => { let player = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).map(|o: ObjectId| q.controller(o)).expect("a reference that always names a player") }; g.empty_mana_pool(player); });
 g.end_sentence();
 hoisted_4.extend(turned_2.clone());

@@ -1,10 +1,9 @@
 // Krovikan Horror
-// status: planned
-// requires: condition GraveyardPosition
+// status: ready
 // At the beginning of the end step, if this card is in your graveyard with a creature card directly above it, you may return this card to your hand.
 // {1}, Sacrifice a creature: This creature deals 1 damage to any target.
 #[allow(unused_imports)] use cantrip_api::*;
-fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { planned_value!("condition GraveyardPosition", false => Some(asker.controller).zip(Some(asker.source)).is_some_and(|(p, card): (PlayerId, ObjectId)| { let cards = q.state().zone(Zone::graveyard(p)); cards.iter().position(|&o| o == card).is_some_and(|at| (cards[..at].iter().copied().filter(|&id| q.chars(id).is(CardType::Creature)).count() as i64) >= (1i64)) })) }
+fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.controller).zip(Some(asker.source)).is_some_and(|(p, card): (PlayerId, ObjectId)| { let cards = q.state().zone(Zone::graveyard(p)); cards.iter().position(|&o| o == card).is_some_and(|at| cards.get(at + 1).copied().is_some_and(|id| q.chars(id).is(CardType::Creature))) }) }
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::End) && true { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_3: Vec<ObjectId> = Vec::new();

@@ -1,6 +1,5 @@
 // Inherited Fiend // Heirloom Mirror
-// status: planned
-// requires: counter kind Ritual
+// status: ready
 // Flying
 // {2}{B}: Exile target creature card from a graveyard. Put a +1/+1 counter on this creature.
 // {1}, {T}, Pay 1 life, Discard a card: Draw a card, mill a card, then put a ritual counter on this artifact. Then if it has three or more ritual counters on it, remove them and transform it. Activate only as a sorcery.
@@ -12,13 +11,13 @@ g.end_sentence();
 let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let mills_1: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_1)).collect(); let milled_1 = g.mill_together(&mills_1);
 g.end_sentence();
 let mut counters_2: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_2.push((object, planned_value!("counter kind Ritual", CounterKind::Charge => CounterKind::Ritual), amount)); } }
+let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_2.push((object, CounterKind::Ritual, amount)); } }
 let had_2: Vec<_> = counters_2.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_2); let applied_2: Vec<ObjectId> = counters_2.iter().zip(had_2).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
-if { let q: &dyn Query = g; Some(asker.source).is_some_and(|candidate: ObjectId| (i64::from(q.state().obj(candidate).counters(planned_value!("counter kind Ritual", CounterKind::Charge => CounterKind::Ritual)))) >= (3i64)) } {
+if { let q: &dyn Query = g; Some(asker.source).is_some_and(|candidate: ObjectId| (i64::from(q.state().obj(candidate).counters(CounterKind::Ritual))) >= (3i64)) } {
 let mut removed_3: i64 = 0;
 let objects_3_0 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() };
-let amount_3_0 = i16::MAX; cantrip_api::instruction(g, |g| { for object in objects_3_0 { removed_3 += i64::from(g.remove_counters(object, planned_value!("counter kind Ritual", CounterKind::Charge => CounterKind::Ritual), amount_3_0)); } });
+let amount_3_0 = i16::MAX; cantrip_api::instruction(g, |g| { for object in objects_3_0 { removed_3 += i64::from(g.remove_counters(object, CounterKind::Ritual, amount_3_0)); } });
 g.end_sentence();
 if let Some(object) = ({ let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied() { g.transform_by(object, item)?; }
 g.end_sentence();

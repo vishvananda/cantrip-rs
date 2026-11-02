@@ -1,7 +1,6 @@
 // Y'shtola Rhul
 // status: planned
 // requires: operation AddPhases
-// requires: turn window FirstEndStep
 // At the beginning of your end step, exile target creature you control, then return it to the battlefield under its owner's control. Then if it's the first end step of the turn, there is an additional end step after this step.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id))))) }
@@ -14,7 +13,7 @@ let objects_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.
 g.end_sentence();
 let objects_1 = ({ let q: &dyn Query = g; ((moved_0.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Exile).collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_1 = { let rows_1: Vec<(ObjectId, PlayerId, bool)> = objects_1.iter().map(|&o| (o, g.state().obj(o).owner, false)).collect(); let came_1 = g.put_all_onto_battlefield_as(&rows_1)?; came_1.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
 g.end_sentence();
-if { let q: &dyn Query = g; planned_value!("turn window FirstEndStep", false => q.state().turn.is_in(TurnWindow::FirstEndStep)) } {
+if { let q: &dyn Query = g; q.state().turn.step() == Step::End && q.history().this_turn().iter().filter(|r| matches!(r.event, Event::StepBegan { step: Step::End })).count() <= 1 } {
 planned!("operation-add-phases" => g.add_phases({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, AddedPhases::End, { let q: &dyn Query = g; (1i64).max(0) as u32 }, None));
 g.end_sentence();
 }

@@ -1,5 +1,6 @@
 // Strength of the Tajuru
 // status: planned
+// requires: engine: X in a mana cost beside a kicker
 // requires: target cardinality Exactly
 // Multikicker {1} (You may pay an additional {1} any number of times as you cast this spell.)
 // Choose target creature, then choose another target creature for each time this spell was kicked. Put X +1/+1 counters on each of them.
@@ -17,6 +18,7 @@ let had_0: Vec<_> = counters_0.iter().map(|c| g.state().obj(c.0).counters(c.1)).
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
+planned_item!("engine-x-in-a-mana-cost-beside-a-kicker", "multikicker(ManaCost { generic: 1, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })");
 
 pub static CARD: CardDef = CardDef { name: "Strength of the Tajuru", token_words: &[], oracle: true, cost: ManaCost { generic: 0, x: 1, symbols: [0, 0, 0, 0, 2, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Instant]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: spell(ABILITY_1_TARGETS, ability_1), abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, kicker: multikicker(ManaCost { generic: 1, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }), ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

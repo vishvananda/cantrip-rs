@@ -1,6 +1,5 @@
 // Iroh, Tea Master
 // status: planned
-// requires: operation GiveControl
 // requires: operation WithReflexive
 // When Iroh enters, create a Food token.
 // At the beginning of combat on your turn, you may have target opponent gain control of target permanent you control. When you do, create a 1/1 white Ally creature token. Put a +1/+1 counter on that token for each permanent you own that your opponents control.
@@ -48,7 +47,7 @@ let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let t_1_raw = announced(g, item, 1, false); let t_1 = announced(g, item, 1, true);
 let decider_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_2, asker.source, Purpose::Optional)? {
-planned!("operation-give-control" => cantrip_mechanics::control::give(g, asker.source, { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() }, { let q: &dyn Query = g; t_1_raw.get(0).copied().filter(|t| t_1.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }, None));
+let players_5: Vec<PlayerId> = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() }; let objects_5 = { let q: &dyn Query = g; t_1_raw.get(0).copied().filter(|t| t_1.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; let who_5 = match players_5.as_slice() { [one] => Some(*one), _ => cantrip_mechanics::choose::player(g, asker.controller, asker.source, players_5.clone(), "GainControl", 0)? }; if let Some(who) = who_5 { cantrip_api::instruction(g, |g| { for &object in &objects_5 { g.gain_control(asker.source, object, who, Duration::Indefinite); } }); }
 planned!("operation-with-reflexive" => cantrip_mechanics::delayed::reflexive_on(g, item, ReflexiveWhen::YouDo, |g: &mut dyn Game| -> Result<(), Suspend> { let players_6 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_6 = Vec::new();
 let count_6_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let def_6_0 = g.card_id(&token_7::CARD);
 for player in players_6 {

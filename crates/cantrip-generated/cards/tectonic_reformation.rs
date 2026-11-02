@@ -3,7 +3,7 @@
 // Each land card in your hand has cycling {R}.
 // Cycling {2} ({2}, Discard this card: Draw a card.)
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); (q.state().obj(affected).zone.kind() == ZoneKind::Hand && Some(asker.controller) == Some(q.state().obj(affected).owner)) && (*so_far).is(CardType::Land) }
+#[allow(unused_variables)] fn ability_0_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); (q.state().obj(affected).became.is_none() && q.state().obj(affected).zone.kind() == ZoneKind::Hand && Some(asker.controller) == Some(q.state().obj(affected).owner)) && (*so_far).is(CardType::Land) }
 fn granted_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_1 { g.draw(player, amount_1); }

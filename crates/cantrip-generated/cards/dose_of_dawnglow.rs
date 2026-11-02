@@ -1,5 +1,6 @@
 // Dose of Dawnglow
-// status: ready
+// status: planned
+// requires: a main phase test that lost its negation
 // Return target creature card from your graveyard to the battlefield. Then if it isn't your main phase, blight 2. (Put two -1/-1 counters on a creature you control.)
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && ((q.chars(id).is(CardType::Creature) && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(id).owner))))) }
@@ -10,7 +11,7 @@ let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
 let objects_0 = ({ let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_0 = { let rows_0: Vec<(ObjectId, PlayerId, bool)> = objects_0.iter().map(|&o| (o, player_0, false)).collect(); let came_0 = g.put_all_onto_battlefield_as(&rows_0)?; came_0.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
 g.end_sentence();
-if { let q: &dyn Query = g; Some(asker.controller).is_some_and(|player: PlayerId| q.state().turn.active == player && matches!(q.state().turn.step(), Step::PrecombatMain | Step::PostcombatMain)) } {
+if planned_value!("a main phase test that lost its negation", false => "(kind:PlayerState,args:(player:(kind:AbilityController),state:InTheirMainPhase))") {
 let amount_1: u8 = { let q: &dyn Query = g; (2i64).max(0) as u8 }; let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let blighted_1: Vec<ObjectId> = cantrip_mechanics::blight::in_effect(g, player_1, asker.source, amount_1)?.into_iter().collect();
 g.end_sentence();
 hoisted_2.extend(blighted_1.clone());

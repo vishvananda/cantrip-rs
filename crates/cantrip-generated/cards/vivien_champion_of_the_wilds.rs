@@ -1,6 +1,5 @@
 // Vivien, Champion of the Wilds
-// status: planned
-// requires: a card a player may look at for a while
+// status: ready
 // You may cast creature spells as though they had flash.
 // [+1]: Until your next turn, up to one target creature gains reach and vigilance.
 // [−2]: Look at the top three cards of your library. Exile one face down and put the rest on the bottom of your library in any order. For as long as it remains exiled, you may cast it if it's a creature spell.
@@ -23,7 +22,7 @@ let objects_4 = { let q: &dyn Query = g; selected_3.clone() }; let by_4 = None; 
 let library_5 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let cards_5: Vec<ObjectId> = { let q: &dyn Query = g; ({ let without: Vec<ObjectId> = { let mut all: Vec<ObjectId> = Vec::new(); for id in objects_4.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() { if !all.contains(&id) { all.push(id); } } all }; (objects_2.clone()).into_iter().filter(|id| !without.contains(id)).collect::<Vec<ObjectId>>() }).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Library).collect::<Vec<ObjectId>>() }.into_iter().filter(|&o| g.state().obj(o).became.is_none() && g.state().obj(o).zone == Zone::library(library_5)).collect(); let placed_5 = cards_5.clone();
 let chooser_5 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let order_5 = cantrip_mechanics::library::ask_library_order(g, chooser_5, asker.source, &cards_5, DestinationKind::LibraryBottom)?; g.arrange_library(library_5, &[], &order_5);
 g.end_sentence();
-planned!("a-card-a-player-may-look-at-for-a-while" => let cards_6_0 = { let q: &dyn Query = g; (moved_4.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_6_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &card in &cards_6_0 { for &player in &players_6_0 { g.allow_look(card, player, Expiry::Never); } });
+let cards_6_0 = { let q: &dyn Query = g; (moved_4.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_6_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &player in &players_6_0 { g.look_at(player, &cards_6_0); }
 let cards_6_1 = { let q: &dyn Query = g; ((moved_4.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>() }; let players_6_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_6_1 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_6_1 { g.allow_play(card, player, PlayGrant { lands: false, expiry: Expiry::Never, ..PlayGrant::CAST }); } } } });
 g.end_sentence();
  Ok(()) }

@@ -10,7 +10,7 @@ let objects_0 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0
 let kind_0_0_0 = { let q: &dyn Query = g; EffectKind::Pump((2i64) as i16, (2i64) as i16) };
 if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &object in &objects_0 { g.add_effect(source, object, kind_0_0_0, duration_0);  } }); }
 g.end_sentence();
-let decider_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_1, asker.source, Purpose::Optional)? {
+let decider_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if ({ let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) }).is_some_and(|o| cantrip_mechanics::targets::permanent(g, o) && g.obj(o).counters(CounterKind::MinusOne) > 0) && cantrip_mechanics::effects::ask_may(g, decider_1, asker.source, Purpose::Optional)? {
 let mut removed_2: i64 = 0;
 let objects_2_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() };
 let amount_2_0 = { let q: &dyn Query = g; (1i64).max(0) as i16 }; cantrip_api::instruction(g, |g| { for object in objects_2_0 { removed_2 += i64::from(g.remove_counters(object, CounterKind::MinusOne, amount_2_0)); } });

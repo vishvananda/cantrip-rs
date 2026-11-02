@@ -1,10 +1,9 @@
 // Finest Hour
-// status: planned
-// requires: engine: no combat phase count
+// status: ready
 // Exalted (Whenever a creature you control attacks alone, that creature gets +1/+1 until end of turn.)
 // Whenever a creature you control attacks alone, if it's the first combat phase of the turn, untap that creature. After this phase, there is an additional combat phase.
 #[allow(unused_imports)] use cantrip_api::*;
-fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { planned_value!("engine: no combat phase count", false => q.state().turn.combat_phase == 1) }
+fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { ((q.state().turn.step() as u8) >= (Step::BeginCombat as u8) && (q.state().turn.step() as u8) <= (Step::EndOfCombat as u8) && q.history().this_turn().iter().filter(|r| matches!(r.event, Event::StepBegan { step: Step::BeginCombat })).count() == 1) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Attacks { attacker, defending, .. } = event { let id = *attacker; let subject = Target::Object(id); let data = [u32::from(defending.0), u32::MAX]; if q.state().attackers.len() == 1 && (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id))) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

@@ -32,7 +32,7 @@ g.end_sentence();
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_5 as i64) != 0) } {
 let payer_7 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let (paid_7, after_7, before_7, picked_7): (bool, Vec<ObjectId>, Vec<ObjectId>, Vec<ObjectId>) = if true {
-let amount_9 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_9 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_9 = Vec::new(); for player in players_9 { cards_9.extend({ let hand = g.state().zone(Zone::hand(player)).to_vec(); cantrip_mechanics::choose::cards(g, player, asker.source, Purpose::Discard, hand, amount_9, true)? }); } let discarded_9 = g.discard_together(&cards_9);
+let amount_9 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_9: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_9 = Vec::new(); for player in players_9 { cards_9.extend({ let hand = g.state().zone(Zone::hand(player)).to_vec(); cantrip_mechanics::choose::cards(g, player, asker.source, Purpose::Discard, hand, amount_9, true)? }); } let discarded_9 = g.discard_together(&cards_9);
 let paid_8 = !discarded_9.clone().is_empty();
 (paid_8, { let q: &dyn Query = g; (discarded_9).clone() }, { let q: &dyn Query = g; (discarded_9.clone()).clone() }, Vec::new()) } else { (false, Vec::new(), Vec::new(), Vec::new()) };
 g.end_sentence();

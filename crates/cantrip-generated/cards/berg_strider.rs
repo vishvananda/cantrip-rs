@@ -1,6 +1,6 @@
 // Berg Strider
 // status: planned
-// requires: snow mana spent
+// requires: engine: snow mana told apart as a spell is paid for
 // When this creature enters, tap target artifact or creature an opponent controls. If {S} was spent to cast this spell, that permanent doesn't untap during its controller's next untap step. ({S} is mana from a snow source.)
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (((q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Creature)) && (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&q.controller(id))))) }
@@ -12,7 +12,7 @@ let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let objects_0 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_0: Vec<ObjectId> = objects_0.iter().copied().filter(|&o| g.state().obj(o).tapped != true).collect(); g.tap_together(&turned_0);
 g.end_sentence();
-if { let q: &dyn Query = g; item.subject.object().is_some_and(|candidate: ObjectId| (planned_value!("snow mana spent", 0i64 => Some(candidate).map_or(0, |o: ObjectId| i64::from(q.obj(o).spent.snow)))) > (0i64)) } {
+if { let q: &dyn Query = g; item.subject.object().is_some_and(|candidate: ObjectId| (planned_value!("engine: snow mana told apart as a spell is paid for", 0i64 => Some(candidate).map_or(0, |o: ObjectId| q.history().mana_spent_to_cast(o).filter(|(source, _)| *source != ObjectId::NONE && q.chars(*source).supertypes.snow).map(|(_, mana)| i64::from(mana.total())).sum::<i64>()))) > (0i64)) } {
 let objects_1 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.exert(object); } });
 g.end_sentence();
 hoisted_2.extend(objects_1.clone());

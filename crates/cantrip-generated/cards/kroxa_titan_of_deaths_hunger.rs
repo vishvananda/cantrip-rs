@@ -1,6 +1,5 @@
 // Kroxa, Titan of Death's Hunger
-// status: planned
-// requires: numeric expression Earlier
+// status: ready
 // When Kroxa enters, sacrifice it unless it escaped.
 // Whenever Kroxa enters or attacks, each opponent discards a card, then each opponent who didn't discard a nonland card this way loses 3 life.
 // Escape—{B}{B}{R}{R}, Exile five other cards from your graveyard. (You may cast this card from your graveyard for its escape cost.)
@@ -24,19 +23,10 @@ g.end_sentence();
 if let Event::Attacks { attacker, defending, .. } = event { let id = *attacker; let subject = Target::Object(id); let data = [u32::from(defending.0), u32::MAX]; if Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let mut players_3: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
-let mut each_6: Vec<Vec<ObjectId>> = vec![Vec::new(); players_3.len()]; let mut all_6: Vec<ObjectId> = Vec::new();
-let mut each_7: Vec<Vec<ObjectId>> = vec![Vec::new(); players_3.len()]; let mut all_7: Vec<ObjectId> = Vec::new();
-let mut each_8 = vec![Default::default(); players_3.len()];
- for (index_3, bound_0) in players_3.iter().copied().enumerate() { let amount_5 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_5 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_5 = Vec::new(); for player in players_5 { cards_5.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_5)?); } let discarded_5 = g.discard_together(&cards_5);
-let paid_4 = !discarded_5.clone().is_empty();
- each_6[index_3] = discarded_5.clone(); all_6.extend(each_6[index_3].iter().copied());
-each_7[index_3] = { let q: &dyn Query = g; discarded_5.clone() }; all_7.extend(each_7[index_3].iter().copied());
-each_8[index_3] = paid_4;
-   } 
+let amount_3 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_3: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_3 = Vec::new(); for player in g.state().apnap().filter(|p| players_3.contains(p)).collect::<Vec<PlayerId>>() { cards_3.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_3)?); } let discarded_3 = g.discard_together(&cards_3);
 g.end_sentence();
-let amount_9 = { let q: &dyn Query = g; (3i64).max(0) as i32 }; let players_9 = { let q: &dyn Query = g; { let mut all = Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>(); let other = { let mut all = Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>(); let other = q.state().apnap().filter(|&bound_0: &PlayerId| (planned_value!("numeric expression Earlier", 0i64 => q.earlier_objects(item, EarlierObjects::Discarded, Some(bound_0)).into_iter().filter(|&id| !(q.chars(id).is(CardType::Land))).count() as i64)) == (0i64)).collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all }; all.retain(|p: &PlayerId| other.contains(p)); all } };
-for player in players_9 { g.lose_life(player, amount_9); }
+let amount_4 = { let q: &dyn Query = g; (3i64).max(0) as i32 }; let players_4 = { let q: &dyn Query = g; { let mut all = Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>(); let other = { let mut all = Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>(); let other = q.state().apnap().filter(|&bound_0: &PlayerId| ((discarded_3.clone()).into_iter().filter(|&id: &ObjectId| q.state().obj(id).owner == bound_0).filter(|&id| !(q.chars(id).is(CardType::Land))).count() as i64) == (0i64)).collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all }; all.retain(|p: &PlayerId| other.contains(p)); all } };
+for player in players_4 { g.lose_life(player, amount_4); }
 g.end_sentence();
  Ok(()) }
 

@@ -1,7 +1,5 @@
 // Collective Voyage
-// status: planned
-// requires: an amount read by each player as their own
-// requires: object reference Bound
+// status: ready
 // Join forces — Starting with you, each player may pay any amount of mana. Each player searches their library for up to X basic land cards, where X is the total amount of mana paid this way, puts them onto the battlefield tapped, then shuffles.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
@@ -9,19 +7,23 @@ let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().co
 let first_0 = { let q: &dyn Query = g; Some(asker.controller) }; if let Some(at) = players_0.iter().position(|&p| Some(p) == first_0) { players_0.rotate_left(at); }
 let mut guard_0_0 = vec![false; players_0.len()];
 let mut each_2 = vec![Default::default(); players_0.len()];
+let mut done_total_2: i64 = 0;
 let mut each_3 = vec![Default::default(); players_0.len()];
  for (index_0, bound_0) in players_0.iter().copied().enumerate() { if cantrip_mechanics::effects::ask_may(g, bound_0, asker.source, Purpose::Optional)? { guard_0_0[index_0] = true;
 let mut done_1: i64 = 0; for player in { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() } { done_1 += { i64::from(g.may_pay_x(player, asker.source, asker.source, cost("{X}"), &PAY_QUESTION)?.unwrap_or(0)) }; }
  each_2[index_0] = done_1;
+done_total_2 += done_1;
 each_3[index_0] = done_1;
   }
  } 
 g.end_sentence();
 let mut players_4: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
- for (index_4, bound_0) in players_4.iter().copied().enumerate() { planned!("an-amount-read-by-each-player-as-their-own", Search, "also" = "[]", "choices" = "[{\"constraints\":[],\"count\":{\"UpTo\":{\"args\":0,\"kind\":\"Performed\"}},\"filter\":{\"args\":[{\"args\":\"Basic\",\"kind\":\"Supertype\"},{\"args\":\"Land\",\"kind\":\"CardType\"}],\"kind\":\"All\"}}]", "either" = "false", "library" = { let q: &dyn Query = g; planned_value!("object reference Bound", None::<ObjectId> => bound_0) }, "outside" = "false", "player" = { let q: &dyn Query = g; planned_value!("object reference Bound", None::<ObjectId> => bound_0) }, "top" = "()");
-    } 
+let mut each_6: Vec<Vec<ObjectId>> = vec![Vec::new(); players_4.len()]; let mut all_6: Vec<ObjectId> = Vec::new();
+ for (index_4, bound_0) in players_4.iter().copied().enumerate() { let searcher_5 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; let owner_5 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; let rule_count_5 = { let q: &dyn Query = g; cantrip_mechanics::select::Count::UpTo(((done_total_2 as i64)).max(0) as u32) }; let shown_5 = cantrip_mechanics::library::searched_cards(g, owner_5); let can_5: Vec<ObjectId> = { let q: &dyn Query = g; shown_5.iter().copied().filter(|&id| (q.chars(id).supertypes.basic && q.chars(id).is(CardType::Land))).collect() }; let found_5 = cantrip_mechanics::library::search(g, searcher_5, owner_5, asker.source, SearchDestination::BattlefieldTapped, cantrip_mechanics::select::Selection::listed(rule_count_5, &shown_5, can_5))?;
+ each_6[index_4] = found_5.clone(); all_6.extend(each_6[index_4].iter().copied());
+   } 
 g.end_sentence();
-let objects_5 = ({ let q: &dyn Query = g; planned_value!("depends on an instruction with a gap", Vec::<ObjectId>::new() => result_1) }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_5 = { let rows_5: Vec<(ObjectId, PlayerId, bool)> = objects_5.iter().map(|&o| (o, g.state().obj(o).owner, true)).collect(); let came_5 = g.put_all_onto_battlefield_as(&rows_5)?; came_5.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
+let objects_7 = ({ let q: &dyn Query = g; all_6.clone() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_7 = { let rows_7: Vec<(ObjectId, PlayerId, bool)> = objects_7.iter().map(|&o| (o, g.state().obj(o).owner, true)).collect(); let came_7 = g.put_all_onto_battlefield_as(&rows_7)?; came_7.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
 g.end_sentence();
  for (index_4, bound_0) in players_4.iter().copied().enumerate() { for player in { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() } { g.shuffle(player); }
     } 

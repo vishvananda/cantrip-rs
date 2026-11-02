@@ -1,6 +1,5 @@
 // Sporogenesis
-// status: planned
-// requires: counter kind Fungus
+// status: ready
 // At the beginning of your upkeep, you may put a fungus counter on target nontoken creature.
 // Whenever a creature with a fungus counter on it dies, create a 1/1 green Saproling creature token for each fungus counter on that creature.
 // When this enchantment leaves the battlefield, remove all fungus counters from all creatures.
@@ -14,14 +13,14 @@ let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let decider_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_0, asker.source, Purpose::Optional)? {
 let mut counters_1: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, planned_value!("counter kind Fungus", CounterKind::Charge => CounterKind::Fungus), amount)); } }
+let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, CounterKind::Fungus, amount)); } }
 let had_1: Vec<_> = counters_1.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_1); let applied_1: Vec<ObjectId> = counters_1.iter().zip(had_1).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
 hoisted_2.extend(applied_1.clone());
 }
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && from.is(ZoneKind::Battlefield) && (q.chars(id).is(CardType::Creature) && (i64::from(q.state().obj(id).counters(planned_value!("counter kind Fungus", CounterKind::Charge => CounterKind::Fungus)))) > (0i64)) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && from.is(ZoneKind::Battlefield) && (q.chars(id).is(CardType::Creature) && (i64::from(q.state().obj(id).counters(CounterKind::Fungus))) > (0i64)) { return Some(Fired { subject, data }); } }
  None }
 pub mod token_4 {
 #[allow(unused_imports)] use cantrip_api::*;
@@ -32,7 +31,7 @@ pub static EXTRA: &[&CardDef] = &[];
 }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_3 = Vec::new();
-let count_3_0 = { let q: &dyn Query = g; ((item.subject.object().into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.state().obj(o).counters(planned_value!("counter kind Fungus", CounterKind::Charge => CounterKind::Fungus)))).sum::<i64>()).max(0) as u32 }; let def_3_0 = g.card_id(&token_4::CARD);
+let count_3_0 = { let q: &dyn Query = g; ((item.subject.object().into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.state().obj(o).counters(CounterKind::Fungus))).sum::<i64>()).max(0) as u32 }; let def_3_0 = g.card_id(&token_4::CARD);
 for player in players_3 {
 tokens_3.extend(std::iter::repeat((def_3_0,player)).take(count_3_0 as usize));
 } let words_3 = g.words(asker.source);
@@ -44,7 +43,7 @@ g.end_sentence();
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut removed_5: i64 = 0;
 let objects_5_0 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>() };
-let amount_5_0 = i16::MAX; cantrip_api::instruction(g, |g| { for object in objects_5_0 { removed_5 += i64::from(g.remove_counters(object, planned_value!("counter kind Fungus", CounterKind::Charge => CounterKind::Fungus), amount_5_0)); } });
+let amount_5_0 = i16::MAX; cantrip_api::instruction(g, |g| { for object in objects_5_0 { removed_5 += i64::from(g.remove_counters(object, CounterKind::Fungus, amount_5_0)); } });
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

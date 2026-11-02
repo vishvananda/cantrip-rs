@@ -1,6 +1,5 @@
 // Ratadrabik of Urborg
-// status: planned
-// requires: copy exception AddColor
+// status: ready
 // Vigilance, ward {2}
 // Other Zombies you control have vigilance.
 // Whenever another legendary creature you control dies, create a token that's a copy of that creature, except it's not legendary and it's a 2/2 black Zombie in addition to its other colors and types.
@@ -10,7 +9,7 @@
 #[allow(unused_variables)] fn ability_3_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && from.is(ZoneKind::Battlefield) && (!(Some(asker.source) == Some(id)) && (q.chars(id).supertypes.legendary && q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))) { return Some(Fired { subject, data }); } }
  None }
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let original_0 = { let q: &dyn Query = g; item.subject.object() }; let values_0 = { let q: &dyn Query = g; original_0.map(|original: ObjectId| planned_value!("copy exception AddColor", q.copiable_values(original).nonlegendary().sized(2, 2) => q.copiable_values(original).nonlegendary().sized(2, 2).with_colors(&[Color::Black])).with_subtype(Subtype::Zombie)) }; let count_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let created_0 = match values_0 { Some(values) => g.create_token_copies_tapped(values, player_0, count_0, false)?, None => Vec::new() };
+let original_0 = { let q: &dyn Query = g; item.subject.object() }; let values_0 = { let q: &dyn Query = g; original_0.map(|original: ObjectId| { let plain = q.copiable_values(original).nonlegendary().sized(2, 2); let had = plain.colors.unwrap_or(q.card(plain.card).colors()); plain.colored([Color::Black].into_iter().fold(had, |set: ColorSet, color: Color| set.with(q.words(asker.source).color(color)))) }.with_subtype(q.words(asker.source).subtype(Subtype::Zombie))) }; let count_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let created_0 = match values_0 { Some(values) => g.create_token_copies_tapped(values, player_0, count_0, false)?, None => Vec::new() };
 g.end_sentence();
  Ok(()) }
 

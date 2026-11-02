@@ -1,10 +1,9 @@
 // Priest of Yawgmoth
-// status: planned
-// requires: cost objects outside a resolving ability
+// status: ready
 // {T}, Sacrifice an artifact: Add an amount of {B} equal to the sacrificed artifact's mana value.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let mana_players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_0_0 = { let q: &dyn Query = g; ((planned_value!("cost objects outside a resolving ability", Vec::<ObjectId>::new() => q.paid_for(asker))).get(0).copied().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o)))).max(0) as u32 };
+let mana_0_0 = { let q: &dyn Query = g; ((q.events().iter().rev().find_map(|r| match r.event { Event::ZoneChange { old, from, part: false, .. } if from.is(ZoneKind::Battlefield) => Some(old), _ => None }).into_iter().collect::<Vec<ObjectId>>()).get(0).copied().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o)))).max(0) as u32 };
 for player in mana_players_0 {
 g.add_mana(player, Mana::B, mana_0_0);}
  Ok(()) }

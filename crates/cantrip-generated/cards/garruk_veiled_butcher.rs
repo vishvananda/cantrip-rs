@@ -1,6 +1,5 @@
 // Garruk, Veiled Butcher
-// status: planned
-// requires: numeric expression Earlier
+// status: ready
 // If a creature an opponent controls would die, exile it instead.
 // [+2]: Up to one target creature gets -4/-1 until your next turn.
 // [−2]: Each player sacrifices a creature of their choice. If you sacrificed a creature this way, create a 4/4 green Beast creature token with trample.
@@ -44,9 +43,9 @@ hoisted_4.extend(created_2.clone());
 g.end_sentence();
  Ok(()) }
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_5 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let players_5 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }; let mut cards_5 = Vec::new(); for player in players_5 { cards_5.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_5)?); } let discarded_5 = g.discard_together(&cards_5);
+let amount_5 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let players_5: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_5 = Vec::new(); for player in g.state().apnap().filter(|p| players_5.contains(p)).collect::<Vec<PlayerId>>() { cards_5.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_5)?); } let discarded_5 = g.discard_together(&cards_5);
 g.end_sentence();
-let amount_6 = { let q: &dyn Query = g; (({ let mut all = Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>(); let other = q.state().apnap().filter(|&bound_0: &PlayerId| !((planned_value!("numeric expression Earlier", 0i64 => q.earlier_objects_of(item, 0).into_iter().filter(|&id| !(q.chars(id).is(CardType::Land))).count() as i64)) >= (2i64))).collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all }).len() as i64).max(0) as u32 }; let players_6 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_6 = { let q: &dyn Query = g; (({ let mut all = Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>(); let other = q.state().apnap().filter(|&bound_0: &PlayerId| !(((discarded_5.clone()).into_iter().filter(|&id: &ObjectId| q.state().obj(id).owner == bound_0).filter(|&id| !(q.chars(id).is(CardType::Land))).count() as i64) >= (2i64))).collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all }).len() as i64).max(0) as u32 }; let players_6 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_6 { g.draw(player, amount_6); }
 g.end_sentence();
  Ok(()) }

@@ -1,6 +1,5 @@
 // Dramatist's Puppet
-// status: planned
-// requires: operation EachCounterKind
+// status: ready
 // When this creature enters, for each kind of counter on target permanent, put another counter of that kind on it or remove one from it.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (true)) }
@@ -9,7 +8,7 @@ static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-planned!("operation-each-counter-kind" => cantrip_mechanics::counters::each_kind(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, asker.source, { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }, "[PutThatKind(Target { slot: Slot(0), index: 0 }), RemoveThatKind(Target { slot: Slot(0), index: 0 })]", false)?);
+let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let among_0: Vec<ObjectId> = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; let kinds_0: Vec<CounterKind> = CounterKind::ALL.into_iter().filter(|&kind| among_0.iter().any(|&o| g.state().obj(o).counters(kind) > 0)).collect(); if let Some(object) = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) } { for kind in kinds_0 { if cantrip_mechanics::choose::cards(g, player_0, asker.source, Purpose::PutCounters(kind, 1), Vec::from([object]), 1, true)?.is_empty() { g.remove_counters(object, kind, 1); } else { g.add_counters(object, kind, 1); } } }
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

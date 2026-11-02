@@ -1,14 +1,13 @@
 // Play with Fire
-// status: planned
-// requires: player collection DamagedBy
+// status: ready
 // Play with Fire deals 2 damage to any target. If a player is dealt damage this way, scry 1. (Look at the top card of your library. You may put that card on the bottom.)
 #[allow(unused_imports)] use cantrip_api::*;
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[cantrip_mechanics::targets::ANY];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let mut done_0: i64 = 0; let source_0 = { let q: &dyn Query = g; Some(asker.source) }; let amount_0 = { let q: &dyn Query = g; (2i64).max(0) as u16 }; let recipients_0 = { let q: &dyn Query = g; t_0.clone() }; if let Some(source) = source_0 { let batch: Vec<(ObjectId, Target, u16)> = recipients_0.iter().map(|t| (source, *t, amount_0)).collect(); done_0 += g.damage_together(&batch).iter().map(|&n| i64::from(n)).sum::<i64>(); }
+let mut done_0: i64 = 0; let mut dealt_0: Vec<ObjectId> = Vec::new(); let mut hurt_0: Vec<PlayerId> = Vec::new(); let before_0 = g.history().head() as usize; let source_0 = { let q: &dyn Query = g; Some(asker.source) }; let amount_0 = { let q: &dyn Query = g; (2i64).max(0) as u16 }; let recipients_0 = { let q: &dyn Query = g; t_0.clone() }; if let Some(source) = source_0 { let batch: Vec<(ObjectId, Target, u16)> = recipients_0.iter().map(|t| (source, *t, amount_0)).collect(); done_0 += g.damage_together(&batch).iter().map(|&n| i64::from(n)).sum::<i64>(); dealt_0.extend(cantrip_mechanics::history::permanents_dealt_damage_by(g.history(), source, before_0)); for r in &g.history().all()[before_0..] { if let Event::Damage { source: s, target: Target::Player(p), amount, .. } = r.event { if s == source && amount > 0 && !hurt_0.contains(&p) { hurt_0.push(p); } } } }
 g.end_sentence();
-if { let q: &dyn Query = g; (({ let mut all = planned_value!("player collection DamagedBy", Vec::<PlayerId>::new() => q.players_damaged_by(asker, 0)); let other = q.state().apnap().collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all }).len() as i64) > (0i64) } {
+if { let q: &dyn Query = g; (({ let mut all = hurt_0.clone(); let other = q.state().apnap().collect::<Vec<PlayerId>>(); all.retain(|p: &PlayerId| other.contains(p)); all }).len() as i64) > (0i64) } {
 let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as usize }; let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; cantrip_mechanics::scry(g, player_1, asker.source, amount_1)?;
 g.end_sentence();
 }

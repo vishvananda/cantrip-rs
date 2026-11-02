@@ -4,17 +4,10 @@
 // Draw a card.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let objects_1 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((3i64).max(0) as usize).collect::<Vec<ObjectId>>() }; g.look_at(player_1, &objects_1);
-let library_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let cards_2: Vec<ObjectId> = { let q: &dyn Query = g; (objects_1.clone()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Library).collect::<Vec<ObjectId>>() }.into_iter().filter(|&o| g.state().obj(o).became.is_none() && g.state().obj(o).zone == Zone::library(library_2)).collect(); let placed_2 = cards_2.clone();
-let chooser_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let order_2 = cantrip_mechanics::library::ask_library_order(g, chooser_2, asker.source, &cards_2, DestinationKind::LibraryTop)?; g.arrange_library(library_2, &order_2, &[]);
+let looked_0 = cantrip_mechanics::top_of_library(g, item.controller, 3); if !looked_0.is_empty() { let ask = RequestKind::DistributeCards { source: item.object, cards: looked_0.clone(), destinations: vec![Destination { kind: DestinationKind::LibraryTop, min: 0, max: u8::MAX, eligible: looked_0 }], may_shuffle: true }; if let Answer::Placements { placements, shuffle } = g.ask(item.controller, ask)? { if shuffle { g.shuffle(item.controller); } else { g.arrange_library(item.controller, &placements[0], &[]); } } }
 g.end_sentence();
-let decider_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_3, asker.source, Purpose::Optional)? {
-for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.shuffle(player); }
-g.end_sentence();
-}
-g.end_sentence();
-let amount_5 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_5 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-for player in players_5 { g.draw(player, amount_5); }
+let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+for player in players_1 { g.draw(player, amount_1); }
 g.end_sentence();
  Ok(()) }
 

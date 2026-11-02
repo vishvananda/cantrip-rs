@@ -1,11 +1,10 @@
 // Regna, the Redeemer
-// status: planned
-// requires: condition SameTeam
+// status: ready
 // Partner with Krav, the Unredeemed (When this creature enters, target player may put Krav into their hand from their library, then shuffle.)
 // Flying
 // At the beginning of each end step, if your team gained life this turn, create two 1/1 white Warrior creature tokens.
 #[allow(unused_imports)] use cantrip_api::*;
-fn ability_2_if(q: &dyn Query, asker: &Asker) -> bool { (q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition SameTeam", false => q.state().same_team(a, b))).collect::<Vec<PlayerId>>()).into_iter().any(|bound_0: PlayerId| (q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::LifeChange { player, delta } = event { let subject = Target::Player(*player); let data = [delta.unsigned_abs(), 0]; if *delta > 0 && Some(bound_0) == Some(*player) { return Some(Fired { subject, data }); } }  None }).count() as i64) >= (1i64)) }
+fn ability_2_if(q: &dyn Query, asker: &Asker) -> bool { (q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0) == Some(asker.controller)).collect::<Vec<PlayerId>>()).into_iter().any(|bound_0: PlayerId| (q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::LifeChange { player, delta } = event { let subject = Target::Player(*player); let data = [delta.unsigned_abs(), 0]; if *delta > 0 && Some(bound_0) == Some(*player) { return Some(Fired { subject, data }); } }  None }).count() as i64) >= (1i64)) }
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::End) && true { return Some(Fired { subject, data }); } }
  None }
 pub mod token_1 {

@@ -5,7 +5,7 @@
 // Whenever one or more creature cards are put into your graveyard from anywhere, venture into the dungeon. This ability triggers only once each turn. (To venture into the dungeon, enter the first room or advance to the next room.)
 // Create Undead — Whenever you complete a dungeon, return target creature card from your graveyard to the battlefield.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && ((q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.state().obj(id).owner)) && !(q.state().obj(id).token)) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && ((q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.state().obj(id).owner)) && !(q.state().obj(id).token)) && !q.state().obj(id).token { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 planned!("engine-venture-into-the-dungeon-reaches-only-undercity" => { let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; g.venture(player)?; });

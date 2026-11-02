@@ -1,6 +1,5 @@
 // Hex, Kellan's Companion
 // status: planned
-// requires: counter kind Fetch
 // requires: engine: no perpetual effects
 // Haste
 // Whenever you cast an Adventure spell, if Hex is on the battlefield or in exile, it perpetually gets +1/+1. Then if it's on the battlefield, exile it with a fetch counter on it.
@@ -25,7 +24,7 @@ let kind_3_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual:
 for &object in &objects_3 { cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_3_0); });
 g.end_sentence();
 if { let q: &dyn Query = g; Some(asker.source).is_some_and(|candidate: ObjectId| (q.state().obj(candidate).became.is_none() && q.state().obj(candidate).zone.kind() == ZoneKind::Battlefield)) } {
-let objects_4 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let moved_4 = { let counters: Vec<(CounterKind, i16)> = vec![(planned_value!("counter kind Fetch", CounterKind::Charge => CounterKind::Fetch), { let q: &dyn Query = g; (1i64).max(0) as i16 })]; let exiled = g.exile_all(&objects_4); let puts: Vec<(ObjectId, CounterKind, i16)> = exiled.iter().flat_map(|&o| counters.iter().map(move |&(kind, n)| (o, kind, n))).collect(); g.add_counters_together(&puts); exiled };
+let objects_4 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let moved_4 = { let counters: Vec<(CounterKind, i16)> = vec![(CounterKind::Fetch, { let q: &dyn Query = g; (1i64).max(0) as i16 })]; let exiled = g.exile_all(&objects_4); let puts: Vec<(ObjectId, CounterKind, i16)> = exiled.iter().flat_map(|&o| counters.iter().map(move |&(kind, n)| (o, kind, n))).collect(); g.add_counters_together(&puts); exiled };
 g.end_sentence();
 hoisted_5.extend(moved_4.clone());
 hoisted_6.extend({ let q: &dyn Query = g; objects_4.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() });
@@ -36,7 +35,7 @@ hoisted_8.extend({ let q: &dyn Query = g; hoisted_6.clone() });
 }
 g.end_sentence();
  Ok(()) }
-fn ability_2_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.source).is_some_and(|candidate: ObjectId| (i64::from(q.state().obj(candidate).counters(planned_value!("counter kind Fetch", CounterKind::Charge => CounterKind::Fetch)))) > (0i64)) }
+fn ability_2_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.source).is_some_and(|candidate: ObjectId| (i64::from(q.state().obj(candidate).counters(CounterKind::Fetch))) > (0i64)) }
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && (true && cast_at(q, event, id).is_some_and(|cast| cast.from == ZoneKind::Exile)) { return Some(Fired { subject, data }); } }
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

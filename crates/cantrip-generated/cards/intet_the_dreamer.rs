@@ -1,6 +1,5 @@
 // Intet, the Dreamer
 // status: planned
-// requires: a card a player may look at for a while
 // requires: play permission lasting WhileOnBattlefield
 // Flying
 // Whenever Intet deals combat damage to a player, you may pay {2}{U}. If you do, exile the top card of your library face down. You may look at that card for as long as it remains exiled. You may play that card without paying its mana cost for as long as Intet remains on the battlefield.
@@ -15,7 +14,7 @@ g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
 let objects_1 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((1i64).max(0) as usize).collect::<Vec<ObjectId>>() }; let by_1 = None; let moved_1 = g.exile_face_down(&objects_1, by_1);
 g.end_sentence();
-planned!("a-card-a-player-may-look-at-for-a-while" => let cards_2_0 = { let q: &dyn Query = g; (moved_1.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_2_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &card in &cards_2_0 { for &player in &players_2_0 { g.allow_look(card, player, Expiry::Never); } });
+let cards_2_0 = { let q: &dyn Query = g; (moved_1.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_2_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &player in &players_2_0 { g.look_at(player, &cards_2_0); }
 g.end_sentence();
 planned!("play-permission-lasting-while-on-battlefield" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.add_player_effect(player, source, EffectKind::PlayerRule(PlayerRule::Play { zone: ZoneKind::Exile, cards: CardsOfRule::These({ let q: &dyn Query = g; (moved_1.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }), grant: PlayGrant { lands: true, instead: Some(ManaCost::ZERO), ..PlayGrant::CAST } }), Duration::WhileSourceOnBattlefield); } });
 g.end_sentence();

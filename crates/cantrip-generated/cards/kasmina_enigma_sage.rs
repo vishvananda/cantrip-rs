@@ -44,7 +44,7 @@ let picked_7 = if open_7.is_empty() { None } else if open_7.len() > 1 || (false 
 let Some(card_7) = picked_7 else { break; };
 let ways_7: Vec<CastWay> = g.cast_ways_during_resolution_by(card_7, caster_7).into_iter().filter(|w| true).collect();
 let done_7 = if ways_7.is_empty() { g.play_land_during_resolution(card_7)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_7, card_7, ways_7)?.map(|w| w.way); g.cast_during_resolution_as(card_7, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(caster_7), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
-if done_7 { left_7 -= 1; played_7.push(g.state().obj(card_7).became.unwrap_or(card_7)); } else if 1i64 == 1 { break; } if done_7 || !(true && false) { pool_7.retain(|&c| c != card_7); }
+if done_7 { left_7 -= 1; played_7.push(g.state().obj(card_7).became.unwrap_or(card_7)); } else if true { break; } if done_7 || !(true && false) { pool_7.retain(|&c| c != card_7); }
 }
 g.end_sentence();
  Ok(()) }

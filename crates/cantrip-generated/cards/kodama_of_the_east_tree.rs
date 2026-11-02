@@ -1,13 +1,12 @@
 // Kodama of the East Tree
-// status: planned
-// requires: object filter MadeBy
+// status: ready
 // Reach
 // Whenever another permanent you control enters, if it wasn't put onto the battlefield with this ability, you may put a permanent card with equal or lesser mana value from your hand onto the battlefield.
 // Partner (You can have two commanders if both have partner.)
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && (!(Some(asker.source) == Some(id)) && true && Some(asker.controller) == Some(q.controller(id))) && subject.object().is_some_and(|candidate: ObjectId| !(planned_value!("object filter MadeBy", false => q.state().obj(candidate).made_by == Some(asker.source)))) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && (!(Some(asker.source) == Some(id)) && true && Some(asker.controller) == Some(q.controller(id))) && subject.object().is_some_and(|candidate: ObjectId| !(Some(asker.source).is_some_and(|m: ObjectId| q.state().obj(candidate).entered_with == Some(m) || q.history().all().iter().any(|r| matches!(r.event, Event::Entered { permanent, .. } if permanent == candidate) && (r.cause == Cause::Spell(m) || matches!(r.cause, Cause::Ability { source, .. } if source == m)))))) { return Some(Fired { subject, data }); } }
  None }
-fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller); if !{ let q: &dyn Query = g; item.subject.object().is_some_and(|candidate: ObjectId| !(planned_value!("object filter MadeBy", false => q.state().obj(candidate).made_by == Some(asker.source)))) } { return Ok(()); } let mut hoisted_4: Vec<ObjectId> = Vec::new();
+fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller); if !{ let q: &dyn Query = g; item.subject.object().is_some_and(|candidate: ObjectId| !(Some(asker.source).is_some_and(|m: ObjectId| q.state().obj(candidate).entered_with == Some(m) || q.history().all().iter().any(|r| matches!(r.event, Event::Entered { permanent, .. } if permanent == candidate) && (r.cause == Cause::Spell(m) || matches!(r.cause, Cause::Ability { source, .. } if source == m)))))) } { return Ok(()); } let mut hoisted_4: Vec<ObjectId> = Vec::new();
 let mut hoisted_3: Vec<ObjectId> = Vec::new();
 let mut hoisted_2: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);

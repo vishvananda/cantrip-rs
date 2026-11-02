@@ -1,7 +1,5 @@
 // Wonderscape Sage
-// status: planned
-// requires: earlier objects Returned
-// requires: object state NonBasicLandType
+// status: ready
 // Flying
 // {T}, Return a land you control to its owner's hand: Draw a card. Then discard a card unless that land had a nonbasic land type.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -11,8 +9,8 @@ let asker = &Asker::new(item.object, item.controller);
 let amount_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_0 { g.draw(player, amount_0); }
 g.end_sentence();
-if { let q: &dyn Query = g; !(((planned_value!("earlier objects Returned", Vec::<ObjectId>::new() => q.acted_on(asker, Acted::Returned))).into_iter().filter(|&id| planned_value!("object state NonBasicLandType", false => q.chars(id).has_nonbasic_land_type())).count() as i64) >= (1i64)) } {
-let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_1 = Vec::new(); for player in players_1 { cards_1.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_1)?); } let discarded_1 = g.discard_together(&cards_1);
+if { let q: &dyn Query = g; !(((q.cost_objects(item).to_vec()).into_iter().filter(|&id| q.chars(id).subtypes.iter().any(|kind| kind.card_types().has(CardType::Land) && !matches!(kind, Subtype::Plains | Subtype::Island | Subtype::Swamp | Subtype::Mountain | Subtype::Forest))).count() as i64) >= (1i64)) } {
+let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_1 = Vec::new(); for player in players_1 { cards_1.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_1)?); } let discarded_1 = g.discard_together(&cards_1);
 g.end_sentence();
 hoisted_2.extend(discarded_1.clone());
 hoisted_3.extend({ let q: &dyn Query = g; discarded_1.clone() });

@@ -1,6 +1,5 @@
 // Aetheric Amplifier
-// status: planned
-// requires: counters a player has, by kind
+// status: ready
 // {T}: Add one mana of any color.
 // {4}, {T}: Choose one. Activate only as a sorcery.
 // • Double the number of each kind of counter on target permanent.
@@ -21,7 +20,7 @@ let puts_1: Vec<(ObjectId, CounterKind, i16)> = objects_1.iter().flat_map(|&o| {
 g.end_sentence();
  Ok(()) }
 fn ability_1_mode_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("counters-a-player-has-by-kind" => let from: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let to: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_mechanics::counters::duplicate_on_players(g, asker, &from, &to, "All")?;);
+for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { let (poison, energy, experience) = { let counters = g.state().player(player); (u32::from(counters.poison()), u32::from(counters.energy()), u32::from(counters.experience())) }; let n = poison; if n > 0 { g.give_poison(player, n); } let n = energy; if n > 0 { g.change_energy(player, n as i32); } let n = experience; if n > 0 { g.give_experience(player, n); } }
 g.end_sentence();
  Ok(()) }
 static ABILITY_1_MODES: ModalDef = modes(&[mode(ability_1_mode_0, "Double the number of each kind of counter on target permanent.").targets(ABILITY_1_MODE_0_TARGETS),mode(ability_1_mode_1, "Double the number of each kind of counter you have.").targets(&[])]).choose(1, 1);

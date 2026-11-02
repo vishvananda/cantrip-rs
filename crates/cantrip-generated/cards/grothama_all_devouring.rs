@@ -1,6 +1,5 @@
 // Grothama, All-Devouring
-// status: planned
-// requires: object reference Granter
+// status: ready
 // Other creatures have "Whenever this creature attacks, you may have it fight Grothama, All-Devouring."
 // When Grothama leaves the battlefield, each player draws cards equal to the amount of damage dealt to Grothama this turn by sources they controlled.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -9,7 +8,7 @@
  None }
 fn granted_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let decider_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_1, asker.source, Purpose::Optional)? {
-let first_2 = ({ let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied(); let second_2 = ({ let q: &dyn Query = g; (planned_value!("object reference Granter", None::<ObjectId> => q.granted_by(asker.source)).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied();
+let first_2 = ({ let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied(); let second_2 = ({ let q: &dyn Query = g; (granter(q, item).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied();
 if let (Some(first), Some(second)) = (first_2, second_2) { g.fight(first, second); }
 g.end_sentence();
 }
@@ -20,11 +19,12 @@ g.end_sentence();
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_3: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
- for (index_3, bound_0) in players_3.iter().copied().enumerate() { let amount_4 = { let q: &dyn Query = g; (q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::Damage { source, target, amount, kind, .. } = event { let (source, amount, combat) = (*source, *amount, kind.is_combat()); let subject = *target; let data = [u32::from(amount), source.0]; if true && Some(bound_0) == Some(q.controller(source)) && matches!(*target, Target::Object(o) if Some(asker.source) == Some(o)) { return Some(Fired { subject, data }); } }  None }).map(|f: Fired| i64::from(f.data[0])).sum::<i64>()).max(0) as u32 }; let players_4 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
+ for (index_3, bound_0) in players_3.iter().copied().enumerate() { let amount_4 = { let q: &dyn Query = g; (q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::Damage { source, target, amount, kind, controller, known, .. } = event { let (source, amount, combat, controller) = (*source, *amount, kind.is_combat(), *controller); let dealt = DamageDealt { source, target: *target, amount, combat, controller, known: *known }; let subject = *target; let data = [u32::from(amount), source.0]; if true && Some(bound_0) == Some(controller) && matches!(*target, Target::Object(o) if Some(asker.source) == Some(o)) { return Some(Fired { subject, data }); } }  None }).map(|f: Fired| i64::from(f.data[0])).sum::<i64>()).max(0) as u32 }; let players_4 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_4 { g.draw(player, amount_4); }
     } 
 g.end_sentence();
  Ok(()) }
+fn granter(q: &dyn Query, item: &StackItem) -> Option<ObjectId> { if item.acquired.by != AcquiredBy::Grant { return None; } let stamp = item.acquired.stamp; let card = item.ability.card; if let Some(e) = q.state().effects.iter().find(|e| e.timestamp == stamp && matches!(e.kind, EffectKind::AddAbility(_))) { return Some(e.source); } if let Some(id) = q.state().battlefield().iter().copied().find(|&id| q.state().obj(id).timestamp == stamp && q.chars(id).card == card) { return Some(id); } q.history().all().iter().rev().find_map(|r| match r.event { Event::ZoneChange { old, from, .. } if from.is(ZoneKind::Battlefield) && q.state().obj(old).timestamp == stamp && q.state().obj(old).card == card => Some(old), _ => None }) }
 
 pub static CARD: CardDef = CardDef { name: "Grothama, All-Devouring", token_words: &[], oracle: true, cost: ManaCost { generic: 3, x: 0, symbols: [0, 0, 0, 0, 2, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Wurm]), supertypes: Supertypes { basic: false, legendary: true, snow: false }, colors: None, power: Some(10), toughness: Some(8), loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::ZONE_CHANGE.0), ability_1_event), ability_1, "When Grothama leaves the battlefield, each player draws cards equal to the amount of damage dealt to Grothama this turn by sources they controlled.").targets(&[])], statics: &[static_ability(Layer::Ability, ability_0_affects, ability_0_apply_0, "Other creatures have \"Whenever this creature attacks, you may have it fight Grothama, All-Devouring.\"")], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[triggered(when_asked(EventMask(EventMask::ATTACKS.0), granted_0_event), granted_0, "Whenever this creature attacks, you may have it fight Grothama, All-Devouring.").targets(&[])], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

@@ -1,13 +1,12 @@
 // Herald of Vengeance
-// status: planned
-// requires: object collection FromHistory
+// status: ready
 // Flying
 // When this creature enters, destroy each permanent you don't control that has the same name as a permanent that dealt damage to you last turn.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let objects_0 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (({ let other = Some(asker.controller); q.state().apnap().filter(|p| Some(*p) != other).collect::<Vec<PlayerId>>() }).contains(&q.controller(id)) && (planned_value!("object collection FromHistory", Vec::<ObjectId>::new() => q.history().all().iter().filter(|r| r.turn + 1 == q.state().turn.number).filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::Damage { source, target, amount, kind, .. } = event { let (source, amount, combat) = (*source, *amount, kind.is_combat()); let subject = Target::Object(source); let data = [u32::from(amount), match target { Target::Player(p) => u32::from(p.0), _ => u32::MAX }]; if !q.state().obj(source).zone.is(ZoneKind::Stack) && true && matches!(*target, Target::Player(p) if Some(asker.controller) == Some(p)) { return Some(Fired { subject, data }); } }  None }).filter_map(|f: Fired| f.subject.object()).collect::<Vec<ObjectId>>())).iter().any(|&o| cantrip_mechanics::same_name(q, id, o)))).collect::<Vec<ObjectId>>() }; let destroyed_0 = g.destroy_all(&objects_0);
+let objects_0 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (({ let other = Some(asker.controller); q.state().apnap().filter(|p| Some(*p) != other).collect::<Vec<PlayerId>>() }).contains(&q.controller(id)) && (q.history().all().iter().filter(|r| r.turn + 1 == q.state().turn.number).filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::Damage { source, target, amount, kind, .. } = event { let (source, amount, combat) = (*source, *amount, kind.is_combat()); let subject = Target::Object(source); let data = [u32::from(amount), match target { Target::Player(p) => u32::from(p.0), _ => u32::MAX }]; if q.state().obj(source).zone.is(ZoneKind::Battlefield) && true && matches!(*target, Target::Player(p) if Some(asker.controller) == Some(p)) { return Some(Fired { subject, data }); } }  None }).filter_map(|f: Fired| f.subject.object()).collect::<Vec<ObjectId>>()).iter().any(|&o| cantrip_mechanics::same_name(q, id, o)))).collect::<Vec<ObjectId>>() }; let destroyed_0 = g.destroy_all(&objects_0);
 g.end_sentence();
  Ok(()) }
 

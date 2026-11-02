@@ -1,6 +1,5 @@
 // Mirror Golem
-// status: planned
-// requires: engine: no protection from this quality
+// status: ready
 // Imprint — When this creature enters, you may exile target card from a graveyard.
 // This creature has protection from each of the exiled card's card types. (Artifact, battle, creature, enchantment, instant, kindred, land, planeswalker, and sorcery are card types.)
 #[allow(unused_imports)] use cantrip_api::*;
@@ -20,7 +19,7 @@ hoisted_3.extend({ let q: &dyn Query = g; objects_1.iter().copied().filter(|&o| 
 }
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_1_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); planned_value!("engine: no protection from this quality", () => chars.protection_from.push(ProtectionQuality::Matching(|q, asker, id| (((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && q.exiled_with(q.linked_to(asker.source)).contains(&id)).collect::<Vec<ObjectId>>()).get(0).copied().is_some_and(|o: ObjectId| { let (a, b) = (&q.chars(id), &q.chars(o)); a.types.iter().any(|t| b.types.has(t)) })))); }
+#[allow(unused_variables)] fn ability_1_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); chars.protection_types = TypeSet(chars.protection_types.0 | ((((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && q.exiled_with(q.linked_to(asker.source)).contains(&id)).collect::<Vec<ObjectId>>()).get(0).copied().map_or(TypeSet::NONE, |o: ObjectId| q.chars(o).types)).0); }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
 
 pub static CARD: CardDef = CardDef { name: "Mirror Golem", token_words: &[], oracle: true, cost: ManaCost { generic: 6, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Artifact,CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Golem]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: Some(3), toughness: Some(4), loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::ZONE_CHANGE.0), ability_0_event), ability_0, "Imprint — When this creature enters, you may exile target card from a graveyard.").targets(ABILITY_0_TARGETS)], statics: &[static_ability(Layer::Ability, cantrip_mechanics::statics::itself, ability_1_apply_0, "This creature has protection from each of the exiled card's card types.")], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };

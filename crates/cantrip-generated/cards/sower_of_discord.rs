@@ -1,18 +1,15 @@
 // Sower of Discord
-// status: planned
-// requires: a choice of several values
-// requires: condition ValueChosenIs
-// requires: player reference OtherChosen
+// status: ready
 // Flying
 // As this creature enters, choose two players.
 // Whenever damage is dealt to one of the chosen players, the other chosen player also loses that much life.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables, unused_mut)] fn ability_1_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let chosen_0 = planned_value!("a choice of several values", asker.controller => cantrip_mechanics::choose::values(g, { let q: &dyn Query = g; Target::Object(asker.source).object().map(|o: ObjectId| q.controller(o)).into_iter().collect::<Vec<PlayerId>>() }, asker.source, ChoiceKind::Player, 2)?);
+#[allow(unused_variables, unused_mut)] fn ability_1_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let candidates_0: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }; let Some(first_0) = cantrip_mechanics::choose::player(g, entering.controller, entering.object, candidates_0.clone(), "Choose", 0)? else { return Ok(()) }; let left_0: Vec<PlayerId> = candidates_0.into_iter().filter(|&p| p != first_0).collect(); let Some(second_0) = cantrip_mechanics::choose::player(g, entering.controller, entering.object, left_0, "Choose", 0)? else { return Ok(()) }; entering.chosen_player = Some(first_0); entering.chosen_number = Some(u32::from(second_0.0));
  Ok(()) }
-#[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Damage { source, target, amount, kind, .. } = event { let (source, amount, combat) = (*source, *amount, kind.is_combat()); let subject = *target; let data = [u32::from(amount), match target { Target::Player(p) => u32::from(p.0), _ => u32::MAX }]; if true && true && matches!(*target, Target::Player(p) if (q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition ValueChosenIs", false => Some(bound_0).is_some_and(|p: PlayerId| q.state().chosen_players(q.linked_to(asker)).contains(&p)))).collect::<Vec<PlayerId>>()).contains(&p)) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Damage { source, target, amount, kind, .. } = event { let (source, amount, combat) = (*source, *amount, kind.is_combat()); let subject = *target; let data = [u32::from(amount), match target { Target::Player(p) => u32::from(p.0), _ => u32::MAX }]; if true && true && matches!(*target, Target::Player(p) if (q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0).is_some_and(|p: PlayerId| q.state().chosen_player(q.linked_to(asker)) == Some(p) || q.state().chosen_number(q.linked_to(asker)) == Some(u32::from(p.0)))).collect::<Vec<PlayerId>>()).contains(&p)) { return Some(Fired { subject, data }); } }
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let amount_1 = { let q: &dyn Query = g; (i64::from(item.data[0])).clamp(0, 2147483647) as i32 }; let players_1 = { let q: &dyn Query = g; planned_value!("player reference OtherChosen", None::<PlayerId> => item.subject.player().and_then(|p: PlayerId| q.other_chosen_player(asker, p))).into_iter().collect::<Vec<PlayerId>>() };
+let amount_1 = { let q: &dyn Query = g; (i64::from(item.data[0])).clamp(0, 2147483647) as i32 }; let players_1 = { let q: &dyn Query = g; item.subject.player().and_then(|p: PlayerId| { let (first, second) = (q.state().chosen_player(q.linked(item)), q.state().chosen_number(q.linked(item)).map(|n| PlayerId(n as u8))); if first == Some(p) { second } else if second == Some(p) { first } else { None } }).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_1 { g.lose_life(player, amount_1); }
 g.end_sentence();
  Ok(()) }

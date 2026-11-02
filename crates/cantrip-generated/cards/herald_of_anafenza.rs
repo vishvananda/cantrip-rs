@@ -1,10 +1,9 @@
 // Herald of Anafenza
-// status: planned
-// requires: activated ability OnStack
+// status: ready
 // Outlast {2}{W} ({2}{W}, {T}: Put a +1/+1 counter on this creature. Outlast only as a sorcery.)
 // Whenever you activate this creature's outlast ability, create a 1/1 white Warrior creature token.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::AbilityActivated { source, ability, player, .. } = event { let id = *source; let def = q.activated_ability(*ability); let subject = Target::Player(*player); let serial = match cantrip_mechanics::triggers::activated_ability_on_stack(q, event) { Some(Target::Ability(serial)) => serial, _ => 0 }; let data = [id.0, serial]; if def.is_some() && Some(asker.controller) == Some(*player) && (planned_value!("activated ability OnStack", false => def.is_some_and(|d| d.keyword_of() == Some(AbilityKeyword::Outlast))) && (def.is_some_and(|d| d.from == ZoneKind::Battlefield) && Some(asker.source) == Some(id))) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::AbilityActivated { source, ability, player, .. } = event { let id = *source; let def = q.activated_ability(*ability); let subject = Target::Player(*player); let serial = match cantrip_mechanics::triggers::activated_ability_on_stack(q, event) { Some(Target::Ability(serial)) => serial, _ => 0 }; let data = [id.0, serial]; if def.is_some() && Some(asker.controller) == Some(*player) && (def.is_some_and(|d| d.text.starts_with("Outlast")) && (def.is_some_and(|d| d.from == ZoneKind::Battlefield) && Some(asker.source) == Some(id))) { return Some(Fired { subject, data }); } }
  None }
 pub mod token_1 {
 #[allow(unused_imports)] use cantrip_api::*;

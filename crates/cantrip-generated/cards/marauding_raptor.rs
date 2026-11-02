@@ -1,6 +1,5 @@
 // Marauding Raptor
-// status: planned
-// requires: object filter DamagedBy
+// status: ready
 // Creature spells you cast cost {1} less to cast.
 // Whenever another creature you control enters, this creature deals 2 damage to it. If a Dinosaur is dealt damage this way, this creature gets +2/+0 until end of turn.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -9,9 +8,9 @@
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_2: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-let mut done_0: i64 = 0; let source_0 = { let q: &dyn Query = g; Some(asker.source) }; let amount_0 = { let q: &dyn Query = g; (2i64).max(0) as u16 }; let recipients_0 = { let q: &dyn Query = g; (item.subject.object().into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() }; if let Some(source) = source_0 { let batch: Vec<(ObjectId, Target, u16)> = recipients_0.iter().map(|t| (source, *t, amount_0)).collect(); done_0 += g.damage_together(&batch).iter().map(|&n| i64::from(n)).sum::<i64>(); }
+let mut done_0: i64 = 0; let mut dealt_0: Vec<ObjectId> = Vec::new(); let mut hurt_0: Vec<PlayerId> = Vec::new(); let before_0 = g.history().head() as usize; let source_0 = { let q: &dyn Query = g; Some(asker.source) }; let amount_0 = { let q: &dyn Query = g; (2i64).max(0) as u16 }; let recipients_0 = { let q: &dyn Query = g; (item.subject.object().into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() }; if let Some(source) = source_0 { let batch: Vec<(ObjectId, Target, u16)> = recipients_0.iter().map(|t| (source, *t, amount_0)).collect(); done_0 += g.damage_together(&batch).iter().map(|&n| i64::from(n)).sum::<i64>(); dealt_0.extend(cantrip_mechanics::history::permanents_dealt_damage_by(g.history(), source, before_0)); for r in &g.history().all()[before_0..] { if let Event::Damage { source: s, target: Target::Player(p), amount, .. } = r.event { if s == source && amount > 0 && !hurt_0.contains(&p) { hurt_0.push(p); } } } }
 g.end_sentence();
-if { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (planned_value!("object filter DamagedBy", false => cantrip_mechanics::history::permanents_dealt_damage_by(q.history(), asker.source, since).contains(&id)) && q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Dinosaur)))).collect::<Vec<ObjectId>>()).len() as i64) > (0i64) } {
+if { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (dealt_0.contains(&id) && q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Dinosaur)))).collect::<Vec<ObjectId>>()).len() as i64) > (0i64) } {
 let objects_1 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let duration_1 = Duration::EndOfTurn;
 let kind_1_0_0 = { let q: &dyn Query = g; EffectKind::Pump((2i64) as i16, (0i64) as i16) };
 if let Some(source) = source_1 { cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.add_effect(source, object, kind_1_0_0, duration_1);  } }); }

@@ -1,6 +1,6 @@
 // Quicksilver Dragon
 // status: planned
-// requires: operation Retarget
+// requires: a spell's target changed to a permanent of no stated kind
 // Flying
 // {U}: If target spell has only one target and that target is this creature, change that spell's target to another creature.
 // Morph {4}{U} (You may cast this card face down as a 2/2 creature for {3}. Turn it face up any time for its morph cost.)
@@ -10,7 +10,7 @@ static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 if { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).is_some_and(|candidate: ObjectId| (q.state().stack.iter().find(|i| i.object == candidate).is_some_and(|i| q.state().targets(i).len() == 1) && q.state().stack.iter().find(|i| i.kind == StackKind::Spell && i.object == candidate).is_some_and(|i| q.state().targets(i).iter().any(|t| t.object().is_some_and(|o| (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).contains(&o)))))) } {
-planned!("operation-retarget" => if let Some(spell) = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) } { cantrip_mechanics::copy::retarget(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, spell, NewTargets::To({ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| !(Some(asker.source) == Some(id))).collect::<Vec<ObjectId>>() }))?; });
+planned!("a-spell-s-target-changed-to-a-permanent-of-no-stated-kind" => if let Some(spell) = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) } { cantrip_mechanics::copy::retarget(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, spell, NewTargets::To({ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| !(Some(asker.source) == Some(id))).collect::<Vec<ObjectId>>() }))?; });
 g.end_sentence();
 }
 g.end_sentence();

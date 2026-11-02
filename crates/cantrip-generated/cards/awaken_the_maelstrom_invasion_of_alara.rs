@@ -1,6 +1,5 @@
 // Awaken the Maelstrom // Invasion of Alara
-// status: planned
-// requires: token recipe CopyOne
+// status: ready
 // Awaken the Maelstrom is all colors.
 // Target player draws two cards. You may put an artifact card from your hand onto the battlefield. Create a token that's a copy of a permanent you control. Distribute three +1/+1 counters among one, two, or three creatures you control. Destroy target permanent an opponent controls.
 // When this Siege enters, exile cards from the top of your library until you exile two nonland cards with mana value 4 or less. You may cast one of those two cards without paying its mana cost. Put one of them into your hand. Then put the other cards exiled this way on the bottom of your library in a random order.
@@ -19,7 +18,7 @@ let picked_2 = if open_2.is_empty() { None } else if open_2.len() > 1 || (true &
 let Some(card_2) = picked_2 else { break; };
 let ways_2: Vec<CastWay> = g.cast_ways_during_resolution_by(card_2, caster_2).into_iter().filter(|w| (!g.card(w.face).types.has(CardType::Land) && (i64::from(w.mana_value)) <= (limit_2_0))).collect();
 let done_2 = if ways_2.is_empty() { g.play_land_during_resolution(card_2)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_2, card_2, ways_2)?.map(|w| w.way); g.cast_during_resolution_as(card_2, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(caster_2), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
-if done_2 { left_2 -= 1; played_2.push(g.state().obj(card_2).became.unwrap_or(card_2)); } else if 1i64 == 1 { break; } if done_2 || !(true && true) { pool_2.retain(|&c| c != card_2); }
+if done_2 { left_2 -= 1; played_2.push(g.state().obj(card_2).became.unwrap_or(card_2)); } else if true { break; } if done_2 || !(true && true) { pool_2.retain(|&c| c != card_2); }
 }
 g.end_sentence();
 let selected_3_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_3_candidates = { let q: &dyn Query = g; (moved_1.clone()).into_iter().filter(|&id| (!(q.chars(id).is(CardType::Land)) && (i64::from(q.mana_value(id))) <= (4i64))).collect::<Vec<ObjectId>>() }; let selected_3_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let selected_3 = { cantrip_mechanics::choose::select(g, selected_3_player, asker.source, Purpose::PutIntoHand, selected_3_candidates, cantrip_mechanics::select::Selection::of(selected_3_count, &[]))? };
@@ -58,7 +57,8 @@ hoisted_5.extend({ let q: &dyn Query = g; objects_2.iter().copied().filter(|&o| 
 }
 }
 g.end_sentence();
-let created_6: Vec<ObjectId> = planned_value!("token recipe CopyOne", Vec::<ObjectId>::new() => cantrip_mechanics::tokens::create(g, asker, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, &[({ let q: &dyn Query = g; (1i64).max(0) as u32 }, TokenRecipe::CopyOne({ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| Some(asker.controller) == Some(q.controller(id))).collect::<Vec<ObjectId>>() }, &[TokenCopyEffects::NoTokenCopyEffects]))], Arrival { tapped: false, counters: &[], states: &[] })?);
+let player_6 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let among_6 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| Some(asker.controller) == Some(q.controller(id))).collect::<Vec<ObjectId>>() }; let chosen_6 = cantrip_mechanics::choose::select(g, player_6, asker.source, Purpose::CopyWhich, among_6, cantrip_mechanics::select::cards(cantrip_mechanics::select::exactly(1)))?.first().copied();
+let values_6 = { let q: &dyn Query = g; chosen_6.map(|original: ObjectId| q.copiable_values(original)) }; let count_6 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let created_6 = match values_6 { Some(values) => g.create_token_copies_tapped(values, player_6, count_6, false)?, None => Vec::new() };
 g.end_sentence();
 let objects_7 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let mut left_7: u32 = { let q: &dyn Query = g; (3i64).max(0) as u32 }; let mut puts_7: Vec<(ObjectId, CounterKind, i16)> = Vec::new(); for (i, &object) in objects_7.iter().enumerate() { let after = (objects_7.len() - i - 1) as u32; let n = if after == 0 { left_7 } else { let most = left_7.saturating_sub(after * 1); cantrip_mechanics::choose::number(g, asker.controller, asker.source, 1.min(most), most, "Distribute")? }; left_7 -= n.min(left_7); if n > 0 { puts_7.push((object, CounterKind::PlusOne, n as i16)); } } g.add_counters_together(&puts_7);
 g.end_sentence();

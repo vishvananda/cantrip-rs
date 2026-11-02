@@ -1,6 +1,5 @@
 // Sothera, the Supervoid
-// status: planned
-// requires: object reference ChosenBy
+// status: ready
 // Whenever a creature you control dies, each opponent chooses a creature they control and exiles it.
 // At the beginning of your end step, if a player controls no creatures, sacrifice Sothera, then put a creature card exiled with it onto the battlefield under your control with two additional +1/+1 counters on it.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -15,7 +14,7 @@ let mut each_2: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut 
 g.end_sentence();
 let mut players_3: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
 let mut gathered_4: Vec<ObjectId> = Vec::new();
- for (index_3, bound_0) in players_3.iter().copied().enumerate() { gathered_4.extend({ let q: &dyn Query = g; planned_value!("object reference ChosenBy", None::<ObjectId> => Some(bound_0).and_then(|p: PlayerId| q.picked_by(item, 0, p))).into_iter().collect::<Vec<ObjectId>>() });
+ for (index_3, bound_0) in players_3.iter().copied().enumerate() { gathered_4.extend({ let q: &dyn Query = g; Some(bound_0).and_then(|who: PlayerId| players_0.iter().position(|&p| p == who)).and_then(|at| each_2[at].first().copied()).into_iter().collect::<Vec<ObjectId>>() });
     } 
 let objects_6 = { let q: &dyn Query = g; gathered_4.clone() }; let moved_6 = { let by = g.linked(item); g.exile_with(&objects_6, by, false) };
 g.end_sentence();

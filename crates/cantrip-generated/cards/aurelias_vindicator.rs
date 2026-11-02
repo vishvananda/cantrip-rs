@@ -2,21 +2,18 @@
 // status: planned
 // requires: numeric expression AnnouncedX
 // requires: target cardinality UpTo
-// requires: target constraint SharesLimitWith
 // Flying, lifelink, ward {2}
 // Disguise {X}{3}{W}
 // When this creature is turned face up, exile up to X other target creatures from the battlefield and/or creature cards from graveyards.
 // When this creature leaves the battlefield, return the exiled cards to their owners' hands.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_4_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((!(q.event_subject().object() == Some(id)) && q.chars(id).is(CardType::Creature)))) }
-#[allow(unused_variables)] fn ability_4_target_1(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && (q.chars(id).is(CardType::Creature))) }
-static ABILITY_4_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_4_target_0).between(0, planned_value!("target cardinality UpTo", 1u32 => TargetSpec::read_as_chosen(|q: &dyn Query, asker: &Asker| (planned_value!("numeric expression AnnouncedX", 0i64 => i64::from(q.announced_x().unwrap_or(0)))).max(0) as u32))),planned_value!("target constraint SharesLimitWith", target(ability_4_target_1).between(0, planned_value!("target cardinality UpTo", 1u32 => TargetSpec::read_as_chosen(|q: &dyn Query, asker: &Asker| (planned_value!("numeric expression AnnouncedX", 0i64 => i64::from(q.announced_x().unwrap_or(0)))).max(0) as u32))) => target(ability_4_target_1).between(0, planned_value!("target cardinality UpTo", 1u32 => TargetSpec::read_as_chosen(|q: &dyn Query, asker: &Asker| (planned_value!("numeric expression AnnouncedX", 0i64 => i64::from(q.announced_x().unwrap_or(0)))).max(0) as u32))).with_rules(&[SelectionRule::SharesLimitWith]))];
+#[allow(unused_variables)] fn ability_4_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { (matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((!(q.event_subject().object() == Some(id)) && q.chars(id).is(CardType::Creature))))) || (matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && (q.chars(id).is(CardType::Creature)))) }
+static ABILITY_4_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_4_target_0).between(0, planned_value!("target cardinality UpTo", 1u32 => TargetSpec::read_as_chosen(|q: &dyn Query, asker: &Asker| (planned_value!("numeric expression AnnouncedX", 0i64 => i64::from(q.announced_x().unwrap_or(0)))).max(0) as u32)))];
 #[allow(unused_variables)] fn ability_4_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::TurnedFaceUp { permanent, .. } = event { let id = *permanent; let subject = Target::Object(id); let data = [u32::MAX, u32::MAX]; if Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_4(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let t_1_raw = announced(g, item, 1, false); let t_1 = announced(g, item, 1, true);
-let objects_0 = { let q: &dyn Query = g; { let mut all: Vec<ObjectId> = Vec::new(); for id in t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>() { if !all.contains(&id) { all.push(id); } } for id in t_1.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>() { if !all.contains(&id) { all.push(id); } } all } }; let moved_0 = { let by = g.linked(item); g.exile_with(&objects_0, by, false) };
+let objects_0 = { let q: &dyn Query = g; { let mut all: Vec<ObjectId> = Vec::new(); for id in t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>() { if !all.contains(&id) { all.push(id); } } for id in t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>() { if !all.contains(&id) { all.push(id); } } all } }; let moved_0 = { let by = g.linked(item); g.exile_with(&objects_0, by, false) };
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_5_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if from.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }

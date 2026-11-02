@@ -1,6 +1,6 @@
 // Search for Glory
 // status: planned
-// requires: snow mana spent
+// requires: engine: snow mana told apart as a spell is paid for
 // Search your library for a snow permanent card, a legendary card, or a Saga card, reveal it, put it into your hand, then shuffle. You gain 1 life for each {S} spent to cast this spell. ({S} is mana from a snow source.)
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
@@ -9,7 +9,7 @@ let objects_1 = { let q: &dyn Query = g; found_0.clone() }; let mut owners_1: Ve
 let objects_2 = { let q: &dyn Query = g; found_0.clone() }; let moved_2 = g.return_to_hand_revealed(&objects_2);
 for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.shuffle(player); }
 g.end_sentence();
-let amount_4 = { let q: &dyn Query = g; (planned_value!("snow mana spent", 0i64 => Some(asker.source).map_or(0, |o: ObjectId| i64::from(q.obj(o).spent.snow)))).clamp(0, 2147483647) as i32 }; let players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_4 = { let q: &dyn Query = g; (planned_value!("engine: snow mana told apart as a spell is paid for", 0i64 => Some(asker.source).map_or(0, |o: ObjectId| q.history().mana_spent_to_cast(o).filter(|(source, _)| *source != ObjectId::NONE && q.chars(*source).supertypes.snow).map(|(_, mana)| i64::from(mana.total())).sum::<i64>()))).clamp(0, 2147483647) as i32 }; let players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_4 { g.gain_life(player, amount_4); }
 g.end_sentence();
  Ok(()) }

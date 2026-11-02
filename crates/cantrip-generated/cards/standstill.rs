@@ -12,6 +12,7 @@ let paid_0 = !picks_0.is_empty();
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
 let amount_1 = { let q: &dyn Query = g; (3i64).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; Some(PlayerId(item.data[0] as u8)).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+let drawing_1: Vec<PlayerId> = players_1.into_iter().collect(); let players_1: Vec<PlayerId> = g.state().apnap().filter(|p| drawing_1.contains(p)).collect();
 for player in players_1 { g.draw(player, amount_1); }
 g.end_sentence();
 }

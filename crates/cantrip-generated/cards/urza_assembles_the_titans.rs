@@ -1,6 +1,5 @@
 // Urza Assembles the Titans
 // status: planned
-// requires: engine: no ReadAhead
 // requires: player rule for a while ActivationGrant
 // Read ahead (Choose a chapter and start with that many lore counters. Add one after your draw step. Skipped chapters don't trigger. Sacrifice after III.)
 // I — Scry 4, then you may reveal the top card of your library. If a planeswalker card is revealed this way, put it into your hand.
@@ -16,7 +15,7 @@ let asker = &Asker::new(item.object, item.controller);
 let amount_0 = { let q: &dyn Query = g; (4i64).max(0) as usize }; let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; cantrip_mechanics::scry(g, player_0, asker.source, amount_0)?;
 g.end_sentence();
 let payer_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
-let paid_1 = cantrip_mechanics::effects::ask_may(g, payer_1, asker.source, Purpose::Optional)?; if paid_1 {
+let paid_1 = !({ let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((1i64).max(0) as usize).collect::<Vec<ObjectId>>() }).is_empty() && cantrip_mechanics::effects::ask_may(g, payer_1, asker.source, Purpose::Optional)?; if paid_1 {
 let objects_2 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((1i64).max(0) as usize).collect::<Vec<ObjectId>>() }; let mut owners_2: Vec<PlayerId> = objects_2.iter().map(|o| g.state().obj(*o).owner).collect(); owners_2.dedup(); for owner in owners_2 { let cards: Vec<ObjectId> = objects_2.iter().copied().filter(|o| g.state().obj(*o).owner == owner).collect(); g.reveal(owner, &cards); }
 g.end_sentence();
 hoisted_3.extend(objects_2.clone());
@@ -56,7 +55,6 @@ fn ability_1_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let 
 planned!("player-rule-for-a-while-activation-grant" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.add_player_effect(player, source, EffectKind::PlayerRule(PlayerRule::ActivationGrant { abilities: |q: &dyn Query, asker: &Asker, permanent: ObjectId, def: Option<&ActivatedDef>| (def.is_some_and(|d| d.is_loyalty_ability()) && (def.is_some_and(|d| d.from == ZoneKind::Battlefield) && (q.chars(permanent).is(CardType::Planeswalker) && Some(asker.controller) == Some(q.controller(permanent))))), grant: ActivationGrant::AdditionalTimes(1i64) }), Duration::EndOfTurn); } });
 g.end_sentence();
  Ok(()) }
-planned_item!("engine-no-read-ahead" => enters: cantrip_mechanics::read_ahead::enters);
 
 pub static CARD: CardDef = CardDef { name: "Urza Assembles the Titans", token_words: &[], oracle: true, cost: ManaCost { generic: 3, x: 0, symbols: [2, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Enchantment]), subtypes: SubtypeSet::of(&[Subtype::Saga]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[chapter(1, ability_1_0, "I — Scry 4, then you may reveal the top card of your library. If a planeswalker card is revealed this way, put it into your hand.").targets(&[]),chapter(2, ability_1_1, "II — You may put a planeswalker card with mana value 6 or less from your hand onto the battlefield.").targets(&[]),chapter(3, ability_1_2, "III — You may activate the loyalty abilities of planeswalkers you control twice this turn rather than only once.").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

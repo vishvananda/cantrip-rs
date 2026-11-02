@@ -1,6 +1,5 @@
 // Namor the Sub-Mariner
 // status: planned
-// requires: mana symbols other than a devotion to one color
 // requires: object filter ManaSymbolInCost
 // Flying
 // Namor's power is equal to the number of Merfolk you control.
@@ -18,7 +17,7 @@ pub static EXTRA: &[&CardDef] = &[];
 }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_0 = Vec::new();
-let count_0_0 = { let q: &dyn Query = g; (planned_value!("mana symbols other than a devotion to one color", 0i64 => cantrip_mechanics::devotion::symbols_among(q, item.subject.object().into_iter().collect::<Vec<ObjectId>>(), &[Color::Blue]))).max(0) as u32 }; let def_0_0 = g.card_id(&token_1::CARD);
+let count_0_0 = { let q: &dyn Query = g; ((item.subject.object().into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|id: ObjectId| { let cost = q.mana_cost(id); let colors = [Color::Blue.mana()]; colors.iter().map(|&m| i64::from(cost.symbols[m as usize]) + i64::from(cost.phyrexian[m as usize]) + i64::from(cost.twobrid[m as usize])).sum::<i64>() + cost.hybrid.iter().flatten().filter(|(a, b)| colors.contains(a) || colors.contains(b)).count() as i64 }).sum::<i64>()).max(0) as u32 }; let def_0_0 = g.card_id(&token_1::CARD);
 for player in players_0 {
 tokens_0.extend(std::iter::repeat((def_0_0,player)).take(count_0_0 as usize));
 } let words_0 = g.words(asker.source);

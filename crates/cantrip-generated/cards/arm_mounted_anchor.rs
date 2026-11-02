@@ -20,7 +20,7 @@ let discarded_3 = g.discard_together(&selected_4); let paid_3 = !discarded_3.is_
 (paid_3, { let q: &dyn Query = g; (discarded_3).clone() }, { let q: &dyn Query = g; (discarded_3.clone()).clone() }, { let q: &dyn Query = g; (selected_4).clone() }) } else { (false, Vec::new(), Vec::new(), Vec::new()) };
 g.end_sentence();
 if { let q: &dyn Query = g; !(((paid_2 as i64) != 0)) } {
-let amount_5 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let players_5 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut cards_5 = Vec::new(); for player in players_5 { cards_5.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_5)?); } let discarded_5 = g.discard_together(&cards_5);
+let amount_5 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let players_5: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_5 = Vec::new(); for player in players_5 { cards_5.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_5)?); } let discarded_5 = g.discard_together(&cards_5);
 g.end_sentence();
 hoisted_6.extend(discarded_5.clone());
 hoisted_7.extend({ let q: &dyn Query = g; discarded_5.clone() });
@@ -31,7 +31,7 @@ g.end_sentence();
 static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target_0)];
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let attachments_8 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let host_8 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) }; if let Some(host) = host_8 { cantrip_api::instruction(g, |g| { for attachment in attachments_8 { g.attach(attachment, host); } }); }
+let attachments_8 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let host_8 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()) }; if let Some(host) = host_8 { cantrip_api::instruction(g, |g| { for attachment in attachments_8 { g.attach(attachment, host); } }); }
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_2_cost(q: &dyn Query, asker: &Asker, costed: Costed, targets: &[Target]) -> CostDelta { if ((((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).len() as i64) <= (1i64) { CostDelta::less((2i64) as u8) } else { CostDelta::NONE } }

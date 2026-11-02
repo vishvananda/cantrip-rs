@@ -38,7 +38,7 @@ g.end_sentence();
  Ok(()) }
 fn ability_0_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let objects_4 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_4 = { let q: &dyn Query = g; Some(asker.source) }; let duration_4 = Duration::EndOfTurn;
-let kinds_4 = { let mut all = Vec::new(); for &object in &objects_4 { let kind = { let q: &dyn Query = g; EffectKind::Pump(((Some(object).map_or(0i64, |o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0)))) as i16).max(0), ((Some(object).map_or(0i64, |o: ObjectId| i64::from(q.chars(o).toughness.unwrap_or(0)))) as i16).max(0)) }; all.push((object, kind));  } all }; if let Some(source) = source_4 { cantrip_api::instruction(g, |g| { for &(object, kind) in &kinds_4 { g.add_effect(source, object, kind, duration_4); } }); }
+let kinds_4 = { let mut all = Vec::new(); for &object in &objects_4 { let kind = { let q: &dyn Query = g; EffectKind::Pump((Some(object).map_or(0i64, |o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0)))) as i16, (Some(object).map_or(0i64, |o: ObjectId| i64::from(q.chars(o).toughness.unwrap_or(0)))) as i16) }; all.push((object, kind));  } all }; if let Some(source) = source_4 { cantrip_api::instruction(g, |g| { for &(object, kind) in &kinds_4 { g.add_effect(source, object, kind, duration_4); } }); }
 g.end_sentence();
  Ok(()) }
 

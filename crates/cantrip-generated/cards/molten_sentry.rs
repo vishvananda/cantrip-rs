@@ -2,7 +2,7 @@
 // status: ready
 // As this creature enters, flip a coin. If the coin comes up heads, this creature enters as a 5/2 creature with haste. If it comes up tails, this creature enters as a 2/5 creature with defender.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let player_0 = { let q: &dyn Query = g; Target::Object(asker.source).object().map(|o: ObjectId| q.controller(o)).expect("a reference that always names a player") }; let flip_0 = g.flip_coin(player_0);
+#[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let player_0 = { let q: &dyn Query = g; Target::Object(asker.source).object().map(|o: ObjectId| q.controller(o)).expect("a reference that always names a player") }; let flip_0 = g.flip_coin_for_heads(player_0);
 if { let q: &dyn Query = g; flip_0 } {
 entering.copy = Some({ let q: &dyn Query = g; q.copiable_values(entering.object).sized(5, 2).with_type(CardType::Creature).with_keyword(Keyword::Haste) });
 } else {

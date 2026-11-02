@@ -1,7 +1,6 @@
 // Thermal Flux
 // status: planned
 // requires: engine: no effect changes supertypes
-// requires: multiple spell bodies
 // Choose one —
 // • Target nonsnow permanent becomes snow until end of turn.
 // • Target snow permanent isn't snow until end of turn.
@@ -25,7 +24,7 @@ let kind_1_0_0 = { let q: &dyn Query = g; planned_value!("engine: no effect chan
 if let Some(source) = source_1 { cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.add_effect(source, object, kind_1_0_0, duration_1);  } }); }
 g.end_sentence();
  Ok(()) }
-static ABILITY_0_MODES: ModalDef = modes(&[mode(ability_0_mode_0, "Target nonsnow permanent becomes snow until end of turn.").targets(ABILITY_0_MODE_0_TARGETS),mode(ability_0_mode_1, "Target snow permanent isn't snow until end of turn.").targets(ABILITY_0_MODE_1_TARGETS)]).choose(1, 1);
+static ABILITY_0_MODES: ModalDef = modes(&[mode(ability_0_mode_0, "Target nonsnow permanent becomes snow until end of turn.").targets(ABILITY_0_MODE_0_TARGETS),mode(ability_0_mode_1, "Target snow permanent isn't snow until end of turn.").targets(ABILITY_0_MODE_1_TARGETS)]).choose(1, 1).shared(ability_1_then);
 fn delayed_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let amount_4 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_4 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_4 { g.draw(player, amount_4); }
@@ -36,7 +35,6 @@ g.delayed_trigger(DelayedWhen::Step { step: Step::Upkeep, on_turn_of: None }, it
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
-planned_item!("multiple-spell-bodies" => spell_after: spell(ability_1_then).targets(&[]));
 
 pub static CARD: CardDef = CardDef { name: "Thermal Flux", token_words: &[], oracle: true, cost: ManaCost { generic: 0, x: 0, symbols: [0, 1, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Instant]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: Some(SpellDef::MODAL), abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[delayed_trigger(delayed_3, "Draw a card at the beginning of the next turn's upkeep.")], enters: None, modal: Some(&ABILITY_0_MODES), enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

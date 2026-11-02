@@ -13,7 +13,7 @@ planned!("rad-counters" => let amount = { let q: &dyn Query = g; (2i64).max(0) a
 let had_0: Vec<_> = counters_0.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_0); let applied_0: Vec<ObjectId> = counters_0.iter().zip(had_0).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_3_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, reason: ZoneReason::Mill, .. } = event { let id = *old; let player = q.state().obj(id).owner; let subject = Target::Object(id); let data = [new.0, u32::from(player.0)]; if from.is(ZoneKind::Library) && true && !(q.chars(id).is(CardType::Land)) && !q.history().done(asker.source, AbilityRef { card: q.chars(asker.source).card, index: 201 }, asker.controller) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_3_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, reason: ZoneReason::Mill, .. } = event { let id = *old; let player = q.state().obj(id).owner; let subject = Target::Object(id); let data = [new.0, u32::from(player.0)]; if from.is(ZoneKind::Library) && true && !(q.chars(id).is(CardType::Land)) && !q.history().this_turn().iter().any(|r| matches!(r.event, Event::Done { ability, player, .. } if ability == AbilityRef { card: q.chars(asker.source).card, index: 201 } && player == asker.controller)) { return Some(Fired { subject, data }); } }
  None }
 pub mod token_4 {
 #[allow(unused_imports)] use cantrip_api::*;

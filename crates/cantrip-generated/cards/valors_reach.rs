@@ -1,7 +1,6 @@
 // Valor's Reach
 // status: planned
 // requires: card type Plane
-// requires: condition SameTeam
 // requires: engine: no additional phase but combat
 // requires: layout Planar
 // requires: subtype Kylem
@@ -9,7 +8,7 @@
 // Whenever your team attacks with exactly two creatures, those creatures gain double strike until end of turn.
 // Whenever chaos ensues, untap up to two target creatures your team controls. If it's a main phase, there is an additional combat phase after this phase, followed by an additional main phase.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Attacks { attacker, defender, defending, .. } = event { let id = *attacker; let subject = Target::Object(id); let data = [u32::from(q.controller(id).0), u32::from(defending.0)]; if q.chars(id).is(CardType::Creature) && (q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition SameTeam", false => q.state().same_team(a, b))).collect::<Vec<PlayerId>>()).contains(&q.controller(id)) && true && (q.state().attackers.iter().filter(|a| { let (id, defender) = (a.id, &a.target); q.chars(id).is(CardType::Creature) && (q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition SameTeam", false => q.state().same_team(a, b))).collect::<Vec<PlayerId>>()).contains(&q.controller(id)) && true }).count() as i64) == (2i64) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Attacks { attacker, defender, defending, .. } = event { let id = *attacker; let subject = Target::Object(id); let data = [u32::from(q.controller(id).0), u32::from(defending.0)]; if q.chars(id).is(CardType::Creature) && (q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0) == Some(asker.controller)).collect::<Vec<PlayerId>>()).contains(&q.controller(id)) && true && (q.state().attackers.iter().filter(|a| { let (id, defender) = (a.id, &a.target); q.chars(id).is(CardType::Creature) && (q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0) == Some(asker.controller)).collect::<Vec<PlayerId>>()).contains(&q.controller(id)) && true }).count() as i64) == (2i64) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let objects_0 = { let q: &dyn Query = g; (q.event_objects(item).to_vec()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_0 = { let q: &dyn Query = g; Some(asker.source) }; let duration_0 = Duration::EndOfTurn;
@@ -17,7 +16,7 @@ let kind_0_0_0 = { let q: &dyn Query = g; EffectKind::AddKeywords(Keywords::of(&
 if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &object in &objects_0 { g.add_effect(source, object, kind_0_0_0, duration_0);  } }); }
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && (q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition SameTeam", false => q.state().same_team(a, b))).collect::<Vec<PlayerId>>()).contains(&q.controller(id))))) }
+#[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) && (q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0) == Some(asker.controller)).collect::<Vec<PlayerId>>()).contains(&q.controller(id))))) }
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0).between(0, 2)];
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

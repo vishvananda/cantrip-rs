@@ -1,8 +1,6 @@
 // Say Its Name
 // status: planned
-// requires: condition Searched
 // requires: engine: no cost moves these objects
-// requires: operation Search
 // Mill three cards. Then you may return a creature or land card from your graveyard to your hand.
 // Exile this card and two other cards named Say Its Name from your graveyard: Search your graveyard, hand, and/or library for a card named Altanak, the Thrice-Called and put it onto the battlefield. If you search your library this way, shuffle. Activate only as a sorcery.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -24,11 +22,13 @@ hoisted_5.extend({ let q: &dyn Query = g; objects_2.iter().copied().filter(|&o| 
 }
 g.end_sentence();
  Ok(()) }
+static ASK_6: Question = Question::new("SearchLibrary", "search your library as well?", "Then shuffle. If you don't, you search only the other zones", "Search it too", "Not the library");
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let found_6: Vec<ObjectId> = planned_value!("operation Search", Vec::<ObjectId>::new() => cantrip_mechanics::library::search_zones(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, asker.source, Searched { top: None, also: &[Zone::Graveyard, Zone::Hand], either: true, outside: false, finds: &[Find { filter: |q: &dyn Query, asker: &Asker, id: ObjectId| q.chars(id).name == "Altanak, the Thrice-Called", count: { let q: &dyn Query = g; cantrip_mechanics::select::Count::UpTo((1i64).max(0) as u32) }, rules: &[] }] })?);
+let searcher_6 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let owner_6 = searcher_6; let may_6 = g.may_search(searcher_6, owner_6); let rule_count_6 = { let q: &dyn Query = g; cantrip_mechanics::select::Count::UpTo((1i64).max(0) as u32) }; let shown_6: Vec<ObjectId> = (if may_6 { cantrip_mechanics::library::searched_cards(g, owner_6) } else { Vec::new() }).into_iter().chain(g.state().zone(Zone::graveyard(owner_6)).iter().copied()).chain(g.state().zone(Zone::hand(owner_6)).iter().copied()).collect::<Vec<ObjectId>>(); let can_6: Vec<ObjectId> = { let q: &dyn Query = g; shown_6.iter().copied().filter(|&id| q.chars(id).name == "Altanak, the Thrice-Called").collect() };
+let zones_6: Vec<ObjectId> = g.state().zone(Zone::graveyard(owner_6)).iter().chain(g.state().zone(Zone::hand(owner_6)).iter()).copied().collect(); let searched_6 = cantrip_mechanics::library::ask_may_search(g, searcher_6, asker.source, &ASK_6)?; let found_6: Vec<ObjectId> = if searched_6 { { let rule = cantrip_mechanics::select::Selection::listed(rule_count_6, &shown_6, can_6.clone()); let found = if shown_6.is_empty() { Vec::new() } else { match g.ask(searcher_6, RequestKind::SearchLibrary { source: asker.source, library: shown_6.clone(), rule: Box::new(rule), destination: SearchDestination::Battlefield })? { Answer::Cards(cards) => cards, _ => Vec::new() } }; if may_6 { g.searched(searcher_6, owner_6); } found } } else { let in_zones: Vec<ObjectId> = can_6.iter().copied().filter(|o| zones_6.contains(o)).collect(); let rule = cantrip_mechanics::select::Selection::listed(rule_count_6, &zones_6, in_zones); let any = cantrip_api::select::first_answer(&*g, &rule, searcher_6, asker.source, &zones_6, true).is_some_and(|taken| !taken.is_empty()); if any { cantrip_mechanics::choose::select(g, searcher_6, asker.source, Purpose::PutOntoBattlefield, zones_6.clone(), rule)? } else { Vec::new() } };
 let player_7 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
 let objects_7 = ({ let q: &dyn Query = g; found_6.clone() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_7 = { let rows_7: Vec<(ObjectId, PlayerId, bool)> = objects_7.iter().map(|&o| (o, player_7, false)).collect(); let came_7 = g.put_all_onto_battlefield_as(&rows_7)?; came_7.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
-if planned_value!("condition Searched", false => "(kind:Searched,args:(0))") {
+if { let q: &dyn Query = g; searched_6 } {
 for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.shuffle(player); }
 g.end_sentence();
 }

@@ -13,7 +13,7 @@ let paid_1 = moved_1.clone().iter().any(|&o| g.obj(o).zone.is(ZoneKind::Exile));
 (paid_1, { let q: &dyn Query = g; (moved_1).clone() }, { let q: &dyn Query = g; (objects_1.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).clone() }, Vec::new()) } else { (false, Vec::new(), Vec::new(), Vec::new()) };
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
-let original_2 = { let q: &dyn Query = g; item.subject.object() }; let values_2 = { let q: &dyn Query = g; original_2.map(|original: ObjectId| q.copiable_values(original).sized(1, 1).with_subtype(Subtype::Nightmare)) }; let count_2 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let created_2 = match values_2 { Some(values) => g.create_token_copies_tapped(values, player_2, count_2, false)?, None => Vec::new() };
+let original_2 = { let q: &dyn Query = g; item.subject.object() }; let values_2 = { let q: &dyn Query = g; original_2.map(|original: ObjectId| q.copiable_values(original).sized(1, 1).with_subtype(q.words(asker.source).subtype(Subtype::Nightmare))) }; let count_2 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let created_2 = match values_2 { Some(values) => g.create_token_copies_tapped(values, player_2, count_2, false)?, None => Vec::new() };
 g.end_sentence();
 hoisted_3.extend(created_2.clone());
 }

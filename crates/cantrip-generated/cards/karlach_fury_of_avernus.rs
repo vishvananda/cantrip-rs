@@ -1,10 +1,9 @@
 // Karlach, Fury of Avernus
-// status: planned
-// requires: engine: no combat phase count
+// status: ready
 // Whenever you attack, if it's the first combat phase of the turn, untap all attacking creatures. They gain first strike until end of turn. After this phase, there is an additional combat phase.
 // Choose a Background (You can have a Background as a second commander.)
 #[allow(unused_imports)] use cantrip_api::*;
-fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { planned_value!("engine: no combat phase count", false => q.state().turn.combat_phase == 1) }
+fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { ((q.state().turn.step() as u8) >= (Step::BeginCombat as u8) && (q.state().turn.step() as u8) <= (Step::EndOfCombat as u8) && q.history().this_turn().iter().filter(|r| matches!(r.event, Event::StepBegan { step: Step::BeginCombat })).count() == 1) }
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::AttackersDeclared { player, count } = event { let subject = Target::Player(*player); let data = [0u32; 2]; if *count > 0 && Some(asker.controller) == Some(*player) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

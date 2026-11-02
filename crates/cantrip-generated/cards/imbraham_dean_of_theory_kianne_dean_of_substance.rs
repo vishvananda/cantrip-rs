@@ -1,6 +1,5 @@
 // Imbraham, Dean of Theory // Kianne, Dean of Substance
-// status: planned
-// requires: counter kind Study
+// status: ready
 // Flying
 // {X}{U}{U}, {T}: Exile the top X cards of your library and put a study counter on each of them. Then you may put a card you own in exile with a study counter on it into your hand.
 // {T}: Exile the top card of your library. If it's a land card, put it into your hand. Otherwise, put a study counter on it.
@@ -19,7 +18,7 @@ hoisted_2.extend(moved_1.clone());
 hoisted_3.extend({ let q: &dyn Query = g; objects_1.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() });
 } else {
 let mut counters_4: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; ((moved_0.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_4.push((object, planned_value!("counter kind Study", CounterKind::Charge => CounterKind::Study), amount)); } }
+let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; ((moved_0.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_4.push((object, CounterKind::Study, amount)); } }
 let had_4: Vec<_> = counters_4.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_4); let applied_4: Vec<ObjectId> = counters_4.iter().zip(had_4).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
 hoisted_5.extend(applied_4.clone());
@@ -42,7 +41,7 @@ tokens_6.extend(std::iter::repeat((def_6_0,player)).take(count_6_0 as usize));
 let created_6 = g.create_tokens_worded(&tokens_6, false, None, words_6)?;
 g.end_sentence();
 let mut counters_8: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; ({ let mut seen = Vec::new(); for id in ((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (!(q.chars(id).is(CardType::Land)) && Some(asker.controller) == Some(q.state().obj(id).owner) && (i64::from(q.state().obj(id).counters(planned_value!("counter kind Study", CounterKind::Charge => CounterKind::Study)))) > (0i64))).collect::<Vec<ObjectId>>() { let value = q.mana_value(id); if !seen.contains(&value) { seen.push(value); } } seen.len() as i64 }).clamp(0, 32767) as i16 }; for t in { let q: &dyn Query = g; (created_6.clone()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_8.push((object, CounterKind::PlusOne, amount)); } }
+let amount = { let q: &dyn Query = g; ({ let mut seen = Vec::new(); for id in ((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (!(q.chars(id).is(CardType::Land)) && Some(asker.controller) == Some(q.state().obj(id).owner) && (i64::from(q.state().obj(id).counters(CounterKind::Study))) > (0i64))).collect::<Vec<ObjectId>>() { let value = q.mana_value(id); if !seen.contains(&value) { seen.push(value); } } seen.len() as i64 }).clamp(0, 32767) as i16 }; for t in { let q: &dyn Query = g; (created_6.clone()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_8.push((object, CounterKind::PlusOne, amount)); } }
 let had_8: Vec<_> = counters_8.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_8); let applied_8: Vec<ObjectId> = counters_8.iter().zip(had_8).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
  Ok(()) }
@@ -58,11 +57,11 @@ let asker = &Asker::new(item.object, item.controller);
 let objects_0 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((i64::from(item.x)).max(0) as usize).collect::<Vec<ObjectId>>() }; let moved_0 = g.exile_all(&objects_0);
 g.end_sentence();
 let mut counters_1: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (moved_0.clone()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, planned_value!("counter kind Study", CounterKind::Charge => CounterKind::Study), amount)); } }
+let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (moved_0.clone()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, CounterKind::Study, amount)); } }
 let had_1: Vec<_> = counters_1.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_1); let applied_1: Vec<ObjectId> = counters_1.iter().zip(had_1).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
 {
-let selected_2_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_2_candidates = { let q: &dyn Query = g; ((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (Some(asker.controller) == Some(q.state().obj(id).owner) && (i64::from(q.state().obj(id).counters(planned_value!("counter kind Study", CounterKind::Charge => CounterKind::Study)))) > (0i64))).collect::<Vec<ObjectId>>() }; let selected_2_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::UpTo((1i64).max(0) as u32) }; let selected_2 = { cantrip_mechanics::choose::select(g, selected_2_player, asker.source, Purpose::PutIntoHand, selected_2_candidates, cantrip_mechanics::select::Selection::of(selected_2_count, &[]))? };
+let selected_2_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_2_candidates = { let q: &dyn Query = g; ((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (Some(asker.controller) == Some(q.state().obj(id).owner) && (i64::from(q.state().obj(id).counters(CounterKind::Study))) > (0i64))).collect::<Vec<ObjectId>>() }; let selected_2_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::UpTo((1i64).max(0) as u32) }; let selected_2 = { cantrip_mechanics::choose::select(g, selected_2_player, asker.source, Purpose::PutIntoHand, selected_2_candidates, cantrip_mechanics::select::Selection::of(selected_2_count, &[]))? };
 if !selected_2.is_empty() { 
 let objects_3 = { let q: &dyn Query = g; selected_2.clone() }; let moved_3 = g.return_to_hand(&objects_3);
 g.end_sentence();

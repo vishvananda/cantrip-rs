@@ -1,6 +1,5 @@
 // Lively Dirge
-// status: planned
-// requires: operation ChangeZone
+// status: ready
 // Spree (Choose one or more additional costs.)
 // + {1} — Search your library for a card, put it into your graveyard, then shuffle.
 // + {2} — Return up to two creature cards with total mana value 4 or less from your graveyard to the battlefield.
@@ -12,7 +11,8 @@ for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collec
 g.end_sentence();
  Ok(()) }
 fn ability_0_mode_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let moved_3: Vec<ObjectId> = planned_value!("operation ChangeZone", Vec::<ObjectId>::new() => cantrip_mechanics::enter::change_zone(g, asker, ZoneChange { actor: { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, cards: { let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>() }, count: Some({ let q: &dyn Query = g; cantrip_mechanics::select::Count::UpTo((2i64).max(0) as u32) }), random: false, group: Some(GroupFilter::TotalManaValueIs("Comparison(LessOrEqual, Constant(4))")), destination: Destination::OwnersBattlefield, entry: &[EnterFlag::EntersNormally], face_down: None })?);
+let selected_4_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_4_candidates = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>() }; let selected_4_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::UpTo((2i64).max(0) as u32) }; let selected_4 = { cantrip_mechanics::choose::select(g, selected_4_player, asker.source, Purpose::PutOntoBattlefield, selected_4_candidates, cantrip_mechanics::select::Selection::of(selected_4_count, &[]).with(cantrip_mechanics::select::total_mana_value_at_most(4)))? };
+let objects_5 = ({ let q: &dyn Query = g; selected_4.clone() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_5 = { let rows_5: Vec<(ObjectId, PlayerId, bool)> = objects_5.iter().map(|&o| (o, g.state().obj(o).owner, false)).collect(); let came_5 = g.put_all_onto_battlefield_as(&rows_5)?; came_5.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
 g.end_sentence();
  Ok(()) }
 static ABILITY_0_MODES: ModalDef = cantrip_mechanics::spree::modal(&[mode(ability_0_mode_0, "+ {1} — Search your library for a card, put it into your graveyard, then shuffle.").targets(&[]).cost(ManaCost { generic: 1, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }),mode(ability_0_mode_1, "+ {2} — Return up to two creature cards with total mana value 4 or less from your graveyard to the battlefield.").targets(&[]).cost(ManaCost { generic: 2, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })]);

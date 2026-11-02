@@ -18,7 +18,7 @@ let picked_2 = if open_2.is_empty() { None } else if open_2.len() > 1 || (true &
 let Some(card_2) = picked_2 else { break; };
 let ways_2: Vec<CastWay> = g.cast_ways_during_resolution_by(card_2, caster_2).into_iter().filter(|w| (i64::from(w.mana_value)) <= (limit_2_0)).collect();
 let done_2 = if ways_2.is_empty() { g.play_land_during_resolution(card_2)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_2, card_2, ways_2)?.map(|w| w.way); g.cast_during_resolution_as(card_2, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(caster_2), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
-if done_2 { left_2 -= 1; played_2.push(g.state().obj(card_2).became.unwrap_or(card_2)); } else if 4294967295i64 == 1 { break; } if done_2 || !(true && true) { pool_2.retain(|&c| c != card_2); }
+if done_2 { left_2 -= 1; played_2.push(g.state().obj(card_2).became.unwrap_or(card_2)); } else if false { break; } if done_2 || !(true && true) { pool_2.retain(|&c| c != card_2); }
 }
 g.end_sentence();
 planned!("engine-no-resolving-rule-on-an-open-set-untap-step" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_open_effect(source, move |q: &dyn Query, asker: &Asker, id: ObjectId| (q.chars(id).is(CardType::Land) && Some(asker.controller) == Some(q.controller(id))), planned_value!("continuous rule UntapStep", EffectKind::CantBlock => EffectKind::DoesntUntap), planned_value!("duration DuringNextUntapStep", Duration::Indefinite => Duration::DuringNextUntapStepOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }))); });

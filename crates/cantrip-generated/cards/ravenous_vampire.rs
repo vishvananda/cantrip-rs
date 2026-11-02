@@ -1,6 +1,6 @@
 // Ravenous Vampire
 // status: planned
-// requires: resolution cost PutCounters
+// requires: a mandatory cost the card's "If you don't" is read after, in the data
 // Flying
 // At the beginning of your upkeep, you may sacrifice a nonartifact creature. If you do, put a +1/+1 counter on this creature. If you don't, tap this creature.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -21,9 +21,9 @@ let paid_1 = !picks_1.is_empty();
 (paid_1, { let q: &dyn Query = g; (sacrificed_1).clone() }, { let q: &dyn Query = g; (objects_1.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).clone() }, Vec::new()) } else { (false, Vec::new(), Vec::new(), Vec::new()) };
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
-let paid_2 = planned_value!("resolution cost PutCounters", false => cantrip_mechanics::effects::pay(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(put_counters(CounterKind::PlusOne, 1)))?);
+planned!("a-mandatory-cost-the-card-s-if-you-don-t-is-read-after-in-the-data", PayCost, "cost" = "{\"parts\":[{\"PutCounters\":[{\"amount\":{\"args\":1,\"kind\":\"Constant\"},\"kind\":{\"PowerToughness\":[1,1]},\"recipients\":{\"args\":{\"args\":{\"kind\":\"Source\"},\"kind\":\"One\"},\"kind\":\"Objects\"},\"selection\":()}]}]}", "optional" = "false", "player" = { let q: &dyn Query = g; Some(asker.controller) });
 g.end_sentence();
-if { let q: &dyn Query = g; !(((paid_2 as i64) != 0)) } {
+if { let q: &dyn Query = g; !(planned_value!("depends on an instruction with a gap", false => result_1)) } {
 let objects_3 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_3: Vec<ObjectId> = objects_3.iter().copied().filter(|&o| g.state().obj(o).tapped != true).collect(); g.tap_together(&turned_3);
 g.end_sentence();
 hoisted_4.extend(turned_3.clone());

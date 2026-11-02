@@ -1,6 +1,5 @@
 // Winnowing
-// status: planned
-// requires: object reference Earlier
+// status: ready
 // Convoke (Your creatures can help cast this spell. Each creature you tap while casting this spell pays for {1} or one mana of that creature's color.)
 // For each player, you choose a creature that player controls. Then each player sacrifices all other creatures they control that don't share a creature type with the chosen creature they control.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -13,7 +12,7 @@ let mut each_2: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut 
 g.end_sentence();
 let mut players_3: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
 let mut gathered_4: Vec<(PlayerId, ObjectId)> = Vec::new();
- for (index_3, bound_0) in players_3.iter().copied().enumerate() { let objects_5 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (!(planned_value!("object reference Earlier", None::<ObjectId> => q.earlier_object(item, EarlierObjects::Selected, Some(bound_0))) == Some(id)) && q.chars(id).is(CardType::Creature) && !(planned_value!("object reference Earlier", None::<ObjectId> => q.earlier_object(item, EarlierObjects::Selected, Some(bound_0))).is_some_and(|o: ObjectId| { let (a, b) = (&q.chars(id), &q.chars(o)); a.subtypes.iter().any(|s| SubtypeSet::CREATURE_TYPES.has(s) && b.subtypes.has(s)) })))).collect::<Vec<ObjectId>>() }; let players_5 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() }; let mut picks_5: Vec<(PlayerId, ObjectId)> = Vec::new();
+ for (index_3, bound_0) in players_3.iter().copied().enumerate() { let objects_5 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (!((players_0.iter().position(|&p| p == bound_0).map_or_else(Vec::new, |at| each_2[at].clone())).first().copied() == Some(id)) && q.chars(id).is(CardType::Creature) && !((players_0.iter().position(|&p| p == bound_0).map_or_else(Vec::new, |at| each_2[at].clone())).first().copied().is_some_and(|o: ObjectId| { let (a, b) = (&q.chars(id), &q.chars(o)); a.subtypes.iter().any(|s| SubtypeSet::CREATURE_TYPES.has(s) && b.subtypes.has(s)) })))).collect::<Vec<ObjectId>>() }; let players_5 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() }; let mut picks_5: Vec<(PlayerId, ObjectId)> = Vec::new();
 for &object in &objects_5 { let controller = g.controller(object); if players_5.contains(&controller) && g.can_sacrifice(controller, object) { picks_5.push((controller, object)); } }
 gathered_4.extend(picks_5.iter().copied());
     } 

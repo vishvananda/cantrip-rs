@@ -1,13 +1,12 @@
 // Tombfire
-// status: planned
-// requires: object filter HasKeywordFamily
+// status: ready
 // Target player exiles all cards with flashback from their graveyard.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Player(p) if true) }
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0)];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let objects_0 = { let q: &dyn Query = g; ((q.state().apnap().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (planned_value!("object filter HasKeywordFamily", false => q.has_keyword_ability(id, KeywordAbility::Flashback)) && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()) == Some(q.state().obj(id).owner)))).collect::<Vec<ObjectId>>() }; let moved_0 = g.exile_all(&objects_0);
+let objects_0 = { let q: &dyn Query = g; ((q.state().apnap().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && ((q.card(q.chars(id).card).ways.iter().any(|w| w.exile_after && w.from == ZoneKind::Graveyard && !w.cost.tap_to_reduce && !matches!(w.cost.permanents, Some(PermanentCost { action: PermanentAction::BeamUp, .. }))) || q.state().permissions.iter().any(|p| p.grant.flashback && q.state().permission_covers(p, id)) || q.state().battlefield().iter().any(|&p| !q.lost_all_abilities(p) && q.card(q.chars(p).card).granted_ways.iter().any(|w| w.flashback && q.state().obj(id).zone.is(w.from) && (w.cost)(q, &Asker::new(p, q.controller(p)), id, q.state().obj(id).owner).is_some()))) && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()) == Some(q.state().obj(id).owner)))).collect::<Vec<ObjectId>>() }; let moved_0 = g.exile_all(&objects_0);
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

@@ -1,6 +1,5 @@
 // Cyclopean Tomb
 // status: planned
-// requires: counter kind Mire
 // requires: engine: no resolving effect sets land types
 // requires: event trigger for Indefinite
 // requires: object filter History CountersPutWith
@@ -13,10 +12,10 @@ static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let mut counters_0: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_0.push((object, planned_value!("counter kind Mire", CounterKind::Charge => CounterKind::Mire), amount)); } }
+let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_0.push((object, CounterKind::Mire, amount)); } }
 let had_0: Vec<_> = counters_0.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_0); let applied_0: Vec<ObjectId> = counters_0.iter().zip(had_0).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
-let objects_1 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let duration_1 = Duration::WhileCounter(planned_value!("counter kind Mire", CounterKind::Charge => CounterKind::Mire));
+let objects_1 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let duration_1 = Duration::WhileCounter(CounterKind::Mire);
 let kind_1_0_0 = { let q: &dyn Query = g; planned_value!("engine: no resolving effect sets land types", EffectKind::Pump(0, 0) => EffectKind::SetLandType(Subtype::Swamp)) };
 if let Some(source) = source_1 { cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.add_effect(source, object, kind_1_0_0, duration_1);  } }); }
 g.end_sentence();
@@ -28,8 +27,8 @@ fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.controller).i
  None }
 fn watch_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut removed_4: i64 = 0;
-let among_4_0 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Land) && planned_value!("object filter History CountersPutWith", false => cantrip_mechanics::history::counters_put_with(q.history().all().iter(), id, planned_value!("counter kind Mire", CounterKind::Charge => CounterKind::Mire), Some(asker.source))) && !(planned_value!("object filter History CountersRemovedWith", false => cantrip_mechanics::history::counters_removed_with(q.history().all().iter(), id, planned_value!("counter kind Mire", CounterKind::Charge => CounterKind::Mire), Some(asker.source)))))).collect::<Vec<ObjectId>>() }; let chooser_4_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let count_4_0 = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let objects_4_0 = cantrip_mechanics::choose::select(g, chooser_4_0, asker.source, Purpose::Choose, among_4_0, cantrip_mechanics::select::Selection::of(count_4_0, &[]))?;
-let amount_4_0 = i16::MAX; cantrip_api::instruction(g, |g| { for object in objects_4_0 { removed_4 += i64::from(g.remove_counters(object, planned_value!("counter kind Mire", CounterKind::Charge => CounterKind::Mire), amount_4_0)); } });
+let among_4_0 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Land) && planned_value!("object filter History CountersPutWith", false => cantrip_mechanics::history::counters_put_with(q.history().all().iter(), id, CounterKind::Mire, Some(asker.source))) && !(planned_value!("object filter History CountersRemovedWith", false => cantrip_mechanics::history::counters_removed_with(q.history().all().iter(), id, CounterKind::Mire, Some(asker.source)))))).collect::<Vec<ObjectId>>() }; let chooser_4_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let count_4_0 = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let objects_4_0 = cantrip_mechanics::choose::select(g, chooser_4_0, asker.source, Purpose::Choose, among_4_0, cantrip_mechanics::select::Selection::of(count_4_0, &[]))?;
+let amount_4_0 = i16::MAX; cantrip_api::instruction(g, |g| { for object in objects_4_0 { removed_4 += i64::from(g.remove_counters(object, CounterKind::Mire, amount_4_0)); } });
 g.end_sentence();
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

@@ -1,6 +1,5 @@
 // Tifa, Martial Artist
-// status: planned
-// requires: engine: no combat phase count
+// status: ready
 // Melee (Whenever this creature attacks, it gets +1/+1 until end of turn for each opponent you attacked this combat.)
 // Whenever one or more creatures you control with power 7 or greater deal combat damage to a player, untap all creatures you control. If it's the first combat phase of your turn, there is an additional combat phase after this phase.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -9,7 +8,7 @@
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let objects_0 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_0: Vec<ObjectId> = objects_0.iter().copied().filter(|&o| g.state().obj(o).tapped != false).collect(); cantrip_api::instruction(g, |g| { for &object in &turned_0 { g.untap(object); } });
 g.end_sentence();
-if { let q: &dyn Query = g; planned_value!("engine: no combat phase count", false => q.state().turn.combat_phase == 1) } {
+if { let q: &dyn Query = g; ((q.state().turn.step() as u8) >= (Step::BeginCombat as u8) && (q.state().turn.step() as u8) <= (Step::EndOfCombat as u8) && q.history().this_turn().iter().filter(|r| matches!(r.event, Event::StepBegan { step: Step::BeginCombat })).count() == 1) } {
 g.add_combat_phase();
 g.end_sentence();
 }

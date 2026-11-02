@@ -1,11 +1,10 @@
 // Aurora Champion
-// status: planned
-// requires: condition SameTeam
+// status: ready
 // Whenever this creature attacks, if your team controls another Warrior, tap target creature.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0)];
-fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { (q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition SameTeam", false => q.state().same_team(a, b))).collect::<Vec<PlayerId>>()).into_iter().any(|bound_0: PlayerId| q.state().battlefield().iter().copied().filter(|&id| q.controller(id) == Some(bound_0).unwrap_or(PlayerId(u8::MAX)) && (!(Some(asker.source) == Some(id)) && q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Warrior)))).count() >= 1) }
+fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { (q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0) == Some(asker.controller)).collect::<Vec<PlayerId>>()).into_iter().any(|bound_0: PlayerId| q.state().battlefield().iter().copied().filter(|&id| q.controller(id) == Some(bound_0).unwrap_or(PlayerId(u8::MAX)) && (!(Some(asker.source) == Some(id)) && q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Warrior)))).count() >= 1) }
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Attacks { attacker, defending, .. } = event { let id = *attacker; let subject = Target::Object(id); let data = [u32::from(defending.0), u32::MAX]; if Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

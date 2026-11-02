@@ -1,6 +1,5 @@
 // Hold for Ransom
-// status: planned
-// requires: object reference Granter
+// status: ready
 // Enchant creature
 // Enchanted creature can't attack or block and has "{7}: Hold for Ransom's controller sacrifices it and draws a card. Activate only as a sorcery."
 #[allow(unused_imports)] use cantrip_api::*;
@@ -8,7 +7,7 @@
 #[allow(unused_variables)] fn ability_1_0_rule(q: &dyn Query, asker: &Asker, attacker: ObjectId, defender: Target) -> bool { let source = asker.source; let asker = &Asker::new(source, q.controller(source)); !(q.state().obj(asker.source).attached_to == Some(attacker)) }
 #[allow(unused_variables)] fn ability_1_1_rule(q: &dyn Query, source: ObjectId, blocker: ObjectId, attacker: ObjectId) -> bool { let asker = &Asker::new(source, q.controller(source)); !(q.state().obj(asker.source).attached_to == Some(blocker) && true) }
 fn granted_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let objects_1 = { let q: &dyn Query = g; planned_value!("object reference Granter", None::<ObjectId> => q.granted_by(asker.source)).into_iter().collect::<Vec<ObjectId>>() }; let players_1 = { let q: &dyn Query = g; planned_value!("object reference Granter", None::<ObjectId> => q.granted_by(asker.source)).map(|o: ObjectId| q.controller(o)).into_iter().collect::<Vec<PlayerId>>() }; let mut picks_1: Vec<(PlayerId, ObjectId)> = Vec::new();
+let objects_1 = { let q: &dyn Query = g; granter(q, item).into_iter().collect::<Vec<ObjectId>>() }; let players_1 = { let q: &dyn Query = g; granter(q, item).map(|o: ObjectId| q.controller(o)).into_iter().collect::<Vec<PlayerId>>() }; let mut picks_1: Vec<(PlayerId, ObjectId)> = Vec::new();
 for &object in &objects_1 { let controller = g.controller(object); if players_1.contains(&controller) && g.can_sacrifice(controller, object) { picks_1.push((controller, object)); } }
 let sacrificed_1 = g.sacrifice_each(&picks_1);
 g.end_sentence();
@@ -17,6 +16,7 @@ for player in players_2 { g.draw(player, amount_2); }
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_2_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); let card = { let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }; let _ = card; if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) { chars.abilities[slot] = Some(AbilityRef::delayed({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, 0)); } }
+fn granter(q: &dyn Query, item: &StackItem) -> Option<ObjectId> { if item.acquired.by != AcquiredBy::Grant { return None; } let stamp = item.acquired.stamp; let card = item.ability.card; if let Some(e) = q.state().effects.iter().find(|e| e.timestamp == stamp && matches!(e.kind, EffectKind::AddAbility(_))) { return Some(e.source); } if let Some(id) = q.state().battlefield().iter().copied().find(|&id| q.state().obj(id).timestamp == stamp && q.chars(id).card == card) { return Some(id); } q.history().all().iter().rev().find_map(|r| match r.event { Event::ZoneChange { old, from, .. } if from.is(ZoneKind::Battlefield) && q.state().obj(old).timestamp == stamp && q.state().obj(old).card == card => Some(old), _ => None }) }
 
 pub static CARD: CardDef = CardDef { name: "Hold for Ransom", token_words: &[], oracle: true, cost: ManaCost { generic: 1, x: 0, symbols: [1, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Enchantment]), subtypes: SubtypeSet::of(&[Subtype::Aura]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[], statics: &[static_ability(Layer::Ability, cantrip_mechanics::attach::attached_object, ability_2_apply_0, "Enchanted creature can't attack or block and has \"{7}: Hold for Ransom's controller sacrifices it and draws a card. Activate only as a sorcery.\"")], replacements: &[], preventions: &[], block_rules: &[ability_1_1_rule], block_requirements: &[], attack_rules: &[ability_1_0_rule], untap_bans: &[], delayed: &[ability(Cost::NONE.and(Cost::mana(ManaCost { generic: 7, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })), granted_0, "{7}: Hold for Ransom's controller sacrifices it and draws a card. Activate only as a sorcery.").targets(&[]).sorcery_speed()], enters: None, modal: None, enchant: Some(target(ability_0_enchant)), ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

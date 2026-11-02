@@ -1,6 +1,5 @@
 // Dual Nature
-// status: planned
-// requires: object filter MadeBy
+// status: ready
 // Whenever a nontoken creature enters, its controller creates a token that's a copy of that creature.
 // Whenever a nontoken creature leaves the battlefield, exile all tokens with the same name as that creature.
 // When this enchantment leaves the battlefield, exile all tokens created with this enchantment.
@@ -20,7 +19,7 @@ g.end_sentence();
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if from.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let objects_2 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| planned_value!("object filter MadeBy", false => q.state().obj(id).made_by == Some(asker.source))).collect::<Vec<ObjectId>>() }; let moved_2 = g.exile_all(&objects_2);
+let objects_2 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| Some(asker.source).is_some_and(|m: ObjectId| q.state().obj(id).entered_with == Some(m) || q.history().all().iter().any(|r| matches!(r.event, Event::Entered { permanent, .. } if permanent == id) && (r.cause == Cause::Spell(m) || matches!(r.cause, Cause::Ability { source, .. } if source == m))))).collect::<Vec<ObjectId>>() }; let moved_2 = g.exile_all(&objects_2);
 g.end_sentence();
  Ok(()) }
 

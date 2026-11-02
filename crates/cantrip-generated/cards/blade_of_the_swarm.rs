@@ -1,6 +1,5 @@
 // Blade of the Swarm
-// status: planned
-// requires: object filter HasKeywordFamily
+// status: ready
 // When this creature enters, choose one —
 // • Put two +1/+1 counters on this creature.
 // • Put target exiled card with warp on the bottom of its owner's library.
@@ -13,7 +12,7 @@ let amount = { let q: &dyn Query = g; (2i64).max(0) as i16 }; for t in { let q: 
 let had_0: Vec<_> = counters_0.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_0); let applied_0: Vec<ObjectId> = counters_0.iter().zip(had_0).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_0_mode_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Exile) && !q.state().obj(id).token && (planned_value!("object filter HasKeywordFamily", false => q.has_keyword_ability(id, KeywordAbility::Warp)))) }
+#[allow(unused_variables)] fn ability_0_mode_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Exile) && !q.state().obj(id).token && (q.card(q.chars(id).card).ways.iter().any(|w| w.kind == WayKind::Warp))) }
 static ABILITY_0_MODE_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_mode_1_target_0)];
 fn ability_0_mode_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);

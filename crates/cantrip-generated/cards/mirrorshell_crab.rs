@@ -1,6 +1,5 @@
 // Mirrorshell Crab
-// status: planned
-// requires: a spell or ability on the stack read as an object
+// status: ready
 // Ward {3} (Whenever this creature becomes the target of a spell or ability an opponent controls, counter it unless that player pays {3}.)
 // Channel — {2}{U}, Discard this card: Counter target spell or ability unless its controller pays {3}.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -8,7 +7,7 @@
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let payer_0 = { let q: &dyn Query = g; planned_value!("a spell or ability on the stack read as an object", None::<ObjectId> => q.stack_item_object(t_0_raw.get(0).copied())).map(|o: ObjectId| q.controller(o)).expect("a reference that always names a player") }; let paid_0 = g.may_pay(payer_0, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 3, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })), &PAY_QUESTION)?;
+let payer_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| q.state().stack.iter().find(|e| (match t { Target::Object(id) => e.kind == StackKind::Spell && e.object == id, Target::Ability(serial) => e.kind != StackKind::Spell && e.serial == serial, _ => false })).map(|e| e.controller)).expect("a reference that always names a player") }; let paid_0 = g.may_pay(payer_0, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 3, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })), &PAY_QUESTION)?;
 g.end_sentence();
 if { let q: &dyn Query = g; !(((paid_0 as i64) != 0)) } {
 let items_1: Vec<(ObjectId, usize)> = t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).into_iter().collect::<Vec<Target>>().into_iter().filter_map(|t| { let stack = &g.state().stack; stack.iter().position(|e| (match t { Target::Object(id) => e.kind == StackKind::Spell && e.object == id, Target::Ability(serial) => e.kind != StackKind::Spell && e.serial == serial, _ => false })).map(|at| (stack[at].object, at)) }).collect(); g.counter_items(&items_1);

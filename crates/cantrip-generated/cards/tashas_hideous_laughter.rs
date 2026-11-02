@@ -1,14 +1,15 @@
 // Tasha's Hideous Laughter
-// status: planned
-// requires: operation RevealUntilGroup
+// status: ready
 // Each opponent exiles cards from the top of their library until that player has exiled cards with total mana value 20 or greater.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
- for (index_0, bound_0) in players_0.iter().copied().enumerate() { planned!("operation-reveal-until-group" => let revealed = cantrip_mechanics::library::reveal_until_group(g, { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }, asker.source, &[SelectionRule::Total(Property::ManaValue, Comparison::GreaterOrEqual, { let q: &dyn Query = g; 20i64 })])?);
-    } 
+let mut each_2: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut all_2: Vec<ObjectId> = Vec::new();
+ for (index_0, bound_0) in players_0.iter().copied().enumerate() { let owner_1 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; let mut total_1: i64 = 0; let mut objects_1: Vec<ObjectId> = Vec::new(); while total_1 < 20 { let Some(&top) = g.state().zone(Zone::library(owner_1)).first() else { break; }; let card = g.exile(top); if g.obj(card).zone.is(ZoneKind::Exile) { total_1 += i64::from(g.mana_value(card)); objects_1.push(card); } }
+ each_2[index_0] = objects_1.clone(); all_2.extend(each_2[index_0].iter().copied());
+   } 
 g.end_sentence();
-let objects_2 = { let q: &dyn Query = g; planned_value!("depends on an instruction with a gap", Vec::<ObjectId>::new() => result_0) }; let moved_2 = g.exile_all(&objects_2);
+let moved_3: Vec<ObjectId> = { let q: &dyn Query = g; all_2.clone() };
 g.end_sentence();
  Ok(()) }
 

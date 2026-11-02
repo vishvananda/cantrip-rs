@@ -1,6 +1,5 @@
 // Chandra, Roaring Flame // Chandra, Fire of Kaladesh
-// status: planned
-// requires: player collection DamagedBy
+// status: ready
 // [+1]: Chandra deals 2 damage to target player or planeswalker.
 // [−2]: Chandra deals 2 damage to target creature.
 // [−7]: Chandra deals 6 damage to each opponent. Each player dealt damage this way gets an emblem with "At the beginning of your upkeep, this emblem deals 3 damage to you."
@@ -23,7 +22,7 @@ let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u16 }; let recipients_1 = { let q: &dyn Query = g; t_0.clone() }; if let Some(source) = source_1 { let batch: Vec<(ObjectId, Target, u16)> = recipients_1.iter().map(|t| (source, *t, amount_1)).collect(); g.damage_together(&batch); }
 g.end_sentence();
-if { let q: &dyn Query = g; Some(asker.source).is_some_and(|candidate: ObjectId| (q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::Damage { source, target, amount, kind, .. } = event { let (source, amount, combat) = (*source, *amount, kind.is_combat()); let subject = Target::Object(source); let data = [u32::from(amount), match target { Target::Object(o) => o.0, Target::Player(p) => u32::MAX - 1 - u32::from(p.0), _ => u32::MAX }]; if !q.state().obj(source).zone.is(ZoneKind::Stack) && Some(candidate) == Some(source) && true { return Some(Fired { subject, data }); } }  None }).map(|f: Fired| i64::from(f.data[0])).sum::<i64>()) >= (3i64)) } {
+if { let q: &dyn Query = g; Some(asker.source).is_some_and(|candidate: ObjectId| (q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::Damage { source, target, amount, kind, controller, known, .. } = event { let (source, amount, combat, controller) = (*source, *amount, kind.is_combat(), *controller); let dealt = DamageDealt { source, target: *target, amount, combat, controller, known: *known }; let subject = Target::Object(source); let data = [u32::from(amount), match target { Target::Object(o) => o.0, Target::Player(p) => u32::MAX - 1 - u32::from(p.0), _ => u32::MAX }]; if q.state().obj(source).zone.is(ZoneKind::Battlefield) && Some(candidate) == Some(source) && true { return Some(Fired { subject, data }); } }  None }).map(|f: Fired| i64::from(f.data[0])).sum::<i64>()) >= (3i64)) } {
 let objects_2 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let moved_2 = g.exile_all(&objects_2);
 g.end_sentence();
 let objects_3 = ({ let q: &dyn Query = g; ((moved_2.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Exile).collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_3 = { let mut moved: Vec<ObjectId> = Vec::new(); for &o in &objects_3 { let controller = g.state().obj(o).owner; let entered = g.put_onto_battlefield_transformed(o, controller, false)?; if g.is_on_battlefield(entered) { moved.push(entered); } } moved };
@@ -69,9 +68,9 @@ pub static EXTRA: &[&CardDef] = &[];
 
 }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let mut done_2: i64 = 0; let source_2 = { let q: &dyn Query = g; Some(asker.source) }; let amount_2 = { let q: &dyn Query = g; (6i64).max(0) as u16 }; let recipients_2 = { let q: &dyn Query = g; (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() }; if let Some(source) = source_2 { let batch: Vec<(ObjectId, Target, u16)> = recipients_2.iter().map(|t| (source, *t, amount_2)).collect(); done_2 += g.damage_together(&batch).iter().map(|&n| i64::from(n)).sum::<i64>(); }
+let mut done_2: i64 = 0; let mut dealt_2: Vec<ObjectId> = Vec::new(); let mut hurt_2: Vec<PlayerId> = Vec::new(); let before_2 = g.history().head() as usize; let source_2 = { let q: &dyn Query = g; Some(asker.source) }; let amount_2 = { let q: &dyn Query = g; (6i64).max(0) as u16 }; let recipients_2 = { let q: &dyn Query = g; (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() }; if let Some(source) = source_2 { let batch: Vec<(ObjectId, Target, u16)> = recipients_2.iter().map(|t| (source, *t, amount_2)).collect(); done_2 += g.damage_together(&batch).iter().map(|&n| i64::from(n)).sum::<i64>(); dealt_2.extend(cantrip_mechanics::history::permanents_dealt_damage_by(g.history(), source, before_2)); for r in &g.history().all()[before_2..] { if let Event::Damage { source: s, target: Target::Player(p), amount, .. } = r.event { if s == source && amount > 0 && !hurt_2.contains(&p) { hurt_2.push(p); } } } }
 g.end_sentence();
-let mut players_3: Vec<PlayerId> = { let q: &dyn Query = g; planned_value!("player collection DamagedBy", Vec::<PlayerId>::new() => q.players_damaged_by(asker, 0)) };
+let mut players_3: Vec<PlayerId> = { let q: &dyn Query = g; hurt_2.clone() };
  for (index_3, bound_0) in players_3.iter().copied().enumerate() { for player in { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() } { cantrip_mechanics::tokens::create_emblem(g, player, &emblem_4::CARD); }
     } 
 g.end_sentence();

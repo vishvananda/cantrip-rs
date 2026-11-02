@@ -1,7 +1,7 @@
 // Reflecting Mirror
 // status: planned
+// requires: a spell's target changed to a player
 // requires: engine: no rule on an ability's X
-// requires: operation Retarget
 // {X}, {T}: Change the target of target spell with a single target if that target is you. The new target must be a player. X is twice the mana value of that spell.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Stack) && ((q.state().stack.iter().find(|i| i.object == id).is_some_and(|i| q.state().targets(i).len() == 1) && q.announced_x().map_or(true, |x| (i64::from(q.mana_value(id))) == (i64::from(x)))))) }
@@ -9,7 +9,7 @@ static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 if { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).is_some_and(|candidate: ObjectId| q.state().stack.iter().find(|i| i.kind == StackKind::Spell && i.object == candidate).is_some_and(|i| q.state().targets(i).iter().any(|t| matches!(t, Target::Player(p) if (Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).contains(p))))) } {
-planned!("operation-retarget" => if let Some(spell) = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) } { cantrip_mechanics::copy::retarget(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, spell, NewTargets::ToPlayers({ let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }))?; });
+planned!("a-spell-s-target-changed-to-a-player" => if let Some(spell) = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) } { cantrip_mechanics::copy::retarget(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, spell, NewTargets::ToPlayers({ let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }))?; });
 g.end_sentence();
 }
 g.end_sentence();

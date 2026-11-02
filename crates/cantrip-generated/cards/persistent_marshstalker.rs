@@ -14,7 +14,7 @@ let payer_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a referenc
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
 let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
-let objects_1 = ({ let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_1 = { let mut moved: Vec<ObjectId> = Vec::new(); for &o in &objects_1 { let controller = player_1; let defender = cantrip_mechanics::combat::choose_attack_target(g, controller, asker.source)?.unwrap_or(Target::None); moved.push(g.put_onto_battlefield_attacking(o, controller, defender, &[])?); } moved };
+let objects_1 = ({ let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_1 = { let mut moved: Vec<ObjectId> = Vec::new(); for &o in &objects_1 { let controller = player_1; let defender = cantrip_mechanics::combat::choose_attack_target(g, controller, asker.source)?.unwrap_or(Target::None); let entered = g.put_onto_battlefield_attacking(o, controller, defender, &[])?; let came = g.is_on_battlefield(entered); if came { moved.push(entered); } } moved };
 g.end_sentence();
 hoisted_2.extend(moved_1.clone());
 hoisted_3.extend({ let q: &dyn Query = g; objects_1.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() });

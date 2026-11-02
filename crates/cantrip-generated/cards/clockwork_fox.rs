@@ -9,6 +9,7 @@ let amount_0 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let players_0 = 
 for player in players_0 { g.draw(player, amount_0); }
 g.end_sentence();
 let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
+let drawing_1: Vec<PlayerId> = players_1.into_iter().collect(); let players_1: Vec<PlayerId> = g.state().apnap().filter(|p| drawing_1.contains(p)).collect();
 for player in players_1 { g.draw(player, amount_1); }
 g.end_sentence();
  Ok(()) }

@@ -1,6 +1,5 @@
 // Super-Adaptoid
-// status: planned
-// requires: operation PutChosenCounters
+// status: ready
 // Super-Adaptoid's power is equal to the number of legendary creatures you control.
 // Whenever Super-Adaptoid enters or attacks, choose another target creature. If that creature has haste and Super-Adaptoid doesn't, put a haste counter on Super-Adaptoid. Do the same for flying, first strike, double strike, deathtouch, indestructible, lifelink, menace, reach, trample, and vigilance.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -12,7 +11,7 @@ if let Event::Attacks { attacker, defending, .. } = event { let id = *attacker; 
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-planned!("operation-put-chosen-counters" => cantrip_mechanics::counters::chosen(g, asker, { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }, "PerAbility { of: Some(Source), kinds: [List([Term { family: \"CheckHasable\", form: \"Haste\", operands: [] }, Term { family: \"CheckHasable\", form: \"Flying\", operands: [] }, Term { family: \"CheckHasable\", form: \"FirstStrike\", operands: [] }, Term { family: \"CheckHasable\", form: \"DoubleStrike\", operands: [] }, Term { family: \"CheckHasable\", form: \"Deathtouch\", operands: [] }, Term { family: \"CheckHasable\", form: \"Indestructible\", operands: [] }, Term { family: \"CheckHasable\", form: \"Lifelink\", operands: [] }, Term { family: \"CheckHasable\", form: \"Menace\", operands: [] }, Term { family: \"CheckHasable\", form: \"Reach\", operands: [] }, Term { family: \"CheckHasable\", form: \"Trample\", operands: [] }, Term { family: \"CheckHasable\", form: \"Vigilance\", operands: [] }]), Object(Target { slot: Slot(0), index: 0 })], missing_only: true }")?);
+let objects_0 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; if let (Some(other), Some(this)) = ({ let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) }, { let q: &dyn Query = g; Some(asker.source) }) { for (keyword, kind) in [(Keyword::Haste, CounterKind::Haste), (Keyword::Flying, CounterKind::Flying), (Keyword::FirstStrike, CounterKind::FirstStrike), (Keyword::DoubleStrike, CounterKind::DoubleStrike), (Keyword::Deathtouch, CounterKind::Deathtouch), (Keyword::Indestructible, CounterKind::Indestructible), (Keyword::Lifelink, CounterKind::Lifelink), (Keyword::Menace, CounterKind::Menace), (Keyword::Reach, CounterKind::Reach), (Keyword::Trample, CounterKind::Trample), (Keyword::Vigilance, CounterKind::Vigilance)] { let (c, o) = (g.chars(other), g.chars(this)); let lacks = !o.keywords.has(keyword); if (c.keywords.has(keyword) || (keyword == Keyword::Hexproof && c.hexproof_from != HexproofFrom::NONE)) && lacks { for &object in &objects_0 { g.add_counters(object, kind, 1); } } } }
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

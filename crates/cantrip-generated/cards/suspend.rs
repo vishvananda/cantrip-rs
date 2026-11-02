@@ -1,7 +1,6 @@
 // Suspend
 // status: planned
 // requires: exiled card gains suspend
-// requires: object filter HasKeywordFamily
 // Exile target creature and put two time counters on it. If it doesn't have suspend, it gains suspend. (At the beginning of its owner's upkeep, they remove a time counter. When the last is removed, they may play it without paying its mana cost. If it's a creature, it has haste.)
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
@@ -14,7 +13,7 @@ let mut counters_1: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
 let amount = { let q: &dyn Query = g; (2i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (moved_0.clone()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, CounterKind::Time, amount)); } }
 let had_1: Vec<_> = counters_1.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_1); let applied_1: Vec<ObjectId> = counters_1.iter().zip(had_1).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
-if { let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied().is_some_and(|candidate: ObjectId| !(planned_value!("object filter HasKeywordFamily", false => q.has_keyword_ability(candidate, KeywordAbility::Suspend)))) } {
+if { let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied().is_some_and(|candidate: ObjectId| !(q.card(q.chars(candidate).card).suspend.is_some())) } {
 let cards_2 = { let q: &dyn Query = g; moved_0.clone() };
 planned!("exiled-card-gains-suspend" => for card in cards_2 { cantrip_mechanics::suspend::gains_suspend(g, card); });
 g.end_sentence();

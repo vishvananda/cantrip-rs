@@ -1,14 +1,12 @@
 // Tlincalli Hunter // Retrieve Prey
-// status: planned
-// requires: alternate spell cost rule
+// status: ready
 // Trample
 // Once each turn, you may pay {0} rather than pay the mana cost for a creature spell you cast from exile.
 // Exile target creature card from your graveyard. Until the end of your next turn, you may cast that card. (Then exile this card. You may cast the creature later from exile.)
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_1_0_applies(q: &dyn Query, asker: &Asker, player: PlayerId) -> bool { player == asker.controller }
-planned_item!("alternate-spell-cost-rule" => statics: player_rule(ability_1_0_applies, PlayerRule::SpellCost { spells: |q: &dyn Query, asker: &Asker, player: PlayerId, spell: ObjectId| (q.chars(spell).is(CardType::Creature) && cast_of(q, spell).is_some_and(|cast| cast.from == ZoneKind::Exile)), change: CostModifier::Alternate { cost: PlayCost::Alternate(&[ManaSymbol::ManaCostGeneric(0)]), limit: Some(PlayLimit::EachTurn(1)) } }));
+#[allow(unused_variables)] fn ability_1_0_rule(q: &dyn Query, asker: &Asker, spell: ObjectId, player: PlayerId) -> bool { player == asker.controller && (q.chars(spell).is(CardType::Creature) && cantrip_mechanics::zone_cast_from(q, spell) == Some(ZoneKind::Exile)) && !cantrip_mechanics::history::permission_used_this_turn(q, asker.source) }
 
-pub static CARD: CardDef = CardDef { name: "Tlincalli Hunter", token_words: &[], oracle: true, cost: ManaCost { generic: 5, x: 0, symbols: [0, 0, 0, 0, 2, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Scorpion,Subtype::Scout]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: Some(7), toughness: Some(7), loyalty: None, defense: None, keywords: Keywords::of(&[Keyword::Trample]), protection: ColorSet(0), spell: None, abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, adventure: Some(&adventure::CARD), ..CardDef::BLANK };
+pub static CARD: CardDef = CardDef { name: "Tlincalli Hunter", token_words: &[], oracle: true, cost: ManaCost { generic: 5, x: 0, symbols: [0, 0, 0, 0, 2, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Scorpion,Subtype::Scout]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: Some(7), toughness: Some(7), loyalty: None, defense: None, keywords: Keywords::of(&[Keyword::Trample]), protection: ColorSet(0), spell: None, abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, spell_alternatives: &[SpellAlternative { text: "Pay {0}", applies: ability_1_0_rule, cost: InsteadOfManaCost::Mana(ManaCost::ZERO), flash: false }], adventure: Some(&adventure::CARD), ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[&adventure::CARD];
 pub mod adventure {
 #[allow(unused_imports)] use cantrip_api::*;

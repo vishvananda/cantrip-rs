@@ -14,7 +14,7 @@ let picked_0 = if open_0.is_empty() { None } else if open_0.len() > 1 || (false 
 let Some(card_0) = picked_0 else { break; };
 let ways_0: Vec<CastWay> = g.cast_ways_during_resolution_by(card_0, caster_0).into_iter().filter(|w| true).collect();
 let done_0 = if ways_0.is_empty() { g.play_land_during_resolution(card_0)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_0, card_0, ways_0)?.map(|w| w.way); g.cast_during_resolution_as(card_0, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(caster_0), exile_instead: ExileInstead::Spell, ..CastTerms::default() })? };
-if done_0 { left_0 -= 1; played_0.push(g.state().obj(card_0).became.unwrap_or(card_0)); } else if 1i64 == 1 { break; } if done_0 || !(true && false) { pool_0.retain(|&c| c != card_0); }
+if done_0 { left_0 -= 1; played_0.push(g.state().obj(card_0).became.unwrap_or(card_0)); } else if true { break; } if done_0 || !(true && false) { pool_0.retain(|&c| c != card_0); }
 }
 g.end_sentence();
 cantrip_mechanics::cipher::encode(g, item)?;

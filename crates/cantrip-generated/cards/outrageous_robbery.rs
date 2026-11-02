@@ -1,6 +1,5 @@
 // Outrageous Robbery
-// status: planned
-// requires: a card a player may look at for a while
+// status: ready
 // Target opponent exiles the top X cards of their library face down. You may look at and play those cards for as long as they remain exiled. If you cast a spell this way, you may spend mana as though it were mana of any type to cast it.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Player(p) if (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&p)) }
@@ -9,7 +8,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let objects_0 = { let q: &dyn Query = g; (((t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((i64::from(item.x)).max(0) as usize).collect::<Vec<ObjectId>>() }; let by_0 = None; let moved_0 = g.exile_face_down(&objects_0, by_0);
 g.end_sentence();
-planned!("a-card-a-player-may-look-at-for-a-while" => let cards_1_0 = { let q: &dyn Query = g; moved_0.clone() }; let players_1_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &card in &cards_1_0 { for &player in &players_1_0 { g.allow_look(card, player, Expiry::Never); } });
+let cards_1_0 = { let q: &dyn Query = g; moved_0.clone() }; let players_1_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &player in &players_1_0 { g.look_at(player, &cards_1_0); }
 let cards_1_1 = { let q: &dyn Query = g; moved_0.clone() }; let players_1_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_1_1 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_1_1 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::Never, any_type: true, ..PlayGrant::CAST }); } } } });
 g.end_sentence();
  Ok(()) }

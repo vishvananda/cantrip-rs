@@ -1,6 +1,5 @@
 // Ral Zarek, Guest Lecturer
-// status: planned
-// requires: numeric expression HeadsFlipped
+// status: ready
 // [+1]: Surveil 2.
 // [−1]: Any number of target players each discard a card.
 // [−2]: Return target creature card with mana value 3 or less from your graveyard to the battlefield.
@@ -14,7 +13,7 @@ g.end_sentence();
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0).between(0, cantrip_api::TargetSpec::ANY_NUMBER)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; t_0.iter().filter_map(|t| t.player()).collect::<Vec<PlayerId>>() }; let mut cards_1 = Vec::new(); for player in players_1 { cards_1.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_1)?); } let discarded_1 = g.discard_together(&cards_1);
+let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().filter(|&p| t_0.iter().any(|t| t.player() == Some(p))).collect::<Vec<PlayerId>>() }.into_iter().collect(); let mut cards_1 = Vec::new(); for player in g.state().apnap().filter(|p| players_1.contains(p)).collect::<Vec<PlayerId>>() { cards_1.extend(cantrip_mechanics::choose_from_hand(g, player, asker.source, amount_1)?); } let discarded_1 = g.discard_together(&cards_1);
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && (((q.chars(id).is(CardType::Creature) && (i64::from(q.mana_value(id))) <= (3i64)) && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(id).owner))))) }
@@ -29,9 +28,9 @@ g.end_sentence();
 static ABILITY_3_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_3_target_0)];
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let player_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let count_3 = { let q: &dyn Query = g; (5i64).max(0) as u32 }; let mut done_3: i64 = 0; for _ in 0..count_3 { if g.flip_coin(player_3) { done_3 += 1; } }
+let player_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let count_3 = { let q: &dyn Query = g; (5i64).max(0) as u32 }; let mut done_3: i64 = 0; for _ in 0..count_3 { if g.flip_coin_for_heads(player_3) { done_3 += 1; } }
 g.end_sentence();
-planned!("numeric-expression-heads-flipped", Keyword, "action" = "{\"Skip\":\"Turn\"}", "actor" = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }, "amount" = "{\"args\":0,\"kind\":\"HeadsFlipped\"}", "object" = "()", "other" = "()", "subtype" = "()");
+let amount_4 = { let q: &dyn Query = g; (done_3).clamp(0, 32767) as u32 }; let player_4 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.player()).expect("a reference that always names a player") }; g.skip_next_turns(asker.source, player_4, amount_4 as _);
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

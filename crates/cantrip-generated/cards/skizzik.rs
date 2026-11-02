@@ -4,7 +4,7 @@
 // Trample, haste
 // At the beginning of the end step, if this creature wasn't kicked, sacrifice it.
 #[allow(unused_imports)] use cantrip_api::*;
-fn ability_3_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.source).is_some_and(|candidate: ObjectId| !(q.state().obj(candidate).kicked > 0)) }
+fn ability_3_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.source).is_some_and(|candidate: ObjectId| !((q.state().obj(candidate).kicked > 0 || (q.state().obj(candidate).paid > 0 && q.card(q.state().obj(candidate).card).kicker.is_some())))) }
 #[allow(unused_variables)] fn ability_3_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::End) && true { return Some(Fired { subject, data }); } }
  None }
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

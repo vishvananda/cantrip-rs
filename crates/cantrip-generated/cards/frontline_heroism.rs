@@ -1,6 +1,5 @@
 // Frontline Heroism
-// status: planned
-// requires: operation CopyOnStack
+// status: ready
 // When this enchantment enters, create a 1/1 red Soldier creature token with haste.
 // Whenever you cast a spell that targets only a single creature you control, create a 1/1 red Soldier creature token with haste, then copy that spell. The copy targets that token.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -22,7 +21,7 @@ tokens_0.extend(std::iter::repeat((def_0_0,player)).take(count_0_0 as usize));
 let created_0 = g.create_tokens_worded(&tokens_0, false, None, words_0)?;
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && (q.state().stack.iter().find(|i| i.object == id).is_some_and(|i| q.state().targets(i).len() == 1) && q.state().stack.iter().find(|i| i.kind == StackKind::Spell && i.object == id).is_some_and(|i| q.state().targets(i).iter().any(|t| t.object().is_some_and(|o| (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).contains(&o))))) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SpellCast { spell, player, .. } = event { let id = *spell; let subject = Target::Object(id); let data = [u32::from(player.0), u32::MAX]; if Some(asker.controller) == Some(*player) && (q.state().stack.iter().find(|i| i.object == id).is_some_and(|i| { let chosen = q.state().targets(i); !chosen.is_empty() && chosen.iter().all(|t| *t == chosen[0]) }) && q.state().stack.iter().find(|i| i.kind == StackKind::Spell && i.object == id).is_some_and(|i| q.state().targets(i).iter().any(|t| t.object().is_some_and(|o| (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).contains(&o))))) { return Some(Fired { subject, data }); } }
  None }
 pub mod token_3 {
 #[allow(unused_imports)] use cantrip_api::*;
@@ -39,7 +38,7 @@ tokens_2.extend(std::iter::repeat((def_2_0,player)).take(count_2_0 as usize));
 } let words_2 = g.words(asker.source);
 let created_2 = g.create_tokens_worded(&tokens_2, false, None, words_2)?;
 g.end_sentence();
-planned!("operation-copy-on-stack" => if let Some(spell) = { let q: &dyn Query = g; item.subject.object() } { cantrip_mechanics::copy::on_stack(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, spell, { let q: &dyn Query = g; (1i64).max(0) as u32 }, NewTargets::Each({ let q: &dyn Query = g; created_2.clone() }))?; });
+let copier_4 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let spell_4 = { let q: &dyn Query = g; item.subject.object() }; let to_4: Vec<ObjectId> = { let q: &dyn Query = g; created_2.clone() }; if let Some(spell) = spell_4 { if let Some(copy) = g.copy_spell(spell, copier_4, false)? { if let Some(&to) = to_4.first() { let count = { let q: &dyn Query = g; q.state().stack.iter().find(|i| i.kind == StackKind::Spell && i.object == copy).map_or(0, |i| q.state().targets(i).len()) }; for _ in 0..count { g.change_a_target_to(Target::Object(copy), to, copier_4)?; } } } }
 g.end_sentence();
  Ok(()) }
 

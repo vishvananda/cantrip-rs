@@ -1,6 +1,5 @@
 // Brigid, Doun's Mind // Brigid, Clachan's Heart
-// status: planned
-// requires: instruction ChooseOne
+// status: ready
 // {T}: Add X {G} or X {W}, where X is the number of other creatures you control.
 // At the beginning of your first main phase, you may pay {W}. If you do, transform Brigid.
 // Whenever this creature enters or transforms into Brigid, Clachan's Heart, create a 1/1 green and white Kithkin creature token.
@@ -42,30 +41,13 @@ pub static CARD: CardDef = CardDef { name: "Brigid, Clachan's Heart", token_word
 pub static EXTRA: &[&CardDef] = &[&token_1::CARD];
 pub mod back {
 #[allow(unused_imports)] use cantrip_api::*;
-fn ability_0_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let value_0: i64 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (!(Some(asker.source) == Some(id)) && q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64 };
-let decider_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; match planned_value!("instruction ChooseOne", 0u8 => cantrip_mechanics::choose::one_of(g, decider_1, asker.source, vec![Label::Card(card_1, 0), Label::Card(card_1, 1)])?) {
-0 => {
-let mana_players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_3_0 = { let q: &dyn Query = g; (value_0).clamp(0, 4294967295) as u32 };
-for player in mana_players_3 {
-g.add_mana(player, Mana::G, mana_3_0);}
-g.end_sentence();
-}
-_ => {
-let mana_players_5 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_5_0 = { let q: &dyn Query = g; (value_0).clamp(0, 4294967295) as u32 };
-for player in mana_players_5 {
-g.add_mana(player, Mana::W, mana_5_0);}
-g.end_sentence();
-}
-}
- Ok(()) }
+fn ability_0_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(), Suspend> { let Some(color) = chosen else { return Ok(()) }; let amount: i64 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (!(Some(asker.source) == Some(id)) && q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64 }; if amount > 0 { g.add_mana(asker.controller, color.mana(), amount as u32); } Ok(()) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::PrecombatMain) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let payer_6 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let paid_6 = g.may_pay(payer_6, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [1, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })), &PAY_QUESTION)?;
+let payer_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let paid_0 = g.may_pay(payer_0, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [1, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })), &PAY_QUESTION)?;
 g.end_sentence();
-if { let q: &dyn Query = g; ((paid_6 as i64) != 0) } {
+if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
 if let Some(object) = ({ let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied() { g.transform_by(object, item)?; }
 g.end_sentence();
 }
@@ -73,5 +55,5 @@ g.end_sentence();
  Ok(()) }
 static PAY_QUESTION: Question = Question::new("Pay", "pay {cost}?", "", "Pay {cost}", "Decline");
 
-pub static CARD: CardDef = CardDef { name: "Brigid, Doun's Mind", token_words: &[], oracle: true, cost: ManaCost::ZERO, has_cost: false, types: TypeSet::of(&[CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Kithkin,Subtype::Soldier]), supertypes: Supertypes { basic: false, legendary: true, snow: false }, colors: Some(ColorSet(16)), power: Some(3), toughness: Some(2), loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[mana_ability(Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(Cost { tap: true, ..Cost::NONE }), add_by(ability_0_mana), "{T}: Add X {G} or X {W}, where X is the number of other creatures you control."),triggered(when_asked(EventMask(EventMask::STEP_BEGAN.0), ability_1_event), ability_1, "At the beginning of your first main phase, you may pay {W}. If you do, transform Brigid.").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
+pub static CARD: CardDef = CardDef { name: "Brigid, Doun's Mind", token_words: &[], oracle: true, cost: ManaCost::ZERO, has_cost: false, types: TypeSet::of(&[CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Kithkin,Subtype::Soldier]), supertypes: Supertypes { basic: false, legendary: true, snow: false }, colors: Some(ColorSet(16)), power: Some(3), toughness: Some(2), loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[mana_ability(Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(Cost { tap: true, ..Cost::NONE }), add_by(ability_0_mana).choose_color().colors(ColorSet(17)), "{T}: Add X {G} or X {W}, where X is the number of other creatures you control."),triggered(when_asked(EventMask(EventMask::STEP_BEGAN.0), ability_1_event), ability_1, "At the beginning of your first main phase, you may pay {W}. If you do, transform Brigid.").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 }

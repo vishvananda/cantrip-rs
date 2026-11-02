@@ -1,6 +1,5 @@
 // Goldwardens' Gambit
-// status: planned
-// requires: operation AttachEach
+// status: ready
 // Affinity for Equipment (This spell costs {1} less to cast for each Equipment you control.)
 // Create five 2/2 red Rebel creature tokens. They gain haste until end of turn. For each of those tokens, you may attach an Equipment you control to it.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -24,7 +23,7 @@ let objects_2 = { let q: &dyn Query = g; (created_0.clone()).into_iter().filter(
 let kind_2_0_0 = { let q: &dyn Query = g; EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])) };
 if let Some(source) = source_2 { cantrip_api::instruction(g, |g| { for &object in &objects_2 { g.add_effect(source, object, kind_2_0_0, duration_2);  } }); }
 g.end_sentence();
-planned!("operation-attach-each" => cantrip_mechanics::attach::each(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, asker.source, { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Equipment)) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }, { let q: &dyn Query = g; (created_0.clone()).into_iter().map(Target::Object).collect::<Vec<Target>>() }, Some({ let q: &dyn Query = g; cantrip_mechanics::select::Count::UpTo((1i64).max(0) as u32) }), true)?);
+let player_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let attachments_3 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Equipment)) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }; let hosts_3 = { let q: &dyn Query = g; created_0.clone() }; for &host in &hosts_3 { let chosen = cantrip_mechanics::choose::select(g, player_3, asker.source, Purpose::Attach, attachments_3.clone(), cantrip_mechanics::select::Selection::of(cantrip_mechanics::select::up_to(1), &[]))?; if let Some(&attachment) = chosen.first() { g.attach(attachment, host); } }
 g.end_sentence();
  Ok(()) }
 

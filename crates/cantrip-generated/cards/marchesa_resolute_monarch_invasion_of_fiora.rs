@@ -1,7 +1,5 @@
 // Marchesa, Resolute Monarch // Invasion of Fiora
-// status: planned
-// requires: condition PlayerDid WasDealtCombatDamage
-// requires: history window SinceLastTurnOf
+// status: ready
 // Menace, deathtouch
 // Whenever Marchesa attacks, remove all counters from up to one target permanent.
 // At the beginning of your upkeep, if you haven't been dealt combat damage since your last turn, you draw a card and you lose 1 life.
@@ -37,7 +35,7 @@ let objects_0_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_
 cantrip_api::instruction(g, |g| { for object in objects_0_0 { cantrip_mechanics::effects::remove_all_counters(g, object); } });
 g.end_sentence();
  Ok(()) }
-fn ability_3_if(q: &dyn Query, asker: &Asker) -> bool { !(planned_value!("condition PlayerDid WasDealtCombatDamage", false => q.player_did(planned_value!("history window SinceLastTurnOf", q.history().all().iter() => cantrip_mechanics::history::since_last_turn_of(q, Some(asker.controller)).iter()), Some(asker.controller), PlayerDeed::WasDealtCombatDamage))) }
+fn ability_3_if(q: &dyn Query, asker: &Asker) -> bool { !({ let history = q.history(); history.all()[history.all().iter().rposition(|r| Some(r.active) == Some(asker.controller) && r.turn != history.turn).map_or(0, |at| at + 1)..].iter() }.any(|r| matches!(r.event, Event::Damage { target: Target::Player(hit), kind, .. } if Some(hit) == Some(asker.controller) && kind.is_combat()))) }
 #[allow(unused_variables)] fn ability_3_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::Upkeep) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

@@ -1,8 +1,6 @@
 // Tetravus
 // status: planned
 // requires: numeric expression PaidCountersRemoved
-// requires: object filter MadeBy
-// requires: objects that paid a cost at resolution
 // requires: static rule Prohibit BeAttachedBy
 // Flying
 // This creature enters with three +1/+1 counters on it.
@@ -25,7 +23,6 @@ pub static EXTRA: &[&CardDef] = &[];
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_4: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let payer_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let paid_1 = g.may_pay(payer_1, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(Cost { variable: Some(VariableCost::RemoveAnyNumberOfCounters(CounterKind::PlusOne)), ..Cost::NONE }), &PAY_QUESTION)?;
-let paid_objects_1: Vec<ObjectId> = planned_value!("objects that paid a cost at resolution", Vec::<ObjectId>::new() => g.objects_that_paid());
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_1 as i64) != 0) } {
 let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_2 = Vec::new();
@@ -44,7 +41,7 @@ g.end_sentence();
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_9: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let payer_5 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let (paid_5, after_5, before_5, picked_5): (bool, Vec<ObjectId>, Vec<ObjectId>, Vec<ObjectId>) = if true {
-let selected_7_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_7_candidates = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| planned_value!("object filter MadeBy", false => q.state().obj(id).made_by == Some(asker.source))).collect::<Vec<ObjectId>>() }; let selected_7_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AnyNumber }; let selected_7 = { cantrip_mechanics::choose::select(g, selected_7_player, asker.source, Purpose::Exile, selected_7_candidates, cantrip_mechanics::select::Selection::of(selected_7_count, &[]))? };
+let selected_7_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_7_candidates = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| Some(asker.source).is_some_and(|m: ObjectId| q.state().obj(id).entered_with == Some(m) || q.history().all().iter().any(|r| matches!(r.event, Event::Entered { permanent, .. } if permanent == id) && (r.cause == Cause::Spell(m) || matches!(r.cause, Cause::Ability { source, .. } if source == m))))).collect::<Vec<ObjectId>>() }; let selected_7_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AnyNumber }; let selected_7 = { cantrip_mechanics::choose::select(g, selected_7_player, asker.source, Purpose::Exile, selected_7_candidates, cantrip_mechanics::select::Selection::of(selected_7_count, &[]))? };
 let objects_6 = { let q: &dyn Query = g; selected_7.clone() }; let moved_6 = g.exile_all(&objects_6);
 let paid_6 = moved_6.clone().iter().any(|&o| g.obj(o).zone.is(ZoneKind::Exile));
 (paid_6, { let q: &dyn Query = g; (moved_6).clone() }, { let q: &dyn Query = g; (objects_6.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).clone() }, { let q: &dyn Query = g; (selected_7).clone() }) } else { (false, Vec::new(), Vec::new(), Vec::new()) };

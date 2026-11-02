@@ -1,6 +1,5 @@
 // Tempt with Mayhem
-// status: planned
-// requires: condition PlayerTook
+// status: ready
 // Tempting offer — Choose target instant or sorcery spell. Each opponent may copy that spell and may choose new targets for the copy they control. You copy that spell once plus an additional time for each opponent who copied the spell this way. You may choose new targets for the copies you control.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Stack) && ((q.chars(id).is(CardType::Instant) || q.chars(id).is(CardType::Sorcery)))) }
@@ -15,7 +14,7 @@ if let Some(spell) = spell_1 { g.copy_spell(spell, copier_1, true)?; }
    }
  } 
 g.end_sentence();
-let runs_2: u32 = { let q: &dyn Query = g; ((1i64 + (q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition PlayerTook", false => q.took_part(asker, Some(bound_0), 0))).collect::<Vec<PlayerId>>()).len() as i64)).clamp(0, 4294967295) as u32 };
+let runs_2: u32 = { let q: &dyn Query = g; ((1i64 + (q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0).and_then(|p: PlayerId| players_0.iter().position(|&next| next == p)).is_some_and(|at| guard_0_0[at])).collect::<Vec<PlayerId>>()).len() as i64)).clamp(0, 4294967295) as u32 };
 let copier_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let spell_2: Option<ObjectId> = ({ let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied();
 if let Some(spell) = spell_2 { for _ in 0..runs_2 { g.copy_spell(spell, copier_2, true)?; } }
 g.end_sentence();

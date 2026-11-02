@@ -1,16 +1,18 @@
 // Wheel of Misfortune
 // status: planned
+// requires: a value chosen in secret
 // requires: condition ChoseExtreme
 // requires: numeric expression PlayerNumber ChosenNumber
-// requires: operation ChooseValueWith
 // requires: operation RevealChoices
 // Each player secretly chooses a number 0 or greater, then all players reveal those numbers simultaneously and determine the highest and lowest numbers revealed this way. Wheel of Misfortune deals damage equal to the highest number to each player who chose that number. Each player who didn't choose the lowest number discards their hand, then draws seven cards.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
 let mut each_2 = vec![Default::default(); players_0.len()];
- for (index_0, bound_0) in players_0.iter().copied().enumerate() { let chosen_1 = planned_value!("operation ChooseValueWith", 0u32 => cantrip_mechanics::choose::value(g, { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() }, asker.source, ChoiceKind::Number, ChoiceTerms { options: &[], except: &[], count: None, secret: true, unchosen: false, random: false, ordered: false, up_to: false })?);
+let mut each_chosen_1 = Vec::new();
+ for (index_0, bound_0) in players_0.iter().copied().enumerate() { let chosen_1 = planned_value!("a value chosen in secret", 0u32 => cantrip_mechanics::choose::value(g, { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() }, asker.source, ChoiceKind::Number, ChoiceTerms { options: &[], except: &[], count: None, secret: true, unchosen: false, random: false, ordered: false, up_to: false })?);
  each_2[index_0] = i64::from(chosen_1);
+each_chosen_1.push(chosen_1);
    } 
 g.end_sentence();
 planned!("operation-reveal-choices" => cantrip_mechanics::secret::reveal_choices(g, asker.source, ChoiceKind::Number));
@@ -19,7 +21,7 @@ let source_4 = { let q: &dyn Query = g; Some(asker.source) }; let amount_4 = { l
 g.end_sentence();
 let mut players_5: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| !(Some(bound_0).is_some_and(|p: PlayerId| (q.state().apnap().filter(|&bound_1: &PlayerId| planned_value!("condition ChoseExtreme", false => Some(bound_1).is_some_and(|p: PlayerId| q.chose_extreme(asker, p, false)))).collect::<Vec<PlayerId>>()).contains(&p)))).collect::<Vec<PlayerId>>() };
 let mut gathered_6: Vec<ObjectId> = Vec::new();
- for (index_5, bound_0) in players_5.iter().copied().enumerate() { let amount_7 = { let q: &dyn Query = g; ((((Some(bound_0).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }; gathered_6.extend(cantrip_mechanics::choose_from_hand(g, bound_0, asker.source, amount_7)?);
+ for (index_5, bound_0) in players_5.iter().copied().enumerate() { gathered_6.extend(g.state().zone(Zone::hand(bound_0)).to_vec());
     } 
 let cards_8 = { let q: &dyn Query = g; gathered_6.clone() }; let discarded_8 = g.discard_together(&cards_8);
 g.end_sentence();

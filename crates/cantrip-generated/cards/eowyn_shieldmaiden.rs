@@ -3,7 +3,7 @@
 // First strike
 // At the beginning of combat on your turn, if another Human entered the battlefield under your control this turn, create two 2/2 red Human Knight creature tokens with trample and haste. Then if you control six or more Humans, draw a card.
 #[allow(unused_imports)] use cantrip_api::*;
-fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { (q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && ((!(Some(asker.source) == Some(id)) && q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Human))) && Some(asker.controller) == Some(q.controller(id))) { return Some(Fired { subject, data }); } }  None }).count() as i64) >= (1i64) }
+fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { (q.history().entered().filter(|e| ((!(Some(asker.source) == Some(e.permanent)) && e.chars(q).has_subtype(q.words(asker.source).subtype(Subtype::Human))) && Some(asker.controller) == Some(e.controller))).count() as i64) >= (1i64) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::BeginCombat) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 pub mod token_1 {

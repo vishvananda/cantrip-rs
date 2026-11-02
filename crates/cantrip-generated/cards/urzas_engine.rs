@@ -1,6 +1,5 @@
 // Urza's Engine
-// status: planned
-// requires: object filter BandedWith
+// status: ready
 // Trample
 // {3}: This creature gains banding until end of turn. (Any creatures with banding, and up to one without, can attack in a band. Bands are blocked as a group. If any creatures with banding you control are blocking or being blocked by a creature, you divide that creature's combat damage, not its controller, among any of the creatures it's being blocked by or is blocking.)
 // {3}: Attacking creatures banded with this creature gain trample until end of turn.
@@ -12,7 +11,7 @@ if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &object i
 g.end_sentence();
  Ok(()) }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let objects_1 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| ((q.state().attackers.iter().any(|a| a.id == id) || q.was_attacking(id)) && q.chars(id).is(CardType::Creature) && planned_value!("object filter BandedWith", false => Some(asker.source).is_some_and(|other: ObjectId| q.banded_with(id, other))))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let duration_1 = Duration::EndOfTurn;
+let objects_1 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| ((q.state().attackers.iter().any(|a| a.id == id) || q.was_attacking(id)) && q.chars(id).is(CardType::Creature) && Some(asker.source).is_some_and(|other: ObjectId| { let band = |o: ObjectId| q.state().attackers.iter().find(|a| a.id == o).map_or(0, |a| a.band); id != other && band(id) != 0 && band(id) == band(other) }))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let duration_1 = Duration::EndOfTurn;
 let kind_1_0_0 = { let q: &dyn Query = g; EffectKind::AddKeywords(Keywords::of(&[Keyword::Trample])) };
 if let Some(source) = source_1 { cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.add_effect(source, object, kind_1_0_0, duration_1);  } }); }
 g.end_sentence();

@@ -1,6 +1,5 @@
 // Eon Frolicker
 // status: planned
-// requires: engine: no protection from this quality
 // requires: player rule for a while GrantKeyword
 // Flying
 // When this creature enters, if you cast it, target opponent takes an extra turn after this one. Until your next turn, you and planeswalkers you control gain protection from that player. (You and planeswalkers you control can't be targeted, dealt damage, or enchanted by anything controlled by that player.)
@@ -16,8 +15,8 @@ g.end_sentence();
 planned!("player-rule-for-a-while-grant-keyword" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.add_player_effect(player, source, EffectKind::PlayerRule(PlayerRule::Protection(Protection::These({ let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() }))), Duration::UntilNextTurnOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })); } });
 g.end_sentence();
 let objects_3 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Planeswalker) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_3 = { let q: &dyn Query = g; Some(asker.source) }; let duration_3 = Duration::UntilNextTurnOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") });
-let kind_3_0_0 = { let q: &dyn Query = g; planned_value!("engine: no protection from this quality", EffectKind::Pump(0, 0) => EffectKind::ProtectionFrom(ProtectionQuality::Players(|q, asker| t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>()))) };
-if let Some(source) = source_3 { cantrip_api::instruction(g, |g| { for &object in &objects_3 { g.add_effect(source, object, kind_3_0_0, duration_3);  } }); }
+let players_3_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() };
+if let Some(source) = source_3 { cantrip_api::instruction(g, |g| { for &object in &objects_3 { for &player in &players_3_0 { g.add_effect(source, object, EffectKind::ProtectionFromPlayer(player), duration_3); }  } }); }
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

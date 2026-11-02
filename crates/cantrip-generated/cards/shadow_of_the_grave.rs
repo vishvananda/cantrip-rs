@@ -1,10 +1,9 @@
 // Shadow of the Grave
-// status: planned
-// requires: object filter History CycledOrDiscarded
+// status: ready
 // Return to your hand all cards in your graveyard that you cycled or discarded this turn.
 #[allow(unused_imports)] use cantrip_api::*;
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let objects_1 = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (true && planned_value!("object filter History CycledOrDiscarded", false => cantrip_mechanics::history::cycled_or_discarded(q.history().this_turn().iter(), id)))).collect::<Vec<ObjectId>>() }; let moved_1 = g.return_to_hand(&objects_1);
+let objects_1 = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (true && q.history().this_turn().iter().any(|r| matches!(r.event, Event::Discarded { card, player, .. } if card == id && player == asker.controller)))).collect::<Vec<ObjectId>>() }; let moved_1 = g.return_to_hand(&objects_1);
 g.end_sentence();
  Ok(()) }
 

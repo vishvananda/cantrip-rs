@@ -1,12 +1,11 @@
 // Living Lore
-// status: planned
-// requires: exile outside a stack item that an ability reads as exiled with its source
+// status: ready
 // As this creature enters, exile an instant or sorcery card from your graveyard.
 // Living Lore's power and toughness are each equal to the exiled card's mana value.
 // Whenever this creature deals combat damage, you may sacrifice it. If you do, you may cast the exiled card without paying its mana cost.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables, unused_mut)] fn ability_0_enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> { let asker = &Asker::new(entering.object, entering.controller); let selected_0_player = { let q: &dyn Query = g; Target::Object(asker.source).object().map(|o: ObjectId| q.controller(o)).expect("a reference that always names a player") }; let selected_0_candidates = { let q: &dyn Query = g; ((q.state().apnap().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && ((q.chars(id).is(CardType::Instant) || q.chars(id).is(CardType::Sorcery)) && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && Target::Object(asker.source).object().map(|o: ObjectId| q.controller(o)) == Some(q.state().obj(id).owner)))).collect::<Vec<ObjectId>>() }; let selected_0_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let selected_0 = { cantrip_mechanics::choose::select(g, selected_0_player, asker.source, Purpose::Exile, selected_0_candidates, cantrip_mechanics::select::Selection::of(selected_0_count, &[]))? };
-let objects_1 = { let q: &dyn Query = g; selected_0.clone() }; let moved_1 = planned_value!("exile outside a stack item that an ability reads as exiled with its source", g.exile_all(&objects_1) => { let by = g.linked_to(asker.source); g.exile_with(&objects_1, by, false) });
+let objects_1 = { let q: &dyn Query = g; selected_0.clone() }; let moved_1 = { let by = g.text_linked(asker.source); g.exile_with(&objects_1, by, false) };
  Ok(()) }
 #[allow(unused_variables)] fn ability_1_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); let (p, t) = (((((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && q.exiled_with(q.linked_to(asker.source)).contains(&id)).collect::<Vec<ObjectId>>()).get(0).copied().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o, &q.chars(o))))).clamp(-32768, 32767) as i16, ((((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && q.exiled_with(q.linked_to(asker.source)).contains(&id)).collect::<Vec<ObjectId>>()).get(0).copied().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o, &q.chars(o))))).clamp(-32768, 32767) as i16); chars.power = Some(p); chars.toughness = Some(t); }
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Damage { source, target, amount, kind, .. } = event { let (source, amount, combat) = (*source, *amount, kind.is_combat()); let subject = Target::Object(source); let data = [u32::from(amount), source.0]; if combat && !q.state().obj(source).zone.is(ZoneKind::Stack) && Some(asker.source) == Some(source) && true { return Some(Fired { subject, data }); } }
@@ -22,7 +21,7 @@ let picked_3 = if open_3.is_empty() { None } else if open_3.len() > 1 || (false 
 let Some(card_3) = picked_3 else { break; };
 let ways_3: Vec<CastWay> = g.cast_ways_during_resolution_by(card_3, caster_3).into_iter().filter(|w| true).collect();
 let done_3 = if ways_3.is_empty() { g.play_land_during_resolution(card_3)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_3, card_3, ways_3)?.map(|w| w.way); g.cast_during_resolution_as(card_3, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(caster_3), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
-if done_3 { left_3 -= 1; played_3.push(g.state().obj(card_3).became.unwrap_or(card_3)); } else if 1i64 == 1 { break; } if done_3 || !(true && false) { pool_3.retain(|&c| c != card_3); }
+if done_3 { left_3 -= 1; played_3.push(g.state().obj(card_3).became.unwrap_or(card_3)); } else if true { break; } if done_3 || !(true && false) { pool_3.retain(|&c| c != card_3); }
 }
 g.end_sentence();
 }

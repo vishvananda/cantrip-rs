@@ -1,6 +1,5 @@
 // Thought-String Analyst
-// status: planned
-// requires: a card a player may look at for a while
+// status: ready
 // At the beginning of your upkeep, exile the top card of target opponent's library face down. You lose life equal to its mana value. You may look at and play that card for as long as it remains exiled, and mana of any type can be spent to cast that spell.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Player(p) if (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&p)) }
@@ -14,7 +13,7 @@ g.end_sentence();
 let amount_1 = { let q: &dyn Query = g; ((moved_0.clone()).get(0 as usize).copied().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o)))).max(0) as i32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_1 { g.lose_life(player, amount_1); }
 g.end_sentence();
-planned!("a-card-a-player-may-look-at-for-a-while" => let cards_2_0 = { let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_2_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &card in &cards_2_0 { for &player in &players_2_0 { g.allow_look(card, player, Expiry::Never); } });
+let cards_2_0 = { let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_2_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &player in &players_2_0 { g.look_at(player, &cards_2_0); }
 let cards_2_1 = { let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_2_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_2_1 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_2_1 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::Never, any_type: true, ..PlayGrant::CAST }); } } } });
 g.end_sentence();
  Ok(()) }

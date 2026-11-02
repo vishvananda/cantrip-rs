@@ -11,7 +11,7 @@ let mut guard_0_0 = vec![false; players_0.len()];
 planned!("per-player-mill" => g.begin_batch(););
 let mut each_2: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut all_2: Vec<ObjectId> = Vec::new();
 let mut each_3: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut all_3: Vec<ObjectId> = Vec::new();
- for (index_0, bound_0) in players_0.iter().copied().enumerate() { let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let mills_1: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_1)).collect(); let milled_1 = g.mill_together(&mills_1);
+ for (index_0, _) in players_0.iter().copied().enumerate() { let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let mills_1: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_1)).collect(); let milled_1 = g.mill_together(&mills_1);
  each_2[index_0] = milled_1.clone(); all_2.extend(each_2[index_0].iter().copied());
 each_3[index_0] = { let q: &dyn Query = g; milled_1.clone() }; all_3.extend(each_3[index_0].iter().copied());
    } 
@@ -25,7 +25,7 @@ g.end_sentence();
 planned!("per-player-instruction-with-several-steps" => g.begin_batch(););
 let mut each_7: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut all_7: Vec<ObjectId> = Vec::new();
 let mut each_8: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut all_8: Vec<ObjectId> = Vec::new();
- for (index_0, bound_0) in players_0.iter().copied().enumerate() { if { let q: &dyn Query = g; !(((each_5[index_0] as i64) != 0)) } { guard_0_0[index_0] = true;
+ for (index_0, _) in players_0.iter().copied().enumerate() { if { let q: &dyn Query = g; !(((each_5[index_0] as i64) != 0)) } { guard_0_0[index_0] = true;
 let objects_6 = { let q: &dyn Query = g; (each_2[index_0].clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let moved_6 = g.return_to_hand(&objects_6);
  each_7[index_0] = moved_6.clone(); all_7.extend(each_7[index_0].iter().copied());
 each_8[index_0] = { let q: &dyn Query = g; objects_6.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() }; all_8.extend(each_8[index_0].iter().copied());

@@ -7,7 +7,7 @@ let objects_0 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect
 let kind_0_0_0 = { let q: &dyn Query = g; EffectKind::Pump((3i64) as i16, (3i64) as i16) };
 if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &object in &objects_0 { g.add_effect(source, object, kind_0_0_0, duration_0);  } }); }
 g.end_sentence();
-{ let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; g.skip_next_turns(asker.source, player, 1); }
+{ let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let times = 1u32; g.skip_next_turns(asker.source, player, times); }
 g.end_sentence();
  Ok(()) }
 

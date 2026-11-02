@@ -2,8 +2,6 @@
 // status: planned
 // requires: card type Phenomenon
 // requires: layout Planar
-// requires: object reference ChosenBy
-// requires: per-player CreateTokens
 // requires: trigger event Player EncountersPhenomenon
 // When you encounter Caught in a Parallel Universe, each player chooses a creature controlled by the player to their left. Each player creates a token that's a copy of the creature they chose, except it has menace. (Then planeswalk away from this phenomenon.)
 #[allow(unused_imports)] use cantrip_api::*;
@@ -16,12 +14,10 @@ let mut each_2: Vec<Vec<ObjectId>> = vec![Vec::new(); players_0.len()]; let mut 
    } 
 g.end_sentence();
 let mut players_3: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
-planned!("per-player-create-tokens" => g.begin_batch(););
-let mut each_5: Vec<Vec<ObjectId>> = vec![Vec::new(); players_3.len()]; let mut all_5: Vec<ObjectId> = Vec::new();
- for (index_3, bound_0) in players_3.iter().copied().enumerate() { let original_4 = { let q: &dyn Query = g; planned_value!("object reference ChosenBy", None::<ObjectId> => Some(bound_0).and_then(|p: PlayerId| q.picked_by(item, 0, p))) }; let values_4 = { let q: &dyn Query = g; original_4.map(|original: ObjectId| q.copiable_values(original).with_keyword(Keyword::Menace)) }; let count_4 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let player_4 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; let created_4 = match values_4 { Some(values) => g.create_token_copies_tapped(values, player_4, count_4, false)?, None => Vec::new() };
- each_5[index_3] = created_4.clone(); all_5.extend(each_5[index_3].iter().copied());
-   } 
-planned!("per-player-create-tokens" => g.end_batch(););
+let mut gathered_4: Vec<(Copiable, PlayerId)> = Vec::new();
+ for (index_3, bound_0) in players_3.iter().copied().enumerate() { let player_5 = { let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }; let originals_5 = { let q: &dyn Query = g; Some(bound_0).and_then(|who: PlayerId| players_0.iter().position(|&p| p == who)).and_then(|at| each_2[at].first().copied()) }.into_iter().collect::<Vec<ObjectId>>(); for original in originals_5 { if let Some(values) = { let q: &dyn Query = g; Some(original).map(|original: ObjectId| q.copiable_values(original).with_keyword(Keyword::Menace)) } { gathered_4.push((values, player_5)); } }
+    } 
+let created_4 = g.create_token_copies_together(&gathered_4)?;
 g.end_sentence();
  Ok(()) }
 planned_item!("trigger-event-player-encounters-phenomenon" => matcher: #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::EncounteredPhenomenon { player, object, .. } = event { let id = *object; let subject = Target::Object(id); let data = [u32::from(player.0), 0]; if Some(asker.controller) == Some(*player) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }

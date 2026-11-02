@@ -1,6 +1,6 @@
 // The Tomb of Aclazotz // Tarrian's Journal
 // status: planned
-// requires: play permission with an effect on what is played
+// requires: engine: a spell a play permission casts enters changed
 // (Transforms from Tarrian's Journal.)
 // {T}: Add {B}.
 // {T}: You may cast a creature spell from your graveyard this turn. If you do, it enters with a finality counter on it and is a Vampire in addition to its other types. (If a creature with a finality counter on it would die, exile it instead.)
@@ -28,7 +28,7 @@ for player in mana_players_0 {
 g.add_mana(player, Mana::B, mana_0_0);}
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("play-permission-with-an-effect-on-what-is-played" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.add_player_effect(player, source, EffectKind::PlayerRule(PlayerRule::Play { zone: ZoneKind::Graveyard, cards: CardsOfRule::kept(move |q: &dyn Query, asker: &Asker, card: ObjectId| ((((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>()).contains(&card)), grant: PlayGrant { limit: PlayLimit::Total(1), rider: Some(&[&[SpellEffect::EntersWithACounter(CounterType::FinalityCounter), SpellEffect::EntersWithLayerEffect(LayerEffect::AddCreatureType(CreatureType::Vampire))]]), ..PlayGrant::CAST } }), Duration::EndOfTurn); } });
+planned!("engine-a-spell-a-play-permission-casts-enters-changed" => if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.add_player_effect(player, source, EffectKind::PlayerRule(PlayerRule::Play { zone: ZoneKind::Graveyard, cards: CardsOfRule::kept(move |q: &dyn Query, asker: &Asker, card: ObjectId| ((((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::graveyard(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>()).contains(&card)), grant: PlayGrant { limit: PlayLimit::Total(1), rider: Some(&[&[SpellEffect::EntersWithACounter(CounterType::FinalityCounter), SpellEffect::EntersWithLayerEffect(LayerEffect::AddCreatureType(CreatureType::Vampire))]]), ..PlayGrant::CAST } }), Duration::EndOfTurn); } });
 g.end_sentence();
  Ok(()) }
 

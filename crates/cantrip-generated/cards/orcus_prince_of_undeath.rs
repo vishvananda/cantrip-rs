@@ -1,7 +1,5 @@
 // Orcus, Prince of Undeath
-// status: planned
-// requires: numeric expression AnnouncedX
-// requires: target cardinality UpTo
+// status: ready
 // Flying, trample
 // When Orcus enters, choose one —
 // • Each other creature gets -X/-X until end of turn. You lose X life.
@@ -19,7 +17,7 @@ for player in players_1 { g.lose_life(player, amount_1); }
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_2_mode_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Graveyard) && !q.state().obj(id).token && ((q.chars(id).is(CardType::Creature) && (q.state().obj(id).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(id).owner))))) }
-static ABILITY_2_MODE_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_mode_1_target_0).between(0, planned_value!("target cardinality UpTo", 1u32 => TargetSpec::read_as_chosen(|q: &dyn Query, asker: &Asker| (planned_value!("numeric expression AnnouncedX", 0i64 => i64::from(q.announced_x().unwrap_or(0)))).max(0) as u32))).together(cantrip_mechanics::select::total_mana_value_at_most(TargetSpec::COUNTED))];
+static ABILITY_2_MODE_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_mode_1_target_0).between(0, TargetSpec::COUNTED).together(cantrip_mechanics::select::total_mana_value_at_most(TargetSpec::COUNTED))];
 fn ability_2_mode_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };

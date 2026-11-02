@@ -1,7 +1,7 @@
 // The Toymaker's Trap
 // status: planned
+// requires: a value chosen in secret
 // requires: condition Outcome
-// requires: operation ChooseValueWith
 // requires: operation Guess
 // requires: operation RevealChoices
 // requires: player reference Named
@@ -14,7 +14,7 @@ let mut hoisted_9: Vec<ObjectId> = Vec::new();
 let mut hoisted_8: Vec<ObjectId> = Vec::new();
 let mut hoisted_7: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-let chosen_0 = planned_value!("operation ChooseValueWith", 0u32 => cantrip_mechanics::choose::value(g, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, asker.source, ChoiceKind::Number, ChoiceTerms { options: &["Comparison(GreaterOrEqual, Constant(1))", "Comparison(LessOrEqual, Constant(5))"], except: &[], count: None, secret: true, unchosen: true, random: false, ordered: false, up_to: false })?);
+let chosen_0 = planned_value!("a value chosen in secret", 0u32 => cantrip_mechanics::choose::value(g, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, asker.source, ChoiceKind::Number, ChoiceTerms { options: &["Comparison(GreaterOrEqual, Constant(1))", "Comparison(LessOrEqual, Constant(5))"], except: &[], count: None, secret: true, unchosen: true, random: false, ordered: false, up_to: false })?);
 g.end_sentence();
 if { let q: &dyn Query = g; ((i64::from(chosen_0) as i64)) >= (1i64) } {
 let among: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };

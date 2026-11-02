@@ -20,12 +20,12 @@ let mut hoisted_2: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 if { let q: &dyn Query = g; Some(asker.controller).is_some_and(|player: PlayerId| q.state().player(player).monarch) } {
-let amount_1 = { let q: &dyn Query = g; (10i64).max(0) as u32 }; let mills_1: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; t_0.iter().filter_map(|t| t.player()).collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_1)).collect(); let milled_1 = g.mill_together(&mills_1);
+let amount_1 = { let q: &dyn Query = g; (10i64).max(0) as u32 }; let mills_1: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; q.state().apnap().filter(|&p| t_0.iter().any(|t| t.player() == Some(p))).collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_1)).collect(); let milled_1 = g.mill_together(&mills_1);
 g.end_sentence();
 hoisted_2.extend(milled_1.clone());
 hoisted_3.extend({ let q: &dyn Query = g; milled_1.clone() });
 } else {
-let amount_4 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let mills_4: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; t_0.iter().filter_map(|t| t.player()).collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_4)).collect(); let milled_4 = g.mill_together(&mills_4);
+let amount_4 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let mills_4: Vec<(PlayerId, u32)> = { let q: &dyn Query = g; q.state().apnap().filter(|&p| t_0.iter().any(|t| t.player() == Some(p))).collect::<Vec<PlayerId>>() }.into_iter().map(|p| (p, amount_4)).collect(); let milled_4 = g.mill_together(&mills_4);
 g.end_sentence();
 hoisted_5.extend(milled_4.clone());
 hoisted_6.extend({ let q: &dyn Query = g; milled_4.clone() });

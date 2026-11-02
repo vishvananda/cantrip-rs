@@ -1,7 +1,7 @@
 // Expert-Level Safe
 // status: planned
+// requires: a value chosen in secret
 // requires: numeric expression PlayerNumber ChosenNumber
-// requires: operation ChooseValueWith
 // requires: operation RevealChoices
 // When this artifact enters, exile the top two cards of your library face down.
 // {1}, {T}: You and target opponent each secretly choose 1, 2, or 3. Then those choices are revealed. If they match, sacrifice this artifact and put all cards exiled with it into their owners' hands. Otherwise, exile the top card of your library face down.
@@ -24,8 +24,10 @@ let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let mut players_1: Vec<PlayerId> = { let q: &dyn Query = g; { let mut all: Vec<PlayerId> = Vec::new(); for p in Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() { if !all.contains(&p) { all.push(p); } } for p in t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() { if !all.contains(&p) { all.push(p); } } all } };
 let mut each_3 = vec![Default::default(); players_1.len()];
- for (index_1, bound_0) in players_1.iter().copied().enumerate() { let chosen_2 = planned_value!("operation ChooseValueWith", 0u32 => cantrip_mechanics::choose::value(g, { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() }, asker.source, ChoiceKind::Number, ChoiceTerms { options: &["Comparison(GreaterOrEqual, Constant(1))", "Comparison(LessOrEqual, Constant(3))"], except: &[], count: None, secret: true, unchosen: false, random: false, ordered: false, up_to: false })?);
+let mut each_chosen_2 = Vec::new();
+ for (index_1, bound_0) in players_1.iter().copied().enumerate() { let chosen_2 = planned_value!("a value chosen in secret", 0u32 => cantrip_mechanics::choose::value(g, { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() }, asker.source, ChoiceKind::Number, ChoiceTerms { options: &["Comparison(GreaterOrEqual, Constant(1))", "Comparison(LessOrEqual, Constant(3))"], except: &[], count: None, secret: true, unchosen: false, random: false, ordered: false, up_to: false })?);
  each_3[index_1] = i64::from(chosen_2);
+each_chosen_2.push(chosen_2);
    } 
 g.end_sentence();
 planned!("operation-reveal-choices" => cantrip_mechanics::secret::reveal_choices(g, asker.source, ChoiceKind::Number));

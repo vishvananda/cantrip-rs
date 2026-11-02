@@ -1,6 +1,5 @@
 // Odric, Blood-Cursed
-// status: planned
-// requires: numeric expression AbilitiesAmong
+// status: ready
 // When Odric enters, create X Blood tokens, where X is the number of abilities from among flying, first strike, double strike, deathtouch, haste, hexproof, indestructible, lifelink, menace, reach, trample, and vigilance found among creatures you control. (Count each ability only once.)
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
@@ -18,7 +17,7 @@ pub static EXTRA: &[&CardDef] = &[];
 
 }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let value_0: i64 = { let q: &dyn Query = g; planned_value!("numeric expression AbilitiesAmong", 0i64 => q.abilities_among(&[CheckHasable::Flying, CheckHasable::FirstStrike, CheckHasable::DoubleStrike, CheckHasable::Deathtouch, CheckHasable::Haste, CheckHasable::AnyHexproof, CheckHasable::Indestructible, CheckHasable::Lifelink, CheckHasable::Menace, CheckHasable::Reach, CheckHasable::Trample, CheckHasable::Vigilance], &q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>())) };
+let value_0: i64 = { let q: &dyn Query = g; { let among: Vec<Chars> = q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>().into_iter().map(|o: ObjectId| q.chars(o)).collect(); [among.iter().any(|c| c.has(Keyword::Flying)), among.iter().any(|c| c.has(Keyword::FirstStrike)), among.iter().any(|c| c.has(Keyword::DoubleStrike)), among.iter().any(|c| c.has(Keyword::Deathtouch)), among.iter().any(|c| c.has(Keyword::Haste)), among.iter().any(|c| c.has(Keyword::Hexproof) || c.hexproof_from != HexproofFrom::NONE), among.iter().any(|c| c.has(Keyword::Indestructible)), among.iter().any(|c| c.has(Keyword::Lifelink)), among.iter().any(|c| c.has(Keyword::Menace)), among.iter().any(|c| c.has(Keyword::Reach)), among.iter().any(|c| c.has(Keyword::Trample)), among.iter().any(|c| c.has(Keyword::Vigilance))].iter().filter(|&&has| has).count() as i64 } };
 g.end_sentence();
 let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_1 = Vec::new();
 let count_1_0 = { let q: &dyn Query = g; (value_0).clamp(0, 4294967295) as u32 }; let def_1_0 = g.card_id(&token_2::CARD);

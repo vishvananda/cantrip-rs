@@ -1,6 +1,5 @@
 // Fumble
-// status: planned
-// requires: operation AttachEach
+// status: ready
 // Return target creature to its owner's hand. Gain control of all Auras and Equipment that were attached to it, then attach them to another creature.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
@@ -14,7 +13,7 @@ let kind_1_0_0 = { let q: &dyn Query = g; EffectKind::Control(Some(asker.control
 if let Some(source) = source_1 { cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.add_effect(source, object, kind_1_0_0, duration_1);  } }); }
 g.end_sentence();
 let selected_3_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_3_candidates = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>() }; let selected_3_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let selected_3 = { cantrip_mechanics::choose::select(g, selected_3_player, asker.source, Purpose::Choose, selected_3_candidates, cantrip_mechanics::select::Selection::of(selected_3_count, &[]))? };
-planned!("operation-attach-each" => cantrip_mechanics::attach::each(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, asker.source, { let q: &dyn Query = g; objects_1.clone() }, { let q: &dyn Query = g; (selected_3.clone()).into_iter().map(Target::Object).collect::<Vec<Target>>() }, None, false)?);
+let player_4 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let attachments_4 = { let q: &dyn Query = g; objects_1.clone() }; let hosts_4 = { let q: &dyn Query = g; selected_3.clone() }; let _ = player_4; if let Some(&host) = hosts_4.first() { cantrip_api::instruction(g, |g| { for &attachment in &attachments_4 { g.attach(attachment, host); } }); }
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

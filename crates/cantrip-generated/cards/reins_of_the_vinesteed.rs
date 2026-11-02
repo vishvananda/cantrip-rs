@@ -1,6 +1,5 @@
 // Reins of the Vinesteed
-// status: planned
-// requires: move arrival state
+// status: ready
 // Enchant creature
 // Enchanted creature gets +2/+2.
 // When enchanted creature dies, you may return this card from your graveyard to the battlefield attached to a creature that shares a creature type with that creature.
@@ -14,13 +13,14 @@ let mut hoisted_2: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let decider_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if g.state().obj(asker.source).became.is_none() && cantrip_mechanics::effects::ask_may(g, decider_0, asker.source, Purpose::Optional)? {
 let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
-let objects_1 = ({ let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_1 = { let mut moved: Vec<ObjectId> = Vec::new(); for &o in &objects_1 { let controller = player_1; moved.extend(planned_value!("move arrival state", None::<ObjectId> => cantrip_mechanics::enter::in_state(g, o, controller, item, "[AttachedToChosen(All([CardType(Creature), Shares { property: CreatureTypes, with: EventSubject }]))]", &[], false)?)); } moved };
+let objects_1 = ({ let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_1 = { let mut moved: Vec<ObjectId> = Vec::new(); for &o in &objects_1 { let controller = player_1; let aura = g.chars(o).has_subtype(Subtype::Aura); let hosts: Vec<ObjectId> = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&host| (q.chars(host).is(CardType::Creature) && item.subject.object().is_some_and(|o: ObjectId| { let (a, b) = (&q.chars(host), &q.chars(o)); a.subtypes.iter().any(|s| SubtypeSet::CREATURE_TYPES.has(s) && b.subtypes.has(s)) })) && (!aura || could_enchant(q, o, controller, host))).collect() }; match cantrip_mechanics::choose::card(g, controller, asker.source, Purpose::Attach, hosts)? { Some(host) => moved.extend(g.put_onto_battlefield_attached(o, controller, host)?), None if !aura => moved.push(g.put_onto_battlefield(o, controller, false)?), None => {} } } moved };
 g.end_sentence();
 hoisted_2.extend(moved_1.clone());
 hoisted_3.extend({ let q: &dyn Query = g; objects_1.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() });
 }
 g.end_sentence();
  Ok(()) }
+fn could_enchant(q: &dyn Query, aura: ObjectId, controller: PlayerId, host: ObjectId) -> bool { let chars = q.chars(aura); if chars.is(CardType::Creature) { return false; } let asker = Asker::new(aura, controller); let printed = q.card(q.state().obj(aura).card).enchant; chars.abilities().filter_map(|a| match a.index { AbilityRef::ENCHANT => q.card(a.card).enchant, AbilityRef::ENCHANT_GIVEN => q.card(a.card).becomes_aura_enchant, _ => None }).chain(printed).all(|spec| (spec.filter)(q, &asker, Target::Object(host))) && !q.chars(host).protected_from_by(&chars, || q.mana_value(aura), controller) }
 
 pub static CARD: CardDef = CardDef { name: "Reins of the Vinesteed", token_words: &[], oracle: true, cost: ManaCost { generic: 3, x: 0, symbols: [0, 0, 0, 0, 1, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Enchantment]), subtypes: SubtypeSet::of(&[Subtype::Aura]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::ZONE_CHANGE.0), ability_2_event), ability_2, "When enchanted creature dies, you may return this card from your graveyard to the battlefield attached to a creature that shares a creature type with that creature.").targets(&[])], statics: &[static_ability(Layer::PtModify, cantrip_mechanics::attach::attached_object, ability_1_apply_0, "Enchanted creature gets +2/+2.")], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: Some(target(ability_0_enchant)), ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

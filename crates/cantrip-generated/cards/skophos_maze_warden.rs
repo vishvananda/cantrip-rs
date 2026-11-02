@@ -1,6 +1,5 @@
 // Skophos Maze-Warden
-// status: planned
-// requires: targeted by AbilityOfAPermanent
+// status: ready
 // {1}: This creature gets +1/-1 until end of turn.
 // Whenever another creature becomes the target of an ability of a land you control named Labyrinth of Skophos, you may have this creature fight that creature. (Each deals damage equal to its power to the other.)
 #[allow(unused_imports)] use cantrip_api::*;
@@ -10,7 +9,7 @@ let kind_0_0_0 = { let q: &dyn Query = g; EffectKind::Pump((1i64) as i16, (-1i64
 if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &object in &objects_0 { g.add_effect(source, object, kind_0_0_0, duration_0);  } }); }
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::BecameTarget { target: Target::Object(target), by, controller, .. } = event { let id = *target; let by = *by; let controller = *controller; let subject = Target::Object(id); let data = [by.0, u32::from(controller.0) | (q.state().stack.len().saturating_sub(1) as u32) << 8]; if (!(Some(asker.source) == Some(id)) && q.chars(id).is(CardType::Creature)) && !q.state().stack.iter().any(|i| i.kind == StackKind::Spell && i.object == by) && planned_value!("targeted by AbilityOfAPermanent", false => cantrip_mechanics::targets::targeted_by(q, by, "AbilityOfAPermanent", &[{ let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Land) && Some(asker.controller) == Some(q.controller(id)) && q.chars(id).name == "Labyrinth of Skophos")).collect::<Vec<ObjectId>>() }])) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::BecameTarget { target: Target::Object(target), by, controller, .. } = event { let id = *target; let by = *by; let controller = *controller; let subject = Target::Object(id); let data = [by.0, u32::from(controller.0) | (q.state().stack.len().saturating_sub(1) as u32) << 8]; if (!(Some(asker.source) == Some(id)) && q.chars(id).is(CardType::Creature)) && !q.state().stack.iter().any(|i| i.kind == StackKind::Spell && i.object == by) && q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Land) && Some(asker.controller) == Some(q.controller(id)) && q.chars(id).name == "Labyrinth of Skophos")).collect::<Vec<ObjectId>>().contains(&by) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let decider_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_1, asker.source, Purpose::Optional)? {

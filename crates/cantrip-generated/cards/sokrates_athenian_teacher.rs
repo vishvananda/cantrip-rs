@@ -1,7 +1,7 @@
 // Sokrates, Athenian Teacher
 // status: planned
+// requires: engine: no static prevention with an effect besides
 // requires: granted Replacement
-// requires: prevention with an effect besides
 // Defender
 // Sokrates has hexproof as long as it's untapped.
 // Sokratic Dialogue — {T}: Until end of turn, target creature gains "If this creature would deal combat damage to a player, prevent that damage. This creature's controller and that player each draw half that many cards, rounded down."
@@ -11,9 +11,10 @@
 #[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
 static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target_0)];
 #[allow(unused_variables, unused_mut)] fn granted_1_then_steps(g: &mut dyn Game, asker: &Asker, subject: Target, data: [u32; 2], done_prevented: u16) -> Result<(), Suspend> { let amount_2 = { let q: &dyn Query = g; (((done_prevented as i64)).div_euclid(2)).max(0) as u32 }; let players_2 = { let q: &dyn Query = g; { let mut all: Vec<PlayerId> = Vec::new(); for p in Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() { if !all.contains(&p) { all.push(p); } } for p in subject.player().into_iter().collect::<Vec<PlayerId>>() { if !all.contains(&p) { all.push(p); } } all } };
+let drawing_2: Vec<PlayerId> = players_2.into_iter().collect(); let players_2: Vec<PlayerId> = g.state().apnap().filter(|p| drawing_2.contains(p)).collect();
 for player in players_2 { g.draw(player, amount_2); }
  Ok(()) }
-#[allow(unused_variables, dead_code)] fn granted_1_then(g: &mut dyn Game, asker: &Asker, e: &cantrip_api::DamageEvent, prevented: u16) { let q: &dyn Query = g; let (source, target, amount, combat) = (e.source, &e.target, e.amount, e.combat); let subject = *target; let data = [u32::from(amount), source.0]; let _ = granted_1_then_steps(g, asker, subject, data, prevented); }
+#[allow(unused_variables, dead_code)] fn granted_1_then(g: &mut dyn Game, asker: &Asker, parts: &[Prevented]) { let Some(first) = parts.first() else { return }; let prevented = Prevented::total(parts).min(u16::MAX.into()) as u16; let e = &Prevented { amount: prevented, ..*first }; let q: &dyn Query = g; let (source, target, amount, combat) = (e.source, &e.target, e.amount, e.combat); let subject = *target; let data = [u32::from(amount), source.0]; let _ = granted_1_then_steps(g, asker, subject, data, prevented); }
 #[allow(unused_variables)] fn granted_1_applies(q: &dyn Query, asker: &Asker, e: &cantrip_api::DamageEvent) -> bool { { let (source, target, amount, combat) = (e.source, &e.target, e.amount, e.combat); let subject = *target; let data = [u32::from(amount), source.0]; if combat && !q.state().obj(source).zone.is(ZoneKind::Stack) && Some(asker.source) == Some(source) && matches!(*target, Target::Player(p) if true) { return true; } }
  false }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

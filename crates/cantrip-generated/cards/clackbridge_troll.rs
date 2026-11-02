@@ -31,14 +31,14 @@ fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mu
 let mut hoisted_10: Vec<ObjectId> = Vec::new();
 let mut hoisted_9: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-let mut paid_2 = false; for bound_1000003 in { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() } {
+let mut paid_2 = false; let mut who_2: Option<PlayerId> = None; for bound_1000003 in { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() } {
 let payer_4 = { let q: &dyn Query = g; Some(bound_1000003).expect("a reference that always names a player") }; let (paid_4, after_4, before_4, picked_4): (bool, Vec<ObjectId>, Vec<ObjectId>, Vec<ObjectId>) = if true {
 let objects_5 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>() }; let players_5 = { let q: &dyn Query = g; Some(bound_1000003).into_iter().collect::<Vec<PlayerId>>() }; let mut picks_5: Vec<(PlayerId, ObjectId)> = Vec::new();
 let count_5 = { let q: &dyn Query = g; cantrip_mechanics::select::Count::UpTo((1i64).max(0) as u32) }; for player in players_5 { let eligible: Vec<ObjectId> = objects_5.iter().copied().filter(|&o| g.controller(o) == player && g.can_sacrifice(player, o)).collect(); let taken = match count_5.clone() { cantrip_mechanics::select::Count::Exactly(n) | cantrip_mechanics::select::Count::AsManyAsCan(n) if eligible.len() < n as usize => eligible, _ => cantrip_mechanics::choose::select(g, player, asker.source, Purpose::Sacrifice, eligible, cantrip_mechanics::select::Selection::of(count_5.clone(), &[]))? }; for object in taken { picks_5.push((player, object)); } }
 let sacrificed_5 = g.sacrifice_each(&picks_5);
 let paid_5 = !picks_5.is_empty();
 (paid_5, { let q: &dyn Query = g; (sacrificed_5).clone() }, { let q: &dyn Query = g; (objects_5.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).clone() }, Vec::new()) } else { (false, Vec::new(), Vec::new(), Vec::new()) };
-if paid_4 { paid_2 = true; break; } }
+if paid_4 { paid_2 = true; who_2 = Some(bound_1000003); break; } }
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_2 as i64) != 0) } {
 let objects_6 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let turned_6: Vec<ObjectId> = objects_6.iter().copied().filter(|&o| g.state().obj(o).tapped != true).collect(); g.tap_together(&turned_6);

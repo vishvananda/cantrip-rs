@@ -1,6 +1,6 @@
 // Princess Yue
 // status: planned
-// requires: move arrival state
+// requires: enters tapped as something else
 // When Princess Yue dies, if she was a nonland creature, return this card to the battlefield tapped under your control. She's a land named Moon. She gains "{T}: Add {C}." (She's still legendary.)
 // {T}: Scry 2.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -12,7 +12,7 @@ for player in mana_players_2 {
 g.add_mana(player, Mana::C, mana_2_0);}
  Ok(()) }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller); if !{ let q: &dyn Query = g; item.subject.object().is_some_and(|candidate: ObjectId| (!(q.chars(candidate).is(CardType::Land)) && q.chars(candidate).is(CardType::Creature))) } { return Ok(()); } let asker = &Asker::new(item.object, item.controller);
-let objects_0: Vec<ObjectId> = { let q: &dyn Query = g; ((Some(ObjectId(item.data[0])).filter(|o| *o != ObjectId::NONE).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Graveyard).collect::<Vec<ObjectId>>()).get(0).copied().into_iter().collect::<Vec<ObjectId>>() }; let moved_0: Vec<ObjectId> = planned_value!("move arrival state", Vec::<ObjectId>::new() => cantrip_mechanics::enter::in_state(g, asker, &objects_0, Destination::Battlefield({ let q: &dyn Query = g; Some(asker.controller) }), Arrival { tapped: true, counters: &[], states: &[ArrivalState::Changes(&[EffectKind::SetTypes(TypeSet::of(&[CardType::Land])), EffectKind::SetName("Moon"), EffectKind::AddAbility(AbilityRef::delayed({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, 0))])] }, false)?);
+let objects_0: Vec<ObjectId> = { let q: &dyn Query = g; ((Some(ObjectId(item.data[0])).filter(|o| *o != ObjectId::NONE).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Graveyard).collect::<Vec<ObjectId>>()).get(0).copied().into_iter().collect::<Vec<ObjectId>>() }; let moved_0: Vec<ObjectId> = planned_value!("enters tapped as something else", Vec::<ObjectId>::new() => cantrip_mechanics::enter::in_state(g, asker, &objects_0, Destination::Battlefield({ let q: &dyn Query = g; Some(asker.controller) }), Arrival { tapped: true, counters: &[], states: &[ArrivalState::Changes(&[EffectKind::SetTypes(TypeSet::of(&[CardType::Land])), EffectKind::SetName("Moon"), EffectKind::AddAbility(AbilityRef::delayed({ let o = q.state().obj(asker.source); o.copied_card().unwrap_or(o.card) }, 0))])] }, false)?);
 g.end_sentence();
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

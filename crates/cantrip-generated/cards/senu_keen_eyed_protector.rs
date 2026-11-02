@@ -1,6 +1,5 @@
 // Senu, Keen-Eyed Protector
-// status: planned
-// requires: move arrival state
+// status: ready
 // Flying, vigilance
 // {T}, Exile Senu: You gain 2 life and scry 2.
 // When a legendary creature you control attacks and isn't blocked, if this card is exiled, put it onto the battlefield attacking.
@@ -17,7 +16,7 @@ fn ability_3_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.source).is_so
  None }
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
-let objects_2 = ({ let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Exile).collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_2 = { let mut moved: Vec<ObjectId> = Vec::new(); for &o in &objects_2 { let controller = player_2; moved.extend(planned_value!("move arrival state", None::<ObjectId> => cantrip_mechanics::enter::in_state(g, o, controller, item, "[Attacking { player: None, or_planeswalker: false }]", &[], false)?)); } moved };
+let objects_2 = ({ let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Exile).collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_2 = { let mut moved: Vec<ObjectId> = Vec::new(); for &o in &objects_2 { let controller = player_2; let defender = cantrip_mechanics::combat::choose_attack_target(g, controller, asker.source)?.unwrap_or(Target::None); let entered = g.put_onto_battlefield_with_counters(o, controller, false, &[])?; let came = g.is_on_battlefield(entered); if came { g.enter_attacking(&[entered], defender); } if came { moved.push(entered); } } moved };
 g.end_sentence();
  Ok(()) }
 

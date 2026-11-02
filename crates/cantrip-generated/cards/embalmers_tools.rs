@@ -3,7 +3,7 @@
 // Activated abilities of creature cards in your graveyard cost {1} less to activate.
 // Tap an untapped Zombie you control: Target player mills a card.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_0_rule(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, q.controller(source)); let Costed::Ability(permanent, ability, _) = costed else { return CostDelta::NONE; }; let def = q.activated_ability(ability); if true && (q.chars(permanent).is(CardType::Creature) && (q.state().obj(permanent).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(permanent).owner))) { CostDelta::less(1) } else { CostDelta::NONE } }
+#[allow(unused_variables)] fn ability_0_0_rule(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, q.controller(source)); let Costed::Ability(permanent, ability, _) = costed else { return CostDelta::NONE; }; let def = q.activated_ability(ability); if true && (q.chars(permanent).is(CardType::Creature) && (q.state().obj(permanent).became.is_none() && q.state().obj(permanent).zone.kind() == ZoneKind::Graveyard && Some(asker.controller) == Some(q.state().obj(permanent).owner))) { CostDelta::less(1) } else { CostDelta::NONE } }
 #[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Player(p) if true) }
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

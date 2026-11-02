@@ -1,6 +1,5 @@
 // Forgotten Ancient
-// status: planned
-// requires: operation MoveCounters
+// status: ready
 // Whenever a player casts a spell, you may put a +1/+1 counter on this creature.
 // At the beginning of your upkeep, you may move any number of +1/+1 counters from this creature onto other creatures.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -21,7 +20,7 @@ g.end_sentence();
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let decider_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_3, asker.source, Purpose::Optional)? {
-planned!("operation-move-counters" => cantrip_mechanics::counters::move_counters(g, asker.source, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }, { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (!(Some(asker.source) == Some(id)) && q.chars(id).is(CardType::Creature))).collect::<Vec<ObjectId>>() }, Some(CounterKind::PlusOne), MovedCounters::AnyNumber)?);
+let player_4 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let from_4: Vec<ObjectId> = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let to_4: Vec<ObjectId> = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (!(Some(asker.source) == Some(id)) && q.chars(id).is(CardType::Creature))).collect::<Vec<ObjectId>>() }; let mut moved_4: i64 = 0; loop { let holders: Vec<ObjectId> = from_4.iter().copied().filter(|&o| to_4.iter().any(|&t| t != o) && g.state().obj(o).counters(CounterKind::PlusOne) > 0).collect(); let holder = match holders.as_slice() { [] => None, [one] => Some(*one), _ => cantrip_mechanics::choose::cards(g, player_4, asker.source, Purpose::Choose, holders.clone(), 1, true)?.first().copied() }; let Some(holder) = holder else { break; }; let Some(kind) = Some(CounterKind::PlusOne) else { break; }; let hosts: Vec<ObjectId> = to_4.iter().copied().filter(|&t| t != holder).collect(); let host = match hosts.as_slice() { [one] => Some(*one), _ => cantrip_mechanics::choose::cards(g, player_4, asker.source, Purpose::PutCounters(kind, 1), hosts.clone(), 1, true)?.first().copied() }; let Some(host) = host else { break; }; let most = g.state().obj(holder).counters(kind).max(0) as u32; let many = cantrip_mechanics::choose::number(g, player_4, asker.source, 0, most, "Move how many counters")?; if many == 0 { break; } let done = g.move_counters(holder, host, kind, many as i16); moved_4 += i64::from(done); if done == 0 { break; } }
 g.end_sentence();
 }
 g.end_sentence();

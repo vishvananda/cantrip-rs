@@ -20,7 +20,7 @@ let decider_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a refere
 let objects_4 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_4 = { let q: &dyn Query = g; Some(asker.source) }; let duration_4 = Duration::EndOfTurn;
 let kind_4_0_0 = { let q: &dyn Query = g; EffectKind::SetPt((value_2).clamp(-32768, 32767) as i16, (value_2).clamp(-32768, 32767) as i16) };
 let kind_4_1_0 = { let q: &dyn Query = g; EffectKind::SetCreatureType(q.words(asker.source).subtype(Subtype::Insect)) };
-let kind_4_2_0 = { let q: &dyn Query = g; EffectKind::SetTypes(TypeSet::of(&[CardType::Artifact, CardType::Creature])) };
+let kind_4_2_0 = { let q: &dyn Query = g; EffectKind::AddTypes(TypeSet::of(&[CardType::Artifact, CardType::Creature])) };
 let kind_4_3_0 = { let q: &dyn Query = g; EffectKind::AddKeywords(Keywords::of(&[Keyword::Flying])) };
 if let Some(source) = source_4 { cantrip_api::instruction(g, |g| { for &object in &objects_4 { g.add_effect(source, object, kind_4_0_0, duration_4); g.add_effect(source, object, kind_4_1_0, duration_4); g.add_effect(source, object, kind_4_2_0, duration_4); g.add_effect(source, object, kind_4_3_0, duration_4);  } }); }
 g.end_sentence();

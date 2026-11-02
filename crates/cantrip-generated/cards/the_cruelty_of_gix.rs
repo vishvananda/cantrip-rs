@@ -1,6 +1,5 @@
 // The Cruelty of Gix
-// status: planned
-// requires: engine: no ReadAhead
+// status: ready
 // Read ahead (Choose a chapter and start with that many lore counters. Add one after your draw step. Skipped chapters don't trigger. Sacrifice after III.)
 // I — Target opponent reveals their hand. You choose a creature or planeswalker card from it. That player discards that card.
 // II — Search your library for a card, put that card into your hand, then shuffle. You lose 3 life.
@@ -33,7 +32,6 @@ let objects_7 = ({ let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
-planned_item!("engine-no-read-ahead" => enters: cantrip_mechanics::read_ahead::enters);
 
 pub static CARD: CardDef = CardDef { name: "The Cruelty of Gix", token_words: &[], oracle: true, cost: ManaCost { generic: 3, x: 0, symbols: [0, 0, 2, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Enchantment]), subtypes: SubtypeSet::of(&[Subtype::Saga]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[chapter(1, ability_1_0, "I — Target opponent reveals their hand. You choose a creature or planeswalker card from it. That player discards that card.").targets(ABILITY_1_0_TARGETS),chapter(2, ability_1_1, "II — Search your library for a card, put that card into your hand, then shuffle. You lose 3 life.").targets(&[]),chapter(3, ability_1_2, "III — Put target creature card from a graveyard onto the battlefield under your control.").targets(ABILITY_1_2_TARGETS)], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

@@ -1,6 +1,5 @@
 // Lonely End
-// status: planned
-// requires: multiple spell bodies
+// status: ready
 // Choose one —
 // • Target creature get -3/-3 until end of turn.
 // • Remove three loyalty counters from target planeswalker.
@@ -24,7 +23,7 @@ let objects_1_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_
 let amount_1_0 = { let q: &dyn Query = g; (3i64).max(0) as i16 }; cantrip_api::instruction(g, |g| { for object in objects_1_0 { removed_1 += i64::from(g.remove_counters(object, CounterKind::Loyalty, amount_1_0)); } });
 g.end_sentence();
  Ok(()) }
-static ABILITY_0_MODES: ModalDef = modes(&[mode(ability_0_mode_0, "Target creature get -3/-3 until end of turn.").targets(ABILITY_0_MODE_0_TARGETS),mode(ability_0_mode_1, "Remove three loyalty counters from target planeswalker.").targets(ABILITY_0_MODE_1_TARGETS)]).choose(1, 1);
+static ABILITY_0_MODES: ModalDef = modes(&[mode(ability_0_mode_0, "Target creature get -3/-3 until end of turn.").targets(ABILITY_0_MODE_0_TARGETS),mode(ability_0_mode_1, "Remove three loyalty counters from target planeswalker.").targets(ABILITY_0_MODE_1_TARGETS)]).choose(1, 1).shared(ability_1_then);
 fn ability_1_then(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 if { let q: &dyn Query = g; !(Some(asker.controller).is_some_and(|player: PlayerId| q.state().turn.starting == player)) } {
 let amount_2 = { let q: &dyn Query = g; (3i64).max(0) as i32 }; let players_2 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
@@ -34,7 +33,6 @@ g.end_sentence();
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
-planned_item!("multiple-spell-bodies" => spell_after: spell(ability_1_then).targets(&[]));
 
 pub static CARD: CardDef = CardDef { name: "Lonely End", token_words: &[], oracle: true, cost: ManaCost { generic: 1, x: 0, symbols: [0, 0, 1, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Instant]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: Some(SpellDef::MODAL), abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: Some(&ABILITY_0_MODES), enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

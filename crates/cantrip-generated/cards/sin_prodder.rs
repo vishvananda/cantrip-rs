@@ -1,6 +1,5 @@
 // Sin Prodder
-// status: planned
-// requires: player reference Performer
+// status: ready
 // Menace
 // At the beginning of your upkeep, reveal the top card of your library. Any opponent may have you put that card into your graveyard. If a player does, this creature deals damage to that player equal to that card's mana value. Otherwise, put that card into your hand.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -13,7 +12,7 @@ let mut hoisted_5: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let objects_0 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((1i64).max(0) as usize).collect::<Vec<ObjectId>>() }; let mut owners_0: Vec<PlayerId> = objects_0.iter().map(|o| g.state().obj(*o).owner).collect(); owners_0.dedup(); for owner in owners_0 { let cards: Vec<ObjectId> = objects_0.iter().copied().filter(|o| g.state().obj(*o).owner == owner).collect(); g.reveal(owner, &cards); }
 g.end_sentence();
-let mut paid_1 = false; for bound_1000002 in { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() } {
+let mut paid_1 = false; let mut who_1: Option<PlayerId> = None; for bound_1000002 in { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() } {
 let payer_3 = { let q: &dyn Query = g; Some(bound_1000002).expect("a reference that always names a player") };
 let paid_3 = cantrip_mechanics::effects::ask_may(g, payer_3, asker.source, Purpose::Optional)?; if paid_3 {
 let objects_4 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((1i64).max(0) as usize).collect::<Vec<ObjectId>>() }; let moved_4 = { let moves: Vec<(ObjectId, Zone)> = objects_4.iter().map(|&o| (o, Zone::graveyard(g.state().obj(o).owner))).collect(); let moved = g.move_together(&moves, MoveReason::Other); moved.into_iter().filter(|&o| g.state().obj(o).zone.kind() == ZoneKind::Graveyard).collect::<Vec<ObjectId>>() };
@@ -21,10 +20,10 @@ g.end_sentence();
 hoisted_5.extend(moved_4.clone());
 hoisted_6.extend({ let q: &dyn Query = g; objects_4.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>() });
 }
-if paid_3 { paid_1 = true; break; } }
+if paid_3 { paid_1 = true; who_1 = Some(bound_1000002); break; } }
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_1 as i64) != 0) } {
-let source_7 = { let q: &dyn Query = g; Some(asker.source) }; let amount_7 = { let q: &dyn Query = g; ((hoisted_5.clone()).into_iter().next().map_or(0i64, |id: ObjectId| i64::from(q.mana_value(id)))).clamp(0, 65535) as u16 }; let recipients_7 = { let q: &dyn Query = g; (planned_value!("player reference Performer", None::<PlayerId> => q.performer_of(asker, 1)).into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() }; if let Some(source) = source_7 { let batch: Vec<(ObjectId, Target, u16)> = recipients_7.iter().map(|t| (source, *t, amount_7)).collect(); g.damage_together(&batch); }
+let source_7 = { let q: &dyn Query = g; Some(asker.source) }; let amount_7 = { let q: &dyn Query = g; ((hoisted_5.clone()).into_iter().next().map_or(0i64, |id: ObjectId| i64::from(q.mana_value(id)))).clamp(0, 65535) as u16 }; let recipients_7 = { let q: &dyn Query = g; (who_1.into_iter().collect::<Vec<PlayerId>>()).into_iter().map(Target::Player).collect::<Vec<Target>>() }; if let Some(source) = source_7 { let batch: Vec<(ObjectId, Target, u16)> = recipients_7.iter().map(|t| (source, *t, amount_7)).collect(); g.damage_together(&batch); }
 g.end_sentence();
 } else {
 let objects_8 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((1i64).max(0) as usize).collect::<Vec<ObjectId>>() }; let moved_8 = g.return_to_hand_revealed(&objects_8);

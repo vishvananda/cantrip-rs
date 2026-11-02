@@ -1,6 +1,5 @@
 // Grub, Notorious Auntie // Grub, Storied Matriarch
-// status: planned
-// requires: objects that paid a cost at resolution
+// status: ready
 // Menace
 // Whenever Grub attacks, you may blight 1. If you do, create a tapped and attacking token that's a copy of the blighted creature, except it has "At the beginning of the end step, sacrifice this token."
 // At the beginning of your first main phase, you may pay {B}. If you do, transform Grub.
@@ -48,11 +47,10 @@ g.end_sentence();
  Ok(()) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_4: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-let payer_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let paid_0 = g.may_pay(payer_0, asker.source, asker.source, cantrip_mechanics::blight::cost(1), &PAY_QUESTION)?;
-let paid_objects_0: Vec<ObjectId> = planned_value!("objects that paid a cost at resolution", Vec::<ObjectId>::new() => g.objects_that_paid());
+let payer_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let blighted_0: Vec<ObjectId> = cantrip_mechanics::blight::may_in_effect(g, payer_0, asker.source, 1, &PAY_QUESTION)?.into_iter().collect(); let paid_0 = !blighted_0.is_empty();
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
-let original_1 = { let q: &dyn Query = g; (paid_objects_0.clone()).get(0).copied() }; let values_1 = { let q: &dyn Query = g; original_1.map(|original: ObjectId| q.copiable_values(original).with_ability(AbilityRef::delayed(q.card_id(&CARD), 0))) }; let count_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let created_1 = match values_1 { Some(values) => g.create_token_copies_tapped(values, player_1, count_1, true)?, None => Vec::new() };
+let original_1 = { let q: &dyn Query = g; (blighted_0.clone()).get(0).copied() }; let values_1 = { let q: &dyn Query = g; original_1.map(|original: ObjectId| q.copiable_values(original).with_ability(AbilityRef::delayed(q.card_id(&CARD), 0))) }; let count_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let created_1 = match values_1 { Some(values) => g.create_token_copies_tapped(values, player_1, count_1, true)?, None => Vec::new() };
 for &token in &created_1 { let controller = g.controller(token); if let Some(defender) = cantrip_mechanics::combat::choose_attack_target(g, controller, asker.source)? { g.enter_attacking(&[token], defender); } }
 g.end_sentence();
 hoisted_4.extend(created_1.clone());

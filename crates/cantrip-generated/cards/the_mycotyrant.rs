@@ -1,6 +1,5 @@
 // The Mycotyrant
-// status: planned
-// requires: numeric expression PlayerNumber DescentsThisTurn
+// status: ready
 // Trample
 // The Mycotyrant's power and toughness are each equal to the number of creatures you control that are Fungi and/or Saprolings.
 // At the beginning of your end step, create X 1/1 black Fungus creature tokens with "This token can't block," where X is the number of times you descended this turn. (You descend each time a permanent card is put into your graveyard from anywhere.)
@@ -17,7 +16,7 @@ pub static EXTRA: &[&CardDef] = &[];
 }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_0 = Vec::new();
-let count_0_0 = { let q: &dyn Query = g; (Some(asker.controller).map_or(0i64, |p: PlayerId| planned_value!("numeric expression PlayerNumber DescentsThisTurn", 0i64 => q.player_number(p, PlayerNumber::DescentsThisTurn)))).max(0) as u32 }; let def_0_0 = g.card_id(&token_1::CARD);
+let count_0_0 = { let q: &dyn Query = g; (Some(asker.controller).map_or(0i64, |p: PlayerId| q.history().select(EventQuery::kind(EventMask::ZONE_CHANGE).to(ZoneKind::Graveyard).this_turn()).filter(|r| matches!(r.event, Event::ZoneChange { new, to, .. } if to == Zone::graveyard(p) && !q.obj(new).token && cantrip_mechanics::targets::is_permanent_card(&q.chars(new)))).count() as i64)).max(0) as u32 }; let def_0_0 = g.card_id(&token_1::CARD);
 for player in players_0 {
 tokens_0.extend(std::iter::repeat((def_0_0,player)).take(count_0_0 as usize));
 } let words_0 = g.words(asker.source);

@@ -1,7 +1,7 @@
 // Radiant Performer
 // status: planned
+// requires: a copy of a spell for each object it could target
 // requires: a spell or ability on the stack read as an object
-// requires: operation CopyOnStack
 // Flash
 // When this creature enters, if you cast it from your hand, choose target spell or ability that targets only a single permanent or player. Copy that spell or ability for each other permanent or player the spell or ability could target. Each copy targets a different one of those permanents and players.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -11,7 +11,7 @@ static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller); if !{ let q: &dyn Query = g; item.subject.object().is_some_and(|candidate: ObjectId| cast_of(q, candidate).is_some_and(|cast| Some(asker.controller).into_iter().collect::<Vec<PlayerId>>().contains(&cast.player) && cast.from == ZoneKind::Hand && Some(asker.controller).into_iter().collect::<Vec<PlayerId>>().contains(&q.state().obj(cast.spell).owner))) } { return Ok(()); } let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-planned!("operation-copy-on-stack" => if let Some(spell) = { let q: &dyn Query = g; planned_value!("a spell or ability on the stack read as an object", None::<ObjectId> => q.stack_item_object(t_0_raw.get(0).copied())) } { cantrip_mechanics::copy::on_stack(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, spell, { let q: &dyn Query = g; (1i64).max(0) as u32 }, NewTargets::EachLegal)?; });
+planned!("a-copy-of-a-spell-for-each-object-it-could-target" => if let Some(spell) = { let q: &dyn Query = g; planned_value!("a spell or ability on the stack read as an object", None::<ObjectId> => q.stack_item_object(t_0_raw.get(0).copied())) } { cantrip_mechanics::copy::on_stack(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, spell, { let q: &dyn Query = g; (1i64).max(0) as u32 }, NewTargets::EachLegal)?; });
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

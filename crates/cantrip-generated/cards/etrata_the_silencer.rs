@@ -1,6 +1,5 @@
 // Etrata, the Silencer
-// status: planned
-// requires: counter kind Hit
+// status: ready
 // Etrata can't be blocked.
 // Whenever Etrata deals combat damage to a player, exile target creature that player controls and put a hit counter on that card. That player loses the game if they own three or more exiled cards with hit counters on them. Etrata's owner shuffles Etrata into their library.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -13,10 +12,10 @@ let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true
 let objects_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; let moved_0 = g.exile_all(&objects_0);
 g.end_sentence();
 let mut counters_1: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; ((moved_0.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, planned_value!("counter kind Hit", CounterKind::Charge => CounterKind::Hit), amount)); } }
+let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; ((moved_0.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, CounterKind::Hit, amount)); } }
 let had_1: Vec<_> = counters_1.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_1); let applied_1: Vec<ObjectId> = counters_1.iter().zip(had_1).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
-if { let q: &dyn Query = g; (((((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (i64::from(q.state().obj(id).counters(planned_value!("counter kind Hit", CounterKind::Charge => CounterKind::Hit)))) > (0i64)).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| item.subject.player() == Some(q.state().obj(id).owner)).collect::<Vec<ObjectId>>()).len() as i64) >= (3i64) } {
+if { let q: &dyn Query = g; (((((q.state().seats().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::exile(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (i64::from(q.state().obj(id).counters(CounterKind::Hit))) > (0i64)).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| item.subject.player() == Some(q.state().obj(id).owner)).collect::<Vec<ObjectId>>()).len() as i64) >= (3i64) } {
 { let player = { let q: &dyn Query = g; item.subject.player().expect("a reference that always names a player") }; g.lose_game(player); if g.state().is_over() { return Ok(()); }; }
 g.end_sentence();
 }

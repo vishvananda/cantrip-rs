@@ -1,7 +1,6 @@
 // Takklemaggot
 // status: planned
 // requires: move arrival state
-// requires: object filter CouldEnchant
 // requires: object reference Scoped
 // requires: power/toughness counter other than ±1/±1
 // Enchant creature
@@ -33,7 +32,7 @@ let mut hoisted_5: Vec<ObjectId> = Vec::new();
 let mut hoisted_3: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
 let paid_1 = true; if paid_1 {
-let selected_2_player = { let q: &dyn Query = g; item.subject.object().map(|o: ObjectId| q.controller(o)).expect("a reference that always names a player") }; let selected_2_candidates = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && planned_value!("object filter CouldEnchant", false => (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().any(|host: ObjectId| q.could_enchant(id, host))))).collect::<Vec<ObjectId>>() }; let selected_2_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let selected_2 = { cantrip_mechanics::choose::select(g, selected_2_player, asker.source, Purpose::ChooseAsEnters, selected_2_candidates, cantrip_mechanics::select::Selection::of(selected_2_count, &[]))? };
+let selected_2_player = { let q: &dyn Query = g; item.subject.object().map(|o: ObjectId| q.controller(o)).expect("a reference that always names a player") }; let selected_2_candidates = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().any(|host: ObjectId| could_enchant(q, id, asker.controller, host)))).collect::<Vec<ObjectId>>() }; let selected_2_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let selected_2 = { cantrip_mechanics::choose::select(g, selected_2_player, asker.source, Purpose::ChooseAsEnters, selected_2_candidates, cantrip_mechanics::select::Selection::of(selected_2_count, &[]))? };
 g.end_sentence();
 hoisted_3.extend(selected_2.clone());
 }
@@ -59,6 +58,7 @@ hoisted_13.extend({ let q: &dyn Query = g; objects_7.iter().copied().filter(|&o|
 }
 g.end_sentence();
  Ok(()) }
+fn could_enchant(q: &dyn Query, aura: ObjectId, controller: PlayerId, host: ObjectId) -> bool { let chars = q.chars(aura); if chars.is(CardType::Creature) { return false; } let asker = Asker::new(aura, controller); let printed = q.card(q.state().obj(aura).card).enchant; chars.abilities().filter_map(|a| match a.index { AbilityRef::ENCHANT => q.card(a.card).enchant, AbilityRef::ENCHANT_GIVEN => q.card(a.card).becomes_aura_enchant, _ => None }).chain(printed).all(|spec| (spec.filter)(q, &asker, Target::Object(host))) && !q.chars(host).protected_from_by(&chars, || q.mana_value(aura), controller) }
 
 pub static CARD: CardDef = CardDef { name: "Takklemaggot", token_words: &[], oracle: true, cost: ManaCost { generic: 2, x: 0, symbols: [0, 0, 2, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Enchantment]), subtypes: SubtypeSet::of(&[Subtype::Aura]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::STEP_BEGAN.0), ability_1_event), ability_1, "At the beginning of the upkeep of enchanted creature's controller, put a -0/-1 counter on that creature.").targets(&[]),triggered(when_asked(EventMask(EventMask::ZONE_CHANGE.0), ability_2_event), ability_2, "When enchanted creature dies, that creature's controller chooses a creature that this card could enchant. If the player does, return this card to the battlefield under your control attached to that creature. If they don't, return this card to the battlefield under your control as a non-Aura enchantment. It loses \"enchant creature\" and gains \"At the beginning of that player's upkeep, this enchantment deals 1 damage to that player.\"").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[triggered(when_asked(EventMask(EventMask::STEP_BEGAN.0), granted_9_event), granted_9, "At the beginning of that player's upkeep, this enchantment deals 1 damage to that player.").targets(&[])], enters: None, modal: None, enchant: Some(target(ability_0_enchant)), ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

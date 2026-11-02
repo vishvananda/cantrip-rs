@@ -1,6 +1,5 @@
 // Poison the Cup
-// status: planned
-// requires: object state Foretold
+// status: ready
 // Destroy target creature. If this spell was foretold, scry 2.
 // Foretell {1}{B} (During your turn, you may pay {2} and exile this card from your hand face down. Cast it on a later turn for its foretell cost.)
 #[allow(unused_imports)] use cantrip_api::*;
@@ -10,7 +9,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let objects_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; let destroyed_0 = g.destroy_all(&objects_0);
 g.end_sentence();
-if { let q: &dyn Query = g; Some(asker.source).is_some_and(|candidate: ObjectId| planned_value!("object state Foretold", false => cantrip_mechanics::foretell::foretold(q.state(), candidate))) } {
+if { let q: &dyn Query = g; Some(asker.source).is_some_and(|candidate: ObjectId| { let id = candidate; let o = q.state().obj(id); let own = AbilityRef::spell(o.card); q.card(o.card).foretell.is_some() && (q.state().permissions.iter().any(|p| p.by.object == id && p.by.ability == own) || q.history().cast_of(id).is_some_and(|cast| cast.granted_by().is_some_and(|by| by.ability == own))) }) } {
 let amount_1 = { let q: &dyn Query = g; (2i64).max(0) as usize }; let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; cantrip_mechanics::scry(g, player_1, asker.source, amount_1)?;
 g.end_sentence();
 }

@@ -7,7 +7,7 @@ let objects_0 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect:
 g.end_sentence();
 let mut players_1: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() };
 let mut gathered_2: Vec<ObjectId> = Vec::new();
- for (index_1, bound_0) in players_1.iter().copied().enumerate() { let amount_3 = { let q: &dyn Query = g; ((((Some(bound_0).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).len() as i64).max(0) as u32 }; gathered_2.extend(cantrip_mechanics::choose_from_hand(g, bound_0, asker.source, amount_3)?);
+ for (index_1, bound_0) in players_1.iter().copied().enumerate() { gathered_2.extend(g.state().zone(Zone::hand(bound_0)).to_vec());
     } 
 let cards_4 = { let q: &dyn Query = g; gathered_2.clone() }; let discarded_4 = g.discard_together(&cards_4);
 g.end_sentence();

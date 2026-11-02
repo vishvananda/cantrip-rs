@@ -3,7 +3,7 @@
 // At the beginning of your end step, if a face-down creature entered the battlefield under your control this turn, put a +1/+1 counter on this creature.
 // {T}: Add {G}.
 #[allow(unused_imports)] use cantrip_api::*;
-fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { (q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && ((q.state().obj(id).face_down && q.chars(id).is(CardType::Creature)) && Some(asker.controller) == Some(q.controller(id))) { return Some(Fired { subject, data }); } }  None }).count() as i64) >= (1i64) }
+fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { (q.history().entered().filter(|e| ((q.state().obj(e.permanent).face_down && e.chars(q).is(CardType::Creature)) && Some(asker.controller) == Some(e.controller))).count() as i64) >= (1i64) }
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::End) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

@@ -1,6 +1,5 @@
 // Threats Undetected
-// status: planned
-// requires: shuffle around cards that stay where they are
+// status: ready
 // Search your library for up to four creature cards with different powers and reveal them. An opponent chooses two of those cards. Shuffle the chosen cards into your library and put the rest into your hand.
 #[allow(unused_imports)] use cantrip_api::*;
 fn different_powers_key(q: &dyn Query, id: ObjectId) -> i16 { q.chars(id).power.unwrap_or(0) }
@@ -13,7 +12,7 @@ let among: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_
 let Some(picked_0) = (if among.len() > 1 { cantrip_mechanics::choose::player(g, asker.controller, asker.source, among, "ChooseRevealedCard", 0)? } else { among.first().copied() }) else { return Ok(()); };
 let selected_3_player = { let q: &dyn Query = g; Some(picked_0).expect("a reference that always names a player") }; let selected_3_candidates = { let q: &dyn Query = g; found_0.clone() }; let selected_3_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((2i64).max(0) as u32) }; let selected_3 = { cantrip_mechanics::choose::select(g, selected_3_player, asker.source, Purpose::Keep, selected_3_candidates, cantrip_mechanics::select::Selection::of(selected_3_count, &[]))? };
 
-planned!("shuffle-around-cards-that-stay-where-they-are" => for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { cantrip_mechanics::library::shuffle_around(g, player, &{ let q: &dyn Query = g; { let chosen: Vec<ObjectId> = selected_3.clone(); (found_0.clone()).into_iter().filter(|o| !chosen.contains(o)).collect::<Vec<ObjectId>>() } }); });
+for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.shuffle(player); }
 let objects_4 = { let q: &dyn Query = g; { let chosen: Vec<ObjectId> = selected_3.clone(); (found_0.clone()).into_iter().filter(|o| !chosen.contains(o)).collect::<Vec<ObjectId>>() } }; let moved_4 = g.return_to_hand_revealed(&objects_4);
 g.end_sentence();
  Ok(()) }

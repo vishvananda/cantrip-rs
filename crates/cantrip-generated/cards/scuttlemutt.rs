@@ -1,6 +1,5 @@
 // Scuttlemutt
-// status: planned
-// requires: a choice of several values
+// status: ready
 // {T}: Add one mana of any color.
 // {T}: Target creature becomes the color or colors of your choice until end of turn.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -14,10 +13,10 @@ g.add_mana(player, color.mana(), mana_0);}
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let chosen_1 = planned_value!("a choice of several values", Color::White => cantrip_mechanics::choose::values(g, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, asker.source, ChoiceKind::Color, 0)?);
+let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let Answer::Colors(picked_1) = g.ask(player_1, RequestKind::ChooseColors { source: asker.source, choices: ColorSet(0b11111), count: 5, purpose: ColorUse::Any })? else { unreachable!("the core answers a color choice with colors") }; let colors_1 = picked_1.into_iter().fold(ColorSet::NONE, |set, color| set.with(color));
 g.end_sentence();
 let objects_2 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_2 = { let q: &dyn Query = g; Some(asker.source) }; let duration_2 = Duration::EndOfTurn;
-let kind_2_0_0 = { let q: &dyn Query = g; EffectKind::SetColors(ColorSet::of(chosen_1)) };
+let kind_2_0_0 = { let q: &dyn Query = g; EffectKind::SetColors(colors_1) };
 if let Some(source) = source_2 { cantrip_api::instruction(g, |g| { for &object in &objects_2 { g.add_effect(source, object, kind_2_0_0, duration_2);  } }); }
 g.end_sentence();
  Ok(()) }

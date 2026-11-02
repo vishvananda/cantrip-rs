@@ -1,6 +1,5 @@
 // Case of the Burning Masks
-// status: planned
-// requires: history measure DistinctSources
+// status: ready
 // When this Case enters, it deals 3 damage to target creature an opponent controls.
 // To solve — Three or more sources you controlled dealt damage this turn. (If unsolved, solve at the beginning of your end step.)
 // Solved — Sacrifice this Case: Exile the top three cards of your library. Choose one of them. You may play that card this turn.
@@ -14,7 +13,7 @@ let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true
 let source_0 = { let q: &dyn Query = g; item.subject.object() }; let amount_0 = { let q: &dyn Query = g; (3i64).max(0) as u16 }; let recipients_0 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() }; if let Some(source) = source_0 { let batch: Vec<(ObjectId, Target, u16)> = recipients_0.iter().map(|t| (source, *t, amount_0)).collect(); g.damage_together(&batch); }
 g.end_sentence();
  Ok(()) }
-fn ability_1_to_solve(q: &dyn Query, asker: &Asker) -> bool { (planned_value!("history measure DistinctSources", 0i64 => cantrip_mechanics::history::measure(q.history().this_turn().iter().filter_map(|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::Damage { source, target, amount, kind, .. } = event { let (source, amount, combat) = (*source, *amount, kind.is_combat()); let subject = Target::Object(source); let data = [u32::from(amount), match target { Target::Object(o) => o.0, Target::Player(p) => u32::MAX - 1 - u32::from(p.0), _ => u32::MAX }]; if true && Some(asker.controller) == Some(q.controller(source)) && true { return Some(Fired { subject, data }); } }  None }), HistoryMeasure::DistinctSources))) >= (3i64) }
+fn ability_1_to_solve(q: &dyn Query, asker: &Asker) -> bool { ({ let mut sources: Vec<ObjectId> = q.history().this_turn().iter().filter(|r: &&Record| (|r: &Record| -> Option<Fired> { let event = &r.event; if let Event::Damage { source, target, amount, kind, controller, known, .. } = event { let (source, amount, combat, controller) = (*source, *amount, kind.is_combat(), *controller); let dealt = DamageDealt { source, target: *target, amount, combat, controller, known: *known }; let subject = Target::Object(source); let data = [u32::from(amount), match target { Target::Object(o) => o.0, Target::Player(p) => u32::MAX - 1 - u32::from(p.0), _ => u32::MAX }]; if true && Some(asker.controller) == Some(controller) && true { return Some(Fired { subject, data }); } }  None })(*r).is_some()).filter_map(|r: &Record| if let Event::Damage { source, .. } = r.event { Some(source) } else { None }).collect(); sources.sort(); sources.dedup(); sources.len() as i64 }) >= (3i64) }
 fn ability_1_solved_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let objects_1 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take((3i64).max(0) as usize).collect::<Vec<ObjectId>>() }; let moved_1 = g.exile_all(&objects_1);
 g.end_sentence();

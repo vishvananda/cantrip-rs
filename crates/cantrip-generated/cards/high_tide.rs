@@ -1,14 +1,12 @@
 // High Tide
-// status: ready
+// status: planned
+// requires: mana for that player the source gives to you
 // Until end of turn, whenever a player taps an Island for mana, that player adds an additional {U}.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn watch_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::TappedForMana { permanent, player, produced } = event { let id = *permanent; let subject = Target::Object(id); let data = [u32::from(player.0), Mana::ALL.iter().filter(|&&m| produced.get(m) > 0).fold(0u32, |types, &m| types | 1 << m as u32)]; if true && q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Island)) { return Some(Fired { subject, data }); } }
  None }
 fn watch_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let mana_players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_3_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 };
-for player in mana_players_3 {
-g.add_mana(player, Mana::U, mana_3_0);}
+planned!("mana-for-that-player-the-source-gives-to-you", AddMana, "mana" = "{\"Amount\":{\"amount\":{\"args\":1,\"kind\":\"Constant\"},\"color\":\"Blue\"}}", "players" = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, "restriction" = "()");
 g.end_sentence();
  Ok(()) }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

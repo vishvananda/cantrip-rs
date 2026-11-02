@@ -23,7 +23,7 @@ let picked_4 = if open_4.is_empty() { None } else if open_4.len() > 1 || (false 
 let Some(card_4) = picked_4 else { break; };
 let ways_4: Vec<CastWay> = g.cast_ways_during_resolution_by(card_4, caster_4).into_iter().filter(|w| true).collect();
 let done_4 = if ways_4.is_empty() { g.play_land_during_resolution(card_4)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_4, card_4, ways_4)?.map(|w| w.way); g.cast_during_resolution_as(card_4, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(caster_4), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
-if done_4 { left_4 -= 1; played_4.push(g.state().obj(card_4).became.unwrap_or(card_4)); } else if 4294967295i64 == 1 { break; } if done_4 || !(true && false) { pool_4.retain(|&c| c != card_4); }
+if done_4 { left_4 -= 1; played_4.push(g.state().obj(card_4).became.unwrap_or(card_4)); } else if false { break; } if done_4 || !(true && false) { pool_4.retain(|&c| c != card_4); }
 }
 g.end_sentence();
 let mut players_5: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| (((q.state().zone(Zone::STACK).to_vec()).into_iter().filter(|&id| true && ((played_4.clone()).contains(&id) && Some(bound_0) == Some(q.state().obj(id).owner))).collect::<Vec<ObjectId>>()).len() as i64) >= (1i64)).collect::<Vec<PlayerId>>() };

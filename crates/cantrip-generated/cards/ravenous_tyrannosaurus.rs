@@ -1,7 +1,6 @@
 // Ravenous Tyrannosaurus
 // status: planned
 // requires: engine: no Devour
-// requires: operation DealDamageWith
 // Devour 3 (As this creature enters, you may sacrifice any number of creatures. It enters with three times that many +1/+1 counters on it.)
 // Whenever this creature attacks, it deals damage equal to its power to up to one other target creature. Excess damage is dealt to that creature's controller instead.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -11,7 +10,7 @@ static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-if let Some(present_2_0) = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).map(|o: ObjectId| q.controller(o)) } { planned!("operation-deal-damage-with" => if let Some(source) = { let q: &dyn Query = g; item.subject.object() } { cantrip_mechanics::damage::excess_to(g, source, &{ let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() }, { let q: &dyn Query = g; (item.subject.object().map_or(0i64, |o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0)))).max(0) as u16 }, { let q: &dyn Query = g; present_2_0 }); });
+if let Some(present_2_0) = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()).map(|o: ObjectId| q.controller(o)) } { let source_1 = { let q: &dyn Query = g; item.subject.object() }; let targets_1 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() }; let amount_1: u16 = { let q: &dyn Query = g; (item.subject.object().map_or(0i64, |o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0)))).max(0) as u16 }; let player_1 = { let q: &dyn Query = g; present_2_0 }; if let (Some(source), Some(&target)) = (source_1, targets_1.first()) { let lethal_1 = { let q: &dyn Query = g; target.object().map_or(amount_1, |o: ObjectId| { let chars = q.chars(o); let left = u16::try_from(chars.toughness.unwrap_or(0).max(0)).unwrap_or(0).saturating_sub(q.state().obj(o).damage); match q.chars(source).has(Keyword::Deathtouch) { true => left.min(1), false => left } }) }; let dealt_1 = amount_1.min(lethal_1); g.damage_together(&[(source, target, dealt_1), (source, Target::Player(player_1), amount_1 - dealt_1)]); }
  }
 g.end_sentence();
  Ok(()) }

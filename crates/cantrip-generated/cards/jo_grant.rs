@@ -4,7 +4,7 @@
 // Whenever you cycle a card, put a +1/+1 counter on Jo Grant.
 // Doctor's companion (You can have two commanders if the other is the Doctor.)
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); (q.state().obj(affected).zone.kind() == ZoneKind::Hand && Some(asker.controller) == Some(q.state().obj(affected).owner)) && ((*so_far).is(CardType::Artifact) || (*so_far).supertypes.legendary || (*so_far).has_subtype(q.words(asker.source).subtype(Subtype::Saga))) }
+#[allow(unused_variables)] fn ability_0_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); (q.state().obj(affected).became.is_none() && q.state().obj(affected).zone.kind() == ZoneKind::Hand && Some(asker.controller) == Some(q.state().obj(affected).owner)) && ((*so_far).is(CardType::Artifact) || (*so_far).supertypes.legendary || (*so_far).has_subtype(q.words(asker.source).subtype(Subtype::Saga))) }
 fn granted_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_1 { g.draw(player, amount_1); }

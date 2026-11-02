@@ -1,6 +1,5 @@
 // Rag Man
-// status: planned
-// requires: operation Together
+// status: ready
 // {B}{B}{B}, {T}: Target opponent reveals their hand and discards a creature card at random. Activate only during your turn.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Player(p) if (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&p)) }
@@ -10,10 +9,8 @@ let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true
 let mut pool_0: Vec<ObjectId> = { let q: &dyn Query = g; (((t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.chars(id).is(CardType::Creature)).collect::<Vec<ObjectId>>() };
 let count_0 = { let q: &dyn Query = g; 1i64 };
 let mut random_0: Vec<ObjectId> = Vec::new(); for _ in 0..count_0 { let Some(one) = cantrip_mechanics::library::random_of(g, &pool_0) else { break }; pool_0.retain(|&o| o != one); random_0.push(one); }
-planned!("operation-together" => g.begin_simultaneous());
 let objects_2 = { let q: &dyn Query = g; ((t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>() }; let mut owners_2: Vec<PlayerId> = objects_2.iter().map(|o| g.state().obj(*o).owner).collect(); owners_2.dedup(); for owner in owners_2 { let cards: Vec<ObjectId> = objects_2.iter().copied().filter(|o| g.state().obj(*o).owner == owner).collect(); g.reveal(owner, &cards); }
 let cards_3 = { let q: &dyn Query = g; random_0.clone() }; let discarded_3 = g.discard_together(&cards_3);
-planned!("operation-together" => g.end_simultaneous());
 g.end_sentence();
  Ok(()) }
 fn ability_0_if(q: &dyn Query, asker: &Asker) -> bool { Some(asker.controller) == Some(q.state().turn.active) }

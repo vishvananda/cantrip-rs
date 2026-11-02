@@ -1,7 +1,6 @@
 // Rootcoil Creeper
 // status: planned
 // requires: mana spending predicate
-// requires: object filter HasKeywordFamily
 // {T}: Add one mana of any color.
 // {T}: Add two mana of any one color. Spend this mana only to cast spells from your graveyard.
 // {G}{U}, {T}, Exile this creature: Return target card with flashback you own from exile to your hand.
@@ -13,7 +12,7 @@ let color = chosen.expect("mana activation selected a color");
 g.add_mana(player, color.mana(), mana_0);}
  Ok(()) }
 #[allow(dead_code, unused_variables)] fn mana_use_418(q: &dyn Query, asker: &Asker, spending: &Spending) -> bool { spending.purpose == SpendingFor::Casting && spending.source.is_some_and(|spell| cast_of(q, spell).is_some_and(|cast| cast.from == ZoneKind::Graveyard && true)) }
-#[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Exile) && !q.state().obj(id).token && ((planned_value!("object filter HasKeywordFamily", false => q.has_keyword_ability(id, KeywordAbility::Flashback)) && Some(asker.controller) == Some(q.state().obj(id).owner)))) }
+#[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Exile) && !q.state().obj(id).token && (((q.card(q.chars(id).card).ways.iter().any(|w| w.exile_after && w.from == ZoneKind::Graveyard && !w.cost.tap_to_reduce && !matches!(w.cost.permanents, Some(PermanentCost { action: PermanentAction::BeamUp, .. }))) || q.state().permissions.iter().any(|p| p.grant.flashback && q.state().permission_covers(p, id)) || q.state().battlefield().iter().any(|&p| !q.lost_all_abilities(p) && q.card(q.chars(p).card).granted_ways.iter().any(|w| w.flashback && q.state().obj(id).zone.is(w.from) && (w.cost)(q, &Asker::new(p, q.controller(p)), id, q.state().obj(id).owner).is_some()))) && Some(asker.controller) == Some(q.state().obj(id).owner)))) }
 static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target_0)];
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);

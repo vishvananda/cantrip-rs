@@ -4,7 +4,7 @@
 // {R}, Sacrifice two artifacts: Exile the top card of your library. You may play that card this turn.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && from.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
-if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && from.is(ZoneKind::Battlefield) && (!(Some(asker.source) == Some(id)) && (!(q.state().obj(id).token) && q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Vampire)) && Some(asker.controller) == Some(q.controller(id)))) && q.chars(id).is(CardType::Creature) { return Some(Fired { subject, data }); } }
+if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Graveyard) && from.is(ZoneKind::Battlefield) && (!(Some(asker.source) == Some(id)) && (!(q.state().obj(id).token) && q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Vampire)) && Some(asker.controller) == Some(q.controller(id)))) { return Some(Fired { subject, data }); } }
  None }
 pub mod token_1 {
 #[allow(unused_imports)] use cantrip_api::*;

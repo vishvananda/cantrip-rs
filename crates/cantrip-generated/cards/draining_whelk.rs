@@ -1,6 +1,5 @@
 // Draining Whelk
-// status: planned
-// requires: earlier objects Countered
+// status: ready
 // Flash
 // Flying
 // When this creature enters, counter target spell. Put X +1/+1 counters on this creature, where X is that spell's mana value.
@@ -11,10 +10,10 @@ static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let objects_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; cantrip_api::instruction(g, |g| { for spell in objects_0 { g.counter(spell); } });
+let objects_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; let before_0 = objects_0.clone(); cantrip_api::instruction(g, |g| { for spell in objects_0 { g.counter(spell); } });
 g.end_sentence();
 let mut counters_1: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; ((planned_value!("earlier objects Countered", Vec::<ObjectId>::new() => q.acted_on(asker, Acted::Countered))).into_iter().next().map_or(0i64, |id: ObjectId| i64::from(q.mana_value(id)))).clamp(0, 32767) as i16 }; for t in { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, CounterKind::PlusOne, amount)); } }
+let amount = { let q: &dyn Query = g; ((before_0.clone()).into_iter().next().map_or(0i64, |id: ObjectId| i64::from(q.mana_value(id)))).clamp(0, 32767) as i16 }; for t in { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, CounterKind::PlusOne, amount)); } }
 let had_1: Vec<_> = counters_1.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_1); let applied_1: Vec<ObjectId> = counters_1.iter().zip(had_1).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
  Ok(()) }

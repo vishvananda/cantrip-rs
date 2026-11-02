@@ -1,6 +1,5 @@
 // Haphazard Bombardment
-// status: planned
-// requires: counter kind Aim
+// status: ready
 // When this enchantment enters, choose four nonenchantment permanents you don't control and put an aim counter on each of them.
 // At the beginning of your end step, if two or more permanents you don't control have an aim counter on them, destroy one of those permanents at random.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -10,15 +9,15 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let selected_0_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_0_candidates = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (!(q.chars(id).is(CardType::Enchantment)) && ({ let other = Some(asker.controller); q.state().apnap().filter(|p| Some(*p) != other).collect::<Vec<PlayerId>>() }).contains(&q.controller(id)))).collect::<Vec<ObjectId>>() }; let selected_0_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((4i64).max(0) as u32) }; let selected_0 = { cantrip_mechanics::choose::select(g, selected_0_player, asker.source, Purpose::ChooseAsEnters, selected_0_candidates, cantrip_mechanics::select::Selection::of(selected_0_count, &[]))? };
 g.end_sentence();
 let mut counters_1: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
-let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (selected_0.clone()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, planned_value!("counter kind Aim", CounterKind::Charge => CounterKind::Aim), amount)); } }
+let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (selected_0.clone()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_1.push((object, CounterKind::Aim, amount)); } }
 let had_1: Vec<_> = counters_1.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_1); let applied_1: Vec<ObjectId> = counters_1.iter().zip(had_1).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
  Ok(()) }
-fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { (((q.state().battlefield().iter().copied().filter(|&id| ({ let other = Some(asker.controller); q.state().apnap().filter(|p| Some(*p) != other).collect::<Vec<PlayerId>>() }).contains(&q.controller(id))).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| (i64::from(q.state().obj(id).counters(planned_value!("counter kind Aim", CounterKind::Charge => CounterKind::Aim)))) > (0i64)).collect::<Vec<ObjectId>>()).len() as i64) >= (2i64) }
+fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { (((q.state().battlefield().iter().copied().filter(|&id| ({ let other = Some(asker.controller); q.state().apnap().filter(|p| Some(*p) != other).collect::<Vec<PlayerId>>() }).contains(&q.controller(id))).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| (i64::from(q.state().obj(id).counters(CounterKind::Aim))) > (0i64)).collect::<Vec<ObjectId>>()).len() as i64) >= (2i64) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::End) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let mut pool_2: Vec<ObjectId> = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (({ let other = Some(asker.controller); q.state().apnap().filter(|p| Some(*p) != other).collect::<Vec<PlayerId>>() }).contains(&q.controller(id)) && (i64::from(q.state().obj(id).counters(planned_value!("counter kind Aim", CounterKind::Charge => CounterKind::Aim)))) > (0i64))).collect::<Vec<ObjectId>>() };
+let mut pool_2: Vec<ObjectId> = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (({ let other = Some(asker.controller); q.state().apnap().filter(|p| Some(*p) != other).collect::<Vec<PlayerId>>() }).contains(&q.controller(id)) && (i64::from(q.state().obj(id).counters(CounterKind::Aim))) > (0i64))).collect::<Vec<ObjectId>>() };
 let count_2 = { let q: &dyn Query = g; 1i64 };
 let mut random_2: Vec<ObjectId> = Vec::new(); for _ in 0..count_2 { let Some(one) = cantrip_mechanics::library::random_of(g, &pool_2) else { break }; pool_2.retain(|&o| o != one); random_2.push(one); }
 let objects_3 = { let q: &dyn Query = g; random_2.clone() }; let destroyed_3 = g.destroy_all(&objects_3);

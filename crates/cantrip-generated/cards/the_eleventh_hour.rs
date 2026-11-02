@@ -1,6 +1,5 @@
 // The Eleventh Hour
-// status: planned
-// requires: mixed token text origins in one creation batch
+// status: ready
 // (As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)
 // I — Search your library for a Doctor card, reveal it, put it into your hand, then shuffle.
 // II — Create a Food token and a 1/1 white Human creature token with "Doctor spells you cast cost {1} less to cast."
@@ -40,15 +39,15 @@ let count_4_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let def_4_1 = g
 for player in players_4 {
 tokens_4.extend(std::iter::repeat((def_4_0,player)).take(count_4_0 as usize));
 tokens_4.extend(std::iter::repeat((def_4_1,player)).take(count_4_1 as usize));
-} let words_4 = Words::NONE;
-let created_4 = planned_value!("mixed token text origins in one creation batch", g.create_tokens_worded(&tokens_4, false, None, words_4)? => g.create_tokens_each_worded(&tokens_4, false, None, &[(def_4_0, Words::NONE), (def_4_1, g.words(asker.source))])?);
+} let words_4 = g.words(asker.source);
+let created_4 = g.create_tokens_worded(&tokens_4, false, None, words_4)?;
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_0_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
 static ABILITY_0_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_2_target_0)];
 fn ability_0_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let original_7 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) }; let values_7 = { let q: &dyn Query = g; original_7.map(|original: ObjectId| q.copiable_values(original).legendary().with_subtype(Subtype::Alien).named("Prisoner Zero")) }; let count_7 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let player_7 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let created_7 = match values_7 { Some(values) => g.create_token_copies_tapped(values, player_7, count_7, false)?, None => Vec::new() };
+let original_7 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()) }; let values_7 = { let q: &dyn Query = g; original_7.map(|original: ObjectId| q.copiable_values(original).legendary().with_subtype(q.words(asker.source).subtype(Subtype::Alien)).named("Prisoner Zero")) }; let count_7 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let player_7 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let created_7 = match values_7 { Some(values) => g.create_token_copies_tapped(values, player_7, count_7, false)?, None => Vec::new() };
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

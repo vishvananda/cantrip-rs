@@ -1,6 +1,5 @@
 // Farmer Cotton
-// status: planned
-// requires: mixed token text origins in one creation batch
+// status: ready
 // When this creature enters, create X 1/1 white Halfling creature tokens and X Food tokens. (They're artifacts with "{2}, {T}, Sacrifice this token: You gain 3 life.")
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
@@ -32,7 +31,7 @@ for player in players_0 {
 tokens_0.extend(std::iter::repeat((def_0_0,player)).take(count_0_0 as usize));
 tokens_0.extend(std::iter::repeat((def_0_1,player)).take(count_0_1 as usize));
 } let words_0 = g.words(asker.source);
-let created_0 = planned_value!("mixed token text origins in one creation batch", g.create_tokens_worded(&tokens_0, false, None, words_0)? => g.create_tokens_each_worded(&tokens_0, false, None, &[(def_0_0, g.words(asker.source)), (def_0_1, Words::NONE)])?);
+let created_0 = g.create_tokens_worded(&tokens_0, false, None, words_0)?;
 g.end_sentence();
  Ok(()) }
 

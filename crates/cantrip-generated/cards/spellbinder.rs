@@ -1,6 +1,5 @@
 // Spellbinder
-// status: planned
-// requires: earlier objects CopiedSpell
+// status: ready
 // Imprint — When this Equipment enters, you may exile an instant card from your hand.
 // Whenever equipped creature deals combat damage to a player, you may copy the exiled card. If you do, you may cast the copy without paying its mana cost.
 // Equip {4}
@@ -35,14 +34,14 @@ hoisted_7.extend(copies_6.clone());
 }
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_5 as i64) != 0) } {
-let caster_8 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let mut pool_8: Vec<ObjectId> = { let q: &dyn Query = g; (planned_value!("earlier objects CopiedSpell", Vec::<ObjectId>::new() => q.acted_on(asker, Acted::CopiedSpell))).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let mut left_8: u32 = 1; let mut played_8: Vec<ObjectId> = Vec::new();
+let caster_8 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let mut pool_8: Vec<ObjectId> = { let q: &dyn Query = g; (hoisted_7.clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let mut left_8: u32 = 1; let mut played_8: Vec<ObjectId> = Vec::new();
 while left_8 > 0 {
 let mut open_8: Vec<ObjectId> = Vec::new(); for &c in &pool_8 { let ways = g.cast_ways_during_resolution_by(c, caster_8); if ways.iter().any(|w| true) { open_8.push(c); } }
 let picked_8 = if open_8.is_empty() { None } else if open_8.len() > 1 || (true && (!false || pool_8.len() > 1)) { cantrip_mechanics::choose::cards_from(g, caster_8, asker.source, Purpose::CastFree, pool_8.clone(), open_8.clone(), 1, true)?.first().copied() } else if !true || cantrip_mechanics::effects::ask_may(g, caster_8, open_8[0], Purpose::CastFree)? { Some(open_8[0]) } else { None };
 let Some(card_8) = picked_8 else { break; };
 let ways_8: Vec<CastWay> = g.cast_ways_during_resolution_by(card_8, caster_8).into_iter().filter(|w| true).collect();
 let done_8 = if ways_8.is_empty() { g.play_land_during_resolution(card_8)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_8, card_8, ways_8)?.map(|w| w.way); g.cast_during_resolution_as(card_8, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(caster_8), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
-if done_8 { left_8 -= 1; played_8.push(g.state().obj(card_8).became.unwrap_or(card_8)); } else if 1i64 == 1 { break; } if done_8 || !(true && true) { pool_8.retain(|&c| c != card_8); }
+if done_8 { left_8 -= 1; played_8.push(g.state().obj(card_8).became.unwrap_or(card_8)); } else if true { break; } if done_8 || !(true && true) { pool_8.retain(|&c| c != card_8); }
 }
 g.end_sentence();
 }
@@ -52,7 +51,7 @@ g.end_sentence();
 static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target_0)];
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let attachments_9 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let host_9 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) }; if let Some(host) = host_9 { cantrip_api::instruction(g, |g| { for attachment in attachments_9 { g.attach(attachment, host); } }); }
+let attachments_9 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let host_9 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()) }; if let Some(host) = host_9 { cantrip_api::instruction(g, |g| { for attachment in attachments_9 { g.attach(attachment, host); } }); }
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

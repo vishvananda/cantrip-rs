@@ -26,7 +26,7 @@ g.end_sentence();
 static ABILITY_0_MODE_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_mode_1_target_0)];
 fn ability_0_mode_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let original_2 = { let q: &dyn Query = g; t_0_raw.get(0).copied().and_then(|t: Target| t.object()) }; let count_2 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let created_2 = match original_2 { Some(original) => g.create_token_copies(original, player_2, count_2)?, None => Vec::new() };
+let original_2 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()) }; let count_2 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let created_2 = match original_2 { Some(original) => g.create_token_copies(original, player_2, count_2)?, None => Vec::new() };
 g.end_sentence();
  Ok(()) }
 static ABILITY_0_MODES: ModalDef = modes(&[mode(ability_0_mode_0, "Create a 1/1 colorless Gnome artifact creature token.").targets(&[]),mode(ability_0_mode_1, "Create a token that's a copy of target artifact token you control.").targets(ABILITY_0_MODE_1_TARGETS)]).choose(1, 1);

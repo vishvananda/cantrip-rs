@@ -1,6 +1,6 @@
 // Charred Foyer // Warped Space
 // status: planned
-// requires: alternate spell cost rule
+// requires: Room door with a standing rule
 // At the beginning of your upkeep, exile the top card of your library. You may play it this turn.
 // (You may cast either half. That door unlocks on the battlefield. As a sorcery, you may pay the mana cost of a locked door to unlock it.)
 // Once each turn, you may pay {0} rather than pay the mana cost for a spell you cast from exile.
@@ -24,8 +24,7 @@ pub static CARD: CardDef = CardDef { name: "Charred Foyer", token_words: &[], or
 }
 pub mod right {
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_0_applies(q: &dyn Query, asker: &Asker, player: PlayerId) -> bool { player == asker.controller }
-planned_item!("alternate-spell-cost-rule" => statics: player_rule(ability_0_0_applies, PlayerRule::SpellCost { spells: |q: &dyn Query, asker: &Asker, player: PlayerId, spell: ObjectId| (true && cast_of(q, spell).is_some_and(|cast| cast.from == ZoneKind::Exile)), change: CostModifier::Alternate { cost: PlayCost::Alternate(&[ManaSymbol::ManaCostGeneric(0)]), limit: Some(PlayLimit::EachTurn(1)) } }));
+#[allow(unused_variables)] fn ability_0_0_rule(q: &dyn Query, asker: &Asker, spell: ObjectId, player: PlayerId) -> bool { player == asker.controller && (true && cantrip_mechanics::zone_cast_from(q, spell) == Some(ZoneKind::Exile)) && !cantrip_mechanics::history::permission_used_this_turn(q, asker.source) }
 
-pub static CARD: CardDef = CardDef { name: "Warped Space", token_words: &[], oracle: true, cost: ManaCost { generic: 4, x: 0, symbols: [0, 0, 0, 2, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Enchantment]), subtypes: SubtypeSet::of(&[Subtype::Room]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
+pub static CARD: CardDef = CardDef { name: "Warped Space", token_words: &[], oracle: true, cost: ManaCost { generic: 4, x: 0, symbols: [0, 0, 0, 2, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Enchantment]), subtypes: SubtypeSet::of(&[Subtype::Room]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, spell_alternatives: &[SpellAlternative { text: "Pay {0}", applies: ability_0_0_rule, cost: InsteadOfManaCost::Mana(ManaCost::ZERO), flash: false }], ..CardDef::BLANK };
 }

@@ -1,6 +1,5 @@
 // Agent's Toolkit
-// status: planned
-// requires: move counters of kinds the mover chooses
+// status: ready
 // This artifact enters with a +1/+1 counter, a flying counter, a deathtouch counter, and a shield counter on it. (If it would be dealt damage or destroyed, remove a shield counter from it instead.)
 // Whenever a creature you control enters, you may move a counter from this artifact onto that creature.
 // {2}, Sacrifice this artifact: Draw a card.
@@ -14,9 +13,7 @@ let more = { let q: &dyn Query = g; (1i64).max(0) as i16 }; entering.counters[Co
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let decider_4 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_4, asker.source, Purpose::Optional)? {
-let mut done_5: i64 = 0; let actor_5 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let sources_5 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let to_5: Option<ObjectId> = ({ let q: &dyn Query = g; (item.subject.object().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied(); if let (Some(&from), Some(to)) = (sources_5.first(), to_5) {
-planned!("move-counters-of-kinds-the-mover-chooses" => done_5 += cantrip_mechanics::counters::move_chosen(g, actor_5, from, to, 1, 1)?);
-}
+let mut done_5: i64 = 0; let actor_5 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let sources_5 = { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let to_5: Option<ObjectId> = ({ let q: &dyn Query = g; (item.subject.object().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied(); if let (Some(&from), Some(to)) = (sources_5.first(), to_5) { if let Some(kind) = g.choose_counter_kind(actor_5, asker.source, from)? { let amount = 1i16; done_5 += i64::from(g.move_counters(from, to, kind, amount)); } }
 g.end_sentence();
 }
 g.end_sentence();

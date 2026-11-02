@@ -6,7 +6,7 @@ fn ability_0_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Res
 let mana_0 = { let q: &dyn Query = g; (2i64).max(0) as u8 };
 for player in mana_players_0 {
 if mana_0 > 0 { let colors = cantrip_mechanics::choose_colors(g, player, asker.source, ColorSet(31), mana_0)?;
-for color in colors { g.add_restricted_mana(player, color.mana(), 1, ManaRestriction::Subtypes(SubtypeSpells::of(Subtype::Elemental).or_abilities_of_permanents())); }
+for color in colors { g.add_restricted_mana(player, color.mana(), 1, ManaRestriction::Subtypes(SubtypeSpells::of(g.words(asker.source).subtype(Subtype::Elemental)).or_abilities_of_permanents())); }
 }
 }
  Ok(()) }

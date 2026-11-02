@@ -1,12 +1,11 @@
 // Azra Bladeseeker
-// status: planned
-// requires: condition SameTeam
+// status: ready
 // When this creature enters, each player on your team may discard a card, then each player who discarded a card this way draws a card.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| planned_value!("condition SameTeam", false => q.state().same_team(a, b))).collect::<Vec<PlayerId>>() };
+let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().filter(|&bound_0: &PlayerId| Some(bound_0) == Some(asker.controller)).collect::<Vec<PlayerId>>() };
 let mut guard_0_0 = vec![false; players_0.len()];
 let mut gathered_1: Vec<ObjectId> = Vec::new();
  for (index_0, bound_0) in players_0.iter().copied().enumerate() { if true { guard_0_0[index_0] = true;

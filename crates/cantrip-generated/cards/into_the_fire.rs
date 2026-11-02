@@ -10,7 +10,7 @@ g.end_sentence();
  Ok(()) }
 fn ability_0_mode_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let selected_1_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_1_candidates = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>() }; let selected_1_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AnyNumber }; let selected_1 = { cantrip_mechanics::choose::select(g, selected_1_player, asker.source, Purpose::PutOnBottom, selected_1_candidates, cantrip_mechanics::select::Selection::of(selected_1_count, &[]))? };
-let objects_2 = { let q: &dyn Query = g; selected_1.clone() }; let moved_2 = g.put_into_library(&objects_2, LibraryPlace::Bottom);
+let objects_2 = { let q: &dyn Query = g; selected_1.clone() }; let moved_2 = { let order_2 = match objects_2.iter().all(|&o| g.state().obj(o).owner == asker.controller) { true => cantrip_mechanics::library::ask_library_order(g, asker.controller, asker.source, &objects_2, DestinationKind::LibraryBottom)?, false => objects_2.clone() }; g.put_into_library(&order_2, LibraryPlace::Bottom) };
 g.end_sentence();
 let amount_3 = { let q: &dyn Query = g; (((objects_2.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).len() as i64 + 1i64)).clamp(0, 4294967295) as u32 }; let players_3 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_3 { g.draw(player, amount_3); }

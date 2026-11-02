@@ -1,6 +1,5 @@
 // The War in Heaven
-// status: planned
-// requires: counter kind Necrodermis
+// status: ready
 // (As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)
 // I — You draw three cards and you lose 3 life.
 // II — Mill three cards.
@@ -23,7 +22,7 @@ static ABILITY_0_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_2_ta
 fn ability_0_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let player_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
-let objects_3 = ({ let q: &dyn Query = g; t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_3 = { let rows_3: Vec<(ObjectId, PlayerId, bool)> = objects_3.iter().map(|&o| (o, player_3, false)).collect(); let counters = [(planned_value!("counter kind Necrodermis", CounterKind::Charge => CounterKind::Necrodermis), { let q: &dyn Query = g; (1i64).max(0) as i16 })]; g.put_all_onto_battlefield_with_counters(&rows_3, &counters)? };
+let objects_3 = ({ let q: &dyn Query = g; t_0.iter().filter_map(|t| t.object()).collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_3 = { let rows_3: Vec<(ObjectId, PlayerId, bool)> = objects_3.iter().map(|&o| (o, player_3, false)).collect(); let counters = [(CounterKind::Necrodermis, { let q: &dyn Query = g; (1i64).max(0) as i16 })]; g.put_all_onto_battlefield_with_counters(&rows_3, &counters)? };
 g.end_sentence();
 let objects_4 = { let q: &dyn Query = g; (moved_3.clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_4 = { let q: &dyn Query = g; Some(asker.source) }; let duration_4 = Duration::Indefinite;
 let kind_4_0_0 = { let q: &dyn Query = g; EffectKind::AddTypes(TypeSet::of(&[CardType::Artifact])) };

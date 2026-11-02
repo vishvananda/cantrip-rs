@@ -40,7 +40,7 @@ g.end_sentence();
 fn ability_0_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let player_4 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let pool_4 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (((q.chars(id).is(CardType::Artifact) && q.state().obj(id).token) || (q.chars(id).is(CardType::Creature) && q.state().obj(id).token)) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>() }; let count_4 = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AnyNumber }; let picked_4 = cantrip_mechanics::choose::select(g, player_4, asker.source, Purpose::ChooseAsEnters, pool_4, cantrip_mechanics::select::Selection::of(count_4, &[]).with(cantrip_mechanics::select::DIFFERENT_NAMES))?;
 g.end_sentence();
-let originals_5 = { let q: &dyn Query = g; picked_4.clone() }; let player_5 = { let q: &dyn Query = g; Some(asker.controller) }; let created_5 = if let Some(player) = player_5 { let copies: Vec<(Copiable, PlayerId)> = originals_5.iter().map(|&original| (g.copiable_values(original), player)).collect(); g.create_token_copies_together(&copies)? } else { Vec::new() };
+let originals_5 = { let q: &dyn Query = g; picked_4.clone() }; let player_5 = { let q: &dyn Query = g; Some(asker.controller) }; let mut copies_5: Vec<(Copiable, PlayerId)> = Vec::new(); if let Some(player) = player_5 { for &original in &originals_5 { if let Some(values) = { let q: &dyn Query = g; Some(original).map(|original: ObjectId| q.copiable_values(original)) } { copies_5.push((values, player)); } } } let created_5 = g.create_token_copies_together(&copies_5)?;
 g.end_sentence();
  Ok(()) }
 

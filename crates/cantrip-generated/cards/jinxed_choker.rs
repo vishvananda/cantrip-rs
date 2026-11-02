@@ -1,6 +1,5 @@
 // Jinxed Choker
-// status: planned
-// requires: instruction ChooseOne
+// status: ready
 // At the beginning of your end step, target opponent gains control of this artifact and puts a charge counter on it.
 // At the beginning of your upkeep, this artifact deals damage to you equal to the number of charge counters on it.
 // {3}: Put a charge counter on this artifact or remove one from it.
@@ -28,7 +27,8 @@ g.end_sentence();
  Ok(()) }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_5: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-let decider_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; match planned_value!("instruction ChooseOne", 0u8 => cantrip_mechanics::choose::one_of(g, decider_3, asker.source, vec![Label::Card(card_3, 0), Label::Card(card_3, 1)])?) {
+let decider_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
+let offered_3: Vec<u8> = [(0u8, true), (1u8, { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().any(|o: ObjectId| q.state().obj(o).counters(CounterKind::Charge) > 0) })].into_iter().filter(|option| option.1).map(|option| option.0).collect(); let card_3 = item.ability.card; let picked_3 = if offered_3.len() > 1 { offered_3[cantrip_mechanics::choose::one_of(g, decider_3, asker.source, offered_3.iter().map(|&option| Label::Card(card_3, option)).collect())? as usize] } else { offered_3.first().copied().unwrap_or(u8::MAX) }; match picked_3 {
 0 => {
 let mut counters_4: Vec<(ObjectId, CounterKind, i16)> = Vec::new();
 let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { if let Target::Object(object) = t { counters_4.push((object, CounterKind::Charge, amount)); } }
@@ -36,16 +36,17 @@ let had_4: Vec<_> = counters_4.iter().map(|c| g.state().obj(c.0).counters(c.1)).
 g.end_sentence();
 hoisted_5.extend(applied_4.clone());
 }
-_ => {
+1 => {
 let mut removed_6: i64 = 0;
 let objects_6_0 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() };
 let amount_6_0 = { let q: &dyn Query = g; (1i64).max(0) as i16 }; cantrip_api::instruction(g, |g| { for object in objects_6_0 { removed_6 += i64::from(g.remove_counters(object, CounterKind::Charge, amount_6_0)); } });
 g.end_sentence();
 }
+_ => {}
 }
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
 
-pub static CARD: CardDef = CardDef { name: "Jinxed Choker", token_words: &[], oracle: true, cost: ManaCost { generic: 3, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Artifact]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::STEP_BEGAN.0), ability_0_event), ability_0, "At the beginning of your end step, target opponent gains control of this artifact and puts a charge counter on it.").targets(ABILITY_0_TARGETS),triggered(when_asked(EventMask(EventMask::STEP_BEGAN.0), ability_1_event), ability_1, "At the beginning of your upkeep, this artifact deals damage to you equal to the number of charge counters on it.").targets(&[]),ability(Cost::NONE.and(Cost::mana(ManaCost { generic: 3, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })), ability_2, "{3}: Put a charge counter on this artifact or remove one from it.").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
+pub static CARD: CardDef = CardDef { name: "Jinxed Choker", token_words: &[], oracle: true, cost: ManaCost { generic: 3, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Artifact]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::STEP_BEGAN.0), ability_0_event), ability_0, "At the beginning of your end step, target opponent gains control of this artifact and puts a charge counter on it.").targets(ABILITY_0_TARGETS),triggered(when_asked(EventMask(EventMask::STEP_BEGAN.0), ability_1_event), ability_1, "At the beginning of your upkeep, this artifact deals damage to you equal to the number of charge counters on it.").targets(&[]),ability(Cost::NONE.and(Cost::mana(ManaCost { generic: 3, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })), ability_2, "{3}: Put a charge counter on this artifact or remove one from it.").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, labels: &["Put a charge counter on this artifact", "Remove one from it"], ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

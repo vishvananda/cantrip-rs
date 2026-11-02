@@ -1,16 +1,16 @@
 // Deny the Witch
-// status: planned
-// requires: a spell or ability on the stack read as an object
+// status: ready
 // Counter target spell, activated ability, or triggered ability. Its controller loses life equal to the number of creatures you control.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { q.state().stack.iter().any(|e| (match t { Target::Object(id) => e.kind == StackKind::Spell && e.object == id, Target::Ability(serial) => e.kind != StackKind::Spell && e.serial == serial, _ => false }) && (((e.kind == StackKind::Spell && true) || e.kind == StackKind::Activated || e.kind == StackKind::Triggered))) }
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0)];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let items_0: Vec<(ObjectId, usize)> = t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).into_iter().collect::<Vec<Target>>().into_iter().filter_map(|t| { let stack = &g.state().stack; stack.iter().position(|e| (match t { Target::Object(id) => e.kind == StackKind::Spell && e.object == id, Target::Ability(serial) => e.kind != StackKind::Spell && e.serial == serial, _ => false })).map(|at| (stack[at].object, at)) }).collect(); g.counter_items(&items_0);
+let countered_0: Vec<Option<PlayerId>> = t_0_raw.iter().map(|&t: &Target| g.state().stack.iter().find(|e| (match t { Target::Object(id) => e.kind == StackKind::Spell && e.object == id, Target::Ability(serial) => e.kind != StackKind::Spell && e.serial == serial, _ => false })).map(|e| e.controller)).collect();
+let items_1: Vec<(ObjectId, usize)> = t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).into_iter().collect::<Vec<Target>>().into_iter().filter_map(|t| { let stack = &g.state().stack; stack.iter().position(|e| (match t { Target::Object(id) => e.kind == StackKind::Spell && e.object == id, Target::Ability(serial) => e.kind != StackKind::Spell && e.serial == serial, _ => false })).map(|at| (stack[at].object, at)) }).collect(); g.counter_items(&items_1);
 g.end_sentence();
-let amount_1 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64).clamp(0, 2147483647) as i32 }; let players_1 = { let q: &dyn Query = g; planned_value!("a spell or ability on the stack read as an object", None::<ObjectId> => q.stack_item_object(t_0_raw.get(0).copied())).map(|o: ObjectId| q.controller(o)).into_iter().collect::<Vec<PlayerId>>() };
-for player in players_1 { g.lose_life(player, amount_1); }
+let amount_2 = { let q: &dyn Query = g; ((q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64).clamp(0, 2147483647) as i32 }; let players_2 = { let q: &dyn Query = g; countered_0.get(0).copied().flatten().into_iter().collect::<Vec<PlayerId>>() };
+for player in players_2 { g.lose_life(player, amount_2); }
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

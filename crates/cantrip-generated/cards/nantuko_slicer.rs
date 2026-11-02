@@ -17,7 +17,7 @@ let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true
 let t_1_raw = announced(g, item, 1, false); let t_1 = announced(g, item, 1, true);
 let objects_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; let moved_0 = g.return_to_hand(&objects_0);
 g.end_sentence();
-if { let q: &dyn Query = g; item.subject.object().is_some_and(|candidate: ObjectId| q.state().obj(candidate).kicked > 0) } {
+if { let q: &dyn Query = g; item.subject.object().is_some_and(|candidate: ObjectId| (q.state().obj(candidate).kicked > 0 || (q.state().obj(candidate).paid > 0 && q.card(q.state().obj(candidate).card).kicker.is_some()))) } {
 let duplicated_1 = { let q: &dyn Query = g; t_1_raw.get(0).copied().filter(|t| t_1.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() };
 let count_1: u32 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let mut conjured_1: Vec<ObjectId> = Vec::new(); for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { conjured_1.extend(planned_value!("operation Conjure", Vec::<ObjectId>::new() => cantrip_mechanics::conjure::conjure(g, player, player, asker.source, Conjured::DuplicateOf(&duplicated_1), count_1, ConjureTo::Hand)?)); }
 g.end_sentence();

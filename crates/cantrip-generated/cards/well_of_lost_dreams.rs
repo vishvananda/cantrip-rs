@@ -1,15 +1,14 @@
 // Well of Lost Dreams
-// status: planned
-// requires: cost part ManaXBounded
+// status: ready
 // Whenever you gain life, you may pay {X}, where X is less than or equal to the amount of life you gained. If you do, draw X cards.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::LifeChange { player, delta } = event { let subject = Target::Player(*player); let data = [delta.unsigned_abs(), 0]; if *delta > 0 && Some(asker.controller) == Some(*player) { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let payer_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let paid_0 = g.may_pay(payer_0, asker.source, asker.source, Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(planned_value!("cost part ManaXBounded", Cost::NONE => Cost::mana_x_bounded(ManaCost { generic: 0, x: 1, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, Comparison::LessOrEqual, |q: &dyn Query, asker: &Asker| i64::from(item.data[0])))), &PAY_QUESTION)?;
+let payer_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let most_0 = ({ let q: &dyn Query = g; i64::from(item.data[0]) }).clamp(0, 255) as u32; let x_0 = cantrip_mechanics::choose::number(g, payer_0, asker.source, 0, most_0, "Choose X")?; let paid_0 = g.may_pay(payer_0, asker.source, asker.source, Cost::mana(ManaCost { generic: x_0 as u8, ..ManaCost::ZERO }), &PAY_QUESTION)?; let bound_0: i64 = i64::from(x_0);
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
-let amount_1 = { let q: &dyn Query = g; (i64::from(item.x)).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let amount_1 = { let q: &dyn Query = g; (bound_0).max(0) as u32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_1 { g.draw(player, amount_1); }
 g.end_sentence();
 }

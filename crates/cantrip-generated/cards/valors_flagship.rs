@@ -1,6 +1,5 @@
 // Valor's Flagship
-// status: planned
-// requires: numeric expression EventActivationX
+// status: ready
 // Flying, first strike, lifelink
 // Crew 3
 // Cycling {X}{2}{W} ({X}{2}{W}, Discard this card: Draw a card.)
@@ -15,16 +14,16 @@ g.end_sentence();
  None }
 pub mod token_2 {
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); chars.keywords = chars.keywords.with(Keyword::CrewsAsThoughPowerTwoGreater); }
-#[allow(unused_variables)] fn ability_0_apply_1(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); chars.keywords = chars.keywords.with(Keyword::SaddlesAsThoughPowerTwoGreater); }
+#[allow(unused_variables)] fn ability_0_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); chars.keywords = chars.keywords.with(Keyword::CrewsAsThoughPowerTwoGreater);
+chars.keywords = chars.keywords.with(Keyword::SaddlesAsThoughPowerTwoGreater); }
 
-pub static CARD: CardDef = CardDef { name: token!(Pilot).name, token_words: token!(Pilot).token_words, oracle: false, cost: ManaCost::ZERO, has_cost: false, types: TypeSet::of(&[CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Pilot]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: Some(1), toughness: Some(1), loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[], statics: &[static_ability(Layer::Ability, cantrip_mechanics::statics::itself, ability_0_apply_0, "This token saddles Mounts and crews Vehicles as though its power were 2 greater."),static_ability(Layer::Ability, cantrip_mechanics::statics::itself, ability_0_apply_1, "This token saddles Mounts and crews Vehicles as though its power were 2 greater.")], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
+pub static CARD: CardDef = CardDef { name: token!(Pilot).name, token_words: token!(Pilot).token_words, oracle: false, cost: ManaCost::ZERO, has_cost: false, types: TypeSet::of(&[CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Pilot]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: Some(1), toughness: Some(1), loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[], statics: &[static_ability(Layer::Ability, cantrip_mechanics::statics::itself, ability_0_apply_0, "This token saddles Mounts and crews Vehicles as though its power were 2 greater.")], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];
 
 }
 fn ability_5(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut tokens_1 = Vec::new();
-let count_1_0 = { let q: &dyn Query = g; (planned_value!("numeric expression EventActivationX", 0i64 => q.event_activation_x(item))).max(0) as u32 }; let def_1_0 = g.card_id(&token_2::CARD);
+let count_1_0 = { let q: &dyn Query = g; (q.state().stack.iter().chain(q.state().left_stack.iter()).rev().find(|i| i.kind == StackKind::Activated && q.obj(i.object).became == Some(asker.source)).map_or(0i64, |i| i64::from(i.x))).max(0) as u32 }; let def_1_0 = g.card_id(&token_2::CARD);
 for player in players_1 {
 tokens_1.extend(std::iter::repeat((def_1_0,player)).take(count_1_0 as usize));
 } let words_1 = g.words(asker.source);

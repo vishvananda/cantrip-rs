@@ -1,6 +1,5 @@
 // Graf Rats
 // status: planned
-// requires: layout MeldPiece
 // requires: operation Meld
 // At the beginning of combat on your turn, if you both own and control this creature and a creature named Midnight Scavengers, exile them, then meld them into Chittering Host.
 #[allow(unused_imports)] use cantrip_api::*;
@@ -15,7 +14,6 @@ let melding_3 = { let q: &dyn Query = g; moved_1.clone() };
 planned!("operation-meld" => g.meld(&melding_3, "Chittering Host"););
 g.end_sentence();
  Ok(()) }
-planned_item!("layout-meld-piece" => melds_into: Some("Chittering Host"));
 
 pub static CARD: CardDef = CardDef { name: "Graf Rats", token_words: &[], oracle: true, cost: ManaCost { generic: 1, x: 0, symbols: [0, 0, 1, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Creature]), subtypes: SubtypeSet::of(&[Subtype::Rat]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: Some(2), toughness: Some(1), loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[triggered(when_asked(EventMask(EventMask::STEP_BEGAN.0), ability_0_event), ability_0, "At the beginning of combat on your turn, if you both own and control this creature and a creature named Midnight Scavengers, exile them, then meld them into Chittering Host.").targets(&[]).condition(ability_0_if)], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[];

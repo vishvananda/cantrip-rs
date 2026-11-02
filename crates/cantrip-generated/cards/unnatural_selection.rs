@@ -1,16 +1,15 @@
 // Unnatural Selection
-// status: planned
-// requires: operation ChooseValueWith
+// status: ready
 // {1}: Choose a creature type other than Wall. Target creature becomes that type until end of turn.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0)];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let chosen_0 = planned_value!("operation ChooseValueWith", Subtype::Plains => cantrip_mechanics::choose::value(g, { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }, asker.source, ChoiceKind::CreatureType, ChoiceTerms { options: &[], except: &[CreatureType::Wall], count: None, secret: false, unchosen: false, random: false, ordered: false, up_to: false })?);
+let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let except_0 = [g.words(asker.source).subtype(Subtype::Wall)]; let ask_0 = RequestKind::ChooseSubtype { source: asker.source, choices: Subtype::CREATURE_TYPES.iter().copied().filter(|t| !except_0.contains(t)).collect(), purpose: WordUse::Chosen }; let Answer::Subtype(chosen_0) = g.ask(player_0, ask_0)? else { unreachable!("the core answers a subtype choice with a subtype") };
 g.end_sentence();
 let objects_1 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let duration_1 = Duration::EndOfTurn;
-let kind_1_0_0 = { let q: &dyn Query = g; EffectKind::AddSubtype(chosen_0) };
+let kind_1_0_0 = { let q: &dyn Query = g; EffectKind::SetCreatureType(chosen_0) };
 if let Some(source) = source_1 { cantrip_api::instruction(g, |g| { for &object in &objects_1 { g.add_effect(source, object, kind_1_0_0, duration_1);  } }); }
 g.end_sentence();
  Ok(()) }

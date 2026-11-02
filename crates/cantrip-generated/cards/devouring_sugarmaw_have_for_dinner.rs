@@ -1,6 +1,5 @@
 // Devouring Sugarmaw // Have for Dinner
-// status: planned
-// requires: mixed token text origins in one creation batch
+// status: ready
 // Menace, trample
 // At the beginning of your upkeep, you may sacrifice an artifact, enchantment, or token. If you don't, tap this creature.
 // Create a 1/1 white Human creature token and a Food token. (Then exile this card. You may cast the creature later from exile.)
@@ -59,7 +58,7 @@ for player in players_0 {
 tokens_0.extend(std::iter::repeat((def_0_0,player)).take(count_0_0 as usize));
 tokens_0.extend(std::iter::repeat((def_0_1,player)).take(count_0_1 as usize));
 } let words_0 = g.words(asker.source);
-let created_0 = planned_value!("mixed token text origins in one creation batch", g.create_tokens_worded(&tokens_0, false, None, words_0)? => g.create_tokens_each_worded(&tokens_0, false, None, &[(def_0_0, g.words(asker.source)), (def_0_1, Words::NONE)])?);
+let created_0 = g.create_tokens_worded(&tokens_0, false, None, words_0)?;
 g.end_sentence();
  Ok(()) }
 

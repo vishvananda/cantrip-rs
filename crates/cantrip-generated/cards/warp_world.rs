@@ -31,7 +31,7 @@ let mut players_15: Vec<PlayerId> = { let q: &dyn Query = g; q.state().apnap().c
 let mut gathered_16: Vec<ObjectId> = Vec::new();
  for (index_15, bound_0) in players_15.iter().copied().enumerate() { gathered_16.extend({ let q: &dyn Query = g; ((Some(bound_0).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && ((all_6.clone()).contains(&id) && Some(bound_0) == Some(q.state().obj(id).owner))).collect::<Vec<ObjectId>>() });
     } 
-let objects_18 = { let q: &dyn Query = g; gathered_16.clone() }; let moved_18 = g.put_into_library(&objects_18, LibraryPlace::Bottom);
+let objects_18 = { let q: &dyn Query = g; gathered_16.clone() }; let moved_18 = { let order_18 = match objects_18.iter().all(|&o| g.state().obj(o).owner == asker.controller) { true => cantrip_mechanics::library::ask_library_order(g, asker.controller, asker.source, &objects_18, DestinationKind::LibraryBottom)?, false => objects_18.clone() }; g.put_into_library(&order_18, LibraryPlace::Bottom) };
 g.end_sentence();
  Ok(()) }
 

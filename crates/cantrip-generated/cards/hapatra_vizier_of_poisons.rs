@@ -19,7 +19,7 @@ hoisted_2.extend(applied_1.clone());
 }
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::CountersPut { object, kind, amount, by, .. } = event { let id = *object; let subject = Target::Object(id); let data = [*amount as u32, id.0]; if q.chars(id).is(CardType::Creature) && *kind == CounterKind::MinusOne && Some(asker.controller) == Some(*by) { return Some(Fired { subject, data }); } }
+#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::CountersPut { object, kind, amount, by, types, .. } = event { let id = *object; let subject = Target::Object(id); let data = [*amount as u32, id.0]; if types.has(CardType::Creature) && *kind == CounterKind::MinusOne && Some(asker.controller) == Some(*by) { return Some(Fired { subject, data }); } }
  None }
 pub mod token_4 {
 #[allow(unused_imports)] use cantrip_api::*;

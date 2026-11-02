@@ -1,6 +1,5 @@
 // Furgul, Quag Nurturer
 // status: planned
-// requires: cost objects outside a resolving ability
 // requires: operation Conjure
 // At the beginning of your end step, conjure a card named Slimy Dualleech onto the battlefield if you control no Leeches. Otherwise, put a +1/+1 counter on each Leech you control.
 // {T}, Sacrifice a creature: Add an amount of {G} equal to the sacrificed creature's power.
@@ -26,7 +25,7 @@ hoisted_4.extend(applied_3.clone());
 g.end_sentence();
  Ok(()) }
 fn ability_1_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let mana_players_5 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-let mana_5_0 = { let q: &dyn Query = g; ((planned_value!("cost objects outside a resolving ability", Vec::<ObjectId>::new() => q.paid_for(asker))).get(0).copied().map_or(0i64, |o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0)))).max(0) as u32 };
+let mana_5_0 = { let q: &dyn Query = g; ((q.events().iter().rev().find_map(|r| match r.event { Event::ZoneChange { old, from, part: false, .. } if from.is(ZoneKind::Battlefield) => Some(old), _ => None }).into_iter().collect::<Vec<ObjectId>>()).get(0).copied().map_or(0i64, |o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0)))).max(0) as u32 };
 for player in mana_players_5 {
 g.add_mana(player, Mana::G, mana_5_0);}
  Ok(()) }

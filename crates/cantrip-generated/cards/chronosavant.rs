@@ -6,7 +6,7 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
 let objects_0 = ({ let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_0 = { let rows_0: Vec<(ObjectId, PlayerId, bool)> = objects_0.iter().map(|&o| (o, player_0, true)).collect(); let came_0 = g.put_all_onto_battlefield_as(&rows_0)?; came_0.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
 g.end_sentence();
-{ let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; g.skip_next_turns(asker.source, player, 1); }
+{ let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let times = 1u32; g.skip_next_turns(asker.source, player, times); }
 g.end_sentence();
  Ok(()) }
 

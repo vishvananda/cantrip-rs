@@ -1,6 +1,5 @@
 // The Weatherseed Treaty
-// status: planned
-// requires: engine: no ReadAhead
+// status: ready
 // Read ahead (Choose a chapter and start with that many lore counters. Add one after your draw step. Skipped chapters don't trigger. Sacrifice after III.)
 // I — Search your library for a basic land card, put it onto the battlefield tapped, then shuffle.
 // II — Create a 1/1 green Saproling creature token.
@@ -42,7 +41,6 @@ if let Some(source) = source_6 { cantrip_api::instruction(g, |g| { for &object i
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
-planned_item!("engine-no-read-ahead" => enters: cantrip_mechanics::read_ahead::enters);
 
 pub static CARD: CardDef = CardDef { name: "The Weatherseed Treaty", token_words: &[], oracle: true, cost: ManaCost { generic: 2, x: 0, symbols: [0, 0, 0, 0, 1, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Enchantment]), subtypes: SubtypeSet::of(&[Subtype::Saga]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[chapter(1, ability_1_0, "I — Search your library for a basic land card, put it onto the battlefield tapped, then shuffle.").targets(&[]),chapter(2, ability_1_1, "II — Create a 1/1 green Saproling creature token.").targets(&[]),chapter(3, ability_1_2, "III — Domain — Target creature you control gets +X/+X and gains trample until end of turn, where X is the number of basic land types among lands you control.").targets(ABILITY_1_2_TARGETS)], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[&token_4::CARD];
