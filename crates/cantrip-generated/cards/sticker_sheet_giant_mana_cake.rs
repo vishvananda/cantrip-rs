@@ -1,0 +1,11 @@
+// Sticker sheet: Giant, Mana, Cake
+// status: planned
+// requires: engine: no stickers
+#[allow(unused_imports)] use cantrip_api::*;
+planned_item!("engine-no-stickers", "Name(\"Giant\")");
+planned_item!("engine-no-stickers", "Name(\"Mana\")");
+planned_item!("engine-no-stickers", "Name(\"Cake\")");
+planned_item!("engine-no-stickers", "Abilities(tickets:2,abilities:[(kind:Triggered,args:(event:Object(event:LeavesBattlefield,objects:(kind:SameObject,args:(kind:Source))),intervening_if:None,limits:(per_turn:None,total:None),announcement:(targets:[],modes:None),body:(instructions:[(kind:Effect,args:(result:(0),operation:(kind:CreateTokens,args:(players:(kind:One,args:(kind:AbilityController)),tokens:[(amount:(kind:Constant,args:2),words:Rules,recipe:Defined((name:FromSubtypes,colors:[],chosen_color:false,chosen_creature_type:false,supertypes:[],card_types:[Artifact],subtypes:[Food],power_toughness:None,abilities:[(kind:Activated,args:(origin:Ordinary,cost:(parts:[Mana([Generic(2)]),TapSymbol,Sacrifice(objects:(kind:One,args:(kind:Source)),choose:None)]),limits:(once:false,once_each_turn:false,sorcery:false,condition:None,activators:None,keyword:None,modifiers:[]),announcement:(targets:[],modes:None),body:(instructions:[(kind:Effect,args:(result:(0),operation:(kind:GainLife,args:(players:(kind:One,args:(kind:AbilityController)),amount:(kind:Constant,args:3)))))])))],abilities_of:None)))],entry:(tapped:false,counters:[],states:[])))))])))])");
+planned_item!("engine-no-stickers", "Abilities(tickets:4,abilities:[(kind:Triggered,args:(event:ZoneChange(objects:(kind:SameObject,args:(kind:Source)),from:Some(Battlefield),to:Graveyard),intervening_if:None,limits:(per_turn:None,total:None),announcement:(targets:[(slot:(0),kind:Object((kind:Permanent,zones:[Battlefield])),count:Exactly((kind:Constant,args:1)),filter:(kind:Not,args:(kind:CardType,args:Land)),players:None,distribute:None,constraints:[],chooser:None)],modes:None),body:(instructions:[(kind:Effect,args:(result:(0),operation:(kind:Destroy,args:(objects:(kind:One,args:(kind:Target,args:(slot:(0),index:0))),regeneration:true))))])))])");
+planned_item!("engine-no-stickers", "PowerToughness(tickets:2,power:3,toughness:3)");
+planned_item!("engine-no-stickers", "PowerToughness(tickets:3,power:6,toughness:2)");

@@ -1,0 +1,11 @@
+// Sticker sheet: Wrinkly, Monkey, Shenanigans
+// status: planned
+// requires: engine: no stickers
+#[allow(unused_imports)] use cantrip_api::*;
+planned_item!("engine-no-stickers", "Name(\"Wrinkly\")");
+planned_item!("engine-no-stickers", "Name(\"Monkey\")");
+planned_item!("engine-no-stickers", "Name(\"Shenanigans\")");
+planned_item!("engine-no-stickers", "Abilities(tickets:2,abilities:[(kind:Activated,args:(origin:Ordinary,cost:(parts:[Mana([Generic(1)])]),limits:(once:false,once_each_turn:false,sorcery:false,condition:None,activators:None,keyword:None,modifiers:[]),announcement:(targets:[(slot:(0),kind:Object((kind:Permanent,zones:[Battlefield])),count:Exactly((kind:Constant,args:1)),filter:(kind:CardType,args:Creature),players:None,distribute:None,constraints:[],chooser:None)],modes:None),body:(instructions:[(kind:Effect,args:(result:(0),operation:(kind:CreateContinuousEffect,args:(source:(kind:Source),affected:Objects((kind:One,args:(kind:Target,args:(slot:(0),index:0)))),changes:[(kind:Rule,args:Prohibit(Block((kind:SameObject,args:(kind:Source)))))],duration:EndOfTurn,evaluation:LiveObjects))))])))])");
+planned_item!("engine-no-stickers", "Abilities(tickets:4,abilities:[(kind:Triggered,args:(event:Turn(point:EndStepBegins,players:(kind:All)),intervening_if:Some((kind:All,args:[(kind:Compare,args:(left:(kind:EventHistory,args:(event:ZoneChange(objects:(kind:CardType,args:Creature),from:Some(Battlefield),to:Graveyard),window:ThisTurn,measure:Occurrences)),comparison:GreaterOrEqual,right:(kind:Constant,args:1))),(kind:ObjectMatches,args:(object:(kind:Source),filter:(kind:CardType,args:Creature)))])),limits:(per_turn:None,total:None),announcement:(targets:[],modes:None),body:(instructions:[(kind:Effect,args:(result:(0),operation:(kind:PutCounters,args:(placements:[(recipients:(kind:Objects,args:(kind:One,args:(kind:Source))),kind:PowerToughness(-1,-1),amount:(kind:Constant,args:1),selection:None)])))),(kind:Effect,args:(result:(1),operation:(kind:Draw,args:(players:(kind:One,args:(kind:AbilityController)),amount:(kind:Constant,args:1)))))])))])");
+planned_item!("engine-no-stickers", "PowerToughness(tickets:2,power:2,toughness:4)");
+planned_item!("engine-no-stickers", "PowerToughness(tickets:3,power:7,toughness:2)");

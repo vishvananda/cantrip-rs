@@ -1,0 +1,11 @@
+// Sticker sheet: Elemental, Time, Flamingo
+// status: planned
+// requires: engine: no stickers
+#[allow(unused_imports)] use cantrip_api::*;
+planned_item!("engine-no-stickers", "Name(\"Elemental\")");
+planned_item!("engine-no-stickers", "Name(\"Time\")");
+planned_item!("engine-no-stickers", "Name(\"Flamingo\")");
+planned_item!("engine-no-stickers", "Abilities(tickets:2,abilities:[(kind:Activated,args:(origin:Ordinary,cost:(parts:[Move(selections:[(objects:(kind:One,args:(kind:Source)),choose:None)],destination:Exile,entry:(tapped:false,counters:[],states:[]),face_down:false)]),limits:(once:false,once_each_turn:false,sorcery:false,condition:None,activators:None,keyword:None,modifiers:[]),announcement:(targets:[(slot:(0),kind:Object((kind:Card,zones:[Graveyard])),count:Exactly((kind:Constant,args:1)),filter:(kind:All,args:[(kind:Not,args:(kind:CardType,args:Land)),(kind:InZone,args:Players(zone:Graveyard,players:(kind:One,args:(kind:AbilityController))))]),players:None,distribute:None,constraints:[],chooser:None)],modes:None),body:(instructions:[(kind:Effect,args:(result:(0),operation:(kind:CreateContinuousEffect,args:(source:(kind:Source),affected:Players((kind:One,args:(kind:AbilityController))),changes:[(kind:PlayerRule,args:PlayPermission(cards:(kind:One,args:(kind:Target,args:(slot:(0),index:0))),from:Graveyard,action:CastSpell,filter:(kind:Any)))],duration:EndOfTurn,evaluation:LiveObjects))))])))])");
+planned_item!("engine-no-stickers", "Abilities(tickets:4,abilities:[(kind:Triggered,args:(event:ZoneChange(objects:(kind:All,args:[(kind:CardType,args:Creature),(kind:ControlledBy,args:(kind:One,args:(kind:AbilityController)))]),from:Some(Battlefield),to:Graveyard),intervening_if:None,limits:(per_turn:None,total:None),announcement:(targets:[],modes:None),body:(instructions:[(kind:Effect,args:(result:(0),operation:(kind:LoseLife,args:(players:(kind:OpponentsOf,args:(kind:AbilityController)),amount:(kind:Constant,args:1))))),(kind:Effect,args:(result:(1),operation:(kind:GainLife,args:(players:(kind:One,args:(kind:AbilityController)),amount:(kind:Constant,args:1)))))])))])");
+planned_item!("engine-no-stickers", "PowerToughness(tickets:2,power:1,toughness:5)");
+planned_item!("engine-no-stickers", "PowerToughness(tickets:3,power:5,toughness:4)");

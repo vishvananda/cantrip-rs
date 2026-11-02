@@ -5,6 +5,7 @@
 // Creatures you control get +1/+0.
 // When you unlock this door, conjure a duplicate of this Room into your hand. When you do, target creature you control gains first strike until end of turn.
 #[allow(unused_imports)] use cantrip_api::*;
+planned_item!("room-door-with-static-abilities", "left::CARD: CardDef::door_unsupported refuses a door with static abilities");
 
 pub static CARD: CardDef = CardDef { name: "Solitary Study // Endless Corridor", token_words: &[], oracle: true, cost: ManaCost { generic: 2, x: 0, symbols: [2, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Enchantment]), subtypes: SubtypeSet::of(&[Subtype::Room]), supertypes: Supertypes { basic: false, legendary: false, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, split: Some((&left::CARD, &right::CARD)), ..CardDef::BLANK };
 pub static EXTRA: &[&CardDef] = &[&left::CARD,&right::CARD];

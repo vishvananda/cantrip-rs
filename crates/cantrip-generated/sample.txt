@@ -1977,7 +1977,6 @@ scouts_warning
 scragnoth
 scrapshooter
 scroll_of_fate
-scurry_of_squirrels
 sea_eagle
 sea_of_sand
 seafarers_quay
@@ -2202,6 +2201,7 @@ steelswarm_operator
 steer_clear
 step_between_worlds
 step_right_up
+sticker_sheet_space_fungus_snickerdoodle
 stifle
 stigma_lasher
 still_life
@@ -2542,7 +2542,6 @@ unexpected_potential
 unfinished_business
 unlawful_entry
 unleash_the_inferno
-unnamed
 unpredictable_cyclone
 unwilling_vessel
 unyaro
