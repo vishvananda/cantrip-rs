@@ -4,7 +4,6 @@ a_good_day_to_pie
 a_killer_among_us
 a_premonition_of_your_demise
 a_reckoning_approaches
-aang_master_of_elements_avatar_aang
 abandon_hope
 abby_merciless_soldier
 abeyance
@@ -20,8 +19,9 @@ academic_probation
 academy_at_tolaria_west
 academy_manufactor
 acceptable_losses
-accident_prone_apprentice_amphibian_accident
+accident_prone_apprentice
 accomplished_automaton
+accursed_witch
 ace_flockbringer
 acererak_the_archlich
 aces_baseball_bat
@@ -71,6 +71,7 @@ ajani_mentor_of_heroes
 ajani_sleeper_agent
 ajani_vengeant
 ajanis_last_stand
+akki_lavarunner
 akoum
 akroan_sergeant
 akroma_angel_of_wrath_avatar
@@ -79,7 +80,7 @@ akromas_will
 alabaster_leech
 aladdins_lamp
 alaundo_the_seer
-albiorix_goose_tyrant_wild_goose_chase
+albiorix_goose_tyrant
 alchemists_gambit
 alchemists_retrieval
 alhammarret_high_arbiter
@@ -99,6 +100,7 @@ alpharael_stonechosen
 altair_ibn_laahad
 altar_of_the_lost
 altar_of_the_pantheon
+altar_of_the_wretched
 alter_reality
 ambassador_blorpityblorpboop
 ambassador_of_evendo
@@ -117,7 +119,6 @@ an_unearthly_child
 anafenza_unyielding_lineage
 anara_wolvid_familiar
 anax_hardened_in_the_forge
-ancestors_embrace_kindly_ancestor
 ancestral_communion
 andradite_leech
 angel_of_eternal_dawn
@@ -146,7 +147,6 @@ anurid_swarmsnapper
 anvil_of_bogardan
 anzrag_the_quake_mole
 apes_of_rath
-apex_observatory_eye_of_ojer_taq
 aplan_mortarium
 apostles_blessing
 apothecary_white
@@ -176,7 +176,7 @@ arcanum_wings
 arcbound_overseer
 arcbound_overseer_avatar
 arcbound_wanderer
-arcee_acrobatic_coupe_arcee_sharpshooter
+arcee_sharpshooter
 archangel_of_strife
 archangel_of_tithes
 archdemon_of_paliano
@@ -187,7 +187,6 @@ archetype_of_finality
 archetype_of_imagination
 archipelagore
 archival_whorl
-archive_haunt_overwhelmed_archivist
 archivist_of_gondor
 archnemesis
 archon_of_coronation
@@ -205,7 +204,7 @@ argentum_masticore
 argivian_welcome
 argothian_uprooting
 armageddon_clock
-armed_dangerous
+armed
 armed_with_proof
 arming_gala
 armor_thrull
@@ -243,11 +242,10 @@ aunties_snitch
 aurelias_fury
 aurora_phoenix
 author_of_shadows
-autumn_tail_kitsune_sage_kitsune_mystic
 autumn_willow
 autumns_veil
 avacyns_judgment
-avatar_kyoshi_the_legend_of_kyoshi
+avatar_aang
 avatar_of_hope
 aven_mindcensor
 aven_riftwatcher
@@ -260,7 +258,6 @@ awe_for_the_guilds
 awesome_presence
 awestruck_cygnet
 axavar_fate_thief
-azamuki_treachery_incarnate_cunning_bandit
 azor_the_lawbringer
 azorius_arrester
 azorius_justiciar
@@ -273,6 +270,7 @@ bad_wolf_bay
 baeloth_barrityl_entertainer
 baffling_defenses
 baird_argivian_recruiter
+baithook_angler
 baldurs_gate_wilderness
 balduvian_fallen
 balduvian_hydra
@@ -330,12 +328,12 @@ bell_borca_spectral_sergeant
 belligerent_yearling
 bellowsbreath_ogre
 belonging
+beloved_beggar
 benalish_commander
 benalish_knight_counselor
 benalish_partisan
 benediction_of_moons
 benevolent_blessing
-benevolent_geist_malevolent_hermit
 benevolent_river_spirit
 benjamin_sisko_besieged
 benthic_explorers
@@ -356,12 +354,14 @@ bilbo_retired_burglar
 bill_ferny_bree_swindler
 bill_the_pony
 bind_to_secrecy
+binding_geist
 bioluminary
 biomancers_familiar
 biophagus
 biowaste_blob
 bird_gets_the_worm
 birds_of_paradise_avatar
+birgi_god_of_storytelling
 birthday_escape
 bismuth_mindrender
 bison_whistle
@@ -376,8 +376,8 @@ blade_of_shared_souls
 bladehold_cleaver
 blademane_baku
 blast_furnace_hellkite
+blaster_combat_dj
 blaster_hulk
-blaster_morale_booster_blaster_combat_dj
 blatant_thievery
 blaze_of_glory
 blazing_shoal
@@ -391,7 +391,7 @@ blinding_angel
 blinding_beam
 blinding_powder
 blink
-blitzwing_adaptive_assailant_blitzwing_cruel_tormentor
+blitzwing_cruel_tormentor
 bloatfly_swarm
 blood_age_muster
 blood_ogre
@@ -434,7 +434,7 @@ bonded_construct
 bonded_horncrest
 bone_dancer
 bone_shaman
-bonecrusher_giant_stomp
+bonecrusher_giant
 boneyard_aberration
 bontus_last_reckoning
 booby_trap
@@ -450,8 +450,8 @@ bosh_iron_golem_avatar
 bosium_strip
 bottomless_vault
 bounce_chamber
+bound
 bound_by_moonsilver
-bound_determined
 bound_in_gold
 bounty_of_the_deep
 bow_to_my_command
@@ -480,8 +480,8 @@ briarblade_adept
 brighthearth_banneret
 brimaz_king_of_oreskos
 brimstone_vandal
+brine_comber
 brine_elemental
-brinebound_gift_brine_comber
 brisela_voice_of_nightmares
 brittle_blast
 broken_ambitions
@@ -499,6 +499,8 @@ brutal_suppression
 bruvac_the_grandiloquent
 bubble_smuggler
 bubbling_muck
+budoka_gardener
+budoka_pupil
 bullseye_death_dealer
 bumi_unleashed
 bumis_feast_lecture
@@ -509,6 +511,7 @@ burning_earth
 burning_tree_bloodscale
 burr_grafter
 burrenton_bombardier
+bushi_tenderfoot
 bushy_bodyguard
 butcher_orgg
 by_elspeths_command
@@ -537,6 +540,7 @@ call_to_the_void
 callaphe_beloved_of_the_sea
 caller_of_the_hunt
 caller_of_the_untamed
+callow_jushi
 calming_licid
 camellia_the_seedmiser
 camouflage
@@ -578,7 +582,6 @@ cast_through_time
 catalyst_stone
 catastrophe
 cathedral_of_serra
-catlike_curiosity_mischievous_catgeist
 catti_brie_of_mithral_hall
 caught_in_a_parallel_universe
 cavalry_master
@@ -627,12 +630,12 @@ chaos_moon
 chaoslace
 chaosphere
 chaotic_aether
-chapel_shieldgeist_chaplain_of_alms
+chaplain_of_alms
 charge_of_the_forever_beast
 charged_conjuration
 chariot_of_the_sun
 charmed_pendant
-charred_foyer_warped_space
+charred_foyer
 chatterfang_squirrel_general
 cheering_fanatic
 chefs_kiss
@@ -688,7 +691,6 @@ clattering_skeletons
 clay_golem
 clergy_of_the_holy_nimbus
 cleric_of_chill_depths
-clever_distraction_distracting_geist
 cliffside_market
 clinging_mists
 cloak_and_dagger_entwined
@@ -789,6 +791,7 @@ corpseweaver_prodigy
 corpseweft
 corrupted_crossroads
 corrupting_licid
+cosima_god_of_the_voyage
 cosis_trickster
 cosmic_sovereign
 cosmos_charger
@@ -800,7 +803,8 @@ courageous_resolve
 courser_of_kruphix
 covenant_of_minds
 cover_of_winter
-covetous_geist_covert_cutpurse
+covert_cutpurse
+covetous_castaway
 covetous_urge
 cowed_by_wisdom
 crab_umbra
@@ -808,7 +812,7 @@ crack_in_time
 cracked_earth_technique
 crackleburr
 crackling_spellslinger
-cramped_vents_access_maze
+cramped_vents
 crashing_wave
 crater_elemental
 craterous_stomp
@@ -818,7 +822,7 @@ craw_giant
 crawling_filth
 creative_technique
 creeping_peeper
-crescendo_conductor_boltwave
+crescendo_conductor
 crevasse
 criminal_past
 crimson_hellkite
@@ -829,7 +833,7 @@ crovax
 crowd_control_warden
 crown_of_convergence
 crucible_of_the_spirit_dragon
-crude_abattoir_unsavory_kitchen
+crude_abattoir
 cruel_alliance
 cruel_entertainment
 cry_of_contrition
@@ -844,6 +848,7 @@ cultist_of_the_absolute
 cultivator_drone
 cultivator_of_blades
 cultural_exchange
+cunning_bandit
 cunning_giant
 cunning_rhetoric
 cuombajj_witches
@@ -853,6 +858,7 @@ curious_forager
 current_curriculum
 curse_of_hospitality
 curse_of_inertia
+curse_of_leeches
 curse_of_misfortunes
 curse_of_vengeance
 cursebound_witch
@@ -868,7 +874,7 @@ cyber_conversion
 cyberman_patrol
 cybership
 cycle_of_life
-cyclonus_cybertronian_fighter_cyclonus_the_saboteur
+cyclonus_the_saboteur
 cyclopean_tomb
 cytoplast_manipulator
 cytoplast_root_kin
@@ -911,7 +917,7 @@ daxos_of_meletis
 day_of_the_moon
 dazzling_beauty
 dazzling_flameweaver
-dazzling_theater_prop_room
+dazzling_theater
 dead_ringers
 deadbeat_attendant
 deadeye_navigator
@@ -962,8 +968,7 @@ demonic_covenant
 demonic_embrace
 demonlord_of_ashmouth
 demoralize
-dennick_pious_apparition_dennick_pious_apprentice
-departed_soulkeeper_devoted_grafkeeper
+dennick_pious_apprentice
 deranged_assistant
 derelor
 derevi_empyrial_tactician
@@ -974,13 +979,14 @@ desert_cenote
 deserters_quarters
 desertion
 desperate_gambit
-destined_lead
+destined
 destructive_tampering
 detection_tower
 detention_vortex
 detritivore
 devastating_dreams
 devoted_caretaker
+devoted_grafkeeper
 devoted_retainer
 devourer_of_destiny
 devouring_greed
@@ -994,7 +1000,6 @@ dihadas_ploy
 dimensional_breach
 diminished_returner
 dinas_guidance
-dinosaur_headdress_paleontologists_pick_axe
 dinosaurs_on_a_spaceship
 direct_current
 diregraf_escort
@@ -1012,6 +1017,7 @@ display_of_dominance
 disrupting_shoal
 distended_mindbender
 distracted_botanist
+distracting_geist
 disturbed_slumber
 disturbing_plot
 diver_skaab
@@ -1024,9 +1030,8 @@ djinn_illuminatus
 doc_aurlock_grizzled_genius
 dodecapod
 dog_umbra
-dokai_weaver_of_life_budoka_gardener
 dollhouse_of_horrors
-dollmakers_shop_porcelain_gallery
+dollmakers_shop
 dominating_licid
 domri_anarch_of_bolas
 domri_chaos_bringer
@@ -1039,7 +1044,7 @@ doom_weaver
 dooms_time_platform
 doomsday
 doomsday_confluence
-dorotheas_retribution_dorothea_vengeful_victim
+dorothea_vengeful_victim
 dose_of_dawnglow
 double_stroke
 doubling_chant
@@ -1092,7 +1097,7 @@ dreamwinder
 drench_the_soil_in_their_blood
 drillworks_mole
 drix_interlacer
-drogskol_armaments_drogskol_infantry
+drogskol_infantry
 droning_bureaucrats
 drop_tower
 drought
@@ -1152,6 +1157,7 @@ ekundu_cyclops
 eladamri
 eladamri_lord_of_leaves_avatar
 eland_umbra
+elbrus_the_binding_blade
 elda_conjurer_of_spectacle
 elder_brain
 elder_pine_of_jukai
@@ -1234,7 +1240,7 @@ eowyn_fearless_knight
 ephara_god_of_the_polis
 epochrasite
 equinox
-erayos_essence_erayo_soratami_ascendant
+erayo_soratami_ascendant
 erdwal_illuminator
 erebos_bleak_hearted
 erebos_god_of_the_dead
@@ -1260,7 +1266,6 @@ essence_of_the_wild
 estrid_the_masked
 etched_oracle_avatar
 etched_slith
-etching_of_kumano_kumano_faces_kakkazan
 eternal_dominion
 eternal_of_harsh_truths
 ethereal_escort
@@ -1309,14 +1314,17 @@ exterminator_magmarch
 extraordinary_journey
 eye_of_duskmantle
 eye_of_nidhogg
+eye_of_ojer_taq
 eye_of_singularity
 ezuri_stalker_of_spheres
 fabrication_foundry
 fabrication_module
 faceless_haven
 faceless_one
-failure_comply
+failure
+faithbound_judge
 faithful_disciple
+faithful_squire
 falco_spara_pactweaver
 falkenrath_gorger
 fallaji_antiquarian
@@ -1379,7 +1387,6 @@ ferris_wheel
 festival
 feywild_trickster
 feywild_visitor
-fibrous_entangler_tangleclaw_werewolf
 field_of_dreams
 fields_of_summer
 fierce_guardianship
@@ -1424,9 +1431,10 @@ flamekin_bladewhirl
 flamekin_herald
 flames_of_moradin
 flames_of_the_blood_hand
+flamescroll_celebrant
 flameskull
 flametongue_kavu_avatar
-flamewar_streetwise_operative_flamewar_brash_veteran
+flamewar_brash_veteran
 flaming_fist
 flaming_fist_duskguard
 flaring_pain
@@ -1546,10 +1554,11 @@ gaeas_will
 galactus_devourer_of_worlds
 galadriel_elven_queen
 galadriel_of_lothlorien
-galathul_galecaller_corvid_squall
+galathul_galecaller
 gale_conduit_of_the_arcane
 gale_storm_conduit
 galea_kindler_of_hope
+galedrifter
 gales_redirection
 galloping_lizrog
 galvanic_alchemist
@@ -1580,7 +1589,6 @@ gemcutter_buccaneer
 genasi_rabble_rouser
 general_jarkeld
 generals_regalia
-generous_soul_beloved_beggar
 genesis_of_the_daleks
 genesis_storm
 genju_of_the_realm
@@ -1594,15 +1602,12 @@ geyadrone_dihada
 ghalma_the_shaper
 ghastbark_twins
 ghastly_discovery
-ghastly_mimicry_mirrorhall_mimic
 ghastly_remains
 ghirapur
 ghirapur_orrery
 ghired_conclave_exile
 ghor_clan_savage
 ghost_ark
-ghost_spider_gwen_stacy_12459
-ghostly_castigator_covetous_castaway
 ghostly_dancers
 ghostly_flame
 ghostly_keybearer
@@ -1619,7 +1624,6 @@ giantbaiting
 giants_amulet
 gibbering_descent
 gibbering_kami
-gideon_battle_forged_kytheon_hero_of_akros
 gideon_jura
 gift_of_doom
 gilanra_caller_of_wirewood
@@ -1694,8 +1698,7 @@ goblin_warchief_avatar
 god_eternal_kefnet
 god_favored_general
 gogo_master_of_mimicry
-goka_the_unjust_initiate_of_blood
-goldbug_scrappy_scout_goldbug_humanitys_ally
+goldbug_humanitys_ally
 golden_demise
 golden_sidekick
 goldenhide_ox
@@ -1744,10 +1747,9 @@ great_intelligences_plan
 great_train_heist
 great_wall
 greater_werewolf
-green_goblin_norman_osborn
 green_mana_battery
 green_ward
-greenhouse_rickety_gazebo
+greenhouse
 greensleeves
 grell_philosopher
 grenzo_crooked_jailer
@@ -1764,11 +1766,11 @@ grinning_demon_avatar
 grinning_totem
 grip_of_chaos
 grip_of_the_roil
-grisly_anglerfish_grizzled_angler
 grist_the_hunger_tide
 gristleback
 grixis
 grixis_illusionist
+grizzled_angler
 grizzled_huntmaster
 grizzlegom_hurloon_hero
 grove_of_the_dreampods
@@ -1805,7 +1807,8 @@ gut_fanatical_priestess
 gut_furious_fanatic
 gut_zealous_fanatic
 gutmorn_pactbound_servant
-gutter_shortcut_gutter_skulker
+gutter_skulker
+gwen_stacy
 gwenom_remorseless
 gyox_brutal_carnivora
 haakon_stromgald_scourge_avatar
@@ -1841,7 +1844,6 @@ hardened_bonds
 hardy_outlander
 harms_way
 harness_infinity
-harnfel_horn_of_bounty_birgi_god_of_storytelling
 harold_and_bob_first_numens
 harrowing_swarm
 haruspex
@@ -1851,7 +1853,6 @@ harvester_druid
 hatchery_sliver
 hateflayer
 hatut_zeraze_strike_force
-haukens_insight_jacob_hauken_inspector
 haunted_house
 haunted_one
 haunted_plate_mail
@@ -1913,6 +1914,7 @@ hinata_dawn_crowned
 hinterland_chef
 hipparion
 hired_heist
+hired_muscle
 hisoka_minamo_sensei
 historians_boon
 hit_the_mother_lode
@@ -1927,10 +1929,9 @@ hollowhenge_wrangler
 hollowsage
 holographic_double
 homarid_warrior
-homuras_essence_homura_human_ascendant
+homura_human_ascendant
 honored_hierarch
 hooded_hydra
-hook_haunt_drifter_baithook_angler
 hook_horror
 hope_of_ghirapur
 horde_ambusher
@@ -1947,6 +1948,7 @@ hot_pursuit
 hotel_of_fears
 house_guildmage
 housemeld
+huatli_poet_of_unity
 huatli_warrior_poet
 hulks_thunderclap
 hum_of_the_radix
@@ -1988,7 +1990,6 @@ icefall_regent
 icehide_golem
 icehide_troll
 icewrought_sentry
-ichiga_who_topples_oaks_budoka_pupil
 ichor_aberration
 ichor_elixir
 icy_blast
@@ -1998,11 +1999,11 @@ ifh_biff_efreet
 ignite_the_cloneforge
 iizuka_the_ruthless
 illicit_auction
-illithid_harvester_plant_tadpoles
+illithid_harvester
 illuminate
 illuminated_folio
+illusion
 illusion_of_choice
-illusion_reality
 illusionary_informant
 illusionary_mask
 illusionary_presence
@@ -2058,7 +2059,6 @@ indrik_umbra
 indris_the_hydrostatic_surge
 induce_despair
 infantry_shield
-infectious_curse_accursed_witch
 infernal_captor
 infernal_darkness
 infernal_denizen
@@ -2071,6 +2071,7 @@ infinite_hourglass
 infinite_reflection
 information_booth
 inherited_envelope
+initiate_of_blood
 ink_eyes_servant_of_oni_avatar
 ink_treader_nephilim
 inner_chamber_guard
@@ -2085,7 +2086,7 @@ inspiring_leader
 inspirited_vanguard
 instigator
 instill_energy
-insult_injury
+insult
 intellect_devourer
 intercessors_arrest
 interface_ace
@@ -2097,10 +2098,14 @@ into_the_pit
 intrepid_outlander
 intrepid_paleontologist
 introductions_are_in_order
+invasion_of_arcavios
+invasion_of_ikoria
+invasion_of_kaldheim
+invasion_of_new_phyrexia
 invasion_of_the_giants
 invasion_plans
+inventive_iteration
 invigorate
-invocation_of_the_founders_invasion_of_arcavios
 invoke_calamity
 inys_haen
 ion_storm
@@ -2144,10 +2149,12 @@ jace_the_perfected_mind
 jaces_archivist
 jaces_machinations
 jackal_familiar
+jacob_hauken_inspector
 jade_avenger
 jade_leech
 jade_monolith
 jade_orb_of_dragonkind
+jadzi_oracle_of_arcavios
 jaheira_harper_emissary
 jaheira_heroic_harper
 jaheira_insightful_harper
@@ -2155,7 +2162,6 @@ jaheira_merciful_harper
 jaheira_ruthless_harper
 jaheira_stirring_harper
 jar_of_eyeballs
-jaraku_the_interloper_callow_jushi
 jared_carthalion_true_heir
 jarsyl_dark_age_scion
 jasmine_boreal_of_the_seven
@@ -2172,7 +2178,7 @@ jeskas_will
 jessie_zane_fangbringer
 jesters_scepter
 jet_collector
-jetfire_air_guardian_jetfire_ingenious_scientist
+jetfire_ingenious_scientist
 jewel_mine_overseer
 jeweled_amulet
 jeweled_bird
@@ -2191,8 +2197,8 @@ joint_assault
 jolene_the_plunder_queen
 jon_irenicus_shattered_one
 joraga_invocation
+jorn_god_of_winter
 jotun_owl_keeper
-journey_to_the_oracle_jadzi_oracle_of_arcavios
 jovens_ferrets
 jubilant_skybonder
 jubilation
@@ -2202,13 +2208,12 @@ juggernaut_peddler
 juggle_the_performance
 jund
 junk_winder
+jushi_apprentice
 juvenile_mist_dragon
 jyoti_moag_ancient
 kaerveks_spite
 kaerveks_torch
-kaiso_memory_of_loyalty_faithful_squire
 kaito_dancing_shadow
-kaldring_the_rimestaff_jorn_god_of_winter
 kamahls_will
 kambal_profiteering_mayor
 kami_of_bamboo_groves
@@ -2244,7 +2249,7 @@ kashi_tribe_elite
 kashi_tribe_reaver
 kashi_tribe_warriors
 kasmina_enigma_sage
-katildas_rising_dawn_katilda_dawnhart_martyr
+katilda_dawnhart_martyr
 kav_landseeker
 kavaron_consumed
 kavu_recluse
@@ -2265,7 +2270,6 @@ kembas_legion
 kembas_outfitter
 kenessos_priest_of_thassa
 kentaro_the_smiling_cat
-kenzo_the_hardhearted_bushi_tenderfoot
 keranos_god_of_storms
 kerblam_warehouse
 kess_dissident_mage
@@ -2286,6 +2290,7 @@ kill_switch
 kilnmouth_dragon
 kilnspire_district
 kin_tree_nurturer
+kindly_ancestor
 king_haralds_revenge
 king_macar_the_gold_cursed
 king_narfis_betrayal
@@ -2298,6 +2303,7 @@ kitesail_skirmisher
 kithkin_brinefarer
 kitsune_blademaster
 kitsune_dawnblade
+kitsune_mystic
 kitsune_palliator
 kjeldoran_elite_guard
 kjeldoran_guard
@@ -2323,6 +2329,7 @@ knowledge_exploitation
 kobold_warcaller
 kodama_of_the_center_tree
 koh_the_face_stealer
+kolvori_god_of_kinship
 konda_lord_of_eiganjo
 kondas_banner
 kondas_hatamoto
@@ -2349,11 +2356,13 @@ krumar_initiate
 kruphix_god_of_horizons
 kukemssa_pirates
 kukemssa_serpent
-kuons_essence_kuon_ogre_ascendant
+kumano_faces_kakkazan
+kuon_ogre_ascendant
 kuros_taken
 kutzil_malamet_exemplar
 kyloxs_voltstrider
 kyren_toy
+kytheon_hero_of_akros
 kytheons_irregulars
 labyrinth_minotaur
 labyrinth_of_skophos
@@ -2379,9 +2388,9 @@ land_equilibrium
 land_grant
 landlore_navigator
 lands_edge
+lantern_bearer
 lantern_lit_graveyard
 lantern_of_insight
-lanterns_lift_lantern_bearer
 lapis_orb_of_dragonkind
 laquatuss_champion
 lara_croft_tomb_raider
@@ -2405,7 +2414,6 @@ leashling
 leech_bonder
 leeches
 leeching_licid
-leeching_lurker_curse_of_leeches
 legion_loyalist
 legion_of_clay
 legion_reconsecrator
@@ -2456,7 +2464,6 @@ liquid_fire
 littjara
 littjara_mirrorlake
 living_armor
-living_breakthrough_inventive_iteration
 living_destiny
 living_inferno
 living_plane
@@ -2502,6 +2509,7 @@ loyal_subordinate
 loyal_unicorn
 lozhan_dragons_legacy
 luck_bobblehead
+ludevic_necrogenius
 lukamina_bear_form
 lukamina_crocodile_form
 lukamina_hawk_form
@@ -2516,9 +2524,9 @@ lumbering_laundry
 lumbering_lightshield
 lumbering_megasloth
 luminous_guardian
-luminous_phantom_lunarch_veteran
 lunar_hatchling
 lunar_rejection
+lunarch_veteran
 lupine_harbingers
 lurker_in_the_deep
 lurking_automaton
@@ -2564,6 +2572,7 @@ majestic_myriarch
 make_a_splash
 make_yourself_useful
 malcolm_keen_eyed_navigator
+malevolent_hermit
 malfegor_avatar
 malik_grim_manipulator
 mammoth_umbra
@@ -2645,7 +2654,7 @@ medomais_prophecy
 meeting_of_the_five
 megaflora_jungle
 megatons_fate
-megatron_destructive_force_megatron_tyrant
+megatron_tyrant
 melee
 melek_izzet_paragon
 melira_the_living_cure
@@ -2717,15 +2726,17 @@ mirri_the_cursed_avatar
 mirri_weatherlight_duelist
 mirror_entity_avatar
 mirror_match
-mirror_room_fractured_realm
+mirror_room
 mirror_shield_hoplite
 mirror_style_master
 mirror_universe
 mirrored_depths
+mirrorhall_mimic
 mirrormere_guardian
 mirrormind_crown
 mirrorwing_dragon
 mirrorwood_treefolk
+mischievous_catgeist
 mischievous_lookout
 mischievous_quanar
 misfortune
@@ -2770,7 +2781,6 @@ monstrous_onslaught
 moonbow_illusionist
 moonhold
 moonlace
-moonlit_ambusher_oakshade_stalker
 moonlit_meditation
 moonlit_strider
 moradins_disciples
@@ -2780,7 +2790,6 @@ mordenkainen
 moria_scavenger
 morinfen_avatar
 moritte_of_the_frost
-morning_apparition_mourning_patrol
 morphic_tide
 morsel_theft
 mortal_flesh_is_weak
@@ -2793,6 +2802,7 @@ motivated_muralist
 mount_keralia
 mountain_stronghold
 mounted_archers
+mourning_patrol
 mournwillow
 mouth_of_ronom
 moxite_refinery
@@ -2824,7 +2834,6 @@ my_will_is_irresistible
 my_wings_enfold_all
 my_wish_is_your_command
 mycelic_ballad
-mycoid_maze_twists_and_turns
 mycoid_resurrection
 mycoloth
 myojin_of_towering_might
@@ -2861,7 +2870,6 @@ narfi_betrayer_king
 narset_transcendent
 nashi_illusion_gadgeteer
 nashi_moon_sages_scion
-nassari_dean_of_expression_uvilda_dean_of_perfection
 naths_elite
 natural_unity
 nature_demands_an_offering
@@ -2909,7 +2917,9 @@ next_of_kin
 nexus_mentality
 neyali_suns_vanguard
 neyith_of_the_dire_hunt
+nezumi_graverobber
 nezumi_ronin
+nezumi_shortfang
 niambi_beloved_protector
 niblis_of_frost
 nicanzil_current_conductor
@@ -2920,7 +2930,6 @@ night_shift_of_the_living_dead
 night_soil
 nightclub_bouncer
 nightcreep
-nighteyes_the_desecrator_nezumi_graverobber
 nightkin_ambusher
 nightshade_peddler
 nightsoil_kami
@@ -2942,6 +2951,7 @@ noble_heritage
 noctis_prince_of_lucis
 noggin_whack
 nomads_en_kor
+norman_osborn
 norns_choirmaster
 norns_dominion
 norns_fetchling
@@ -2970,6 +2980,7 @@ nyx
 o_naginata
 o_saurus
 oaken_brawler
+oakshade_stalker
 oath_of_teferi
 oathsworn_knight
 oathsworn_vampire
@@ -2993,11 +3004,11 @@ ogre_enforcer
 ogre_geargrabber
 ogre_shaman
 ohran_yeti
+ojer_pakpatiq_deepest_epoch
 ojutai_soul_of_winter
 ojutais_breath
 oketras_last_mercy
 okk
-olag_ludevics_hubris_ludevic_necrogenius
 old_growth_troll
 oloro_ageless_ascetic
 ominous_harvest
@@ -3023,7 +3034,7 @@ open_the_way
 ophidian
 opposition_agent
 oppressive_rays
-optimus_prime_autobot_leader_optimus_prime_hero
+optimus_prime_hero
 opulent_clomper
 oracle
 oracle_en_vec
@@ -3053,6 +3064,7 @@ ormos_archive_keeper
 ornate_imitations
 ornitharch
 orochi_colony
+orochi_eggwatcher
 orochi_ranger
 orvar_the_all_form
 orzhov_advokist
@@ -3080,6 +3092,7 @@ overgrown_zealot
 overmaster
 overpowering_attack
 overseer_of_vault_76
+overwhelmed_archivist
 oyaminartok_polar_werebear
 ozai_the_phoenix_king
 pain_seer
@@ -3090,6 +3103,7 @@ pair_o_dice_lost
 palace_guard
 paladin_of_prahv
 pale_wayfarer
+paleontologists_pick_axe
 paliano
 paliano_the_high_city
 paliano_vanguard
@@ -3131,7 +3145,7 @@ pay_tribute_to_me
 peace_talks
 peacekeeper_avatar
 pearl_collector
-pearl_lake_warden_nesting_instinct
+pearl_lake_warden
 peema_outrider
 peerless_recycling
 peerless_samurai
@@ -3222,7 +3236,7 @@ pompeii
 pool_of_vigorous_growth
 pools_of_becoming
 popular_entertainer
-porcine_portent_lend_a_ham
+porcine_portent
 portal_mage
 portal_manipulator
 possessed_goat
@@ -3254,7 +3268,7 @@ pride_of_conquerors
 pride_of_lions
 pride_of_the_clouds
 priest_of_possibility
-primal_wellspring_primal_amulet
+primal_amulet
 primalcrux
 prime_ministers_cabinet_room
 primeval_spawn
@@ -3285,7 +3299,7 @@ prototype_x_8
 proud_wildbonder
 providence
 providence_of_night
-prowl_pursuit_vehicle_prowl_stoic_strategist
+prowl_stoic_strategist
 psionic_ritual
 psychic_battle
 psychic_impetus
@@ -3315,7 +3329,6 @@ pus_kami
 putrefying_rotboar
 putrid_hexhag
 pygmy_hippo
-pyre_of_the_world_tree_invasion_of_kaldheim
 pyretic_hunter
 pyrewood_gearhulk
 pyromancers_goggles
@@ -3330,7 +3343,7 @@ quagnoth
 quantum_reduction
 quasiduplicate
 queen_allenal_of_ruadach
-queen_of_ice_rage_of_winter
+queen_of_ice
 quenchable_fire
 quick_fixer
 quickbeast_amulet
@@ -3353,9 +3366,9 @@ rabble_rouser
 racketeer_boss
 rad_rascal
 raddic_tal_zealot
+radiant_grace
 radiant_lotus
 radiant_performer
-radiant_restraints_radiant_grace
 radiant_solar
 radiate
 radical_idea
@@ -3363,7 +3376,7 @@ rage_of_purphoros
 raging_kronch
 raging_river
 ragnarok_divine_deliverance
-rahilda_feral_outlaw_rahilda_wanted_cutthroat
+rahilda_wanted_cutthroat
 raiding_schemes
 rain_of_gore
 raised_by_giants
@@ -3372,7 +3385,7 @@ rakshasa_debaser
 rakshasa_gravecaller
 ral_and_the_implicit_maze
 ral_caller_of_storms
-ral_leyline_prodigy_ral_monsoon_mage
+ral_monsoon_mage
 rally_the_galadhrim
 rambling_possum
 rampant_frogantua
@@ -3391,7 +3404,7 @@ rasaad_radiant_monk
 rasputin_dreamweaver
 rasputin_the_oneiromancer
 rassilon_the_war_president
-ratchet_rescue_racer_ratchet_field_medic
+ratchet_field_medic
 ratonhnhake_ton
 ravagers_mace
 ravaging_riftwurm
@@ -3434,7 +3447,7 @@ redeem_the_lost
 redemption_arc
 redemptor_dreadnought
 redoubled_stormsinger
-reduce_rubble
+reduce
 reed_richards_smartest_man
 reef_shaman
 reezug_the_bonecobbler
@@ -3470,12 +3483,11 @@ resourceful_collector
 restless_cottage
 restless_dreams
 restless_spire
-restricted_office_lecture_hall
+restricted_office
 retether
 retribution_of_the_ancients
 retriever_phoenix
 reveka_wizard_savant
-revel_in_silence_flamescroll_celebrant
 revelation
 revenant_patriarch
 revenge_of_the_hunted
@@ -3531,7 +3543,6 @@ road_of_return
 roalesk_prime_specimen
 roar_of_challenge
 roar_of_jukai
-roar_of_the_fifth_people_huatli_poet_of_unity
 robber_of_the_rich
 robo_pinata
 rocco_street_chef
@@ -3589,7 +3600,7 @@ rune_of_might
 rune_of_mortality
 rune_of_speed
 rune_of_sustenance
-rune_tails_essence_rune_tail_kitsune_ascendant
+rune_tail_kitsune_ascendant
 runeblade_raiser
 runed_halo
 runesword
@@ -3616,7 +3627,7 @@ sage_of_the_unknowable
 saheeli_the_gifted
 sahir_visitor_in_darkness
 saiba_trespassers
-said_done
+said
 sail_into_the_west
 sailmonger
 saint_elenda
@@ -3647,7 +3658,6 @@ sandcloud_harbinger
 sandmans_quicksand
 sands_of_time
 sandskitter_outrider
-sandswirl_wanderglyph_unstable_glyphbridge
 sanguine_brushstroke
 sanguine_sipper
 sanguine_soothsayer
@@ -3661,7 +3671,7 @@ sarevok_the_usurper
 sarkhan_the_dragonspeaker
 sarkhan_wanderer_to_shiv
 sarulf_realm_eater
-sasayas_essence_sasaya_orochi_ascendant
+sasaya_orochi_ascendant
 sash_and_waistcoat_unmen
 satoru_the_infiltrator
 satyr_nyx_smith
@@ -3689,7 +3699,6 @@ scalpelexis
 scampire
 scandalmonger
 scared_stiff
-scarmaker_hired_muscle
 scarred_puma
 scars_of_the_veteran
 scatter_to_the_winds
@@ -3728,7 +3737,7 @@ seasoned_tactician
 seatower_imprisonment
 secluded_starforge
 second_little_pig
-secret_arcade_dusty_parlor
+secret_arcade
 secret_door
 secret_of_bloodbending
 secret_summoning
@@ -3763,7 +3772,7 @@ sensei_golden_tail
 sentinel
 sentinel_dispatch
 sentry_oak
-sephiroth_one_winged_angel_sephiroth_fabled_soldier
+sephiroth_fabled_soldier
 seraph
 seraph_of_the_scales
 serene_master
@@ -3807,7 +3816,6 @@ shellfish_scholar
 shelob_child_of_ungoliant
 shelob_dread_weaver
 sheoldreds_assimilator
-shidako_broodmistress_orochi_eggwatcher
 shield_broker
 shield_of_the_righteous
 shield_sphere
@@ -3815,7 +3823,6 @@ shimmering_efreet
 shimmering_mirage
 shinen_of_lifes_roar
 shining_shoal
-shinryu_transcendent_rival_zenos_yae_galvus
 shiny_impetus
 shipbreaker_kraken
 shipwreck_sifters
@@ -3872,7 +3879,6 @@ sinister_concierge
 sinister_concoction
 sinister_reflections
 sinkhole_surveyor
-sinners_judgment_faithbound_judge
 sinuous_striker
 siphon_insight
 siren_of_the_fanged_coast
@@ -3916,7 +3922,7 @@ sleep
 sleep_of_the_dead
 sleeper_dart
 sleight_of_mind
-slicer_high_speed_antagonist_slicer_hired_muscle
+slicer_hired_muscle
 slimefoot_thallid_transplant
 slimy_kavu
 slip_on_the_ring
@@ -3930,7 +3936,7 @@ smeagol_helpful_guide
 smog_smasher
 smogbelcher_chariot
 smoke
-smoky_lounge_misty_salon
+smoky_lounge
 smoldering_stagecoach
 smuggler_captain
 snake_cult_initiation
@@ -3952,7 +3958,7 @@ soldiers_of_the_watch
 solfatara
 solitary_confinement
 solitary_sanctuary
-solitary_study_endless_corridor
+solitary_study
 somnophore
 song_of_blood
 song_of_point_prime
@@ -3987,7 +3993,7 @@ soulflayer
 soulgorger_orgg
 soulsworn_spirit
 soultether_golem
-soundwave_superior_captain_soundwave_sonic_spy
+soundwave_sonic_spy
 sovereign_okinec_ahau
 sovereigns_realm
 space_beleren
@@ -3997,7 +4003,6 @@ spatial_binding
 spatial_merging
 spectra_ward
 spectral_bears
-spectral_binding_binding_geist
 spectral_force
 spectral_gateguards
 spectral_shift
@@ -4021,7 +4026,7 @@ sphinxs_tutelage
 spider_punk
 spider_umbra
 spike_tailed_ceratops
-spiked_corridor_torture_pit
+spiked_corridor
 spikeshell_harrier
 spin_into_myth
 spinebiter
@@ -4032,7 +4037,6 @@ spinny_ride
 spiny_starfish
 spire_patrol
 spire_phantasm
-spires_of_orazca_thaumatic_compass
 spirespine
 spirit_en_dal
 spirit_en_kor
@@ -4060,7 +4064,6 @@ squeaking_pie_sneak
 squee
 squee_goblin_nabob_avatar
 squirrel_squatters
-stabwhisker_the_odious_nezumi_shortfang
 staff_of_the_ages
 stairs_to_infinity
 stalking_leonin
@@ -4078,16 +4081,16 @@ star_athlete
 star_compass
 starke
 starlight_spectacular
-starscream_seeker_leader_starscream_power_hungry
+starscream_power_hungry
 start_the_tardis
 stasis
 static_discharge
 static_orb
-steady_tortoise_harried_dash
+steady_tortoise
 steeling_stance
 stensia
 stensia_innkeeper
-stensian_sanguinist_exsanguinate
+stensian_sanguinist
 step_between_worlds
 step_right_up
 stern_mentor
@@ -4153,7 +4156,7 @@ stolen_strategy
 stolen_uniform
 stonecoil_serpent
 stonehewer_giant_avatar
-stonehide_ancient_warning_tremor
+stonehide_ancient
 stonehorn_dignitary
 stoneshock_giant
 stonewright
@@ -4167,14 +4170,13 @@ stormbind
 stormblood_berserker
 stormcage_containment_facility
 stormforged_armor
-stormkeld_curator_giant_secrets
+stormkeld_curator
 stormscale_anarch
 stormsurge_kraken
 stormwild_capridor
 storybook_ride
 strago_and_relm
 stranglehold
-strangling_grasp_vengeful_strangler
 streambed_aquitects
 street_savvy
 street_urchin
@@ -4190,6 +4192,7 @@ stronghold_furnace
 stronghold_gambit
 struggle_for_project_purity
 stubborn_burrowfiend
+student_of_elements
 study_hall
 stuffy_doll_avatar
 stumpsquall_hydra
@@ -4211,6 +4214,7 @@ summoners_grimoire
 summons_of_saruman
 sun_warriors
 suncleanser
+sundering_eruption
 sundering_sentinel
 sunglasses_of_urza
 sungold_sentinel
@@ -4287,6 +4291,7 @@ tamiyo_upriser_crowned
 tan_jolom_the_worldwalker
 tandem_lookout
 tangle
+tangleclaw_werewolf
 tangleweave_armor
 tannuk_steadfast_second
 tapestry_warden
@@ -4295,6 +4300,7 @@ tardis
 tardis_bay
 tariff
 tarmogoyf_nest
+tarrians_journal
 task_mage_assembly
 taste_of_paradise
 tasteful_offering
@@ -4316,7 +4322,6 @@ tchaka_venerable_king
 technomancer
 tectonic_rift
 teekas_dragon
-teferi_akosa_of_zhalfir_invasion_of_new_phyrexia
 teferi_timeless_voyager
 teferi_who_slows_the_sunset
 teferis_contingency
@@ -4329,7 +4334,6 @@ teleportal
 tember_city
 tempest_efreet
 temple_of_atropos
-temple_of_cyclical_time_ojer_pakpatiq_deepest_epoch
 temporal_aperture
 tempting_licid
 temur_charger
@@ -4359,6 +4363,7 @@ thalakos_dreamsower
 thalakos_lowlands
 thassa_deep_dwelling
 thassa_god_of_the_sea
+thaumatic_compass
 thayan_evokers
 the_abyss
 the_aether_flues
@@ -4416,7 +4421,6 @@ the_golden_throne
 the_grand_goatnapper
 the_great_aerie
 the_great_forest
-the_great_work_urabrask
 the_grim_captains_locker
 the_hippodrome
 the_hourglass_coven
@@ -4426,6 +4430,7 @@ the_irencrag
 the_iron_guardian_stirs
 the_kingpin_of_crime
 the_last_agni_kai
+the_legend_of_kyoshi
 the_lux_foundation_library
 the_madcap_jester
 the_maelstrom
@@ -4447,7 +4452,6 @@ the_motherlode_excavator
 the_mystical_archive
 the_necrobloom
 the_ninth_doctor
-the_omenkeel_cosima_god_of_the_voyage
 the_pandorica
 the_parting_of_the_ways
 the_peregrine_dynamo
@@ -4458,7 +4462,6 @@ the_prismatic_piper
 the_pyramid_of_mars
 the_rani
 the_ring_goes_south
-the_ringhart_crest_kolvori_god_of_kinship
 the_ruinous_powers
 the_second_doctor
 the_seventh_doctor
@@ -4470,7 +4473,6 @@ the_temporal_anchor
 the_tenth_doctor
 the_third_doctor
 the_thirteenth_doctor
-the_tomb_of_aclazotz_tarrians_journal
 the_toymakers_trap
 the_twelfth_doctor
 the_unagi_of_kyoshi_island
@@ -4544,7 +4546,6 @@ thunderherd_migration
 thundering_mightmare
 thundermane_dragon
 tiana_angelic_mechanic
-tibalt_cosmic_impostor_valki_god_of_lies
 tibalt_wicked_tormentor
 ticket_turbotubes
 ticketomaton
@@ -4576,9 +4577,7 @@ titans_presence
 titans_revenge
 tithe_taker
 tivit_seller_of_secrets
-tobita_master_of_winds_student_of_elements
 toby_beastie_befriender
-tok_tok_volcano_born_akki_lavarunner
 tolabow_loch_rascal
 tolaria
 tom_bombadil
@@ -4589,7 +4588,6 @@ tombstone_stairwell
 tome_of_gadwick
 tome_of_legends
 tome_of_the_infinite
-tomoya_the_revealer_jushi_apprentice
 too_evil_to_stay_dead
 took_reaper
 tooth_claw_and_tail
@@ -4598,8 +4596,8 @@ toph_earthbending_master
 toph_greatest_earthbender
 topography_tracker
 topsoil_turner
+toralf_god_of_fury
 toralfs_disciple
-toralfs_hammer_toralf_god_of_fury
 torgal_a_fine_hound
 torii_watchward
 torment_of_venom
@@ -4668,10 +4666,11 @@ turtle_duck
 turtles_forever
 tusk_and_whiskers
 twilight_diviner
-twinblade_invocation_twinblade_geist
+twinblade_geist
 twinning_staff
 twins_of_discord
 twist_allegiance
+twists_and_turns
 two_headed_dragon
 two_headed_giant_of_foriys
 two_headed_giant_of_foriys_avatar
@@ -4691,7 +4690,7 @@ ulamogs_despoiler
 ulamogs_nullifier
 uldaros_theorix
 ulder_ravengard_marshal
-ultra_magnus_armored_carrier_ultra_magnus_tactician
+ultra_magnus_tactician
 ultron_unlimited
 umaro_raging_yeti
 umbra_mystic
@@ -4728,17 +4727,19 @@ unpredictable_cyclone
 unstable_amulet
 unstable_footing
 unstable_frontier
+unstable_glyphbridge
 unstable_molecule_suit
 unstoppable_ash
 untaidake_the_cloud_keeper
 unyaro
 upwelling
 ur_drago
+urabrask
 urban_burgeoning
 urborg_scavengers
 ureni_the_song_unending
 urianger_augurelt
-ursine_guide_rangers_merit
+ursine_guide
 uruk_hai_berserker
 urza
 urza_assembles_the_titans
@@ -4746,6 +4747,7 @@ urza_lord_protector
 urza_planeswalker
 urzas_construction_drone
 urzas_rage
+uvilda_dean_of_perfection
 vadrik_astral_archmage
 vaevictis_asmadi_the_dire
 val_marooned_surveyor
@@ -4754,6 +4756,7 @@ valiant_batrider
 valiant_emberkin
 valiant_endeavor
 valiant_farewell
+valki_god_of_lies
 valko_indorian
 valley_rally
 valor_made_real
@@ -4787,6 +4790,7 @@ venerated_teacher
 vengeant_earth
 vengeful_archon
 vengeful_dreams
+vengeful_strangler
 venomous_breath
 venser_corpse_puppet
 venser_the_sojourner
@@ -4860,7 +4864,6 @@ volatile_chimera
 volatile_orbit
 volatile_rift
 volatile_stormdrake
-volcanic_fissure_sundering_eruption
 volcanic_offering
 volcanic_wind
 volcano_hellion
@@ -4883,10 +4886,9 @@ vulture_feathered_fiend
 vulturous_aven
 vvviza_orbital_overseer
 wagon_wrecker
-waildrifter_galedrifter
 wake_thrasher
 wakestone_gargoyle
-walk_in_closet_forgotten_cellar
+walk_in_closet
 walking_bulwark
 walking_desecration
 wall_of_deceit
@@ -5022,7 +5024,6 @@ wishmonger
 witch_hunt
 witch_king_of_angmar
 witchs_clinic
-withengar_unbound_elbrus_the_binding_blade
 wizards_of_the
 wizards_spellbook
 wizened_githzerai
@@ -5054,7 +5055,6 @@ worzel_the_protector
 wrens_run_hydra
 wrens_run_packmaster
 wrens_run_vanquisher
-wretched_bonemass_altar_of_the_wretched
 writ_of_passage
 wurmcalling
 wyll_blade_of_frontiers
@@ -5077,7 +5077,7 @@ xorn
 yannik_scavenging_sentinel
 yare
 yarus_roar_of_the_old_gods
-yavimaya_bloomsage_channel
+yavimaya_bloomsage
 yawgmoths_bargain
 yawgmoths_will
 ydwen_efreet
@@ -5119,13 +5119,13 @@ zada_hedron_grinder
 zagorka_mother_of_sanctum
 zalto_fire_giant_duke
 zealous_inquisitor
+zenos_yae_galvus
 zerapa_minotaur
 zevlor_elturel_exile
 zhalfirin_crusader
 zhur_taa_druid
 ziatoras_envoy
 zidane_tantalus_thief
-zilortha_apex_of_ikoria_invasion_of_ikoria
 zilortha_strength_incarnate
 zinnia_valleys_voice
 zombie_boa

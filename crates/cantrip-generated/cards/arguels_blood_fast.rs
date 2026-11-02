@@ -1,0 +1,42 @@
+// Arguel's Blood Fast // Temple of Aclazotz
+// status: ready
+// (Transforms from Arguel's Blood Fast.)
+// {T}: Add {B}.
+// {T}, Sacrifice a creature: You gain life equal to the sacrificed creature's toughness.
+// {1}{B}, Pay 2 life: Draw a card.
+// At the beginning of your upkeep, if you have 5 or less life, you may transform Arguel's Blood Fast.
+#[allow(unused_imports)] use cantrip_api::*;
+fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
+let amount_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+for player in players_0 { g.draw(player, amount_0); }
+g.end_sentence();
+ Ok(()) }
+fn ability_1_if(q: &dyn Query, asker: &Asker) -> bool { (Some(asker.controller).map_or(0i64, |p: PlayerId| i64::from(q.state().player(p).life))) <= (5i64) }
+#[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::Upkeep) && Some(asker.controller) == Some(q.state().turn.active) { return Some(Fired { subject, data }); } }
+ None }
+fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
+let decider_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_1, asker.source, Purpose::Optional)? {
+if let Some(object) = ({ let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied() { g.transform_by(object, item)?; }
+g.end_sentence();
+}
+g.end_sentence();
+ Ok(()) }
+
+pub static CARD: CardDef = CardDef { name: "Arguel's Blood Fast", token_words: &[], oracle: true, cost: ManaCost { generic: 1, x: 0, symbols: [0, 0, 1, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }, has_cost: true, types: TypeSet::of(&[CardType::Enchantment]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: true, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[ability(Cost::NONE.and(Cost::mana(ManaCost { generic: 1, x: 0, symbols: [0, 0, 1, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(life(2)), ability_0, "{1}{B}, Pay 2 life: Draw a card.").targets(&[]),triggered(when_asked(EventMask(EventMask::STEP_BEGAN.0), ability_1_event), ability_1, "At the beginning of your upkeep, if you have 5 or less life, you may transform Arguel's Blood Fast.").targets(&[]).condition(ability_1_if)], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, back: Some(&back::CARD), ..CardDef::BLANK };
+pub static EXTRA: &[&CardDef] = &[];
+pub mod back {
+#[allow(unused_imports)] use cantrip_api::*;
+fn ability_0_mana(g: &mut dyn Game, asker: &Asker, chosen: Option<Color>) -> Result<(),Suspend> { let mana_players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+let mana_0_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 };
+for player in mana_players_0 {
+g.add_mana(player, Mana::B, mana_0_0);}
+ Ok(()) }
+fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
+let amount_1 = { let q: &dyn Query = g; ((q.cost_objects(item).to_vec()).get(0).copied().map_or(0i64, |o: ObjectId| i64::from(q.chars(o).toughness.unwrap_or(0)))).max(0) as i32 }; let players_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+for player in players_1 { g.gain_life(player, amount_1); }
+g.end_sentence();
+ Ok(()) }
+#[allow(unused_variables)] fn ability_1_2(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { q.chars(id).is(CardType::Creature) }
+
+pub static CARD: CardDef = CardDef { name: "Temple of Aclazotz", token_words: &[], oracle: true, cost: ManaCost::ZERO, has_cost: false, types: TypeSet::of(&[CardType::Land]), subtypes: SubtypeSet::of(&[]), supertypes: Supertypes { basic: false, legendary: true, snow: false }, colors: None, power: None, toughness: None, loyalty: None, defense: None, keywords: Keywords::of(&[]), protection: ColorSet(0), spell: None, abilities: &[mana_ability(Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(Cost { tap: true, ..Cost::NONE }), Adds { pool: ManaPool([0, 0, 1, 0, 0, 0]), ..add_by(ability_0_mana) }, "{T}: Add {B}."),ability(Cost::NONE.and(Cost::mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 0, 0, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] })).and(Cost { tap: true, ..Cost::NONE }).and(sacrifice(1, ability_1_2)), ability_1, "{T}, Sacrifice a creature: You gain life equal to the sacrificed creature's toughness.").targets(&[])], statics: &[], replacements: &[], preventions: &[], block_rules: &[], block_requirements: &[], attack_rules: &[], untap_bans: &[], delayed: &[], enters: None, modal: None, enchant: None, ..CardDef::BLANK };
+}
