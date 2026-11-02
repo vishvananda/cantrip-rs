@@ -3,7 +3,7 @@
 // This spell costs {2} less to cast for each card you've cycled or discarded this turn.
 // Cycling {2} ({2}, Discard this card: Draw a card.)
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_cost(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, player); if costed == Costed::Spell(source) && true { CostDelta::less(((2i64 * Some(asker.controller).map_or(0i64, |p: PlayerId| q.history().this_turn().iter().filter(|r| matches!(r.event, Event::Discarded { player, .. } if player == p)).count() as i64))).clamp(0, 255) as u8) } else { CostDelta::NONE } }
+#[allow(unused_variables)] fn ability_0_cost(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, player); if costed == Costed::Spell(source) && true { CostDelta::less(((2i64 * Some(asker.controller).map_or(0i64, |p: PlayerId| q.history().this_turn().iter().filter(|r| matches!(r.event, Event::Discarded { player, .. } if player == p)).count() as i64))).min(u32::MAX.into()) as u32) } else { CostDelta::NONE } }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let amount_0 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_0 { g.draw(player, amount_0); }

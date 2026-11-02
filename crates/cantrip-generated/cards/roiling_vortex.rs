@@ -17,7 +17,8 @@ let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let amount_1 = { l
 g.end_sentence();
  Ok(()) }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let players_2_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_2_0 { g.add_player_effect(asker.controller, source, EffectKind::CantGainLife(player), Duration::EndOfTurn); } }
+cantrip_api::instruction(g, |g| { let players_2_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_2_0 { g.add_player_effect(asker.controller, source, EffectKind::CantGainLife(player), Duration::EndOfTurn); } }
+ });
 g.end_sentence();
  Ok(()) }
 

@@ -3,7 +3,7 @@
 // If you weren't the starting player, this spell costs {1} less to cast.
 // Target opponent reveals each nonland card in their hand with mana value 4 or less. Choose a card revealed this way or a card in their graveyard. Exile that card.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_cost(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, player); if costed == Costed::Spell(source) && !(Some(asker.controller).is_some_and(|player: PlayerId| q.state().turn.starting == player)) { CostDelta::less((1i64) as u8) } else { CostDelta::NONE } }
+#[allow(unused_variables)] fn ability_0_cost(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, player); if costed == Costed::Spell(source) && !(Some(asker.controller).is_some_and(|player: PlayerId| q.state().turn.starting == player)) { CostDelta::less((1i64).max(0) as u32) } else { CostDelta::NONE } }
 #[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Player(p) if (Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>()).contains(&p)) }
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_11: Vec<ObjectId> = Vec::new();

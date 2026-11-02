@@ -4,7 +4,7 @@
 // Flying
 // Spells you cast with mana value 5 or greater cost {1} less to cast and can't be countered.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_2_0_rule(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, q.controller(source)); let Costed::Spell(spell) = costed else { return CostDelta::NONE; }; if player == asker.controller && (i64::from(q.mana_value(spell))) >= (5i64) { CostDelta::less((1i64) as u8) } else { CostDelta::NONE } }
+#[allow(unused_variables)] fn ability_2_0_rule(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, q.controller(source)); let Costed::Spell(spell) = costed else { return CostDelta::NONE; }; if player == asker.controller && (i64::from(q.mana_value(spell))) >= (5i64) { CostDelta::less((1i64).max(0) as u32) } else { CostDelta::NONE } }
 #[allow(unused_variables)] fn ability_2_1_affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool { let asker = &Asker::new(source, q.controller(source)); (q.state().obj(affected).became.is_none() && q.state().obj(affected).zone.kind() == ZoneKind::Stack) && ((q.state().obj(affected).cast_from.is_some() && q.state().stack.iter().any(|i| i.kind == StackKind::Spell && i.object == affected && Some(asker.controller) == Some(i.controller))) && (i64::from(q.mana_value(affected, &(*so_far)))) >= (5i64)) }
 #[allow(unused_variables)] fn ability_2_1_apply_0(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) { let asker = &Asker::new(source, q.controller(source)); chars.keywords = chars.keywords.with(Keyword::CantBeCountered); }
 

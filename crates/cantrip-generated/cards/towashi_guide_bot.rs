@@ -19,7 +19,7 @@ let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1 = 
 for player in players_1 { g.draw(player, amount_1); }
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_1_cost(q: &dyn Query, asker: &Asker, costed: Costed, targets: &[Target]) -> CostDelta { if true { CostDelta::less(((q.state().battlefield().iter().copied().filter(|&id| (modified(q, id) && q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64).clamp(0, 255) as u8) } else { CostDelta::NONE } }
+#[allow(unused_variables)] fn ability_1_cost(q: &dyn Query, asker: &Asker, costed: Costed, targets: &[Target]) -> CostDelta { if true { CostDelta::less(((q.state().battlefield().iter().copied().filter(|&id| (modified(q, id) && q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)))).collect::<Vec<ObjectId>>()).len() as i64) as u32) } else { CostDelta::NONE } }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
 fn modified(q: &dyn Query, id: ObjectId) -> bool { q.state().obj(id).has_counters() || q.state().battlefield().iter().any(|&a| q.state().obj(a).attached_to == Some(id) && { let chars = q.chars(a); chars.has_subtype(Subtype::Equipment) || chars.has_subtype(Subtype::Aura) && q.controller(a) == q.controller(id) }) }
 

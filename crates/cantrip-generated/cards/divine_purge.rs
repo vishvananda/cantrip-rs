@@ -14,7 +14,8 @@ planned!("engine-no-perpetual-effects" => let objects_2: Vec<ObjectId> = { let q
 for &object in &objects_2 { let kind_2_0 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_3) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_2_0); let kind_2_1 = { let q: &dyn Query = g; cantrip_mechanics::perpetual::Perpetual::Rules(&PERPETUAL_4) }; cantrip_mechanics::perpetual::apply(g, asker.source, object, kind_2_1); });
 g.end_sentence();
 for bound_0 in { let q: &dyn Query = g; moved_0.clone() } {
-let cards_7_0 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<ObjectId>>() }; let players_7_0 = { let q: &dyn Query = g; Some(bound_0).map(|o: ObjectId| q.state().obj(o).owner).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_7_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_7_0 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::Never, ..PlayGrant::CAST }); } } } });
+cantrip_api::instruction(g, |g| { let cards_7_0 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<ObjectId>>() }; let players_7_0 = { let q: &dyn Query = g; Some(bound_0).map(|o: ObjectId| q.state().obj(o).owner).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_7_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_7_0 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::Never, ..PlayGrant::CAST }); } } } });
+ });
 g.end_sentence();
 }
 g.end_sentence();

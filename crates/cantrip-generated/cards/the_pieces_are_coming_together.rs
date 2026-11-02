@@ -6,12 +6,13 @@
 // When you set this scheme in motion, draw two cards. Artifact spells you cast this turn cost {2} less to cast.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { None }
-#[allow(unused_variables)] fn lasting_cost_2(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, player); let Costed::Spell(spell) = costed else { return CostDelta::NONE; }; if q.chars(spell).is(CardType::Artifact) { CostDelta::less((2i64) as u8) } else { CostDelta::NONE } }
+#[allow(unused_variables)] fn lasting_cost_2(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, player); let Costed::Spell(spell) = costed else { return CostDelta::NONE; }; if q.chars(spell).is(CardType::Artifact) { CostDelta::less((2i64).max(0) as u32) } else { CostDelta::NONE } }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let amount_0 = { let q: &dyn Query = g; (2i64).max(0) as u32 }; let players_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
 for player in players_0 { g.draw(player, amount_0); }
 g.end_sentence();
-let players_1_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_1_0 { g.add_player_effect(asker.controller, source, EffectKind::SpellCostChange { card: item.ability.card, index: 0, player }, Duration::EndOfTurn); } }
+cantrip_api::instruction(g, |g| { let players_1_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_1_0 { g.add_player_effect(asker.controller, source, EffectKind::SpellCostChange { card: item.ability.card, index: 0, player }, Duration::EndOfTurn); } }
+ });
 g.end_sentence();
  Ok(()) }
 planned_item!("trigger-event-player-sets-scheme-in-motion" => matcher: #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::SchemeSetInMotion { player, object, .. } = event { let id = *object; let subject = Target::Object(id); let data = [u32::from(player.0), 0]; if Some(asker.controller) == Some(*player) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }

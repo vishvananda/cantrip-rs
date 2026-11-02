@@ -14,7 +14,8 @@ let selected_2_player = { let q: &dyn Query = g; Some(asker.controller).expect("
 let objects_3 = { let q: &dyn Query = g; selected_2.clone() }; let moved_3 = g.exile_all(&objects_3);
 g.end_sentence();
 if { let q: &dyn Query = g; (((objects_3.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| (q.chars(id).is(CardType::Instant) || q.chars(id).is(CardType::Sorcery))).collect::<Vec<ObjectId>>()).len() as i64) > (0i64) } {
-let cards_4_0 = { let q: &dyn Query = g; (moved_3.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_4_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_4_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_4_0 { g.allow_play(card, player, PlayGrant { lands: false, expiry: Expiry::WhileControls(asker.source), any_type: true, ..PlayGrant::CAST }); } } } });
+cantrip_api::instruction(g, |g| { let cards_4_0 = { let q: &dyn Query = g; (moved_3.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_4_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_4_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_4_0 { g.allow_play(card, player, PlayGrant { lands: false, expiry: Expiry::WhileControls(asker.source), any_type: true, ..PlayGrant::CAST }); } } } });
+ });
 g.end_sentence();
 }
 g.end_sentence();

@@ -29,11 +29,11 @@ if { let q: &dyn Query = g; ((q.exiled_with(q.linked(item))).into_iter().map(|o:
 let caster_9 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let mut pool_9: Vec<ObjectId> = { let q: &dyn Query = g; (q.exiled_with(q.linked(item))).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let mut left_9: u32 = 4294967295; let mut played_9: Vec<ObjectId> = Vec::new();
 while left_9 > 0 {
 let mut open_9: Vec<ObjectId> = Vec::new(); for &c in &pool_9 { let ways = g.cast_ways_during_resolution_by(c, caster_9); if ways.iter().any(|w| true) { open_9.push(c); } }
-let picked_9 = if open_9.is_empty() { None } else if open_9.len() > 1 || (true && (!false || pool_9.len() > 1)) { cantrip_mechanics::choose::cards_from(g, caster_9, asker.source, Purpose::CastFree, pool_9.clone(), open_9.clone(), 1, true)?.first().copied() } else if !true || cantrip_mechanics::effects::ask_may(g, caster_9, open_9[0], Purpose::CastFree)? { Some(open_9[0]) } else { None };
+let picked_9 = if open_9.is_empty() { None } else if open_9.len() > 1 || (true && (!false || pool_9.len() > 1)) { cantrip_mechanics::choose::cards_from(g, caster_9, asker.source, Purpose::CastFree, pool_9.clone(), open_9.clone(), 1, true)?.first().copied() } else if cantrip_mechanics::effects::ask_may(g, caster_9, open_9[0], Purpose::CastFree)? { Some(open_9[0]) } else { None };
 let Some(card_9) = picked_9 else { break; };
 let ways_9: Vec<CastWay> = g.cast_ways_during_resolution_by(card_9, caster_9).into_iter().filter(|w| true).collect();
-let done_9 = if ways_9.is_empty() { g.play_land_during_resolution(card_9)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_9, card_9, ways_9)?.map(|w| w.way); g.cast_during_resolution_as(card_9, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(caster_9), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
-if done_9 { left_9 -= 1; played_9.push(g.state().obj(card_9).became.unwrap_or(card_9)); } else if false { break; } if done_9 || !(true && true) { pool_9.retain(|&c| c != card_9); }
+let done_9 = { let way = cantrip_mechanics::choose::cast_way(g, caster_9, card_9, ways_9)?.map(|w| w.way); g.cast_during_resolution_as(card_9, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(caster_9), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
+if done_9 { left_9 -= 1; played_9.push(g.state().obj(card_9).became.unwrap_or(card_9)); } if done_9 || !true { pool_9.retain(|&c| c != card_9); }
 }
 g.end_sentence();
 }

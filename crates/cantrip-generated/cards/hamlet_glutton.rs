@@ -5,7 +5,7 @@
 // Trample
 // When this creature enters, you gain 3 life.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_1_cost(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, player); if costed == Costed::Spell(source) && Some(asker.source).is_some_and(|candidate: ObjectId| q.state().obj(candidate).paid > 0) { CostDelta::less((2i64) as u8) } else { CostDelta::NONE } }
+#[allow(unused_variables)] fn ability_1_cost(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, player); if costed == Costed::Spell(source) && Some(asker.source).is_some_and(|candidate: ObjectId| q.state().obj(candidate).paid > 0) { CostDelta::less((2i64).max(0) as u32) } else { CostDelta::NONE } }
 #[allow(unused_variables)] fn ability_3_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, to, .. } = event { let id = *new; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if to.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

@@ -4,7 +4,7 @@
 // Enchantment spells you cast cost {1} less to cast.
 // Unlock costs you pay cost {1} less.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_0_rule(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, q.controller(source)); let Costed::Spell(spell) = costed else { return CostDelta::NONE; }; if player == asker.controller && q.chars(spell).is(CardType::Enchantment) { CostDelta::less((1i64) as u8) } else { CostDelta::NONE } }
+#[allow(unused_variables)] fn ability_0_0_rule(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, q.controller(source)); let Costed::Spell(spell) = costed else { return CostDelta::NONE; }; if player == asker.controller && q.chars(spell).is(CardType::Enchantment) { CostDelta::less((1i64).max(0) as u32) } else { CostDelta::NONE } }
 planned_item!("a-keyword-s-cost-changed" => #[allow(unused_variables)] fn ability_1_0_keyword_cards_0(q: &dyn Query, asker: &Asker, player: PlayerId, card: ObjectId) -> bool { player == asker.controller && true });
 planned_item!("a-keyword-s-cost-changed" => #[allow(unused_variables)] fn ability_1_0_keyword_per_0(q: &dyn Query, asker: &Asker) -> i64 { 1 });
 planned_item!("a-keyword-s-cost-changed" => keyword_costs: KeywordCostRule { keyword: CostedKeyword::Unlock, applies: ability_1_0_keyword_cards_0, change: KeywordCostChange::Reduce(Cost::generic(1)), per: ability_1_0_keyword_per_0, first_each_turn: false });

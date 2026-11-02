@@ -12,9 +12,10 @@
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut done_1: i64 = 0; let mut dealt_1: Vec<ObjectId> = Vec::new(); let mut hurt_1: Vec<PlayerId> = Vec::new(); let before_1 = g.history().head() as usize; let source_1 = { let q: &dyn Query = g; Some(asker.source) }; let amount_1 = { let q: &dyn Query = g; (((planned_value!("engine: no record of what paid a cost", Vec::<ObjectId>::new() => q.paid_objects(item, [0]).to_vec())).into_iter().filter_map(|o: ObjectId| q.state().obj(o).became).collect::<Vec<ObjectId>>()).get(0).copied().map_or(0i64, |o: ObjectId| i64::from(q.mana_value(o)))).min(u16::MAX.into()) as u16 }; let recipients_1 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied().filter(|&id| (!(q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Dragon))) && q.chars(id).is(CardType::Creature))).collect::<Vec<ObjectId>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() }; if let Some(source) = source_1 { let batch: Vec<(ObjectId, Target, u16)> = recipients_1.iter().map(|t| (source, *t, amount_1)).collect(); done_1 += g.damage_together(&batch).iter().map(|&n| i64::from(n)).sum::<i64>(); dealt_1.extend(cantrip_mechanics::history::permanents_dealt_damage_by(g.history(), source, before_1)); for r in &g.history().all()[before_1..] { if let Event::Damage { source: s, target: Target::Player(p), amount, .. } = r.event { if s == source && amount > 0 && !hurt_1.contains(&p) { hurt_1.push(p); } } } }
 g.end_sentence();
-for bound_1003 in dealt_1.clone() {
+cantrip_api::instruction(g, |g| { for bound_1003 in dealt_1.clone() {
 {  let to = Some(Target::None); let about = { let q: &dyn Query = g; Some(bound_1003) }; if let (Some(to), Some(about)) = (to, about) { let _ = to; g.add_effect(item.object, about, EffectKind::Replacement { card: item.ability.card, index: 0 }, Duration::EndOfTurn); } }
 }
+ });
 g.end_sentence();
 let objects_5 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let moved_5 = g.exile_all(&objects_5);
 g.end_sentence();

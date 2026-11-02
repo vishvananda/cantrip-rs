@@ -4,7 +4,7 @@
 // Haste
 // {1}, {T}: Copy target activated or triggered ability you control from another legendary source that's not a commander. You may choose new targets for the copy. (Mana abilities can't be targeted.)
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { q.state().stack.iter().any(|e| (match t { Target::Object(id) => e.kind == StackKind::Spell && e.object == id, Target::Ability(serial) => e.kind != StackKind::Spell && e.serial == serial, _ => false }) && (((e.kind == StackKind::Activated || e.kind == StackKind::Triggered) && Some(asker.controller) == Some(e.controller) && (e.kind != StackKind::Spell && (q.chars(e.object).supertypes.legendary && !(planned_value!("engine: no commander", false => q.is_commander(e.object)))))))) }
+#[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { q.state().stack.iter().any(|e| matches!(t, Target::Ability(serial) if e.kind != StackKind::Spell && e.serial == serial) && (((e.kind == StackKind::Activated || e.kind == StackKind::Triggered) && Some(asker.controller) == Some(e.controller) && (e.kind != StackKind::Spell && (q.chars(e.object).supertypes.legendary && !(planned_value!("engine: no commander", false => q.is_commander(e.object)))))))) }
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);

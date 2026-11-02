@@ -23,11 +23,11 @@ g.end_sentence();
 let caster_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let mut pool_3: Vec<ObjectId> = { let q: &dyn Query = g; (copies_2.clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let mut left_3: u32 = 1; let mut played_3: Vec<ObjectId> = Vec::new();
 while left_3 > 0 {
 let mut open_3: Vec<ObjectId> = Vec::new(); for &c in &pool_3 { let ways = g.cast_ways_during_resolution_by(c, caster_3); if ways.iter().any(|w| true) { open_3.push(c); } }
-let picked_3 = if open_3.is_empty() { None } else if open_3.len() > 1 || (true && (!true || pool_3.len() > 1)) { cantrip_mechanics::choose::cards_from(g, caster_3, asker.source, Purpose::Optional, pool_3.clone(), open_3.clone(), 1, true)?.first().copied() } else if !true || cantrip_mechanics::effects::ask_may(g, caster_3, open_3[0], Purpose::Optional)? { Some(open_3[0]) } else { None };
+let picked_3 = if open_3.is_empty() { None } else if open_3.len() > 1 || (true && (!true || pool_3.len() > 1)) { cantrip_mechanics::choose::cards_from(g, caster_3, asker.source, Purpose::Optional, pool_3.clone(), open_3.clone(), 1, true)?.first().copied() } else if cantrip_mechanics::effects::ask_may(g, caster_3, open_3[0], Purpose::Optional)? { Some(open_3[0]) } else { None };
 let Some(card_3) = picked_3 else { break; };
 let ways_3: Vec<CastWay> = g.cast_ways_during_resolution_by(card_3, caster_3).into_iter().filter(|w| true).collect();
-let done_3 = if ways_3.is_empty() { g.play_land_during_resolution(card_3)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_3, card_3, ways_3)?.map(|w| w.way); g.cast_during_resolution_as(card_3, CastTerms { instead: None, way, caster: Some(caster_3), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
-if done_3 { left_3 -= 1; played_3.push(g.state().obj(card_3).became.unwrap_or(card_3)); } else if true { break; } if done_3 || !(true && true) { pool_3.retain(|&c| c != card_3); }
+let done_3 = { let way = cantrip_mechanics::choose::cast_way(g, caster_3, card_3, ways_3)?.map(|w| w.way); g.cast_during_resolution_as(card_3, CastTerms { instead: None, way, caster: Some(caster_3), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
+if done_3 { left_3 -= 1; played_3.push(g.state().obj(card_3).became.unwrap_or(card_3)); } else { break; } if done_3 || !true { pool_3.retain(|&c| c != card_3); }
 }
 g.end_sentence();
 hoisted_4.extend(copies_2.clone());
@@ -48,11 +48,11 @@ g.end_sentence();
 let caster_10 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let mut pool_10: Vec<ObjectId> = { let q: &dyn Query = g; (copies_9.clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let mut left_10: u32 = 4294967295; let mut played_10: Vec<ObjectId> = Vec::new();
 while left_10 > 0 {
 let mut open_10: Vec<ObjectId> = Vec::new(); for &c in &pool_10 { let ways = g.cast_ways_during_resolution_by(c, caster_10); if ways.iter().any(|w| true) { open_10.push(c); } }
-let picked_10 = if open_10.is_empty() { None } else if open_10.len() > 1 || (true && (!true || pool_10.len() > 1)) { cantrip_mechanics::choose::cards_from(g, caster_10, asker.source, Purpose::CastFree, pool_10.clone(), open_10.clone(), 1, true)?.first().copied() } else if !true || cantrip_mechanics::effects::ask_may(g, caster_10, open_10[0], Purpose::CastFree)? { Some(open_10[0]) } else { None };
+let picked_10 = if open_10.is_empty() { None } else if open_10.len() > 1 || (true && (!true || pool_10.len() > 1)) { cantrip_mechanics::choose::cards_from(g, caster_10, asker.source, Purpose::CastFree, pool_10.clone(), open_10.clone(), 1, true)?.first().copied() } else if cantrip_mechanics::effects::ask_may(g, caster_10, open_10[0], Purpose::CastFree)? { Some(open_10[0]) } else { None };
 let Some(card_10) = picked_10 else { break; };
 let ways_10: Vec<CastWay> = g.cast_ways_during_resolution_by(card_10, caster_10).into_iter().filter(|w| true).collect();
-let done_10 = if ways_10.is_empty() { g.play_land_during_resolution(card_10)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_10, card_10, ways_10)?.map(|w| w.way); g.cast_during_resolution_as(card_10, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(caster_10), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
-if done_10 { left_10 -= 1; played_10.push(g.state().obj(card_10).became.unwrap_or(card_10)); } else if false { break; } if done_10 || !(true && true) { pool_10.retain(|&c| c != card_10); }
+let done_10 = { let way = cantrip_mechanics::choose::cast_way(g, caster_10, card_10, ways_10)?.map(|w| w.way); g.cast_during_resolution_as(card_10, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(caster_10), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
+if done_10 { left_10 -= 1; played_10.push(g.state().obj(card_10).became.unwrap_or(card_10)); } if done_10 || !true { pool_10.retain(|&c| c != card_10); }
 }
 g.end_sentence();
 hoisted_11.extend(copies_9.clone());

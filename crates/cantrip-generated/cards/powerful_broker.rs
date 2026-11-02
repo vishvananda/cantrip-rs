@@ -19,7 +19,6 @@ g.end_sentence();
  Ok(()) }
 fn ability_0_implied(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller); let chosen = (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == 0).map(|i| g.state().target(item, i)).next().unwrap_or(Target::None);
 if ability_0_mode_0_target_0(g, asker, chosen) { return ability_0_mode_0(g, item); }
-if ability_0_mode_1_target_0(g, asker, chosen) { return ability_0_mode_1(g, item); }
 ability_0_mode_1(g, item) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
 

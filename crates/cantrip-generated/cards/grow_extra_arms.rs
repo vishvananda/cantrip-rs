@@ -3,7 +3,7 @@
 // This spell costs {1} less to cast if it targets a Spider.
 // Target creature gets +4/+4 until end of turn.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_cost(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, player); if costed == Costed::Spell(source) && targets.iter().filter_map(|t| t.object()).any(|id| q.state().obj(id).zone.is(ZoneKind::Battlefield) && q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Spider))) { CostDelta::less((1i64) as u8) } else { CostDelta::NONE } }
+#[allow(unused_variables)] fn ability_0_cost(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, player); if costed == Costed::Spell(source) && targets.iter().filter_map(|t| t.object()).any(|id| q.state().obj(id).zone.is(ZoneKind::Battlefield) && q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Spider))) { CostDelta::less((1i64).max(0) as u32) } else { CostDelta::NONE } }
 #[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

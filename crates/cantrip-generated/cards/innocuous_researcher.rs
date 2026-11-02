@@ -22,7 +22,8 @@ let objects_4 = { let q: &dyn Query = g; (q.state().battlefield().iter().copied(
 paid_3 = !turned_4.clone().is_empty(); }
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_3 as i64) != 0) } {
-let players_5_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_5_0 { g.add_player_effect(asker.controller, source, EffectKind::CantCastSpellsFrom(player, ZoneKinds::ALL), Duration::UntilNextTurnOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })); } }
+cantrip_api::instruction(g, |g| { let players_5_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_5_0 { g.add_player_effect(asker.controller, source, EffectKind::CantCastSpellsFrom(player, ZoneKinds::ALL), Duration::UntilNextTurnOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })); } }
+ });
 g.end_sentence();
 }
 g.end_sentence();

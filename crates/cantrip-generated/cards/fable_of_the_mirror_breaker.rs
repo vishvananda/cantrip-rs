@@ -46,28 +46,30 @@ tokens_0.extend(std::iter::repeat((def_0_0,player)).take(count_0_0 as usize));
 let created_0 = g.create_tokens_worded(&tokens_0, false, None, words_0)?;
 g.end_sentence();
  Ok(()) }
-fn ability_0_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_7: Vec<ObjectId> = Vec::new();
-let mut hoisted_6: Vec<ObjectId> = Vec::new();
+fn ability_0_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_6: Vec<ObjectId> = Vec::new();
 let mut hoisted_5: Vec<ObjectId> = Vec::new();
+let mut hoisted_4: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-let decider_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; if cantrip_mechanics::effects::ask_may(g, decider_2, asker.source, Purpose::Optional)? {
-let selected_3_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_3_candidates = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>() }; let selected_3_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::UpTo((2i64).max(0) as u32) }; let selected_3 = { cantrip_mechanics::choose::select(g, selected_3_player, asker.source, Purpose::Discard, selected_3_candidates, cantrip_mechanics::select::Selection::of(selected_3_count, &[]))? };
-let cards_4 = { let q: &dyn Query = g; selected_3.clone() }; let discarded_4 = g.discard_together(&cards_4);
+{
+let selected_2_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_2_candidates = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>() }; let selected_2_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::UpTo((2i64).max(0) as u32) }; let selected_2 = { cantrip_mechanics::choose::select(g, selected_2_player, asker.source, Purpose::Discard, selected_2_candidates, cantrip_mechanics::select::Selection::of(selected_2_count, &[]))? };
+if !selected_2.is_empty() { 
+let cards_3 = { let q: &dyn Query = g; selected_2.clone() }; let discarded_3 = g.discard_together(&cards_3);
 g.end_sentence();
-hoisted_5.extend(discarded_4.clone());
-hoisted_6.extend(selected_3.clone());
-hoisted_7.extend({ let q: &dyn Query = g; discarded_4.clone() });
+hoisted_4.extend(discarded_3.clone());
+hoisted_5.extend(selected_2.clone());
+hoisted_6.extend({ let q: &dyn Query = g; discarded_3.clone() });
+}
 }
 g.end_sentence();
-let amount_8 = { let q: &dyn Query = g; ((hoisted_7.clone()).len() as i64) as u32 }; let players_8 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
-for player in players_8 { g.draw(player, amount_8); }
+let amount_7 = { let q: &dyn Query = g; ((hoisted_6.clone()).len() as i64) as u32 }; let players_7 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() };
+for player in players_7 { g.draw(player, amount_7); }
 g.end_sentence();
  Ok(()) }
 fn ability_0_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let objects_9 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let moved_9 = g.exile_all(&objects_9);
+let objects_8 = { let q: &dyn Query = g; Some(asker.source).into_iter().collect::<Vec<ObjectId>>() }; let moved_8 = g.exile_all(&objects_8);
 g.end_sentence();
-let player_10 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
-let objects_10 = ({ let q: &dyn Query = g; ((moved_9.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Exile).collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_10 = { let mut moved: Vec<ObjectId> = Vec::new(); for &o in &objects_10 { let controller = player_10; let entered = g.put_onto_battlefield_transformed(o, controller, false)?; if g.is_on_battlefield(entered) { moved.push(entered); } } moved };
+let player_9 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
+let objects_9 = ({ let q: &dyn Query = g; ((moved_8.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Exile).collect::<Vec<ObjectId>>() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_9 = { let mut moved: Vec<ObjectId> = Vec::new(); for &o in &objects_9 { let controller = player_9; let entered = g.put_onto_battlefield_transformed(o, controller, false)?; if g.is_on_battlefield(entered) { moved.push(entered); } } moved };
 g.end_sentence();
  Ok(()) }
 

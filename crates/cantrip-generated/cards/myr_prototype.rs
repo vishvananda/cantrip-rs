@@ -12,7 +12,7 @@ let amount = { let q: &dyn Query = g; (1i64).max(0) as i16 }; for t in { let q: 
 let had_0: Vec<_> = counters_0.iter().map(|c| g.state().obj(c.0).counters(c.1)).collect(); g.add_counters_together(&counters_0); let applied_0: Vec<ObjectId> = counters_0.iter().zip(had_0).filter(|(c, had)| g.state().obj(c.0).counters(c.1) > *had).map(|(c, _)| c.0).collect();
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn ability_1_0_rule(q: &dyn Query, asker: &Asker, attacker: ObjectId, defender: Target) -> Option<ManaCost> { (attacker == asker.source && true).then(|| ManaCost { generic: u8::try_from(((Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.state().obj(o).counters(CounterKind::PlusOne))).sum::<i64>()) as i64 * 1).unwrap_or(u8::MAX), ..ManaCost::ZERO }) }
+#[allow(unused_variables)] fn ability_1_0_rule(q: &dyn Query, asker: &Asker, attacker: ObjectId, defender: Target) -> Option<ManaCost> { (attacker == asker.source && true).then(|| ManaCost { generic: u32::try_from(((Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().map(|o: ObjectId| i64::from(q.state().obj(o).counters(CounterKind::PlusOne))).sum::<i64>()) as i64 * 1).unwrap_or(u32::MAX), ..ManaCost::ZERO }) }
 #[allow(unused_variables)] fn ability_1_1_rule(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { id == asker.source }
 planned_item!("static-rule-combat-cost-block" => block_costs: ability_1_1_rule);
 

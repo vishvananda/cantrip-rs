@@ -11,11 +11,13 @@ let kind_0_0_0 = { let q: &dyn Query = g; EffectKind::AddKeywords(Keywords::of(&
 let kind_0_1_0 = { let q: &dyn Query = g; EffectKind::AddKeywords(Keywords::of(&[Keyword::Indestructible])) };
 if let Some(source) = source_0 { cantrip_api::instruction(g, |g| { for &object in &objects_0 { g.add_effect(source, object, kind_0_0_0, duration_0); g.add_effect(source, object, kind_0_1_0, duration_0);  } }); }
 g.end_sentence();
-let players_1_0 = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_1_0 { g.add_player_effect(player, source, EffectKind::PlayerHexproof, Duration::EndOfTurn); } }
+cantrip_api::instruction(g, |g| { let players_1_0 = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_1_0 { g.add_player_effect(player, source, EffectKind::PlayerHexproof, Duration::EndOfTurn); } }
+ });
 g.end_sentence();
-planned!("player-rule-for-a-while-can-t-lose-life" => let players_2_0 = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_2_0 { g.add_player_effect(asker.controller, source, EffectKind::CantLoseLife(player), Duration::EndOfTurn); } });
+cantrip_api::instruction(g, |g| { planned!("player-rule-for-a-while-can-t-lose-life" => let players_2_0 = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_2_0 { g.add_player_effect(asker.controller, source, EffectKind::CantLoseLife(player), Duration::EndOfTurn); } });
 planned!("player-rule-for-a-while-can-t-lose-the-game" => let players_2_1 = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_2_1 { g.add_player_effect(asker.controller, source, EffectKind::CantLoseGame(player), Duration::EndOfTurn); } });
 planned!("player-rule-for-a-while-can-t-win-the-game" => let players_2_2 = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_2_2 { g.add_player_effect(asker.controller, source, EffectKind::CantWinGame(player), Duration::EndOfTurn); } });
+ });
 g.end_sentence();
  Ok(()) }
 

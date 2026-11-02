@@ -35,7 +35,8 @@ g.end_sentence();
 hoisted_3.extend(created_1.clone());
 }
 g.end_sentence();
-planned!("play-permission-for-a-number-of-cards" => let cards = { let q: &dyn Query = g; (milled_0.clone()).into_iter().filter(|&id| true).collect::<Vec<ObjectId>>() }; let players = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &player in &players { g.allow_play_some(&cards, player, PlayGrant { lands: false, expiry: Expiry::EndOfTurn, ..PlayGrant::CAST }, 1); });
+cantrip_api::instruction(g, |g| { planned!("play-permission-for-a-number-of-cards" => let cards = { let q: &dyn Query = g; (milled_0.clone()).into_iter().filter(|&id| true).collect::<Vec<ObjectId>>() }; let players = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &player in &players { g.allow_play_some(&cards, player, PlayGrant { lands: false, expiry: Expiry::EndOfTurn, ..PlayGrant::CAST }, 1); });
+ });
 g.end_sentence();
  Ok(()) }
 

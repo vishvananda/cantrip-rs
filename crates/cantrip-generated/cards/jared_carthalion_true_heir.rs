@@ -13,7 +13,8 @@ fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 if let Some(player) = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()) } { g.become_monarch(player); }
 g.end_sentence();
-planned!("player-rule-for-a-while-can-t-become-the-monarch" => let players_1_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_1_0 { g.add_player_effect(asker.controller, source, EffectKind::CantBecomeMonarch(player), Duration::EndOfTurn); } });
+cantrip_api::instruction(g, |g| { planned!("player-rule-for-a-while-can-t-become-the-monarch" => let players_1_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_1_0 { g.add_player_effect(asker.controller, source, EffectKind::CantBecomeMonarch(player), Duration::EndOfTurn); } });
+ });
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables, unused_mut)] fn ability_1_0_then_steps(g: &mut dyn Game, asker: &Asker, subject: Target, data: [u32; 2], done_prevented: u16) -> Result<(), Suspend> { let mut counters_2: Vec<(ObjectId, CounterKind, i16)> = Vec::new();

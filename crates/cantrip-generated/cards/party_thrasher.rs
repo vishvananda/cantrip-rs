@@ -20,7 +20,8 @@ let objects_3 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().c
 g.end_sentence();
 let selected_4_player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let selected_4_candidates = { let q: &dyn Query = g; moved_3.clone() }; let selected_4_count = { let q: &dyn Query = g; cantrip_mechanics::select::Count::AsManyAsCan((1i64).max(0) as u32) }; let selected_4 = { cantrip_mechanics::choose::select(g, selected_4_player, asker.source, Purpose::ChooseAsEnters, selected_4_candidates, cantrip_mechanics::select::Selection::of(selected_4_count, &[]))? };
 g.end_sentence();
-let cards_5_0 = { let q: &dyn Query = g; (selected_4.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_5_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_5_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_5_0 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::EndOfTurn, ..PlayGrant::CAST }); } } } });
+cantrip_api::instruction(g, |g| { let cards_5_0 = { let q: &dyn Query = g; (selected_4.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_5_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_5_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_5_0 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::EndOfTurn, ..PlayGrant::CAST }); } } } });
+ });
 g.end_sentence();
 hoisted_6.extend(moved_3.clone());
 hoisted_7.extend(selected_4.clone());

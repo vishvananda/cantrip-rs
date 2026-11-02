@@ -3,7 +3,7 @@
 // During your turn, this spell costs {2}{U}{U} less to cast.
 // End the turn. (Exile all spells and abilities from the stack, including this card. The player whose turn it is discards down to their maximum hand size. Damage wears off, and "this turn" and "until end of turn" effects end.)
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_cost(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, player); if costed == Costed::Spell(source) && Some(asker.controller) == Some(q.state().turn.active) { { let mut less = ManaCost::ZERO; less.generic += (2i64) as u8; less.symbols[1] += (1i64) as u8; less.symbols[1] += (1i64) as u8; CostDelta::less_mana(less) } } else { CostDelta::NONE } }
+#[allow(unused_variables)] fn ability_0_cost(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, player); if costed == Costed::Spell(source) && Some(asker.controller) == Some(q.state().turn.active) { { let mut less = ManaCost::ZERO; less.generic += (2i64).max(0) as u32; less.symbols[1] += (1i64).max(0) as u32; less.symbols[1] += (1i64).max(0) as u32; CostDelta::less_mana(less) } } else { CostDelta::NONE } }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 g.end_the_turn()?;
 g.end_sentence();

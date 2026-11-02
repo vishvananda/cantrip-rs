@@ -45,7 +45,8 @@ g.end_sentence();
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
-let cards_1_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; let players_1_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_1_0 { if g.obj(card).zone.is(ZoneKind::Graveyard) { for &player in &players_1_0 { g.allow_play(card, player, PlayGrant { lands: false, expiry: Expiry::EndOfTurn, exile_instead: ExileInstead::Spell, ..PlayGrant::CAST }); } } } });
+cantrip_api::instruction(g, |g| { let cards_1_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() }; let players_1_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_1_0 { if g.obj(card).zone.is(ZoneKind::Graveyard) { for &player in &players_1_0 { g.allow_play(card, player, PlayGrant { lands: false, expiry: Expiry::EndOfTurn, exile_instead: ExileInstead::Spell, ..PlayGrant::CAST }); } } } });
+ });
 g.end_sentence();
  Ok(()) }
 pub mod emblem_2 {

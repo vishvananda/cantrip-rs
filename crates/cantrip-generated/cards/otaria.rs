@@ -7,7 +7,7 @@
 // Instant and sorcery cards in graveyards have flashback. The flashback cost is equal to the card's mana cost. (Its owner may cast the card from their graveyard for its mana cost. Then they exile it.)
 // Whenever chaos ensues, take an extra turn after this one.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_cost(q: &dyn Query, asker: &Asker, card: ObjectId, player: PlayerId) -> Option<Cost> { (player == asker.controller && (q.chars(card).is(CardType::Instant) || q.chars(card).is(CardType::Sorcery)) && q.card(q.chars(card).card).has_cost).then(|| Cost::mana(q.card(q.chars(card).card).cost)) }
+#[allow(unused_variables)] fn ability_0_cost(q: &dyn Query, asker: &Asker, card: ObjectId, player: PlayerId) -> Option<Cost> { (player == asker.controller && (q.card(q.obj(card).card).is(CardType::Instant) || q.card(q.obj(card).card).is(CardType::Sorcery)) && q.card(q.chars(card).card).has_cost).then(|| Cost::mana(q.card(q.chars(card).card).cost)) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 { let player = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let times = 1u32; g.add_extra_turns(player, times); }

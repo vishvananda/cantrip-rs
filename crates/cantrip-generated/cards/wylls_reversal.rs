@@ -5,7 +5,7 @@
 // 1—14 | You may choose new targets for that spell or ability.
 // 15+ | You may choose new targets for that spell or ability. Then copy it. You may choose new targets for the copy.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { q.state().stack.iter().any(|e| (match t { Target::Object(id) => e.kind == StackKind::Spell && e.object == id, Target::Ability(serial) => e.kind != StackKind::Spell && e.serial == serial, _ => false }) && ((e.kind == StackKind::Spell && (q.state().stack.iter().find(|i| i.kind == StackKind::Spell && i.object == e.object).map_or(0i64, |i| q.state().targets(i).len() as i64)) >= (1i64)))) }
+#[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { q.state().stack.iter().any(|e| matches!(t, Target::Object(id) if e.kind == StackKind::Spell && e.object == id) && ((e.kind == StackKind::Spell && (q.state().stack.iter().find(|i| i.kind == StackKind::Spell && i.object == e.object).map_or(0i64, |i| q.state().targets(i).len() as i64)) >= (1i64)))) }
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0)];
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);

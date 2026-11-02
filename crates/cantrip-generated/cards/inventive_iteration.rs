@@ -44,7 +44,8 @@ pub mod back {
  None }
 planned_item!("player-rule-for-a-while-can-t-cast-some-spells" => #[allow(unused_variables)] fn lasting_spell_rule_0(q: &dyn Query, asker: &Asker, about: Target, player: PlayerId, spell: ObjectId) -> bool { let source = asker.source; about.object().is_some_and(|o: ObjectId| q.mana_value(spell) == q.mana_value(o)) });
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("player-rule-for-a-while-can-t-cast-some-spells" => let players_0_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_0_0 { g.add_player_effect(asker.controller, source, EffectKind::CantCast { player, card: item.ability.card, index: 0, about: item.subject }, Duration::UntilNextTurnOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })); } });
+cantrip_api::instruction(g, |g| { planned!("player-rule-for-a-while-can-t-cast-some-spells" => let players_0_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_0_0 { g.add_player_effect(asker.controller, source, EffectKind::CantCast { player, card: item.ability.card, index: 0, about: item.subject }, Duration::UntilNextTurnOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })); } });
+ });
 g.end_sentence();
  Ok(()) }
 planned_item!("player-rule-for-a-while-can-t-cast-some-spells" => lasting_spell_rules: lasting_spell_rule_0);

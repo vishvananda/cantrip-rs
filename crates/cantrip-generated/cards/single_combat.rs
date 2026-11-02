@@ -15,7 +15,8 @@ let objects_3 = { let q: &dyn Query = g; { let chosen: Vec<ObjectId> = all_2.clo
 for &object in &objects_3 { let controller = g.controller(object); if players_3.contains(&controller) && g.can_sacrifice(controller, object) { picks_3.push((controller, object)); } }
 let sacrificed_3 = g.sacrifice_each(&picks_3);
 g.end_sentence();
-planned!("player-rule-for-a-while-can-t-cast-some-spells" => let players_4_0 = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_4_0 { g.add_player_effect(asker.controller, source, EffectKind::CantCast { player, card: item.ability.card, index: 0, about: Target::None }, Duration::EndOfNextTurnOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })); } });
+cantrip_api::instruction(g, |g| { planned!("player-rule-for-a-while-can-t-cast-some-spells" => let players_4_0 = { let q: &dyn Query = g; q.state().apnap().collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_4_0 { g.add_player_effect(asker.controller, source, EffectKind::CantCast { player, card: item.ability.card, index: 0, about: Target::None }, Duration::EndOfNextTurnOf({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") })); } });
+ });
 g.end_sentence();
  Ok(()) }
 planned_item!("player-rule-for-a-while-can-t-cast-some-spells" => lasting_spell_rules: lasting_spell_rule_0);

@@ -17,7 +17,7 @@ g.end_sentence();
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let mut hoisted_5: Vec<ObjectId> = Vec::new();
 let mut hoisted_4: Vec<ObjectId> = Vec::new();
 let asker = &Asker::new(item.object, item.controller);
-let payer_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let owed_2: u8 = { let q: &dyn Query = g; (Some(asker.source).map_or(0i64, |o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0)))).clamp(0, 255) as u8 }; let base_2 = ManaCost { generic: 0, x: 1, symbols: [0, 0, 0, 1, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }; let price_2 = ManaCost { generic: base_2.generic.saturating_add(owed_2.saturating_mul(base_2.x)), x: 0, ..base_2 }; let paid_2 = g.may_pay(payer_2, asker.source, asker.source, Cost::mana(price_2), &PAY_QUESTION)?;
+let payer_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let owed_2: u32 = { let q: &dyn Query = g; (Some(asker.source).map_or(0i64, |o: ObjectId| i64::from(q.chars(o).power.unwrap_or(0)))).max(0) as u32 }; let base_2 = ManaCost { generic: 0, x: 1, symbols: [0, 0, 0, 1, 0, 0], hybrid: [None,None,None,None,None,None], twobrid: [0, 0, 0, 0, 0], phyrexian: [0, 0, 0, 0, 0] }; let price_2 = ManaCost { generic: base_2.generic.saturating_add(owed_2.saturating_mul(u32::from(base_2.x))), x: 0, ..base_2 }; let paid_2 = g.may_pay(payer_2, asker.source, asker.source, Cost::mana(price_2), &PAY_QUESTION)?;
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_2 as i64) != 0) } {
 let player_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };

@@ -8,7 +8,8 @@ planned_item!("player-rule-for-a-while-can-t-cast-some-spells" => #[allow(unused
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() };
 { let order: Vec<PlayerId> = g.state().apnap().collect(); players_0.sort_by_key(|p| order.iter().position(|o| o == p)); }
-g.one_instruction(&mut |g| { for (index_0, bound_0) in players_0.iter().copied().enumerate() { planned!("player-rule-for-a-while-can-t-cast-some-spells" => let players_1_0 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_1_0 { g.add_player_effect(asker.controller, source, EffectKind::CantCast { player, card: item.ability.card, index: 0, about: Target::None }, planned_value!("duration DuringNextTurn", Duration::Indefinite => Duration::DuringNextTurn({ let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }))); } });
+g.one_instruction(&mut |g| { for (index_0, bound_0) in players_0.iter().copied().enumerate() { cantrip_api::instruction(g, |g| { planned!("player-rule-for-a-while-can-t-cast-some-spells" => let players_1_0 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_1_0 { g.add_player_effect(asker.controller, source, EffectKind::CantCast { player, card: item.ability.card, index: 0, about: Target::None }, planned_value!("duration DuringNextTurn", Duration::Indefinite => Duration::DuringNextTurn({ let q: &dyn Query = g; Some(bound_0).expect("a reference that always names a player") }))); } });
+ });
     } Ok(()) })?;
 g.end_sentence();
  Ok(()) }

@@ -44,7 +44,8 @@ let searcher_6 = { let q: &dyn Query = g; Some(asker.controller).expect("a refer
 let objects_7 = { let q: &dyn Query = g; found_6.clone() }; let moved_7 = g.exile_all(&objects_7);
 for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.shuffle(player); }
 g.end_sentence();
-let cards_9_0 = { let q: &dyn Query = g; moved_7.clone() }; let players_9_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_9_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_9_0 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::EndOfTurn, instead: Some(ManaCost::ZERO), ..PlayGrant::CAST }); } } } });
+cantrip_api::instruction(g, |g| { let cards_9_0 = { let q: &dyn Query = g; moved_7.clone() }; let players_9_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_9_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_9_0 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::EndOfTurn, instead: Some(ManaCost::ZERO), ..PlayGrant::CAST }); } } } });
+ });
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

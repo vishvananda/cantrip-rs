@@ -20,7 +20,8 @@ g.end_sentence();
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Attacks { attacker, defending, .. } = event { let id = *attacker; let subject = Target::Object(id); let data = [u32::from(defending.0), u32::MAX]; if Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let players_4_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let linked_4_0 = g.linked(item); cantrip_api::instruction(g, |g| { for &player in &players_4_0 { g.allow_play_exiled_with(linked_4_0, player, PlayGrant { lands: true, expiry: Expiry::EndOfTurn, ..PlayGrant::CAST }, true); } });
+cantrip_api::instruction(g, |g| { let players_4_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let linked_4_0 = g.linked(item); cantrip_api::instruction(g, |g| { for &player in &players_4_0 { g.allow_play_exiled_with(linked_4_0, player, PlayGrant { lands: true, expiry: Expiry::EndOfTurn, ..PlayGrant::CAST }, true); } });
+ });
 g.end_sentence();
  Ok(()) }
 

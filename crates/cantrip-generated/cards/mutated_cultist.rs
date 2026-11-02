@@ -19,7 +19,7 @@ let mut removed_0: i64 = 0;
 let objects_0_0 = { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>() };
 cantrip_api::instruction(g, |g| { for object in objects_0_0 { removed_0 += CounterKind::ALL.iter().map(|k| i64::from(g.state().obj(object).counters(*k))).sum::<i64>(); cantrip_mechanics::effects::remove_all_counters(g, object); } });
 g.end_sentence();
-planned!("operation-change-spell" => { let changes = { let q: &dyn Query = g; [SpellChange::Cost(CostDelta::less(((removed_0 as i64)).clamp(0, 255) as u8))] }; cantrip_mechanics::spell_changes::next_spell(g, asker, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, |q: &dyn Query, asker: &Asker, id: ObjectId| true, NextSpell { this_turn: true, from_hand: false }, &changes); });
+planned!("operation-change-spell" => { let changes = { let q: &dyn Query = g; [SpellChange::Cost(CostDelta::less(((removed_0 as i64)) as u32))] }; cantrip_mechanics::spell_changes::next_spell(g, asker, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, |q: &dyn Query, asker: &Asker, id: ObjectId| true, NextSpell { this_turn: true, from_hand: false }, &changes); });
 g.end_sentence();
  Ok(()) }
 fn ability_1_mode_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
@@ -27,12 +27,11 @@ let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true
 let mut removed_2: i64 = 0;
 for player in { let q: &dyn Query = g; t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.player()).into_iter().collect::<Vec<PlayerId>>() } { removed_2 += planned_value!("counters removed from a player", 0i64 => i64::from(g.remove_player_counters(player, None, i16::MAX))); }
 g.end_sentence();
-planned!("operation-change-spell" => { let changes = { let q: &dyn Query = g; [SpellChange::Cost(CostDelta::less(((removed_2 as i64)).clamp(0, 255) as u8))] }; cantrip_mechanics::spell_changes::next_spell(g, asker, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, |q: &dyn Query, asker: &Asker, id: ObjectId| true, NextSpell { this_turn: true, from_hand: false }, &changes); });
+planned!("operation-change-spell" => { let changes = { let q: &dyn Query = g; [SpellChange::Cost(CostDelta::less(((removed_2 as i64)) as u32))] }; cantrip_mechanics::spell_changes::next_spell(g, asker, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, |q: &dyn Query, asker: &Asker, id: ObjectId| true, NextSpell { this_turn: true, from_hand: false }, &changes); });
 g.end_sentence();
  Ok(()) }
 fn ability_1_implied(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller); let chosen = (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == 0).map(|i| g.state().target(item, i)).next().unwrap_or(Target::None);
 if ability_1_mode_0_target_0(g, asker, chosen) { return ability_1_mode_0(g, item); }
-if ability_1_mode_1_target_0(g, asker, chosen) { return ability_1_mode_1(g, item); }
 ability_1_mode_1(g, item) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }
 

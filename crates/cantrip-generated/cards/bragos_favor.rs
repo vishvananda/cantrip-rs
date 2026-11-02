@@ -7,7 +7,7 @@
 // Hidden agenda (Start the game with this conspiracy face down in the command zone and secretly choose a card name. You may turn this conspiracy face up any time and reveal that name.)
 // Spells with the chosen name you cast cost {1} less to cast.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_1_0_rule(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, q.controller(source)); let Costed::Spell(spell) = costed else { return CostDelta::NONE; }; if player == asker.controller && (planned_value!("a choice of CardName outside its body", None::<CardId> => q.state().chosen_card(q.linked_to(asker))).is_some_and(|chosen| cantrip_mechanics::library::object_has_name(q, spell, chosen))) { CostDelta::less((1i64) as u8) } else { CostDelta::NONE } }
+#[allow(unused_variables)] fn ability_1_0_rule(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, q.controller(source)); let Costed::Spell(spell) = costed else { return CostDelta::NONE; }; if player == asker.controller && (planned_value!("a choice of CardName outside its body", None::<CardId> => q.state().chosen_card(q.linked_to(asker))).is_some_and(|chosen| cantrip_mechanics::library::object_has_name(q, spell, chosen))) { CostDelta::less((1i64).max(0) as u32) } else { CostDelta::NONE } }
 planned_item!("engine-no-hidden-agenda" => opening_hand: cantrip_mechanics::hidden_agenda::OPENING_HAND);
 planned_item!("layout-conspiracy" => variant: Some(Variant::ConspiracyDraft));
 

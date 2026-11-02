@@ -23,7 +23,8 @@ let player_1 = { let q: &dyn Query = g; Some(asker.controller).expect("a referen
 let objects_2 = { let q: &dyn Query = g; (objects_1.clone()).into_iter().filter(|&id| q.state().obj(id).became.is_none() && q.state().obj(id).zone.kind() == ZoneKind::Library).collect::<Vec<ObjectId>>() }; let by_2 = None; let moved_2 = g.exile_face_down(&objects_2, by_2);
 g.end_sentence();
 for bound_0 in { let q: &dyn Query = g; moved_2.clone() } {
-let cards_3_0 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<ObjectId>>() }; let players_3_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_3_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_3_0 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::Never, when: Some(PlayCondition::ControlsSubtype(Subtype::Wizard)), ..PlayGrant::CAST }); } } } });
+cantrip_api::instruction(g, |g| { let cards_3_0 = { let q: &dyn Query = g; Some(bound_0).into_iter().collect::<Vec<ObjectId>>() }; let players_3_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_3_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_3_0 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::Never, when: Some(PlayCondition::ControlsSubtype(Subtype::Wizard)), ..PlayGrant::CAST }); } } } });
+ });
 g.end_sentence();
 }
 g.end_sentence();

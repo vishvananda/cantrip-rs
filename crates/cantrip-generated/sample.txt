@@ -672,7 +672,6 @@ elvish_ranger
 elvish_refueler
 emblazoned_golem
 emergent_sequence
-emissary_of_grudges
 emissary_of_soulfire
 emissarys_ploy
 emrakul_the_promised_end
@@ -1342,6 +1341,7 @@ maelstrom_archangel_avatar
 maelstrom_djinn
 maestros_ascendancy
 magar_of_the_magic_strings
+magical_hack
 magma_mine
 magnanimous_magistrate
 magnetic_web
@@ -1762,6 +1762,7 @@ rabid_wombat
 rad_rascal
 radiant_grace
 radiant_lotus
+radiant_performer
 radiate
 radical_idea
 raff_capashen_ships_mage
@@ -2158,6 +2159,7 @@ storyteller_pixie
 stranglehold
 street_savvy
 streetwise_negotiator
+strionic_resonator
 strixhaven
 strixhaven_stadium
 stromgald_spy

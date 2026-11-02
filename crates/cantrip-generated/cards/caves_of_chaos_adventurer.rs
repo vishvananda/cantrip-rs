@@ -20,7 +20,8 @@ if { let q: &dyn Query = g; Some(asker.controller).is_some_and(|player: PlayerId
 planned!("a-play-for-the-turn-read-as-a-play-now", Optional, "body" = "{\"instructions\":[{\"args\":{\"operation\":{\"args\":{\"action\":\"Either\",\"actor\":{\"args\":{\"kind\":\"AbilityController\"},\"kind\":\"One\"},\"cards\":{\"args\":{\"args\":{\"index\":0,\"phase\":\"After\",\"result\":0},\"kind\":\"Result\"},\"kind\":\"One\"},\"cost\":\"Free\",\"count\":{\"Exactly\":{\"args\":1,\"kind\":\"Constant\"}},\"into_exile\":false},\"kind\":\"PlayCards\"},\"result\":1},\"kind\":\"Effect\"}]}", "decider" = { let q: &dyn Query = g; Some(asker.controller) });
 g.end_sentence();
 } else {
-let cards_2_0 = { let q: &dyn Query = g; (moved_1.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_2_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_2_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_2_0 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::EndOfTurn, ..PlayGrant::CAST }); } } } });
+cantrip_api::instruction(g, |g| { let cards_2_0 = { let q: &dyn Query = g; (moved_1.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_2_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_2_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_2_0 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::EndOfTurn, ..PlayGrant::CAST }); } } } });
+ });
 g.end_sentence();
 }
 g.end_sentence();

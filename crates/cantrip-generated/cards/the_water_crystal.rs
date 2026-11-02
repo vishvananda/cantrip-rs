@@ -5,7 +5,7 @@
 // If an opponent would mill one or more cards, they mill that many cards plus four instead.
 // {4}{U}{U}, {T}: Each opponent mills cards equal to the number of cards in your hand.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_0_rule(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, q.controller(source)); let Costed::Spell(spell) = costed else { return CostDelta::NONE; }; if player == asker.controller && q.chars(spell).colors.has(q.words(asker.source).color(Color::Blue)) { CostDelta::less((1i64) as u8) } else { CostDelta::NONE } }
+#[allow(unused_variables)] fn ability_0_0_rule(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, q.controller(source)); let Costed::Spell(spell) = costed else { return CostDelta::NONE; }; if player == asker.controller && q.chars(spell).colors.has(q.words(asker.source).color(Color::Blue)) { CostDelta::less((1i64).max(0) as u32) } else { CostDelta::NONE } }
 #[allow(unused_variables, unused_mut)] fn ability_1_then_steps(g: &mut dyn Game, asker: &Asker, subject: Target, data: [u32; 2]) -> Result<(), Suspend> { let mut players_0: Vec<PlayerId> = { let q: &dyn Query = g; subject.player().into_iter().collect::<Vec<PlayerId>>() };
 let mut gathered_1: Vec<(PlayerId, u32)> = Vec::new();
  for (index_0, bound_9000) in players_0.iter().copied().enumerate() { gathered_1.push((bound_9000, { let q: &dyn Query = g; ((i64::from(data[0]) + 4i64)).min(u32::MAX.into()) as u32 }));

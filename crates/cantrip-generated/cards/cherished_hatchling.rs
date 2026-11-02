@@ -13,7 +13,8 @@ planned!("operation-change-spell" => if let Some(spell) = { let q: &dyn Query = 
 g.end_sentence();
  Ok(()) }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_player_effect(asker.controller, source, planned_value!("flash for spells other than by type", EffectKind::CastAsThoughFlash(TypeSet::NONE) => EffectKind::CastAsThoughFlash(|q: &dyn Query, asker: &Asker, id: ObjectId| -> bool { q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Dinosaur)) })), Duration::EndOfTurn); }
+cantrip_api::instruction(g, |g| { if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { g.add_player_effect(asker.controller, source, planned_value!("flash for spells other than by type", EffectKind::CastAsThoughFlash(TypeSet::NONE) => EffectKind::CastAsThoughFlash(|q: &dyn Query, asker: &Asker, id: ObjectId| -> bool { q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Dinosaur)) })), Duration::EndOfTurn); }
+ });
 g.end_sentence();
 if let Some(source) = Some(item.object) { g.delayed_trigger(DelayedWhen::ThisTurn, source, item.controller, AbilityRef::delayed(item.ability.card, 0), Target::None); }
 g.end_sentence();

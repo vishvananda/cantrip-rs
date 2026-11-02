@@ -42,7 +42,8 @@ let mut joined_13: Vec<ObjectId> = Vec::new();
 joined_13.extend(hoisted_4.clone());
 joined_13.extend(hoisted_9.clone());
 g.end_sentence();
-planned!("play-permission-with-mana-as-though-any-color" => let cards_14_0 = { let q: &dyn Query = g; (joined_12.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_14_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_14_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_14_0 { g.allow_play(card, player, PlayGrant { lands: false, expiry: Expiry::Never, any_color: true, ..PlayGrant::CAST }); } } } }););
+cantrip_api::instruction(g, |g| { planned!("play-permission-with-mana-as-though-any-color" => let cards_14_0 = { let q: &dyn Query = g; (joined_12.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_14_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_14_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_14_0 { g.allow_play(card, player, PlayGrant { lands: false, expiry: Expiry::Never, any_color: true, ..PlayGrant::CAST }); } } } }););
+ });
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

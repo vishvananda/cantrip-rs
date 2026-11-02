@@ -18,10 +18,12 @@ let amount_1 = { let q: &dyn Query = g; (1i64).max(0) as u32 }; let players_1 = 
 for player in players_1 { g.draw(player, amount_1); }
 g.end_sentence();
 if { let q: &dyn Query = g; (Some(asker.controller).map_or(0i64, |p: PlayerId| i64::from(q.state().player(p).life))) <= (5i64) } {
-planned!("player-rule-for-a-while-can-t-lose-life" => let players_2_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_2_0 { g.add_player_effect(asker.controller, source, EffectKind::CantLoseLife(player), Duration::EndOfTurn); } });
+cantrip_api::instruction(g, |g| { planned!("player-rule-for-a-while-can-t-lose-life" => let players_2_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_2_0 { g.add_player_effect(asker.controller, source, EffectKind::CantLoseLife(player), Duration::EndOfTurn); } });
 planned!("player-rule-for-a-while-can-t-lose-the-game" => let players_2_1 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_2_1 { g.add_player_effect(asker.controller, source, EffectKind::CantLoseGame(player), Duration::EndOfTurn); } });
+ });
 g.end_sentence();
-planned!("player-rule-for-a-while-can-t-win-the-game" => let players_3_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_3_0 { g.add_player_effect(asker.controller, source, EffectKind::CantWinGame(player), Duration::EndOfTurn); } });
+cantrip_api::instruction(g, |g| { planned!("player-rule-for-a-while-can-t-win-the-game" => let players_3_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().flat_map(|p: PlayerId| q.state().opponents(p)).collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_3_0 { g.add_player_effect(asker.controller, source, EffectKind::CantWinGame(player), Duration::EndOfTurn); } });
+ });
 g.end_sentence();
 }
 g.end_sentence();

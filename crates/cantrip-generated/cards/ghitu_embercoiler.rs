@@ -22,7 +22,8 @@ let objects_4 = { let q: &dyn Query = g; picked_3.clone() }; let moved_4 = g.ret
 g.end_sentence();
 let objects_5 = { let q: &dyn Query = g; (moved_4.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let moved_5 = g.exile_all(&objects_5);
 g.end_sentence();
-let cards_6_0 = { let q: &dyn Query = g; (moved_5.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_6_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_6_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_6_0 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::EndOfYourNextTurn, ..PlayGrant::CAST }); } } } });
+cantrip_api::instruction(g, |g| { let cards_6_0 = { let q: &dyn Query = g; (moved_5.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_6_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_6_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_6_0 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::EndOfYourNextTurn, ..PlayGrant::CAST }); } } } });
+ });
 g.end_sentence();
 hoisted_7.extend(moved_4.clone());
 hoisted_8.extend(moved_5.clone());

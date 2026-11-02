@@ -3,7 +3,7 @@
 // This spell costs {1}{U} less to cast if it targets an instant or sorcery spell.
 // Counter target spell.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_cost(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, player); if costed == Costed::Spell(source) && targets.iter().filter_map(|t| t.object()).any(|id| q.state().obj(id).zone.is(ZoneKind::Stack) && (q.chars(id).is(CardType::Instant) || q.chars(id).is(CardType::Sorcery))) { { let mut less = ManaCost::ZERO; less.generic += (1i64) as u8; less.symbols[1] += (1i64) as u8; CostDelta::less_mana(less) } } else { CostDelta::NONE } }
+#[allow(unused_variables)] fn ability_0_cost(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, player); if costed == Costed::Spell(source) && targets.iter().filter_map(|t| t.object()).any(|id| q.state().obj(id).zone.is(ZoneKind::Stack) && (q.chars(id).is(CardType::Instant) || q.chars(id).is(CardType::Sorcery))) { { let mut less = ManaCost::ZERO; less.generic += (1i64).max(0) as u32; less.symbols[1] += (1i64).max(0) as u32; CostDelta::less_mana(less) } } else { CostDelta::NONE } }
 #[allow(unused_variables)] fn ability_1_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if (q.state().obj(id).zone.kind() == ZoneKind::Stack) && (true)) }
 static ABILITY_1_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_1_target_0)];
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

@@ -22,7 +22,6 @@ g.end_sentence();
  Ok(()) }
 fn ability_1_implied(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller); let chosen = (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == 0).map(|i| g.state().target(item, i)).next().unwrap_or(Target::None);
 if ability_1_mode_0_target_0(g, asker, chosen) { return ability_1_mode_0(g, item); }
-if ability_1_mode_1_target_0(g, asker, chosen) { return ability_1_mode_1(g, item); }
 ability_1_mode_1(g, item) }
 #[allow(unused_variables)] fn ability_2_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::ZoneChange { old, new, from, .. } = event { let id = *old; let subject = Target::Object(id); let data = [0u32, u32::MAX]; if from.is(ZoneKind::Battlefield) && Some(asker.source) == Some(id) { return Some(Fired { subject, data }); } }
  None }

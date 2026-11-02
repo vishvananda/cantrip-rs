@@ -24,7 +24,8 @@ let amount_3_0 = { let q: &dyn Query = g; (1i64).max(0) as i16 }; cantrip_api::i
 g.end_sentence();
 let objects_4 = { let q: &dyn Query = g; (((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).into_iter().take(((removed_3 as i64)) as usize).collect::<Vec<ObjectId>>() }; let moved_4 = g.exile_all(&objects_4);
 g.end_sentence();
-let cards_5_0 = { let q: &dyn Query = g; moved_4.clone() }; let players_5_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_5_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_5_0 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::EndOfTurn, ..PlayGrant::CAST }); } } } });
+cantrip_api::instruction(g, |g| { let cards_5_0 = { let q: &dyn Query = g; moved_4.clone() }; let players_5_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_5_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_5_0 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::EndOfTurn, ..PlayGrant::CAST }); } } } });
+ });
 g.end_sentence();
  Ok(()) }
 

@@ -9,7 +9,8 @@ let objects_1 = { let q: &dyn Query = g; picked_0.clone() }; let by_1 = None; le
 g.end_sentence();
 let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let objects_2 = { let q: &dyn Query = g; moved_1.clone() }; g.look_at(player_2, &objects_2);
 g.end_sentence();
-planned!("play-permission-for-a-number-of-cards" => let cards = { let q: &dyn Query = g; (moved_1.clone()).into_iter().filter(|&id| true).collect::<Vec<ObjectId>>() }; let players = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &player in &players { g.allow_play_some(&cards, player, PlayGrant { lands: true, expiry: Expiry::Never, ..PlayGrant::CAST }, 1); });
+cantrip_api::instruction(g, |g| { planned!("play-permission-for-a-number-of-cards" => let cards = { let q: &dyn Query = g; (moved_1.clone()).into_iter().filter(|&id| true).collect::<Vec<ObjectId>>() }; let players = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &player in &players { g.allow_play_some(&cards, player, PlayGrant { lands: true, expiry: Expiry::Never, ..PlayGrant::CAST }, 1); });
+ });
 g.end_sentence();
  Ok(()) }
 

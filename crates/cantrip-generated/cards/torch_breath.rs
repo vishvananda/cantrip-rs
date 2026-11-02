@@ -4,7 +4,7 @@
 // This spell can't be countered.
 // Torch Breath deals X damage to target creature or planeswalker.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_cost(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, player); if costed == Costed::Spell(source) && targets.iter().filter_map(|t| t.object()).any(|id| q.state().obj(id).zone.is(ZoneKind::Battlefield) && q.chars(id).colors.has(q.words(asker.source).color(Color::Blue))) { CostDelta::less((2i64) as u8) } else { CostDelta::NONE } }
+#[allow(unused_variables)] fn ability_0_cost(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, player); if costed == Costed::Spell(source) && targets.iter().filter_map(|t| t.object()).any(|id| q.state().obj(id).zone.is(ZoneKind::Battlefield) && q.chars(id).colors.has(q.words(asker.source).color(Color::Blue))) { CostDelta::less((2i64).max(0) as u32) } else { CostDelta::NONE } }
 #[allow(unused_variables)] fn ability_2_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && ((q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Planeswalker)))) }
 static ABILITY_2_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_2_target_0)];
 fn ability_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

@@ -14,7 +14,8 @@ let objects_1 = { let q: &dyn Query = g; (Some(asker.controller).into_iter().fla
 g.end_sentence();
  Ok(()) }
 fn ability_1_mode_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let players_2_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let linked_2_0 = g.linked(item); cantrip_api::instruction(g, |g| { for &player in &players_2_0 { g.allow_play_exiled_with(linked_2_0, player, PlayGrant { lands: true, expiry: Expiry::EndOfTurn, instead: Some(ManaCost::ZERO), ..PlayGrant::CAST }, true); } });
+cantrip_api::instruction(g, |g| { let players_2_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let linked_2_0 = g.linked(item); cantrip_api::instruction(g, |g| { for &player in &players_2_0 { g.allow_play_exiled_with(linked_2_0, player, PlayGrant { lands: true, expiry: Expiry::EndOfTurn, instead: Some(ManaCost::ZERO), ..PlayGrant::CAST }, true); } });
+ });
 g.end_sentence();
  Ok(()) }
 fn ability_1_mode_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

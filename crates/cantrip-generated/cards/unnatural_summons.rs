@@ -4,7 +4,7 @@
 // Manifest dread.
 // Rebound
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_cost(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, player); if costed == Costed::Spell(source) && !(Some(asker.controller).is_some_and(|player: PlayerId| q.state().turn.starting == player)) { CostDelta::less((1i64) as u8) } else { CostDelta::NONE } }
+#[allow(unused_variables)] fn ability_0_cost(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, player); if costed == Costed::Spell(source) && !(Some(asker.controller).is_some_and(|player: PlayerId| q.state().turn.starting == player)) { CostDelta::less((1i64).max(0) as u32) } else { CostDelta::NONE } }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let player_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let entered_0: Vec<ObjectId> = cantrip_mechanics::manifest_dread::manifest_dread_object(g, player_0, asker.source)?.into_iter().collect();
 g.end_sentence();

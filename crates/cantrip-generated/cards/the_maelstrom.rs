@@ -30,7 +30,8 @@ hoisted_2.extend(objects_1.clone());
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_0 as i64) != 0) } {
 let payer_3 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
-let paid_3 = cantrip_mechanics::effects::ask_may(g, payer_3, asker.source, Purpose::Optional)?; if paid_3 {
+let looked_3 = cantrip_mechanics::top_of_library(g, { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, 1); let offered_3 = { let q: &dyn Query = g; looked_3.iter().copied().any(|id| (q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Battle) || q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Enchantment) || q.chars(id).is(CardType::Land) || q.chars(id).is(CardType::Planeswalker))) };
+let paid_3 = offered_3 && cantrip_mechanics::effects::ask_may(g, payer_3, asker.source, Purpose::Optional)?; if paid_3 {
 let player_4 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let top_4 = cantrip_mechanics::top_of_library(g, player_4, 1);
 let matching_4: Vec<ObjectId> = { let q: &dyn Query = g; top_4.iter().copied().filter(|&id| (q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Battle) || q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Enchantment) || q.chars(id).is(CardType::Land) || q.chars(id).is(CardType::Planeswalker))).collect() };
 let objects_5 = ({ let q: &dyn Query = g; matching_4.clone() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_5 = { let rows_5: Vec<(ObjectId, PlayerId, bool)> = objects_5.iter().map(|&o| (o, g.state().obj(o).owner, false)).collect(); let came_5 = g.put_all_onto_battlefield_as(&rows_5)?; came_5.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };

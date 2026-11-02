@@ -31,7 +31,6 @@ g.end_sentence();
  Ok(()) }
 fn reflexive_2_implied(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller); let chosen = (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == 0).map(|i| g.state().target(item, i)).next().unwrap_or(Target::None);
 if reflexive_2_mode_0_target_0(g, asker, chosen) { return reflexive_2_mode_0(g, item); }
-if reflexive_2_mode_1_target_0(g, asker, chosen) { return reflexive_2_mode_1(g, item); }
 reflexive_2_mode_1(g, item) }
 fn reflexive_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { reflexive_2_implied(g, item) }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

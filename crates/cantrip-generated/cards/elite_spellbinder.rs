@@ -29,7 +29,8 @@ hoisted_8.extend({ let q: &dyn Query = g; objects_4.iter().copied().filter(|&o| 
 }
 g.end_sentence();
 if { let q: &dyn Query = g; ((paid_1 as i64) != 0) } {
-let cards_9_0 = { let q: &dyn Query = g; (hoisted_5.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_9_0 = { let q: &dyn Query = g; (hoisted_5.clone()).get(0 as usize).copied().map(|o: ObjectId| q.state().obj(o).owner).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_9_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_9_0 { g.allow_play(card, player, PlayGrant { lands: false, expiry: Expiry::Never, more: 2, ..PlayGrant::CAST }); } } } });
+cantrip_api::instruction(g, |g| { let cards_9_0 = { let q: &dyn Query = g; (hoisted_5.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_9_0 = { let q: &dyn Query = g; (hoisted_5.clone()).get(0 as usize).copied().map(|o: ObjectId| q.state().obj(o).owner).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_9_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_9_0 { g.allow_play(card, player, PlayGrant { lands: false, expiry: Expiry::Never, more: 2, ..PlayGrant::CAST }); } } } });
+ });
 g.end_sentence();
 }
 g.end_sentence();

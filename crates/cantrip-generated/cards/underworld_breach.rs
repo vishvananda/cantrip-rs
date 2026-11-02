@@ -3,7 +3,7 @@
 // Each nonland card in your graveyard has escape. The escape cost is equal to the card's mana cost plus exile three other cards from your graveyard. (You may cast cards from your graveyard for their escape cost.)
 // At the beginning of the end step, sacrifice this enchantment.
 #[allow(unused_imports)] use cantrip_api::*;
-#[allow(unused_variables)] fn ability_0_escape_cost(q: &dyn Query, asker: &Asker, card: ObjectId, player: PlayerId) -> Option<Cost> { (player == asker.controller && !(q.chars(card).is(CardType::Land)) && q.card(q.chars(card).card).has_cost).then(|| cantrip_mechanics::escape::cost(q.card(q.chars(card).card).cost, 3)) }
+#[allow(unused_variables)] fn ability_0_escape_cost(q: &dyn Query, asker: &Asker, card: ObjectId, player: PlayerId) -> Option<Cost> { (player == asker.controller && !(q.card(q.obj(card).card).is(CardType::Land)) && q.card(q.chars(card).card).has_cost).then(|| cantrip_mechanics::escape::cost(q.card(q.chars(card).card).cost, 3)) }
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::End) && true { return Some(Fired { subject, data }); } }
  None }
 fn ability_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

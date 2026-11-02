@@ -5,7 +5,7 @@
 #[allow(unused_variables)] fn ability_0_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::StepBegan { step } = event { let subject = Target::Player(q.state().turn.active); let data = [0u32; 2]; if matches!(*step, Step::Upkeep) && true { return Some(Fired { subject, data }); } }
  None }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let objects_0 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && item.subject.player() == Some(q.controller(id)) && q.chars(id).power.is_some_and(|v| (i64::from(v)) > ((((item.subject.player().into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && true).collect::<Vec<ObjectId>>()).len() as i64)))).collect::<Vec<ObjectId>>() }; let moved_0 = g.return_to_hand(&objects_0);
+let objects_0 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| (q.chars(id).is(CardType::Creature) && item.subject.player() == Some(q.controller(id)) && q.chars(id).power.is_some_and(|v| (i64::from(v)) > ((((item.subject.player().into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::hand(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&card_in_zone| true && true).collect::<Vec<ObjectId>>()).len() as i64)))).collect::<Vec<ObjectId>>() }; let moved_0 = g.return_to_hand(&objects_0);
 g.end_sentence();
  Ok(()) }
 

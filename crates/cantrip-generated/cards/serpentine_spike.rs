@@ -21,9 +21,10 @@ let amount_0_1 = { let q: &dyn Query = g; (3i64).max(0) as u16 }; if let Some(so
 let amount_0_2 = { let q: &dyn Query = g; (4i64).max(0) as u16 }; if let Some(source) = source_0 { for t in { let q: &dyn Query = g; (t_2_raw.get(0).copied().filter(|t| t_2.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() } { batch_0.push((source, t, amount_0_2)); } }
 let before_0 = g.history().head() as usize; g.damage_together(&batch_0); let dealt_0 = source_0.map_or(Vec::new(), |source| cantrip_mechanics::history::permanents_dealt_damage_by(g.history(), source, before_0));
 g.end_sentence();
-for bound_1002 in dealt_0.clone() {
+cantrip_api::instruction(g, |g| { for bound_1002 in dealt_0.clone() {
 {  let to = Some(Target::None); let about = { let q: &dyn Query = g; Some(bound_1002) }; if let (Some(to), Some(about)) = (to, about) { let _ = to; g.add_effect(item.object, about, EffectKind::Replacement { card: item.ability.card, index: 0 }, Duration::EndOfTurn); } }
 }
+ });
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

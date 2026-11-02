@@ -27,7 +27,8 @@ let mut joined_7: Vec<ObjectId> = Vec::new();
 joined_7.extend(hoisted_1.clone());
 joined_7.extend(hoisted_4.clone());
 g.end_sentence();
-let cards_8_0 = { let q: &dyn Query = g; joined_6.clone() }; let players_8_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_8_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_8_0 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::EndOfYourNextTurn, ..PlayGrant::CAST }); } } } });
+cantrip_api::instruction(g, |g| { let cards_8_0 = { let q: &dyn Query = g; joined_6.clone() }; let players_8_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_8_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_8_0 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::EndOfYourNextTurn, ..PlayGrant::CAST }); } } } });
+ });
 g.end_sentence();
  Ok(()) }
 

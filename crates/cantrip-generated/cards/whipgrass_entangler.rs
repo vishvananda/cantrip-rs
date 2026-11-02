@@ -6,7 +6,7 @@
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_0_target_0(q: &dyn Query, asker: &Asker, t: Target) -> bool { matches!(t, Target::Object(id) if cantrip_mechanics::targets::permanent(q, id) && (q.chars(id).is(CardType::Creature))) }
 static ABILITY_0_TARGETS: &[cantrip_api::TargetSpec] = &[target(ability_0_target_0)];
-#[allow(unused_variables)] fn granted_1_0_rule(q: &dyn Query, asker: &Asker, attacker: ObjectId, defender: Target) -> Option<ManaCost> { (attacker == asker.source && true).then(|| ManaCost { generic: u8::try_from(((q.state().battlefield().iter().copied().filter(|&id| q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Cleric))).collect::<Vec<ObjectId>>()).len() as i64) as i64 * 1).unwrap_or(u8::MAX), ..ManaCost::ZERO }) }
+#[allow(unused_variables)] fn granted_1_0_rule(q: &dyn Query, asker: &Asker, attacker: ObjectId, defender: Target) -> Option<ManaCost> { (attacker == asker.source && true).then(|| ManaCost { generic: u32::try_from(((q.state().battlefield().iter().copied().filter(|&id| q.chars(id).has_subtype(q.words(asker.source).subtype(Subtype::Cleric))).collect::<Vec<ObjectId>>()).len() as i64) as i64 * 1).unwrap_or(u32::MAX), ..ManaCost::ZERO }) }
 #[allow(unused_variables)] fn granted_1_1_rule(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool { id == asker.source }
 fn ability_0(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);

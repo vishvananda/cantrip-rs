@@ -12,7 +12,8 @@ let searcher_0 = { let q: &dyn Query = g; Some(asker.controller).expect("a refer
 let objects_1 = { let q: &dyn Query = g; found_0.clone() }; let by_1 = None; let moved_1 = g.exile_face_down(&objects_1, by_1);
 for player in { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() } { g.shuffle(player); }
 g.end_sentence();
-let cards_3_0 = { let q: &dyn Query = g; (moved_1.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_3_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_3_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_3_0 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::Never, ..PlayGrant::CAST }); } } } });
+cantrip_api::instruction(g, |g| { let cards_3_0 = { let q: &dyn Query = g; (moved_1.clone()).get(0 as usize).copied().into_iter().collect::<Vec<ObjectId>>() }; let players_3_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; cantrip_api::instruction(g, |g| { for &card in &cards_3_0 { if g.obj(card).zone.is(ZoneKind::Exile) { for &player in &players_3_0 { g.allow_play(card, player, PlayGrant { lands: true, expiry: Expiry::Never, ..PlayGrant::CAST }); } } } });
+ });
 g.end_sentence();
  Ok(()) }
 #[allow(unused_variables)] fn ability_3_0_rule(q: &dyn Query, source: ObjectId, player: PlayerId, spell: ObjectId) -> PayWith { let asker = &Asker::new(source, q.controller(source)); if player == asker.controller && cantrip_mechanics::zone_cast_from(q, spell) == Some(ZoneKind::Exile) { PayWith { convoke: true, ..PayWith::NONE } } else { PayWith::NONE } }

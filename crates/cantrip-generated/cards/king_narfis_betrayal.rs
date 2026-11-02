@@ -18,11 +18,13 @@ let objects_4 = { let q: &dyn Query = g; all_3.clone() }; let moved_4 = { let by
 g.end_sentence();
  Ok(()) }
 fn ability_0_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("play-permission-with-mana-as-though-any-color" => let players_5_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let linked_5_0 = g.linked(item); cantrip_api::instruction(g, |g| { for &player in &players_5_0 { g.allow_play_exiled_with(linked_5_0, player, PlayGrant { lands: false, expiry: Expiry::EndOfTurn, any_color: true, ..PlayGrant::CAST }, false); } }););
+cantrip_api::instruction(g, |g| { planned!("play-permission-with-mana-as-though-any-color" => let players_5_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let linked_5_0 = g.linked(item); cantrip_api::instruction(g, |g| { for &player in &players_5_0 { g.allow_play_exiled_with(linked_5_0, player, PlayGrant { lands: false, expiry: Expiry::EndOfTurn, any_color: true, ..PlayGrant::CAST }, false); } }););
+ });
 g.end_sentence();
  Ok(()) }
 fn ability_0_2(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-planned!("play-permission-with-mana-as-though-any-color" => let players_6_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let linked_6_0 = g.linked(item); cantrip_api::instruction(g, |g| { for &player in &players_6_0 { g.allow_play_exiled_with(linked_6_0, player, PlayGrant { lands: false, expiry: Expiry::EndOfTurn, any_color: true, ..PlayGrant::CAST }, false); } }););
+cantrip_api::instruction(g, |g| { planned!("play-permission-with-mana-as-though-any-color" => let players_6_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let linked_6_0 = g.linked(item); cantrip_api::instruction(g, |g| { for &player in &players_6_0 { g.allow_play_exiled_with(linked_6_0, player, PlayGrant { lands: false, expiry: Expiry::EndOfTurn, any_color: true, ..PlayGrant::CAST }, false); } }););
+ });
 g.end_sentence();
  Ok(()) }
 

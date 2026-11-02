@@ -20,7 +20,8 @@ let mut found_2: Vec<ObjectId> = Vec::new();
 let objects_4 = { let q: &dyn Query = g; carried_3_0.clone() }; let moved_4 = g.exile_all(&objects_4);
 for player in { let q: &dyn Query = g; (moved_0.clone()).get(0 as usize).copied().map(|o: ObjectId| q.state().obj(o).owner).into_iter().collect::<Vec<PlayerId>>() } { g.shuffle(player); }
 g.end_sentence();
-planned!("play-permission-for-a-number-of-cards" => let cards = { let q: &dyn Query = g; (moved_4.clone()).into_iter().filter(|&id| true).collect::<Vec<ObjectId>>() }; let players = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &player in &players { g.allow_play_some(&cards, player, PlayGrant { lands: true, expiry: Expiry::WhileControls(asker.source), any_color: true, ..PlayGrant::CAST }, 1); });
+cantrip_api::instruction(g, |g| { planned!("play-permission-for-a-number-of-cards" => let cards = { let q: &dyn Query = g; (moved_4.clone()).into_iter().filter(|&id| true).collect::<Vec<ObjectId>>() }; let players = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; for &player in &players { g.allow_play_some(&cards, player, PlayGrant { lands: true, expiry: Expiry::WhileControls(asker.source), any_color: true, ..PlayGrant::CAST }, 1); });
+ });
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

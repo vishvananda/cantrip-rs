@@ -42,11 +42,11 @@ g.end_sentence();
 let caster_14 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let mut pool_14: Vec<ObjectId> = { let q: &dyn Query = g; (moved_12.clone()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }; let mut left_14: u32 = 4294967295; let mut played_14: Vec<ObjectId> = Vec::new();
 while left_14 > 0 {
 let mut open_14: Vec<ObjectId> = Vec::new(); for &c in &pool_14 { let ways = g.cast_ways_during_resolution_by(c, caster_14); if ways.iter().any(|w| true) { open_14.push(c); } }
-let picked_14 = if open_14.is_empty() { None } else if open_14.len() > 1 || (false && (!false || pool_14.len() > 1)) { cantrip_mechanics::choose::cards_from(g, caster_14, asker.source, Purpose::CastFree, pool_14.clone(), open_14.clone(), 1, true)?.first().copied() } else if !true || cantrip_mechanics::effects::ask_may(g, caster_14, open_14[0], Purpose::CastFree)? { Some(open_14[0]) } else { None };
+let picked_14 = if open_14.is_empty() { None } else if cantrip_mechanics::effects::ask_may(g, caster_14, open_14[0], Purpose::CastFree)? { Some(open_14[0]) } else { None };
 let Some(card_14) = picked_14 else { break; };
 let ways_14: Vec<CastWay> = g.cast_ways_during_resolution_by(card_14, caster_14).into_iter().filter(|w| true).collect();
-let done_14 = if ways_14.is_empty() { g.play_land_during_resolution(card_14)?.is_some() } else { let way = cantrip_mechanics::choose::cast_way(g, caster_14, card_14, ways_14)?.map(|w| w.way); g.cast_during_resolution_as(card_14, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(caster_14), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
-if done_14 { left_14 -= 1; played_14.push(g.state().obj(card_14).became.unwrap_or(card_14)); } else if false { break; } if done_14 || !(true && false) { pool_14.retain(|&c| c != card_14); }
+let done_14 = { let way = cantrip_mechanics::choose::cast_way(g, caster_14, card_14, ways_14)?.map(|w| w.way); g.cast_during_resolution_as(card_14, CastTerms { instead: Some(ManaCost::ZERO), way, caster: Some(caster_14), exile_instead: ExileInstead::Never, ..CastTerms::default() })? };
+if done_14 { left_14 -= 1; played_14.push(g.state().obj(card_14).became.unwrap_or(card_14)); } pool_14.retain(|&c| c != card_14);
 }
 g.end_sentence();
  Ok(()) }

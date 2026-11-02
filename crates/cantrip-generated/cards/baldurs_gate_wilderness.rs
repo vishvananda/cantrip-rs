@@ -57,7 +57,7 @@ g.end_sentence();
 fn ability_4_room(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 let payer_9 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }; let (paid_9, after_9, before_9, picked_9): (bool, Vec<ObjectId>, Vec<ObjectId>, Vec<ObjectId>) = if true {
 let objects_10 = { let q: &dyn Query = g; q.state().battlefield().iter().copied().filter(|&id| true).collect::<Vec<ObjectId>>() }; let players_10 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; let mut picks_10: Vec<(PlayerId, ObjectId)> = Vec::new();
-let count_10 = { let q: &dyn Query = g; cantrip_mechanics::select::Count::UpTo((1i64).max(0) as u32) }; for player in players_10 { let eligible: Vec<ObjectId> = objects_10.iter().copied().filter(|&o| g.controller(o) == player && g.can_sacrifice(player, o)).collect(); let taken = match count_10.clone() { cantrip_mechanics::select::Count::Exactly(n) | cantrip_mechanics::select::Count::AsManyAsCan(n) if eligible.len() < n as usize => eligible, _ => cantrip_mechanics::choose::select(g, player, asker.source, Purpose::Sacrifice, eligible, cantrip_mechanics::select::Selection::of(count_10.clone(), &[]))? }; for object in taken { picks_10.push((player, object)); } }
+let count_10 = { let q: &dyn Query = g; cantrip_mechanics::select::Count::UpTo((1i64).max(0) as u32) }; for player in players_10 { let eligible: Vec<ObjectId> = objects_10.iter().copied().filter(|&o| g.controller(o) == player && g.can_sacrifice(player, o)).collect(); let taken = cantrip_mechanics::choose::select(g, player, asker.source, Purpose::Sacrifice, eligible, cantrip_mechanics::select::Selection::of(count_10.clone(), &[]))?; for object in taken { picks_10.push((player, object)); } }
 let sacrificed_10 = g.sacrifice_each(&picks_10);
 let paid_10 = !picks_10.is_empty();
 (paid_10, { let q: &dyn Query = g; (sacrificed_10).clone() }, { let q: &dyn Query = g; (objects_10.iter().copied().filter(|&o| q.state().obj(o).became.is_some()).collect::<Vec<ObjectId>>()).clone() }, Vec::new()) } else { (false, Vec::new(), Vec::new(), Vec::new()) };
@@ -147,9 +147,10 @@ tokens_24.extend(std::iter::repeat((def_24_0,player)).take(count_24_0 as usize))
 let created_24 = g.create_tokens_worded(&tokens_24, false, None, words_24)?;
 g.end_sentence();
  Ok(()) }
-#[allow(unused_variables)] fn lasting_cost_27(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, player); let Costed::Spell(spell) = costed else { return CostDelta::NONE; }; if (q.chars(spell).is(CardType::Instant) || q.chars(spell).is(CardType::Sorcery)) { CostDelta::less((3i64) as u8) } else { CostDelta::NONE } }
+#[allow(unused_variables)] fn lasting_cost_27(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, targets: &[Target]) -> CostDelta { let asker = &Asker::new(source, player); let Costed::Spell(spell) = costed else { return CostDelta::NONE; }; if (q.chars(spell).is(CardType::Instant) || q.chars(spell).is(CardType::Sorcery)) { CostDelta::less((3i64).max(0) as u32) } else { CostDelta::NONE } }
 fn ability_11_room(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
-let players_26_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_26_0 { g.add_player_effect(asker.controller, source, EffectKind::SpellCostChange { card: item.ability.card, index: 0, player }, Duration::EndOfTurn); } }
+cantrip_api::instruction(g, |g| { let players_26_0 = { let q: &dyn Query = g; Some(asker.controller).into_iter().collect::<Vec<PlayerId>>() }; if let Some(source) = { let q: &dyn Query = g; Some(asker.source) } { for &player in &players_26_0 { g.add_player_effect(asker.controller, source, EffectKind::SpellCostChange { card: item.ability.card, index: 0, player }, Duration::EndOfTurn); } }
+ });
 g.end_sentence();
  Ok(()) }
 fn ability_12_room(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);

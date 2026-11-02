@@ -38,9 +38,10 @@ fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let as
 let t_0_raw = announced(g, item, 0, false); let t_0 = announced(g, item, 0, true);
 let mut done_3: i64 = 0; let mut dealt_3: Vec<ObjectId> = Vec::new(); let mut hurt_3: Vec<PlayerId> = Vec::new(); let before_3 = g.history().head() as usize; let source_3 = { let q: &dyn Query = g; Some(asker.source) }; let amount_3 = { let q: &dyn Query = g; (i64::from(item.x)) as u16 }; let recipients_3 = { let q: &dyn Query = g; (t_0_raw.get(0).copied().filter(|t| t_0.contains(t)).and_then(|t: Target| t.object()).into_iter().collect::<Vec<_>>()).into_iter().map(Target::Object).collect::<Vec<Target>>() }; if let Some(source) = source_3 { let batch: Vec<(ObjectId, Target, u16)> = recipients_3.iter().map(|t| (source, *t, amount_3)).collect(); done_3 += g.damage_together(&batch).iter().map(|&n| i64::from(n)).sum::<i64>(); dealt_3.extend(cantrip_mechanics::history::permanents_dealt_damage_by(g.history(), source, before_3)); for r in &g.history().all()[before_3..] { if let Event::Damage { source: s, target: Target::Player(p), amount, .. } = r.event { if s == source && amount > 0 && !hurt_3.contains(&p) { hurt_3.push(p); } } } }
 g.end_sentence();
-for bound_1005 in dealt_3.clone() {
+cantrip_api::instruction(g, |g| { for bound_1005 in dealt_3.clone() {
 {  let to = Some(Target::None); let about = { let q: &dyn Query = g; Some(bound_1005) }; if let (Some(to), Some(about)) = (to, about) { let _ = to; g.add_effect(item.object, about, EffectKind::Replacement { card: item.ability.card, index: 0 }, Duration::EndOfTurn); } }
 }
+ });
 g.end_sentence();
  Ok(()) }
 fn announced(g: &dyn Game, item: &StackItem, spec: u8, legal: bool) -> Vec<Target> { (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == spec && (!legal || g.target_legal(item, i))).map(|i| g.state().target(item, i)).collect() }

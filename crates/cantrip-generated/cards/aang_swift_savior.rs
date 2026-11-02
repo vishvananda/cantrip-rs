@@ -25,7 +25,6 @@ g.end_sentence();
  Ok(()) }
 fn ability_2_implied(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller); let chosen = (0..g.state().targets(item).len()).filter(|&i| g.state().spec(item, i) == 0).map(|i| g.state().target(item, i)).next().unwrap_or(Target::None);
 if ability_2_mode_0_target_0(g, asker, chosen) { return ability_2_mode_0(g, item); }
-if ability_2_mode_1_target_0(g, asker, chosen) { return ability_2_mode_1(g, item); }
 ability_2_mode_1(g, item) }
 fn ability_3(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> { let asker = &Asker::new(item.object, item.controller);
 if let Some(object) = ({ let q: &dyn Query = g; (Some(asker.source).into_iter().collect::<Vec<ObjectId>>()).into_iter().filter(|&o| q.state().obj(o).became.is_none()).collect::<Vec<ObjectId>>() }).first().copied() { g.transform_by(object, item)?; }

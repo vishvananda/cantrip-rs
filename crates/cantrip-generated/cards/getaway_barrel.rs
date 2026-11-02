@@ -11,7 +11,7 @@ let mut pool_1 = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().c
 let player_2 = { let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") };
 let objects_2 = ({ let q: &dyn Query = g; picked_1.clone() }).into_iter().filter(|&o: &ObjectId| !g.state().obj(o).token).collect::<Vec<ObjectId>>(); let moved_2 = { let rows_2: Vec<(ObjectId, PlayerId, bool)> = objects_2.iter().map(|&o| (o, player_2, false)).collect(); let came_2 = g.put_all_onto_battlefield_as(&rows_2)?; came_2.into_iter().filter(|&o| g.state().obj(o).zone.is(ZoneKind::Battlefield)).collect::<Vec<ObjectId>>() };
 g.end_sentence();
-let objects_3 = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (objects_0.clone()).contains(&id)).collect::<Vec<ObjectId>>() }; let moved_3 = g.put_into_library(&objects_3, LibraryPlace::BottomInRandomOrder);
+let objects_3 = { let q: &dyn Query = g; ((Some(asker.controller).into_iter().collect::<Vec<PlayerId>>()).into_iter().flat_map(|p: PlayerId| q.state().zone(Zone::library(p)).to_vec()).collect::<Vec<ObjectId>>()).into_iter().filter(|&id| true && (objects_0.clone()).contains(&id)).collect::<Vec<ObjectId>>() }; let moved_3 = { g.bottom_in_random_order({ let q: &dyn Query = g; Some(asker.controller).expect("a reference that always names a player") }, &objects_3); objects_3.clone() };
 g.end_sentence();
  Ok(()) }
 

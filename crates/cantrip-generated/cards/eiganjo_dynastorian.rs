@@ -2,7 +2,7 @@
 // status: ready
 // Vigilance
 // Whenever you attack with two or more creatures, this creature becomes prepared. (While it's prepared, you may cast a copy of its spell. Doing so unprepares it.)
-// Return all enchantment cards from your graveyard to the battlefield. (Auras with nothing to enchant remain in your graveyard.)
+// Return all enchantment cards from your graveyard to the battlefield.
 #[allow(unused_imports)] use cantrip_api::*;
 #[allow(unused_variables)] fn ability_1_event(q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> { if let Event::Attacks { attacker, defender, defending, .. } = event { let id = *attacker; let subject = Target::Object(id); let data = [u32::from(q.controller(id).0), u32::from(defending.0)]; if q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)) && true && (q.state().attackers.iter().filter(|a| { let (id, defender) = (a.id, &a.target); q.chars(id).is(CardType::Creature) && Some(asker.controller) == Some(q.controller(id)) && true }).count() as i64) >= (2i64) { return Some(Fired { subject, data }); } }
  None }
