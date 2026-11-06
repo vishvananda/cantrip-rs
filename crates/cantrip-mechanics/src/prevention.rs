@@ -136,6 +136,10 @@ pub fn damage_sources(q: &dyn Query) -> Vec<ObjectId> {
 /// as it would deal damage, by the effect's `applies`: CR 609.7b). None when there is none to choose.
 pub fn choose_source(g: &mut dyn Game, item: &StackItem, rule: Selection) -> Result<Option<ObjectId>, Suspend> {
     let sources = damage_sources(&*g);
+    let choice = Choice { chooser: item.controller, source: item.object, candidates: &sources, selected: &[] };
+    if !cantrip_api::select::judge(&*g, &rule, &choice).addable.any() {
+        return Ok(None);
+    }
     Ok(crate::choose::select(g, item.controller, item.object, Purpose::Choose, sources, rule)?.first().copied())
 }
 

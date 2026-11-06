@@ -33,6 +33,24 @@ pub fn put(cx: &mut Cx, id: ObjectId, kind: CounterKind, amount: i32, by: Player
     put_all(cx, id, counts, by, how);
 }
 
+/// A restriction on this effect's final placement, not a replacement effect or a permanent-wide counter ban
+/// (Clockwork Beast and Clockwork Avian; CR 101.2, 608.2c, 609.3, 614.17). Replacements see the requested quantity first.
+pub fn put_with_limit(cx: &mut Cx, id: ObjectId, kind: CounterKind, amount: i32, by: PlayerId, maximum_total: i32) {
+    if amount <= 0 { return; }
+    let mut counts = [0; CounterKind::COUNT]; counts[kind as usize] = amount;
+    let placement = Placement { object: id, counts, by };
+    let limit = CounterLimit { object: id, kind, maximum_total };
+    let events = cx.instruction(|cx| place_together_event(cx, &[placement], How::Effect, Some(limit)), |_| true);
+    if !events.is_empty() { cx.emit_batch(&events, None); }
+}
+
+#[derive(Clone, Copy)]
+struct CounterLimit {
+    object: ObjectId,
+    kind: CounterKind,
+    maximum_total: i32,
+}
+
 /// Counters of several kinds put on `id` together by `by` (CR 122.6): one placement of `put_together`, announced as one
 /// event however many kinds it has.
 pub fn put_all(cx: &mut Cx, id: ObjectId, counts: [i32; CounterKind::COUNT], by: PlayerId, how: How) {
@@ -46,6 +64,27 @@ pub struct Placement {
     pub object: ObjectId,
     pub counts: [i32; CounterKind::COUNT],
     pub by: PlayerId,
+}
+
+/// A cost paid on already chosen recipients (CR 118.3, 118.11, 118.12a): validate the whole before paying any part.
+/// Keep separate components separate even on the same object (Sheltering Ancient's cost paid for each age counter);
+/// a replacement that changes one component to zero still pays that component, rather than invalidating the cost.
+pub fn pay_cost(cx: &mut Cx, payer: PlayerId, puts: &[(ObjectId, CounterKind, i32)]) -> bool {
+    if cx.s().player(payer).lost || puts.iter().any(|&(object, kind, amount)| {
+        amount < 0 || amount > 0 && (!live(cx.s(), object)
+            || cx.s().obj(object).zone.is(ZoneKind::PhasedOut)
+            || cx.s().obj(object).zone.is(ZoneKind::Battlefield)
+                && crate::static_rules::counters_banned(cx, cx.cards(), object, cx.s().obj(object).controller, kind))
+    }) {
+        return false;
+    }
+    // The components are separate actions, paid after every choice is made (CR 702.24a). Do not merge their replacement
+    // or trigger observations: a later component sees the earlier one's counters. A replacement may modify a later
+    // recipient or prevent its placement; that still pays the declared cost (CR 118.11).
+    for &(object, kind, amount) in puts {
+        put(cx, object, kind, amount, payer, How::Cost);
+    }
+    true
 }
 
 /// Counters put on several objects by one instruction, or of several kinds on one (CR 608.2, 101.4): one simultaneous
@@ -65,6 +104,10 @@ pub fn put_together(cx: &mut Cx, placements: &[Placement], how: How) {
 /// `put_together`, the events handed back for the caller to announce with the rest of a simultaneous event: the counters
 /// damage is dealt as (CR 120.3d) are announced with the damage (CR 510.2, 603.2c).
 pub fn place_together(cx: &mut Cx, placements: &[Placement], how: How) -> Vec<Event> {
+    cx.instruction(|cx| place_together_event(cx, placements, how, None), |_| true)
+}
+
+fn place_together_event(cx: &mut Cx, placements: &[Placement], how: How, limit: Option<CounterLimit>) -> Vec<Event> {
     let mut merged: Vec<Placement> = placements
         .iter()
         .filter(|p| p.counts.iter().any(|&n| n > 0))
@@ -90,7 +133,16 @@ pub fn place_together(cx: &mut Cx, placements: &[Placement], how: How) -> Vec<Ev
         if !can(cx, m.object) || m.counts.iter().all(|&n| n <= 0) {
             continue;
         }
-        let (id, counts) = (m.object, m.counts);
+        let (id, mut semantic) = (m.object, m.counts.map(|n| n.max(0)));
+        // Apply the restriction after counter replacements and before physical storage checks or events.
+        if let Some(limit) = limit.filter(|limit| limit.object == id) {
+            let room = limit.maximum_total.saturating_sub(cx.s().obj(id).counters(limit.kind)).max(0);
+            semantic[limit.kind as usize] = semantic[limit.kind as usize].min(room);
+        }
+        if semantic.iter().all(|&n| n <= 0) { continue; }
+        // RX-5 retains the counter domain and the state's saturating adder. Wider intermediate proposals do not
+        // turn an accepted boundary into a panic or widen the stored counter field.
+        let counts = semantic.map(|n| n.max(0));
         cx.st().update_obj(id, |o| o.put_path_add(&counts));
         // The layers look for hone counters from now on (CR 122.1j).
         if counts[CounterKind::Hone as usize] > 0 {
@@ -256,7 +308,7 @@ fn siege_defeat_triggers(cx: &mut Cx, id: ObjectId) {
     }
     let ability = AbilityRef { card: cx.cards().intrinsic, index: cantrip_api::intrinsic::SIEGE_DEFEAT };
     let controller = cx.s().obj(id).controller;
-    cx.st().trigger_push(PendingTrigger {
+    cx.st().trigger_push(PendingTrigger { event_amount: None,
         source: id,
         ability,
         controller,
@@ -281,16 +333,16 @@ pub fn intrinsic(cards: &CardTable, obj: &Obj, read_ahead: Option<u8>, counts: &
     // A copy effect's exception may state its loyalty (CR 707.9b: "has starting loyalty X"); a face-down permanent has
     // the values it is face down as, and none of a copy's.
     if let Some(loyalty) = obj.copiable().and_then(|c| c.stated_loyalty()).or(def.loyalty) {
-        counts[CounterKind::Loyalty as usize] += loyalty;
+        counts[CounterKind::Loyalty as usize] = counts[CounterKind::Loyalty as usize].saturating_add(i32::from(loyalty));
     }
     if let Some(defense) = def.defense {
-        counts[CounterKind::Defense as usize] += defense;
+        counts[CounterKind::Defense as usize] = counts[CounterKind::Defense as usize].saturating_add(i32::from(defense));
     }
     let saga = def.subtypes.has(Subtype::Saga) && def.abilities.iter().any(|a| matches!(a, AbilityDef::Triggered(t) if t.chapter > 0));
     if let Some(chosen) = read_ahead {
         counts[CounterKind::Lore as usize] += i32::from(chosen);
     } else if saga {
-        counts[CounterKind::Lore as usize] += 1;
+        counts[CounterKind::Lore as usize] = counts[CounterKind::Lore as usize].saturating_add(1);
     }
 }
 
@@ -312,6 +364,7 @@ pub fn place_arrived(cx: &mut Cx, id: ObjectId, counts: [i32; CounterKind::COUNT
     if counts.iter().all(|&n| n <= 0) {
         return;
     }
+    let counts = counts.map(|n| n.max(0));
     cx.st().update_obj(id, |o| o.put_path_add(&counts));
     for kind in CounterKind::ALL {
         let amount = counts[kind as usize];
@@ -327,7 +380,7 @@ pub fn place_arrived(cx: &mut Cx, id: ObjectId, counts: [i32; CounterKind::COUNT
 /// put, but a moment's hypothesis that `ops::as_it_would_exist` takes back (its journal mark) before anything happens.
 pub(crate) fn hypothetical(o: &mut Obj, counts: &[i32; CounterKind::COUNT]) {
     o.clear_counters();
-    o.put_path_add(counts);
+    o.put_path_add(&counts);
 }
 
 /// Counters of a player's kinds (CR 122.1): poison, energy, experience.
@@ -357,7 +410,8 @@ pub fn put_on_player(cx: &mut Cx, player: PlayerId, counts: PlayerCounts, by: Pl
         return;
     }
     let counts = replace::player_counters(cx, player, by, counts);
-    cx.st().update_player(player, |p| p.put_path_add(counts.poison, counts.energy, counts.experience));
+    let poison = counts.poison;
+    cx.st().update_player(player, |p| p.put_path_add(poison, counts.energy, counts.experience));
 }
 
 #[cfg(test)]
@@ -390,7 +444,21 @@ mod tests {
     };
 
     fn cx(g: &mut Game) -> Cx<'_> {
-        Cx { g, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None, producing: None }
+        Cx { g, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None }
+    }
+
+    #[test]
+    fn rx5_counter_storage_saturates_and_preserves_the_existing_event_contract() {
+        let table = Box::leak(Box::new(CardTable::new([&BEAR])));
+        let mut game = Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
+        let bear = game.state.push_obj(Obj::new(table.id_of(&BEAR), YOU, Zone::BATTLEFIELD));
+        game.state.zone_push(Zone::BATTLEFIELD, bear);
+        let mut context = cx(&mut game);
+        put(&mut context, bear, CounterKind::Shield, i32::MAX - 7, YOU, How::Effect);
+        put(&mut context, bear, CounterKind::Shield, 10, YOU, How::Effect);
+        assert_eq!(context.s().obj(bear).counters(CounterKind::Shield), i32::MAX);
+        assert!(matches!(context.g.log.last().unwrap().event,
+            Event::CountersPut { object, kind: CounterKind::Shield, amount: 10, total: i32::MAX, .. } if object == bear));
     }
 
     #[test]
