@@ -695,3 +695,65 @@ fn a_read_within_layer_seven_c_finds_the_base_power() {
     enter(&mut g, &SHRINK);
     assert_eq!(read(&g, counts), (Some(4), Some(1)));
 }
+
+
+/// Its power and its toughness.
+fn pt(game: &Game, id: ObjectId) -> (Option<i32>, Option<i32>) {
+    let c = cantrip_api::Query::chars(game, id);
+    (c.power, c.toughness)
+}
+
+/// CR 613.4b: an effect that sets toughness alone (Sentinel) leaves power as the earlier layers make it: the printed box,
+/// a copy's (CR 613.2), a characteristic-defining ability's (CR 613.4a), with 7c on top of each and 7d after (CR 613.4d).
+#[test]
+fn setting_toughness_alone_leaves_power_to_the_other_layers() {
+    let mut g = game();
+    let creature = enter(&mut g, &BEAR);
+    let anthem = enter(&mut g, &ANTHEM);
+    effect(&mut g, creature, EffectKind::SetToughness(7));
+    assert_eq!(pt(&g, creature), (Some(3), Some(8)));
+    assert_eq!(read(&g, creature), (Some(3), Some(2)));
+    let wall = g.cards.id_of(&WALL);
+    g.state.update_obj(creature, |o| o.copy = Some(Copiable::of(wall)));
+    assert_eq!(pt(&g, creature), (Some(2), Some(8)));
+    let defined = g.cards.id_of(&DEFINED);
+    g.state.update_obj(creature, |o| o.copy = Some(Copiable::of(defined)));
+    assert_eq!(pt(&g, creature), (Some(6), Some(8)));
+    effect(&mut g, creature, EffectKind::SwitchPt);
+    assert_eq!(pt(&g, creature), (Some(8), Some(6)));
+    g.state.zone_remove(Zone::BATTLEFIELD, anthem);
+    assert_eq!(pt(&g, creature), (Some(7), Some(5)));
+}
+
+/// CR 613.7: within layer 7b a toughness setting and a setting of both apply in timestamp order, the later one winning
+/// the toughness, whichever kind each is and whether it is an effect or another permanent's static ability (CR 613.7a);
+/// the value is signed and the effect is undone with the journal.
+#[test]
+fn a_toughness_setting_and_a_power_and_toughness_setting_apply_in_timestamp_order() {
+    let mut g = game();
+    let creature = enter(&mut g, &BEAR);
+    effect(&mut g, creature, EffectKind::SetPt(5, 7));
+    effect(&mut g, creature, EffectKind::SetToughness(-2));
+    assert_eq!(pt(&g, creature), (Some(5), Some(-2)));
+    let mark = g.state.mark();
+    let before = crate::loops::position(&g.state);
+    effect(&mut g, creature, EffectKind::SetPt(3, 4));
+    assert_eq!(pt(&g, creature), (Some(3), Some(4)));
+    effect(&mut g, creature, EffectKind::SetToughness(i32::MIN));
+    assert_eq!(pt(&g, creature), (Some(3), Some(i32::MIN)));
+    assert_ne!(crate::loops::position(&g.state), before);
+    g.state.rollback(mark);
+    assert_eq!(crate::loops::position(&g.state), before);
+    assert_eq!(pt(&g, creature), (Some(5), Some(-2)));
+    let shrink = enter(&mut g, &SHRINK);
+    assert_eq!(pt(&g, creature), (Some(1), Some(1)));
+    effect(&mut g, creature, EffectKind::SetToughness(6));
+    assert_eq!(pt(&g, creature), (Some(1), Some(6)));
+    g.state.zone_remove(Zone::BATTLEFIELD, shrink);
+    assert_eq!(pt(&g, creature), (Some(5), Some(6)));
+    let mut cx = cx(&mut g);
+    cx.doer = Some(YOU);
+    cantrip_api::Game::add_counters(&mut cx, creature, CounterKind::PlusOne, 2);
+    let c = cx.chars(creature);
+    assert_eq!((c.power, c.toughness), (Some(7), Some(8)));
+}

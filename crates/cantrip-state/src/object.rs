@@ -1593,6 +1593,9 @@ pub enum EffectKind {
     SwitchPt,
     /// Its power and toughness become these (CR 613.4b), layer 7b: "it becomes a 0/0 creature".
     SetPt(i32, i32),
+    /// Its toughness alone becomes this (CR 613.4b), layer 7b: "its base toughness becomes 5" (Sentinel). Its power is
+    /// left as the earlier layers and settings make it.
+    SetToughness(i32),
     /// Is exactly these card types (CR 205.1a, 613.1d), layer 4: an instant or sorcery stays one, and the subtypes it had stay
     /// only where they belong to a card type it still has (`Subtype::card_types`). An effect that also names its subtypes
     /// ("becomes an Equipment artifact") sets them with `LoseSubtypesOf` and `AddSubtype` after it.
