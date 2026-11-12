@@ -590,6 +590,7 @@ impl Event {
             Event::ResolutionCostObjectPaid { source, object: paid, .. } => source == object || paid == object,
             Event::CombatFirstStrike { creature } => creature == object,
             Event::CombatPaymentBegan { .. } => false,
+            Event::CombatFirstStrike { creature } => creature == object,
             Event::CombatCostObjectPaid { source, attacker, object: paid, .. } => source == object || attacker == object || paid == object,
             Event::AbilityCopied { .. } | Event::ActivatedAs { .. } => false,
             Event::PaidAlternative { spell, .. } | Event::PaidRepeatedly { spell, .. } => spell == object,
