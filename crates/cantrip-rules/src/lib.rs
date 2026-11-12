@@ -3547,3 +3547,6 @@ mod banding;
 mod banding_tests;
 #[cfg(test)]
 mod combat_delayed_tests;
+
+#[cfg(test)]
+mod combat_group_tests;
