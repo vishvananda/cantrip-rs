@@ -3458,3 +3458,6 @@ mod untap_limit_tests;
 
 #[cfg(test)]
 mod nonmana_mana_tap_tests;
+
+#[cfg(test)]
+mod attack_haste_tests;
