@@ -3465,3 +3465,6 @@ mod nonmana_mana_tap_tests;
 
 #[cfg(test)]
 mod attack_haste_tests;
+
+#[cfg(test)]
+mod skip_step_tests;
