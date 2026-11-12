@@ -3931,7 +3931,7 @@ impl CardDef {
         colors: None,
         color_identity: ColorSet::NONE,
         types: TypeSet::NONE,
-        supertypes: Supertypes { basic: false, legendary: false, snow: false },
+        supertypes: Supertypes { basic: false, legendary: false, snow: false, world: false },
         subtypes: SubtypeSet::NONE,
         power: None,
         toughness: None,
@@ -4362,6 +4362,9 @@ pub struct CardTable {
     /// Which cards have a control-changing static ability (CR 613.1b, `Layer::Control`): what tells whether control could
     /// change without working out the static sources.
     pub control_statics: Vec<bool>,
+    /// Printed Worlds and definitions that can change the world supertype in layer 4, including abilities they grant.
+    /// Checked on live game sources, never as a global card-table guard.
+    pub world_sensitive: Vec<bool>,
     /// Definitions whose own activated abilities name different activators. Checked on live source texts; an ability
     /// acquired from another source is checked separately through the layers' acquisition guard.
     pub other_activators: Vec<bool>,
@@ -4956,6 +4959,9 @@ impl CardTable {
             .collect();
         let statics: Vec<bool> = cards.iter().map(|c| c.statics.iter().any(|s| !s.own)).collect();
         let control_statics: Vec<bool> = cards.iter().map(|c| c.statics.iter().any(|s| s.layer == Layer::Control)).collect();
+        let world_sensitive = cards.iter().map(|c| c.supertypes.world
+            || c.statics.iter().any(|s| s.layer == Layer::Type)
+            || c.delayed.iter().any(|a| matches!(a, AbilityDef::Static(s) if s.layer == Layer::Type))).collect();
         let other_activators = cards.iter().map(|c| c.abilities.iter()
             .any(|a| matches!(a, AbilityDef::Activated(d) if d.activators.is_some()))).collect();
         let looks_back = |a: &AbilityDef| matches!(a, AbilityDef::Triggered(t) if t.may_look_back());
@@ -5082,6 +5088,7 @@ impl CardTable {
             functions_elsewhere,
             statics,
             control_statics,
+            world_sensitive,
             other_activators,
             look_back,
             zone_words,
