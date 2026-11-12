@@ -3497,3 +3497,6 @@ mod combat_delayed_tests;
 
 #[cfg(test)]
 mod combat_group_tests;
+
+#[cfg(test)]
+mod combat_payment_tests;
