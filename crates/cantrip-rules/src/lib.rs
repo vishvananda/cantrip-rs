@@ -3472,3 +3472,8 @@ mod attack_haste_tests;
 
 #[cfg(test)]
 mod skip_step_tests;
+
+mod banding;
+
+#[cfg(test)]
+mod banding_tests;
