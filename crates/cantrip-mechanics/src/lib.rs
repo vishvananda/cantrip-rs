@@ -1221,3 +1221,4 @@ pub fn hideaway(g: &mut dyn Game, item: &StackItem, count: usize) -> Result<(), 
 }
 
 pub mod commander;
+pub mod notes;
