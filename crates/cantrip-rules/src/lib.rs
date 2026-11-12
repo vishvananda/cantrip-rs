@@ -3553,3 +3553,8 @@ mod combat_group_tests;
 
 #[cfg(test)]
 mod combat_payment_tests;
+
+mod target_choices;
+
+#[cfg(test)]
+mod target_choice_tests;
