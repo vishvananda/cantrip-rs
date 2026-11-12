@@ -3529,3 +3529,8 @@ mod skip_step_tests;
 #[cfg(test)]
 #[path = "keyword_family_tests.rs"]
 mod keyword_family_tests;
+
+mod banding;
+
+#[cfg(test)]
+mod banding_tests;
