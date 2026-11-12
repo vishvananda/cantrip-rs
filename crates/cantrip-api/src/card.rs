@@ -1787,6 +1787,7 @@ impl TriggeredDef {
     }
 
     pub const BLANK: TriggeredDef = TriggeredDef {
+        keyword_family: None,
         text: "",
         listens: EventMask(0),
         matches: no_match,
@@ -1884,9 +1885,16 @@ pub struct ManaCombinationEffect {
     pub colors: ColorSet,
 }
 
+/// Keyword families represented by triggered definitions rather than `Keywords` bits (CR 702.23, 702.24).
+/// A family is semantic metadata supplied by its shared keyword implementation, never inferred from display text.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[repr(u8)]
+pub enum KeywordFamily { Rampage, CumulativeUpkeep }
+
 /// A triggered ability (CR 603).
 #[derive(Clone, Copy)]
 pub struct TriggeredDef {
+    pub keyword_family: Option<KeywordFamily>,
     pub text: &'static str,
     pub listens: EventMask,
     pub matches: TriggerMatch,
