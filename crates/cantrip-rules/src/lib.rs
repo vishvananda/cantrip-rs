@@ -3018,7 +3018,7 @@ impl cantrip_api::Game for Cx<'_> {
     fn empty_mana_pool(&mut self, player: PlayerId) -> ManaPool {
         let mut lost = self.g.state.player(player).pool;
         for (_, restricted) in self.g.state.restricted_of(player) {
-            for (total, amount) in lost.0.iter_mut().zip(restricted.0) { *total += amount; }
+            for (total, amount) in lost.0.iter_mut().zip(restricted.0) { *total = total.saturating_add(amount); }
         }
         // `Turn` is the longest intrinsic mana lifetime. An explicit loss is unrelated to step/phase boundaries,
         // so no static `mana_kept` rule applies. This also removes source, snow and restriction provenance.
