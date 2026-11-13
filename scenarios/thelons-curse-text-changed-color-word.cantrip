@@ -1,0 +1,51 @@
+# Sleight of Mind changes Thelon's Curse's blue to black: the blue creature untaps as usual, the black one stays tapped,
+# and the upkeep choice untaps it for {U}, a mana symbol the text change leaves alone (CR 612.2, 502.3).
+[Bot1 Deck]
+Black Lotus
+Thelon's Curse
+Mox Sapphire
+Mox Jet
+Merfolk of the Pearl Trident
+Muck Rats
+Sleight of Mind
+Island x20
+[Bot2 Deck]
+Island x20
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Merfolk of the Pearl Trident.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Muck Rats.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Thelon's Curse.Cast
+? Bot1.Mana = {G}
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sleight of Mind.Cast(Bot1.Battlefield.Thelon's Curse)
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Blue)
+Bot1.Colors(Black)
+Bot1.Attack(Merfolk of the Pearl Trident; Muck Rats > Bot2)
+[T5 Bot1.Upkeep]
+? Bot1.Battlefield.Merfolk of the Pearl Trident.Tapped = false
+? Bot1.Battlefield.Muck Rats.Tapped = true
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Muck Rats)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+? Bot1.Mana =
+[T5 Bot1.Main1]
+[Expect]
+Bot1.Battlefield.Muck Rats.Tapped = false
+Bot1.Battlefield.Mox Jet.Tapped = false
