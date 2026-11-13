@@ -2,7 +2,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::{attach, effects, mana};
 use cantrip_rules::{Game as RulesGame, Setup};
-use cantrip_state::{Frame, FrameKind, INLINE_TARGETS};
+use cantrip_state::{Frame, FrameKind, Span, INLINE_TARGETS};
 
 const YOU: PlayerId = PlayerId(0);
 const THEM: PlayerId = PlayerId(1);
@@ -213,6 +213,7 @@ fn run(probe: &'static CardDef) {
     game.state.zone_push(Zone::STACK, spell);
     let members = game.state.members_push(&[sacrificed]);
     game.state.stack_push(StackItem {
+        target_choosers: Span::default(),
         instance: AbilityAcquisition::OWN,
         event_amount: None,
         kind: StackKind::Triggered,
