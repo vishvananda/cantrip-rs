@@ -138,7 +138,7 @@ fn pay(g: &mut dyn Game, item: &StackItem, payment: Payment, age: u32) -> Result
         // A total with more hybrid symbols than a cost holds is not offered (`ManaCost::times`).
         Payment::Mana(mana) => paid_if(g, mana.times(age), |g, total| g.may_pay(payer, this, this, Cost::mana(total), &PAY)),
         Payment::ManaAndLife(mana, life) => {
-            let total = mana.times(age).map(|mana| (mana, u32::from(life) * age));
+            let total = mana.times(age).zip(u32::from(life).checked_mul(age));
             paid_if(g, total, |g, (mana, life)| g.may_pay(payer, this, this, Cost { mana, life, ..Cost::NONE }, &PAY))
         }
         Payment::Life(life) => g.may_pay(payer, this, this, Cost { life: u32::from(life) * age, ..Cost::NONE }, &PAY),
