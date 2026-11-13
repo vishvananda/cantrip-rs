@@ -1,0 +1,45 @@
+# Pox counts a third of all the creatures a player controls, one that can't be sacrificed among them (CR 701.21a, 101.2):
+# Bot2's Hithlain Rope ("This artifact can't be sacrificed.") is a creature under Ensoul Artifact, beside three Memnites. A
+# third of four, rounded up, is two, so Bot2 sacrifices two of the Memnites - not a third of the three it could sacrifice.
+[Bot1 Deck]
+Black Lotus
+Pox
+Island x20
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+Hithlain Rope
+Ensoul Artifact
+Memnite
+Memnite
+Memnite
+Island x20
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Hithlain Rope.Cast
+Bot2.Hand.Ensoul Artifact.Cast(Hithlain Rope)
+? Bot2.Mana =
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Memnite.Cast
+Bot2.Hand.Memnite.Cast
+? Bot2.Battlefield.Hithlain Rope.Power = 5
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Pox.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island; Island)
+Bot2.Choose(Island)
+! Bot2.Choose(Hithlain Rope)
+Bot2.Choose(Memnite#1; Memnite#2)
+[Expect]
+Bot2.Battlefield.Count = 4
+Bot2.Battlefield.Hithlain Rope.Power = 5
+Bot2.Battlefield.Memnite.Power = 1
+Bot2.Graveyard.Count = 4
