@@ -1206,6 +1206,15 @@ opponents" sees one occurrence, individual observers see each loss. The return v
 not blocked losses, replaced gains or a replacement continuation's other actions. `each_opponent_loses_life` uses the same
 operation for equal amounts; single-player changes still apply and emit immediately.
 
+An instruction whose parts are different actions done at once, or whose player suffers several losses that are each their
+own occurrence, uses `Game::together` (`cantrip_api::Together`): Rottenmouth Viper's sacrifices, discards and 4-life losses
+"the appropriate number of times" (its rulings), and an exchange of life totals (CR 701.12c, `exchange::life_totals`). Each
+signed change of life is its own occurrence, never coalesced: replaced on its own through `prepare_life_changes` and
+announced as its own `LifeChange`, so "whenever an opponent loses life" (Bloodthirsty Conqueror) triggers for each and "one
+or more" once. The sacrifices and discards are one `move_together` (each move with its own reason), which carries the life
+changes: they are prepared and judged against the game before any move is made, applied with the moves and announced in
+their batch; the discards' own `Discarded` events follow, as every discard's do.
+
 Damage uses that same life preparation and application within the existing `ops::DamageBatch`, with the four phases
 of CR 120.4 kept distinct. Once every damage replacement and prevention has applied, the batch finalizes actual damage
 and each recipient's total excess, records all of that dealt damage in the existing history through `Cx::record_batch`,
@@ -3207,7 +3216,9 @@ rules' own, `intrinsic::SPEED_UP`, queued from `ops::change_life` when an oppone
 active player's speed is below 4, from an object in no zone as the monarch's are (`designations::queue`). "Only once each
 turn" is asked of the history: the turn's `Event::Triggered` records of that ability (only the active player's can trigger in
 a turn). "If your speed is less than 4" is its intervening "if" (CR 603.4). `Game::increase_speed` raises speed, never past 4
-(CR 702.179c, e; the release notes), and records `Event::SpeedChanged`. Effects read it with
+(CR 702.179c, e; the release notes), and `Game::reduce_speed(player, amount, minimum)` lowers it, never below `minimum` (only a
+card's effect does, e.g. Spikeshell Harrier's "can't reduce their speed below 1"; a player with no speed has none to reduce);
+each change records `Event::SpeedChanged`. Effects read it with
 `cantrip_mechanics::start_your_engines::{speed, has_max_speed}` (0 for none, CR 702.179f); "Max speed — [ability]" is
 `max_speed::max_speed(text)`, a layer-6 static granting the card's `delayed[0]` while its controller has speed 4
 (CR 702.178a), so below that the permanent has no such ability at all. A max speed ability granting one that works from

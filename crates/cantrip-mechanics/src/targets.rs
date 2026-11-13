@@ -324,10 +324,14 @@ pub const OTHER_CREATURE_YOU_CONTROL_WITH_POWER_2_OR_LESS: TargetSpec = target(o
 /// "Creature or Vehicle" (CR 205.3g, 301.7): a permanent on the battlefield that is a creature, or a Vehicle whether or not
 /// it is crewed into a creature right now. Bounce Off and Perilous Snare target one; Reckoner Shakedown chooses one.
 pub fn creature_or_vehicle(q: &dyn Query, id: ObjectId) -> bool {
-    on_battlefield(q, id) && {
-        let c = q.chars(id);
-        c.is(CardType::Creature) || c.has_subtype(Subtype::Vehicle)
-    }
+    on_battlefield(q, id) && is_creature_or_vehicle(&q.chars(id))
+}
+
+/// Whether these are the characteristics of a creature or a Vehicle (CR 205.3g, 301.7), wherever the object is: the creature type, or
+/// the Vehicle subtype whether or not it is crewed into a creature. Bounce Off and Perilous Snare target a permanent that is one;
+/// Back on Track and Carrion Cruiser take a card from a graveyard that is one.
+pub fn is_creature_or_vehicle(c: &Chars) -> bool {
+    c.is(CardType::Creature) || c.has_subtype(Subtype::Vehicle)
 }
 
 fn creature_or_vehicle_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
@@ -342,6 +346,14 @@ fn creature_or_vehicle_you_control_filter(q: &dyn Query, asker: &Asker, t: Targe
 pub const CREATURE_OR_VEHICLE: TargetSpec = target(creature_or_vehicle_filter);
 /// "Target creature or Vehicle you control" (CR 115.1, 109.5). Perilous Snare prints it.
 pub const CREATURE_OR_VEHICLE_YOU_CONTROL: TargetSpec = target(creature_or_vehicle_you_control_filter);
+
+fn creature_or_vehicle_an_opponent_controls_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if creature_or_vehicle(q, id) && q.controller(id) != asker.controller)
+}
+
+/// "Target creature or Vehicle an opponent controls" (CR 115.1, 109.5). Howler's Heavy, Roadside Blowout and Spikeshell
+/// Harrier print it.
+pub const CREATURE_OR_VEHICLE_AN_OPPONENT_CONTROLS: TargetSpec = target(creature_or_vehicle_an_opponent_controls_filter);
 
 /// "Creature or Spacecraft" (CR 205.3g), as Beyond the Quiet's "all creatures and Spacecraft" reads it too: a permanent
 /// on the battlefield that is a creature, or a Spacecraft whether or not it is a creature right now (it is one only while
@@ -378,6 +390,14 @@ fn opponent_whose_turn_it_is_filter(q: &dyn Query, asker: &Asker, t: Target) -> 
 /// the opponent whenever the ability's controller is not the active player. Cmdr. Troi, Outgoing Empath prints it.
 pub const OPPONENT_WHOSE_TURN_IT_IS: TargetSpec = target(opponent_whose_turn_it_is_filter);
 pub const SPELL: TargetSpec = target(spell_filter);
+
+fn spell_you_control_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    spell_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) == asker.controller)
+}
+
+/// "Target spell you control" (CR 115.1, 109.5): a spell on the stack, of any kind, that the ability's controller controls.
+/// Slick Imitator and Overloaded Mage-Ring (Invasion of Vryn's back face) print it.
+pub const SPELL_YOU_CONTROL: TargetSpec = target(spell_you_control_filter);
 fn spell_or_ability_with_a_single_target_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     let state = q.state();
     let stack = &state.stack;

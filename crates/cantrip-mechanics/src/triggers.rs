@@ -1916,6 +1916,19 @@ pub fn creature_attacks_you_or_a_planeswalker_you_control(q: &dyn Query, me: &As
     }
 }
 
+/// "Whenever one or more creatures attack you" (CR 508.1, 603.2c): each creature declared as an attacker of this ability's controller,
+/// the ability being about it (`Fired::about`), so with `.once_per_batch()` the creatures of one declaration that
+/// attack the ability's controller are one batch (`Query::event_objects`). Any creature counts, whoever controls it; one
+/// attacking a planeswalker or battle you control does not. Sabotage Strategist and Orim's Prayer print it.
+pub fn creature_attacks_you(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Attacks { attacker, defender: Target::Player(p), .. } if *p == me.controller => Fired::about(Target::Object(*attacker)),
+        _ => None,
+    }
+}
+
+pub const CREATURE_ATTACKS_YOU: Trigger = when_asked(EventMask::ATTACKS, creature_attacks_you);
+
 /// "Whenever a creature an opponent controls enters" (CR 603.6a): any creature, token or not, under the control of a player
 /// other than this ability's controller as it entered. The ability is about that player (`Fired::about`), for "deals 1 damage
 /// to that player". Authority of the Consuls and Gideon the Oathless print it.
@@ -2283,6 +2296,18 @@ pub fn subtype_you_control_deal_combat_damage_to_player<const SUBTYPE: u16>(q: &
     }
 }
 
+/// "Whenever a creature you control with flying deals combat damage to a player" (CR 510.2, 603.2, 702.9): flying as the layers
+/// give it to the creature as it dealt the damage. Written with `.sums_per_subject()`, the "one or more creatures" form of Mu
+/// Yanling, Wind Rider and Vulture, Feathered Fiend (CR 603.2c) triggers once for each player the batch damaged.
+pub fn creature_you_control_with_flying_deals_combat_damage_to_player(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Damage { source: from, .. } if q.chars(*from).has(Keyword::Flying) => {
+            creature_you_control_deals_combat_damage_to_player(q, me, event)
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever you commit a crime" (CR 700.13): the ability's controller cast a spell, activated an ability or put a
 /// triggered ability on the stack that targets an opponent, anything an opponent controls and/or a card in an opponent's
 /// graveyard - once for that spell or ability, however many such targets it has. Magda, the Hoardmaster, Raven of Fell
@@ -2319,6 +2344,21 @@ pub fn you_discard(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
 }
 
 pub const YOU_DISCARD: Trigger = when_asked(EventMask::DISCARDED, you_discard);
+
+/// "Whenever this creature saddles a Mount or crews a Vehicle during your main phase" (CR 702.171, 702.122, 603.2): the
+/// source itself is the creature that tapped to saddle or crew (`Event::Saddled`, `Event::Crewed`), in a main phase of a turn of
+/// its controller's; the trigger is about the Mount or Vehicle (`StackItem::subject`). Reckless Velocitaur prints it.
+pub fn this_saddles_or_crews_in_your_main_phase(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    let (Event::Saddled { creature, mount: permanent } | Event::Crewed { creature, vehicle: permanent }) = event else { return None };
+    let turn = q.state().turn;
+    if *creature != me.source || turn.active != me.controller || !turn.step().is_main() {
+        return None;
+    }
+    Fired::about(Target::Object(*permanent))
+}
+
+pub const THIS_SADDLES_OR_CREWS_IN_YOUR_MAIN_PHASE: Trigger =
+    when_asked(EventMask(EventMask::SADDLED.0 | EventMask::CREWED.0), this_saddles_or_crews_in_your_main_phase);
 
 /// "Whenever you flip a coin" (CR 705.1): any flip its controller makes, won or lost.
 pub fn you_flip_a_coin(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
@@ -2395,6 +2435,14 @@ pub fn loyalty_ability_you_activated(q: &dyn Query, me: &Asker, event: &Event) -
 /// "Whenever you activate a loyalty ability": any permanent's, by this ability's controller (Ajani Unrelenting).
 pub fn you_activate_a_loyalty_ability(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     loyalty_ability_you_activated(q, me, event).and(Fired::PLAIN)
+}
+
+/// "Whenever you activate an exhaust ability" (CR 702.177a, 602.2, 603.2): any exhaust ability, of any permanent, that this
+/// ability's controller activates. It sees the activation, so the ability has not resolved and is triggered even if it is countered
+/// or its source is gone. Rangers' Refueler and Adrenaline Jockey print it.
+pub fn you_activate_an_exhaust_ability(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    let (_, player, def) = activation(q, event)?;
+    if player == me.controller && def.exhaust { Fired::PLAIN } else { None }
 }
 
 /// "Whenever an opponent activates an ability of an artifact, creature, or land [on the battlefield] that isn't a mana
@@ -2693,6 +2741,7 @@ pub const CREATURE_DEALS_COMBAT_DAMAGE_TO_YOU: Trigger = when_asked(EventMask::D
 pub const OPPONENT_ACTIVATES_ABILITY_OF_ARTIFACT_CREATURE_OR_LAND: Trigger =
     when_asked(EventMask::ABILITY_ACTIVATED, opponent_activates_ability_of_artifact_creature_or_land);
 pub const YOU_ACTIVATE_A_LOYALTY_ABILITY: Trigger = when_asked(EventMask::ABILITY_ACTIVATED, you_activate_a_loyalty_ability);
+pub const YOU_ACTIVATE_AN_EXHAUST_ABILITY: Trigger = when_asked(EventMask::ABILITY_ACTIVATED, you_activate_an_exhaust_ability);
 
 /// "Whenever this creature transforms into [this face]" (CR 701.27e): the ability is that face's, so it is there to see
 /// only once the permanent has turned over to it (CR 603.2, 603.6). A permanent that enters with this face up has not

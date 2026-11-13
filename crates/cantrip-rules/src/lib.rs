@@ -2981,6 +2981,10 @@ impl cantrip_api::Game for Cx<'_> {
         ops::lose_life_together(self, losses)
     }
 
+    fn together(&mut self, parts: cantrip_api::Together) -> i32 {
+        ops::together(self, parts)
+    }
+
     fn set_life_total(&mut self, player: PlayerId, total: i32) {
         let life = self.g.state.player(player).life;
         ops::change_life(self, player, i64::from(total) - i64::from(life));
@@ -3254,6 +3258,10 @@ impl cantrip_api::Game for Cx<'_> {
 
     fn increase_speed(&mut self, player: PlayerId, amount: u8) {
         speed::increase(self, player, amount);
+    }
+
+    fn reduce_speed(&mut self, player: PlayerId, amount: u8, minimum: u8) {
+        speed::reduce(self, player, amount, minimum);
     }
 
     fn damage_cant_be_prevented(&mut self) {

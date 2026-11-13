@@ -1,5 +1,4 @@
 use cantrip_api::*;
-use cantrip_mechanics::crew::crew;
 use cantrip_mechanics::{effects, haste_until_end_of_turn, targets, tokens, triggers};
 use cantrip_oracle as oracle;
 
@@ -20,27 +19,10 @@ fn animate_vehicle(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// 0: "Create a 3/2 colorless Vehicle artifact token with crew 1."
-fn create_vehicle(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let vehicle = g.card_id(&VEHICLE);
-    g.create_tokens(vehicle, item.controller, 1, false)?;
-    Ok(())
-}
-
 fn emblem(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     tokens::create_emblem(g, item.controller, &EMBLEM);
     Ok(())
 }
-
-/// The 3/2 colorless Vehicle artifact token with crew 1.
-pub static VEHICLE: CardDef = CardDef {
-    types: TypeSet::of(&[CardType::Artifact]),
-    power: Some(3),
-    toughness: Some(2),
-    abilities: &[crew(1, "Crew 1 (Tap any number of creatures you control with total power 1 or more: This Vehicle becomes an artifact creature until end of turn.)")],
-    text: "Crew 1",
-    ..token!(Vehicle)
-};
 
 /// The emblem: "Whenever an artifact you control enters, this emblem deals 3 damage to any target." The emblem is the damage's
 /// source (CR 114.4).
@@ -66,11 +48,11 @@ pub static CARD: CardDef = CardDef {
         )
         .targets(&[up_to_one(vehicle_you_control)]),
         ability(loyalty(2), |g, item| effects::may_sacrifice_an_artifact_or_discard_to_draw(g, item, 1), "+2: You may sacrifice an artifact or discard a card. If you do, draw a card."),
-        ability(loyalty(0), create_vehicle, "0: Create a 3/2 colorless Vehicle artifact token with crew 1."),
+        ability(loyalty(0), tokens::create_a_crew_1_vehicle, "0: Create a 3/2 colorless Vehicle artifact token with crew 1."),
         ability(loyalty(-7), emblem, "\u{2212}7: You get an emblem with \"Whenever an artifact you control enters, this emblem deals 3 damage to any target.\""),
     ],
     labels: &["Sacrifice an artifact", "Discard a card", "Neither"],
     ..oracle::CHANDRA_SPARK_HUNTER
 };
 
-pub static EXTRA: &[&CardDef] = &[&VEHICLE, &EMBLEM];
+pub static EXTRA: &[&CardDef] = &[&tokens::VEHICLE_CREW_1, &EMBLEM];

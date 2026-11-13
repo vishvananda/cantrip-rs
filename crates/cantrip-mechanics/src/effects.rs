@@ -40,6 +40,17 @@ pub fn gain_control_of_target_while_you_control_source(g: &mut dyn Game, item: &
     Ok(())
 }
 
+/// "[That creature] can't attack or block for as long as you control this [permanent]" (CR 508.1c, 509.1b, 611.2b): both
+/// restrictions on `object` use the uninterrupted `Duration::WhileSourceControlled` interval. Extraction Specialist (the
+/// creature it returned) and Possession Engine (the creature it took) print it.
+pub fn cant_attack_or_block_while_you_control_source(g: &mut dyn Game, item: &StackItem, object: ObjectId) {
+    let duration = Duration::WhileSourceControlled;
+    instruction(g, |g| {
+        g.add_effect(item.object, object, EffectKind::CantAttack, duration);
+        g.add_effect(item.object, object, EffectKind::CantBlock, duration);
+    });
+}
+
 /// "The number of counters on" an object (CR 122.1): counters of every kind, a +1/+1 and a -1/-1 counter both counted while
 /// state-based actions have not yet removed the pair (CR 704.5q). Read from the object as it last existed if it has left the
 /// battlefield (CR 608.2h). Jadzia Dax, Living Legacy and Savanti Romero, Time's Exile ask it of themselves. A count of one
@@ -372,11 +383,18 @@ pub fn pump_all_creatures(g: &mut dyn Game, source: ObjectId, power: i32, toughn
 }
 
 /// "Creatures other than [these] get +`power`/+`toughness` until end of turn" (CR 611.2, 611.2c): `pump_all_creatures`, with
-/// the creatures `other_than` names left out. Harvester of Misery's "other creatures get -2/-2" and D'Ghor Bloodletter's
-/// "all other creatures get -1/-1" leave out their source; Zenos yae Galvus's "creatures other than Zenos yae Galvus and the
-/// chosen creature get -2/-2" its source and the creature it chose.
+/// the creatures `other_than` names left out. Zenos yae Galvus's "creatures other than Zenos yae Galvus and the chosen
+/// creature get -2/-2" leaves out its source and the creature it chose; `other_creatures_get` is it leaving out only the source.
 pub fn pump_creatures_other_than(g: &mut dyn Game, source: ObjectId, other_than: &[ObjectId], power: i32, toughness: i32) {
     pump_creatures_where(g, source, |_, id| !other_than.contains(&id), power, toughness);
+}
+
+/// "Other creatures get +`P`/+`T` until end of turn" as a spell's or ability's whole effect: `pump_creatures_other_than`, leaving
+/// out only its source (CR 611.2, 611.2c), whoever controls the rest. Harvester of Misery (-2/-2), D'Ghor Bloodletter (-1/-1,
+/// "All other creatures") and Shefet Archfiend (-2/-2, "all other creatures") print it.
+pub fn other_creatures_get<const P: i32, const T: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    pump_creatures_other_than(g, item.object, &[item.object], P, T);
+    Ok(())
 }
 
 /// "All nonartifact creatures get -`power`/-`toughness` until end of turn" (CR 611.2c): the creatures on the battlefield at
@@ -463,7 +481,7 @@ pub fn counters_on_each(g: &mut dyn Game, objects: &[ObjectId], kind: CounterKin
 /// (CR 612.2); all of them at once (CR 608.2, 101.4: one event, CR 603.2c). The permanents. Lyra, Archangel of Dawn
 /// (Angels) and Ajani, Nacatl Avenger (Cats) print it, with one +1/+1 counter: `plus_one_counter_on_each_of_subtype_you_control`.
 pub fn counters_on_each_of_subtype_you_control(g: &mut dyn Game, item: &StackItem, subtype: Subtype, kind: CounterKind, n: i32) -> Vec<ObjectId> {
-    of_subtype_you_control(g, item, subtype, false, kind, n)
+    of_subtype_you_control(g, item, subtype, false, false, kind, n)
 }
 
 /// "Other [subtype]s you control gain [keywords] until end of turn" (CR 611.2, 611.2c, 702): every permanent with the subtype that `item`'s
@@ -482,20 +500,27 @@ pub fn other_of_subtype_you_control_gain_until_end_of_turn<const SUBTYPE: u16, c
     Ok(())
 }
 
+/// "Put `n` `kind` counters on each [subtype] creature you control" (CR 122.1, 205.3, 608.2): `counters_on_each_of_subtype_you_control`
+/// for the permanents of the subtype that are creatures as it resolves, so a noncreature permanent with the subtype gets none. Mindspring
+/// Merfolk (Merfolk, +1/+1) and Avenger of Zendikar (Plant, +1/+1) print it.
+pub fn counters_on_each_creature_of_subtype_you_control(g: &mut dyn Game, item: &StackItem, subtype: Subtype, kind: CounterKind, n: i32) -> Vec<ObjectId> {
+    of_subtype_you_control(g, item, subtype, false, true, kind, n)
+}
+
 /// "Put `n` `kind` counters on each other [subtype] you control": `counters_on_each_of_subtype_you_control` without the
 /// source. Thalia's Lieutenant (Humans), Rescue Retriever (Soldiers), Camellia, the Seedmiser (Squirrels), Agent Phil
 /// Coulson and Doctor Spectrum (Heroes) and Vampire Socialite (Vampires) print it, with one +1/+1 counter:
 /// `plus_one_counter_on_each_other_of_subtype_you_control`.
 pub fn counters_on_each_other_of_subtype_you_control(g: &mut dyn Game, item: &StackItem, subtype: Subtype, kind: CounterKind, n: i32) -> Vec<ObjectId> {
-    of_subtype_you_control(g, item, subtype, true, kind, n)
+    of_subtype_you_control(g, item, subtype, true, false, kind, n)
 }
 
-fn of_subtype_you_control(g: &mut dyn Game, item: &StackItem, subtype: Subtype, other: bool, kind: CounterKind, n: i32) -> Vec<ObjectId> {
+fn of_subtype_you_control(g: &mut dyn Game, item: &StackItem, subtype: Subtype, other: bool, creature: bool, kind: CounterKind, n: i32) -> Vec<ObjectId> {
     let word = g.words(item.object).subtype(subtype);
     let objects: Vec<ObjectId> = g
         .permanents_of(item.controller)
         .into_iter()
-        .filter(|&id| !(other && id == item.object) && g.chars(id).has_subtype(word))
+        .filter(|&id| !(other && id == item.object) && (!creature || g.chars(id).is(CardType::Creature)) && g.chars(id).has_subtype(word))
         .collect();
     counters_on_each(g, &objects, kind, n);
     objects
@@ -579,6 +604,17 @@ pub fn plus_one_counter_on_this(g: &mut dyn Game, item: &StackItem) -> Result<()
     Ok(())
 }
 
+/// "This Vehicle becomes an artifact creature. Put `N` +1/+1 counters on it" (CR 301.7, 611.2a, 122.1): with no duration said it
+/// stays an artifact creature for as long as it is on the battlefield, still a Vehicle, its printed power and toughness and the
+/// counters making it. Done to the permanent whose ability this is, so a Vehicle that has left the battlefield by the time the
+/// ability resolves is a new object and gets nothing (CR 400.7). The exhaust ability of Invasion Submersible (three counters) and
+/// Rangers' Refueler (one) is it.
+pub fn this_vehicle_becomes_artifact_creature_with_plus_one_counters<const N: i32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.add_effect(item.object, item.object, EffectKind::AddTypes(TypeSet::of(&[CardType::Artifact, CardType::Creature])), Duration::Indefinite);
+    g.add_counters(item.object, CounterKind::PlusOne, N);
+    Ok(())
+}
+
 /// "Put two +1/+1 counters on [this permanent]" (CR 122.1, 201.5): the ability's source, not a new object once it has
 /// left the battlefield (CR 400.7). The whole effect of a trigger or ability of Brave Brawler, Demon Wall, Knight of Autumn,
 /// Loki Laufeyson, Serpent Specialist, Titanbones, Towering Heart, Viv Vision, Teen Synthezoid, Volcanic Villain and Ygra,
@@ -592,6 +628,16 @@ pub fn two_plus_one_counters_on_this(g: &mut dyn Game, item: &StackItem) -> Resu
 /// battlefield (CR 400.7). The whole effect of an ability of Aerial Doombot (power-up) and Guardian of the Halls.
 pub fn three_plus_one_counters_on_this(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.add_counters(item.object, CounterKind::PlusOne, 3);
+    Ok(())
+}
+
+/// "Put that many +1/+1 counters on [this permanent]" (CR 122.1, 603.2c) after a "whenever you ... one or more" trigger
+/// with `.once_per_batch()`: one counter for each object of the batch the trigger saw, counted even for one that has since
+/// left. The ability's source, not a new object once it has left the battlefield (CR 400.7). The whole effect of Marauding
+/// Mako's and Scrounging Skyray's triggers.
+pub fn that_many_plus_one_counters_on_this(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let many = g.event_objects(item).len() as i32;
+    g.add_counters(item.object, CounterKind::PlusOne, many);
     Ok(())
 }
 
@@ -1202,6 +1248,13 @@ pub fn each_opponent_loses_1_life(g: &mut dyn Game, item: &StackItem) -> Result<
     Ok(())
 }
 
+/// "Each opponent loses 2 life" (CR 119.3): every opponent still in the game loses it together. Engine Rat, Leech Collector's
+/// Bloodletting and The Coming of Galactus's chapters II and III print it.
+pub fn each_opponent_loses_2_life(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.each_opponent_loses_life(item.controller, 2);
+    Ok(())
+}
+
 /// "Target player loses `n` life and you gain `n` life" (CR 119.3), and "target opponent ...": the first target, a player,
 /// whichever its slot allows. A target no longer legal loses nothing (CR 608.2b), while the gain, which does not use it, is
 /// still made when the resolution goes on without it (a mode of a modal spell whose other target is legal); an ability with that
@@ -1457,17 +1510,22 @@ pub fn target_player_mills<const N: u32>(g: &mut dyn Game, item: &StackItem) -> 
     Ok(())
 }
 
+/// "Each opponent mills N cards" (CR 701.17a, 101.4): every opponent of the controller mills together, as one instruction.
+/// Aether Syphon and Psychic Corrosion print it (two).
+pub fn each_opponent_mills<const N: u32>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let mills: Vec<(PlayerId, u32)> = g.state().opponents(item.controller).map(|p| (p, N)).collect();
+    g.mill_together(&mills);
+    Ok(())
+}
+
 /// "You draw two cards and each player loses 2 life." (CR 121.1, 119.3, 101.4): the controller draws, then every player in
-/// the game loses the life, in turn order from the active player, as one instruction. Impossible Choice's second mode and
+/// the game loses the life together, as one event, replaced in turn order from the active player. Impossible Choice's second mode and
 /// The City on the Edge of Forever's chapter II print it.
 pub fn draw_two_each_player_loses_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.draw(item.controller, 2);
-    let players: Vec<PlayerId> = g.state().apnap().collect();
-    instruction(g, |g| {
-        for player in players {
-            g.lose_life(player, 2);
-        }
-    });
+    // Every player loses it together: one event, replaced in APNAP order (CR 101.4, 603.2c).
+    let losses: Vec<(PlayerId, i32)> = g.state().apnap().map(|player| (player, 2)).collect();
+    g.lose_life_together(&losses);
     Ok(())
 }
 
@@ -1645,6 +1703,15 @@ pub fn untap_all_creatures_you_control(g: &mut dyn Game, item: &StackItem) -> Re
     let creatures: Vec<ObjectId> =
         g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
     g.untap_together(&creatures);
+    Ok(())
+}
+
+/// "Untap all nonland permanents you control" (CR 701.26b): everything the ability's controller controls as it resolves that is
+/// not a land, with no choice, untapped together (CR 101.4). Paradox Engine and Unstoppable Plan print it.
+pub fn untap_all_nonland_permanents_you_control(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let nonland: Vec<ObjectId> =
+        g.permanents_of(item.controller).into_iter().filter(|&id| !g.chars(id).is(CardType::Land)).collect();
+    g.untap_together(&nonland);
     Ok(())
 }
 
@@ -2360,6 +2427,18 @@ pub fn plus_one_counters_on_first_target_that_gains_until_end_of_turn<const COUN
     g.add_counters(creature, CounterKind::PlusOne, COUNTERS);
     g.end_sentence();
     g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords(KEYWORDS)), Duration::EndOfTurn);
+    Ok(())
+}
+
+/// "Put `COUNTERS` +1/+1 counters on [this creature]. It gains [keywords] until end of turn" (CR 122.1, 611.2a, 608.2c): the
+/// ability's source, and only while it is still the object that was on the battlefield (CR 400.7); the counters, then as a second
+/// instruction the keywords for the rest of the turn. `KEYWORDS` is a `Keywords` as `u128`
+/// (`Keywords::of(&[Keyword::DoubleStrike]).0`). Pacesetter Paragon (one counter, double strike) and Rough Rhino Cavalry (two
+/// counters, trample) print it.
+pub fn plus_one_counters_on_this_that_gains_until_end_of_turn<const COUNTERS: i32, const KEYWORDS: u128>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.add_counters(item.object, CounterKind::PlusOne, COUNTERS);
+    g.end_sentence();
+    g.add_effect(item.object, item.object, EffectKind::AddKeywords(Keywords(KEYWORDS)), Duration::EndOfTurn);
     Ok(())
 }
 

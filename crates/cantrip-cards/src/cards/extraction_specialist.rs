@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::targets;
+use cantrip_mechanics::{effects, targets};
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
@@ -9,11 +9,7 @@ use cantrip_oracle as oracle;
 fn raise(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(card) = targets::object(g, item, 0) else { return Ok(()) };
     let arrived = g.put_onto_battlefield(card, item.controller, false)?;
-    let until = Duration::WhileSourceControlled;
-    instruction(g, |g| {
-        g.add_effect(item.object, arrived, EffectKind::CantAttack, until);
-        g.add_effect(item.object, arrived, EffectKind::CantBlock, until);
-    });
+    effects::cant_attack_or_block_while_you_control_source(g, item, arrived);
     Ok(())
 }
 

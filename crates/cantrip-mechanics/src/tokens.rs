@@ -415,6 +415,17 @@ pub static GNOME: CardDef = CardDef {
     ..token!(Gnome)
 };
 
+/// The 3/2 colorless Vehicle artifact token with crew 1 (CR 111, 301.7, 702.122). Chandra, Spark Hunter and Mu Yanling, Wind Rider
+/// make it.
+pub static VEHICLE_CREW_1: CardDef = CardDef {
+    types: TypeSet::of(&[CardType::Artifact]),
+    power: Some(3),
+    toughness: Some(2),
+    abilities: &[crate::crew::crew(1, "Crew 1 (Tap any number of creatures you control with total power 1 or more: This Vehicle becomes an artifact creature until end of turn.)")],
+    text: "Crew 1",
+    ..token!(Vehicle)
+};
+
 /// The 1/1 colorless Pilot creature token: "This token crews Vehicles as though its power were 2 greater." Shorikai,
 /// Genesis Engine and Reckoner Bankbuster make it.
 pub static PILOT: CardDef = CardDef {
@@ -1262,6 +1273,13 @@ pub fn create_a_treasure(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspe
     create_treasure(g, item.controller)
 }
 
+/// "Create a 3/2 colorless Vehicle artifact token with crew 1" as an effect (CR 111.1): one `VEHICLE_CREW_1` under the controller of the
+/// resolving spell or ability. Chandra, Spark Hunter and Mu Yanling, Wind Rider print it.
+pub fn create_a_crew_1_vehicle(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    create(g, item.controller, &VEHICLE_CREW_1, 1)?;
+    Ok(())
+}
+
 /// "Target player creates N Treasure tokens" (CR 111.10a): all at once, under the player the item targeted in `slot`, if that
 /// target is still legal (CR 608.2b). Ashling's Command (two) and Prismari Command (one) print it.
 pub fn target_player_creates_treasures(g: &mut dyn Game, item: &StackItem, slot: usize, n: u32) -> Result<(), Suspend> {
@@ -1549,4 +1567,11 @@ mod tests {
         assert_eq!(OFFICER.power, Some(1));
         assert_eq!(OFFICER.toughness, Some(1));
     }
+}
+
+/// "Create a 2/2 black Zombie creature token." (CR 111.1): one `ZOMBIE` under `item`'s controller, the card file listing it in
+/// its `EXTRA`. Hour of Victory and Liliana, Dreadhorde General print it.
+pub fn create_a_zombie(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    create(g, item.controller, &ZOMBIE, 1)?;
+    Ok(())
 }
