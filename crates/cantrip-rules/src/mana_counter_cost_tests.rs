@@ -67,7 +67,7 @@ static SPELL: CardDef = CardDef {
 };
 
 fn game() -> Game {
-    let table = Box::leak(Box::new(CardTable::new([&FILLER, &STORE, &BATTERY, &REPEAT, &SACRIFICE, &EXILE, &FIXED, &SPHERE, &PAID, &MANA_X, &SPELL])));
+    let table = Box::leak(Box::new(CardTable::new([&FILLER, &STORE, &BATTERY, &REPEAT, &SACRIFICE, &EXILE, &FIXED, &SPHERE, &PAID, &MANA_X, &SPELL, &SPLIT_MANA, &SPLIT_ABILITY])));
     let deck = vec![table.id_of(&FILLER); 20];
     let mut game = Game::new(table, &Setup { decks: vec![deck.clone(), deck], ..Default::default() });
     game.verify = true;
@@ -271,4 +271,27 @@ fn could_produce_ignores_counter_cost_payability_and_includes_the_two_mana_repla
     assert_eq!(game.state.obj(source).counters(CounterKind::Charge), 0);
     assert_eq!(game.state.obj(source).x, 9);
     assert_eq!(game.state.player(YOU).pool.total(), 0);
+}
+
+/// Two fixed removals of three kept as separate components (`Cost::sequence`), and any number more on the whole: from five
+/// counters no X is payable, so activating it pays nothing and adds nothing (CR 118.3).
+const SPLIT: Cost = Cost::sequence(&[remove_counters(CounterKind::Charge, 3), remove_counters(CounterKind::Charge, 3)]).and(COUNTER_COST);
+static SPLIT_MANA: CardDef = CardDef {
+    name: "Mana counter split", abilities: &[mana_ability(SPLIT, add_by(add_x), "Remove three charge counters, three more, and any number more: Add that much {G}.").x_is_mana_amount()],
+    ..BATTERY
+};
+static SPLIT_ABILITY: CardDef = CardDef {
+    name: "Counter split ability", abilities: &[ability(SPLIT, nothing, "Remove three charge counters, three more, and any number more: Nothing.")],
+    ..BATTERY
+};
+#[test]
+fn fixed_components_beyond_the_counters_leave_no_x_to_announce() {
+    for def in [&SPLIT_MANA, &SPLIT_ABILITY] {
+        let mut game = game(); let source = put(&mut game, def, Zone::BATTLEFIELD);
+        act(&mut game, source);
+        assert!(!matches!(game.pending().map(|r| &r.kind), Some(RequestKind::PayCosts { announcing: true, .. })), "{}: no X is announced", def.name);
+        assert_eq!(game.state.obj(source).counters(CounterKind::Charge), 5, "{}", def.name);
+        assert_eq!(game.state.player(YOU).pool.total(), 0, "{}", def.name);
+        assert!(game.state.stack.is_empty(), "{}", def.name);
+    }
 }
