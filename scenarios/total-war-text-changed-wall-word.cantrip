@@ -1,0 +1,50 @@
+# Artificial Evolution changes Total War's Wall to Elf: the attacking player's untapped Wall that didn't attack is
+# destroyed and their Elf is spared (CR 612.2, 205.3m).
+[Bot1 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Wall of Wood
+Memnite
+Island x20
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Total War
+Artificial Evolution
+Island x20
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Wall of Wood.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Total War.Cast
+? Bot2.Mana =
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Artificial Evolution.Cast(Bot2.Battlefield.Total War)
+Bot2.Pass
+Bot1.Pass
+Bot2.Modes(Wall)
+Bot2.Modes(Elf)
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Memnite)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Graveyard = Wall of Wood
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot2.Life = 19
