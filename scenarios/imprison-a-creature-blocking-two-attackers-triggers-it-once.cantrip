@@ -1,0 +1,48 @@
+# Imprison's "whenever enchanted creature blocks" triggers once for Two-Headed Giant of Foriys blocking two attackers (CR 509.3a):
+# Bot1 pays {1} once, the Giant is tapped and removed from combat, both attackers it alone blocked become unblocked
+# (CR 509.1h), and no second trigger destroys Imprison for want of a second payment.
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Memnite
+Memnite
+Imprison
+Island x20
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Mox Emerald
+Two-Headed Giant of Foriys
+Island x20
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Memnite.Cast
+Bot1.Hand.Memnite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Two-Headed Giant of Foriys.Cast
+? Bot2.Mana =
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Imprison.Cast(Two-Headed Giant of Foriys)
+? Bot1.Mana =
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Memnite#1 > Bot2; Memnite#2 > Bot2)
+Bot2.Block(Two-Headed Giant of Foriys > Memnite#1; Two-Headed Giant of Foriys > Memnite#2)
+? Stack.Count = 1
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.PayCost
+? Bot1.Mana =
+? Stack.Count = 0
+[T3 Bot1.Main2]
+[Expect]
+Bot2.Life = 18
+Bot2.Battlefield.Two-Headed Giant of Foriys.Tapped = true
+Bot1.Battlefield.Imprison.AttachedTo = Two-Headed Giant of Foriys
+Bot1.Battlefield.Memnite#2.Power = 1
