@@ -270,6 +270,16 @@ fn creature_blocked_by_source_filter(q: &dyn Query, asker: &Asker, t: Target) ->
 }
 pub const CREATURE_IT_IS_BLOCKING: TargetSpec = target(creature_blocked_by_source_filter);
 
+/// "Target creature blocking or blocked by this creature" (CR 115.1, 509.1g-h): a creature on the battlefield among
+/// `creatures_blocking` or `creatures_blocked_by` the ability's source, which read the source as it last existed if it has
+/// left (CR 608.2h). Lesser Werewolf and Sentinel print it.
+fn creature_blocking_or_blocked_by_source_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    creature_filter(q, asker, t)
+        && matches!(t, Target::Object(id) if q.creatures_blocking(asker.source).contains(&id)
+            || q.creatures_blocked_by(asker.source).contains(&id))
+}
+pub const CREATURE_BLOCKING_OR_BLOCKED_BY_SOURCE: TargetSpec = target(creature_blocking_or_blocked_by_source_filter);
+
 fn artifact_creature_or_land_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if on_battlefield(q, id)
         && (q.chars(id).is(CardType::Artifact) || q.chars(id).is(CardType::Creature) || q.chars(id).is(CardType::Land)))
