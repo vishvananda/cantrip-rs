@@ -2523,6 +2523,10 @@ public sealed class ActionOptionMessage
     [Key(37)]
     public uint Rider { get; set; }
 
+    /// <summary>Mutually exclusive full bundles produced by one mana activation, chosen as it resolves.</summary>
+    [Key(38)]
+    public List<List<ManaTypeView>> ProducesAlternatives { get; set; } = [];
+
 }
 
 /// <summary>
