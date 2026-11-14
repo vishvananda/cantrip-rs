@@ -1615,6 +1615,15 @@ pub trait Game: Query {
     /// tripled", `CardDef::tap_power`). A creature that has left the battlefield counts as the power it last had.
     fn tapped_power(&self, creature: ObjectId, permanent: ObjectId) -> i32;
 
+    /// The life available for a cost paid as an effect resolves (CR 118.12, 119.4), accounting for prohibitions.
+    fn payable_resolution_life(&self, player: PlayerId) -> u32;
+    /// "Destroy [each of `permanents`] unless any player pays [life]" (Cleansing): the life costs chosen for it, each a
+    /// payer, an amount and the permanent it is paid for, and the destruction of every permanent no payment is made for,
+    /// as one instruction (CR 101.4, 118.12a, 608.2e). Every payment is its own occurrence. One whose payer has left the
+    /// game (CR 800.4a), or that its payer can't pay together with their earlier payments here (CR 118.3), is not made,
+    /// and its permanent is destroyed. The caller asks the choices in APNAP order before this call.
+    fn pay_life_with_permanents(&mut self, source: ObjectId, permanents: &[ObjectId], payments: &[(PlayerId, u32, ObjectId)]);
+
     fn lose_life(&mut self, player: PlayerId, amount: i32);
     /// The life losses of one instruction, simultaneously (CR 101.4, 119.3): each pair is a player and the amount they
     /// lose, determined before this call (CR 608.2h). Positive amounts for the same player are added; none or fewer do

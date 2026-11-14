@@ -2989,6 +2989,14 @@ impl cantrip_api::Game for Cx<'_> {
         static_rules::tapped_power(self, creature, self.chars(creature).power.unwrap_or(0), permanent)
     }
 
+    fn payable_resolution_life(&self, player: PlayerId) -> u32 {
+        actions::payable_life(self, player).max(0) as u32
+    }
+
+    fn pay_life_with_permanents(&mut self, source: ObjectId, permanents: &[ObjectId], payments: &[(PlayerId, u32, ObjectId)]) {
+        ops::pay_life_with_permanents(self, source, permanents, payments)
+    }
+
     fn lose_life(&mut self, player: PlayerId, amount: i32) {
 
         ops::change_life(self, player, -i64::from(amount));
