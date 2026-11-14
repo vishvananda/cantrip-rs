@@ -1,0 +1,69 @@
+# A Sol Ring cast after Boomerang returns Titania's Song to its owner's hand would exist as a 1/1 artifact creature
+# under the lingering effect, though no card with a static ability is left anywhere its abilities function: Authority
+# of the Consuls makes it enter tapped, and its trigger gains 1 life for the creature that entered. In its owner's hand
+# it is an artifact card alone: the effect reaches only permanents (CR 611.3a, 614.12, 613.1d, 613.4b).
+[Bot1 Deck]
+Black Lotus
+Titania's Song
+Sol Ring
+Forest
+Forest
+Forest
+Forest
+Forest x20
+[Bot2 Deck]
+Plains
+Authority of the Consuls
+Boomerang
+Island
+Island
+Island
+Island x20
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Authority of the Consuls.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Authority of the Consuls.Tapped = false
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Titania's Song.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Boomerang.Cast(Bot1.Battlefield.Titania's Song)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Pass
+Bot1.Pass
+? Bot1.Hand.Count = 5
+? Bot2.Life = 20
+? Bot1.Hand.Sol Ring.Power = (absent)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sol Ring.Tapped = true
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[Expect]
+Bot1.Graveyard = Black Lotus
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Sol Ring.Types = Artifact; Creature
+Bot1.Battlefield.Sol Ring.Power = 1
+Bot1.Battlefield.Sol Ring.Tapped = true
+Bot2.Life = 21

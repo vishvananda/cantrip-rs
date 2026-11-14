@@ -1,0 +1,77 @@
+# Titania's Song's continuous effect still applies to noncreature artifacts entering after the Song leaves, until cleanup.
+# Sol Ring remains a 1/1 without its mana ability after Disenchant destroys the Song (CR 611.3a, 613.6, 514.2).
+# Mind Stone, under Bot1's control since an earlier turn (so its {T} ability is not barred by CR 302.6), is a 2/2 that
+# has lost its mana ability, while the Song is on the battlefield and after it leaves (CR 613.1f, 613.4b, 202.3).
+# The Sol Ring cast after the Song left would exist on the battlefield as an artifact creature, so Bot2's Authority of the
+# Consuls has it enter tapped, and its "a creature enters" trigger gains Bot2 1 life (CR 614.12, 603.6a); Mind Stone,
+# cast before the Song when it was no creature, entered untapped.
+[Bot1 Deck]
+Black Lotus
+Forest
+Titania's Song
+Sol Ring
+Mind Stone
+Forest
+Forest
+Forest
+Forest x20
+[Bot2 Deck]
+Plains
+Disenchant
+Authority of the Consuls
+Plains
+Island
+Island
+Island
+Island
+Island x20
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Authority of the Consuls.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mind Stone.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mind Stone.Tapped = false
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Titania's Song.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mind Stone.Power = 2
+! Bot1.Battlefield.Mind Stone.Activate(Ability: Add)
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Titania's Song)
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Pass
+Bot1.Pass
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sol Ring.Tapped = true
+? Bot2.Life = 21
+? Bot1.Battlefield.Sol Ring.Power = 1
+! Bot1.Battlefield.Sol Ring.Activate
+! Bot1.Battlefield.Mind Stone.Activate(Ability: Add)
+[Expect]
+Bot1.Graveyard = Titania's Song; Black Lotus
+Bot1.Battlefield.Sol Ring.Types = Artifact; Creature
+Bot1.Battlefield.Sol Ring.Toughness = 1
+Bot1.Battlefield.Mind Stone.Types = Artifact; Creature
+Bot1.Battlefield.Mind Stone.Toughness = 2
+Bot2.Life = 21
