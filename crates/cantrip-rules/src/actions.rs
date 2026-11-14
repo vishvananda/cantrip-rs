@@ -14745,6 +14745,10 @@ fn mana_activation_window(cx: &mut Cx, player: PlayerId, source: ObjectId, total
     }
 }
 
+// Keep ordinary small payments on their existing one-unit flow. Larger generic payments offer an optional count,
+// including one, so the payer can still interleave other costs at every unit (CR 601.2h).
+const MANA_BATCH_PROMPT_MIN: u32 = 16;
+
 fn pay_mana_inner(cx: &mut Cx, player: PlayerId, source: ObjectId, mut total: ManaCost, helpers: &Helpers, scope: Option<PaymentScope>, mut checkpoint: Option<&mut dyn FnMut(&mut Cx, &mut Vec<Event>, &mut Vec<(ObjectId, CostPart)>, &mut Vec<ObjectId>) -> R<bool>>, script_override: Option<Option<Vec<crate::takeback::Step>>>) -> R<(ManaPool, u8)> {
     // A Phyrexian symbol not yet announced is announced now, each paid with its color or 2 life (CR 107.4f), before any mana
     // ability is activated to pay it, and its life is paid with the mana. A cost to attack is the one that gets here so
@@ -14901,7 +14905,7 @@ fn pay_mana_inner(cx: &mut Cx, player: PlayerId, source: ObjectId, mut total: Ma
                 && owed.symbols.iter().all(|&n| n == 0)
                 && owed.hybrid.iter().all(Option::is_none);
             let available = spent[mana as usize];
-            let count = if generic_only && available > 1 {
+            let count = if generic_only && available >= MANA_BATCH_PROMPT_MIN {
                 match cx.ask_core(player, RequestKind::ChooseNumber {
                     source, least: 1, most: available, heading: "Spend mana",
                 }, true)? {
@@ -14959,7 +14963,7 @@ fn pay_mana_inner(cx: &mut Cx, player: PlayerId, source: ObjectId, mut total: Ma
                             && owed.symbols.iter().all(|&n| n == 0)
                             && owed.hybrid.iter().all(Option::is_none);
                         let available = groups.as_ref().and_then(|gs| gs.iter().find(|g| g.mana == mana && g.snow == action.snow && g.restriction == action.restriction && g.from == from)).map_or(1, |g| g.n).min(due.generic);
-                        let count = if generic_only && available > 1 {
+                        let count = if generic_only && available >= MANA_BATCH_PROMPT_MIN {
                             match cx.ask_core(player, RequestKind::ChooseNumber { source, least: 1, most: available, heading: "Spend mana" }, true)? {
                                 Answer::Announce(n) => n,
                                 _ => return Err(Stop::Cancel),
@@ -14987,7 +14991,7 @@ fn pay_mana_inner(cx: &mut Cx, player: PlayerId, source: ObjectId, mut total: Ma
                         (None, None) => cx.s().player(player).pool.get(mana) - told_mana.iter().map(|(_, pool)| pool.get(mana)).sum::<u32>(),
                     };
                     let batch = if generic_only { available.min(due.generic) } else { 1 };
-                    let count = if batch > 1 {
+                    let count = if batch >= MANA_BATCH_PROMPT_MIN {
                         match cx.ask_core(player, RequestKind::ChooseNumber { source, least: 1, most: batch, heading: "Spend mana" }, true)? {
                             Answer::Announce(n) => n,
                             _ => return Err(Stop::Cancel),
