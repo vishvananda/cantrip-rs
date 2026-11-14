@@ -3101,3 +3101,9 @@ pub fn draw_then_may_put_up_to_lands_tapped(g: &mut dyn Game, player: PlayerId, 
     crate::hand::may_put_up_to_onto_battlefield_tapped(g, player, source, crate::select::land_cards(crate::select::up_to(most)))?;
     Ok(())
 }
+
+/// Sacrifice the source (Stangg and Underworld Breach; CR 701.21a).
+pub fn sacrifice_this(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.sacrifice(item.controller, &[item.object]);
+    Ok(())
+}
