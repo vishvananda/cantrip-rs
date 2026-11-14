@@ -985,6 +985,8 @@ fn activate_rockets(g: &mut Game, source: ObjectId, x: u32) {
     let own_x = g.state.obj(source).x;
     g.state.add_mana(PlayerId(1), Mana::C, x, ObjectId::NONE, None, ManaLasts::Step, false);
     let mut answers = vec![Answer::Announce(x)];
+    // Generic payments of at least 16 ask how much to spend; pay the whole announced X.
+    if x >= 16 { answers.push(Answer::Announce(x)); }
     let mut left = x;
     while left > 0 {
         let n = left.min(255);

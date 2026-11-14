@@ -36,6 +36,7 @@ fn wizards_rockets_produces_all_256_mana_after_sacrifice_without_replacing_its_c
         let request = game.pending().cloned().unwrap();
         let answer = match &request.kind {
             RequestKind::ChooseColors { .. } => break,
+            RequestKind::ChooseNumber { heading: "Spend mana", most, .. } => Answer::Announce(*most),
             RequestKind::PayCosts { options, .. } => {
                 let pay = options.iter().find(|o| o.kind == ActionKind::ConfirmCasting)
                     .or_else(|| options.iter().find(|o| o.kind == ActionKind::AssignMana))

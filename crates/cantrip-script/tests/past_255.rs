@@ -237,9 +237,10 @@ fn put(game: &mut Game, name: &str) -> ObjectId {
     id
 }
 
-/// Announces 300 for X and pays with the Probe Wells' mana: each Well tapped, then the pool's mana one at a time.
+/// Announces 300 for X and pays with the Probe Wells' mana, including any counted mana-payment choice.
 fn announce_300_and_pay(request: &Request) -> Option<Answer> {
     match &request.kind {
+        RequestKind::ChooseNumber { heading: "Spend mana", most, .. } => Some(Answer::Announce(*most)),
         RequestKind::ChooseCostPayment { choices, .. } => {
             assert!(choices.iter().all(|choice| matches!(choice.kind, CostPaymentKind::Tap | CostPaymentKind::Mana)));
             Some(Answer::CostPayment(choices.iter().position(|choice| choice.kind == CostPaymentKind::Tap).unwrap_or(0)))

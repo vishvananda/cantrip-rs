@@ -23,11 +23,17 @@ fn tap_them(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// {X} sorcery: "Tap X target creatures."
+/// Its X can't exceed the number of creatures on the battlefield.
+fn creature_limit(q: &dyn Query, asker: &Asker, _: &[Target]) -> u32 {
+    q.state().battlefield().iter().filter(|&&id| creature(q, asker, Target::Object(id))).count() as u32
+}
+
+/// {X} sorcery: "X can't exceed the number of creatures. Tap X target creatures."
 static SWEEP: CardDef = CardDef {
     name: "Probe Sweep",
     types: TypeSet::of(&[CardType::Sorcery]),
     cost: ManaCost { x: 1, ..ManaCost::ZERO },
+    x_rule: Some(XRule::AtMost(creature_limit)),
     spell: spell(&[target(creature).counted()], tap_them),
     ..CardDef::BLANK
 };
@@ -86,7 +92,7 @@ fn x_is_announced_at_once_up_to_the_most_and_refused_past_it() {
             }
             RequestKind::Priority { .. } => Answer::Pass,
             RequestKind::PayCosts { announcing: true, most, .. } => {
-                assert!(*most >= 2);
+                assert_eq!(*most, 2);
                 assert!(game.answer(request.id, request.player, Answer::Announce(*most + 1)).is_err(), "past the most is refused");
                 assert_eq!(game.pending().map(|r| r.id), Some(request.id), "the refused answer leaves the question outstanding");
                 announced = Some(2);
