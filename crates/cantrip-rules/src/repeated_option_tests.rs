@@ -84,6 +84,9 @@ fn cast(g: &mut Game, spell: ObjectId, counts: &[u32]) -> Vec<u32> {
                 let chosen = choices.iter().position(|c| c.kind == CostPaymentKind::Mana).unwrap_or(0);
                 g.answer(r.id, r.player, Answer::CostPayment(chosen)).expect("a legal cost order");
             }
+            RequestKind::ChooseNumber { heading: "Spend mana", most, .. } => {
+                g.answer(r.id, r.player, Answer::Announce(*most)).expect("a legal mana batch");
+            }
             RequestKind::PayCosts { options, .. } => {
                 let o = options.iter().find(|o| o.kind == ActionKind::AssignMana)
                     .or_else(|| options.iter().find(|o| o.kind == ActionKind::ConfirmCasting))
@@ -122,5 +125,15 @@ fn a_repeated_cost_may_be_paid_as_many_times_as_the_caster_can_pay() {
     let mosts = cast(&mut g, spell, &[40, 0]);
     assert!(mosts.iter().all(|&most| most >= 1_000_000), "no practical bound on the count: {mosts:?}");
     assert_eq!(g.state.player(YOU).life, life + 40);
+    assert_eq!(g.state.player(YOU).pool.get(Mana::C), 0);
+}
+
+#[test]
+fn repeated_cost_can_be_paid_300_times() {
+    let (mut g, spell) = game(300);
+    let life = g.state.player(YOU).life;
+    let mosts = cast(&mut g, spell, &[300, 0]);
+    assert!(mosts.iter().all(|&most| most >= 300));
+    assert_eq!(g.state.player(YOU).life, life + 300);
     assert_eq!(g.state.player(YOU).pool.get(Mana::C), 0);
 }

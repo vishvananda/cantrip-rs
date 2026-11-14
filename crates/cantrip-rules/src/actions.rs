@@ -10334,6 +10334,8 @@ fn cast(
         };
         let x_asker = Asker { instance: None, source: spell, controller: player, by: None, spell: true };
         let cap = cap.min(crate::x_rules::upper(cx, &x_asker, def.x_rule, targets));
+        // Multikicker's count is stored in `kicked` (u8). Other repeated optional costs retain their own u32 counts.
+        let cap = if def.kicker.is_some_and(|k| k.multi && k.cost.x == 0) { cap.min(u32::from(u8::MAX)) } else { cap };
         // An X that can't be 0 starts at 1 (CR 107.3a). A kicker with {X} announces 0 as not kicking it, so a kicked one
         // has X 1 or more as it is.
         let least = if def.kicker.is_none() && less_each == 0 { u32::from(least_x(def.x_cant_be_zero)) } else { 0 };
@@ -12343,7 +12345,6 @@ fn at_least_x(cost: ManaCost, x_cant_be_zero: bool) -> ManaCost {
 fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, kicker: Option<Kicker>, paid: Option<&XCost>, least: u32, cap: u32, loyalty: bool, less_each: u8, governs: &'static str) -> R<u32> {
     let most: u32 = match kicker {
         Some(Kicker { multi: false, cost, .. }) if cost.x == 0 => 1.min(cap),
-        Some(Kicker { multi: true, cost, .. }) if cost.x == 0 => cap.min(u32::from(u8::MAX)),
         _ => cap,
     };
     if least > most {
