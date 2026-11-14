@@ -2872,6 +2872,42 @@ mod tests {
             assert_eq!(draw(&mut copied, 1).2, second);
         }
     }
+    fn captured_choice_then(g: &mut dyn cantrip_api::Game, a: &Asker, _: ObjectId, value: u32, _: &Proposal, _: &Proposal) {
+        if let Ok(Answer::Yes) = g.ask(a.controller, RequestKind::May { source: a.source, purpose: Purpose::Ask(&SKIP) }) {
+            g.gain_life(a.controller, value as i32);
+        }
+    }
+    static CHOICE_CALLBACKS: cantrip_api::CapturedReplacementCallbacks = cantrip_api::CapturedReplacementCallbacks {
+        applies: captured_applies, apply: captured_skip, then: Some(captured_choice_then), damage: None,
+    };
+    static CAPTURE_CHOICE: CardDef = CardDef {
+        name: "Captured choice probe", types: TypeSet::of(&[CardType::Enchantment]),
+        granted_replacements: &[cantrip_api::captured_granted_replacement(ReplacementKind::Draw, &CHOICE_CALLBACKS, "choose captured life").once()],
+        ..CardDef::BLANK
+    };
+    #[test]
+    fn captured_value_survives_choice_suspension_and_replay() {
+        let mut g = game(&[(&CAPTURE_CHOICE, Zone::BATTLEFIELD)], vec![]);
+        let source = g.state.battlefield()[0];
+        let card = g.cards.id_of(&CAPTURE_CHOICE);
+        let frame = g.state.agenda.len() - 1;
+        let mut cx = Cx { g: &mut g, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+        cantrip_api::Game::add_player_effect(&mut cx, ME, source, EffectKind::CapturedReplacementRule { card, index: 0, value: 3 }, Duration::EndOfTurn);
+        let mark = g.state.mark();
+        let log = g.log.len();
+        let mut cx = Cx { g: &mut g, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+        crate::ops::draw_cards(&mut cx, ME, 1);
+        assert!(cx.s().agenda[frame].pending.is_some());
+        g.state.rollback(mark);
+        g.log.truncate(log);
+        let mut no = g.clone();
+        g.state.update_frame(frame, |f| f.answers.push((None, Answer::Yes)));
+        no.state.update_frame(frame, |f| f.answers.push((None, Answer::No)));
+        assert_eq!(draw(&mut g, 1).2, 23);
+        assert_eq!(draw(&mut no, 1).2, 20);
+        assert!(!g.state.effects.iter().any(|e| matches!(e.kind, EffectKind::CapturedReplacementRule { .. })));
+        assert!(!no.state.effects.iter().any(|e| matches!(e.kind, EffectKind::CapturedReplacementRule { .. })));
+    }
     fn captured_nested_then(g: &mut dyn cantrip_api::Game, a: &Asker, _: ObjectId, value: u32, _: &Proposal, _: &Proposal) {
         g.gain_life(a.controller, value as i32);
         g.draw(a.controller, 1);
@@ -3044,7 +3080,7 @@ mod tests {
     /// library, and a frame whose run is given `answers`.
     fn game(cards: &[(&'static CardDef, Zone)], answers: Vec<Answer>) -> Game {
         let table: &'static CardTable =
-            Box::leak(Box::new(CardTable::new([&FILLER, &DOUBLER, &GAINER, &GRAVE_GAINER, &LIMITER, &DENIER, &PEACE, &LASTING_DENIER, &LASTING_ONCE, &LASTING_MANA, &PRINTED_DAMAGE, &LASTING_DAMAGE, &ONCE_DAMAGE, &LASTING_TOKENS, &CAPTURE, &CAPTURE_NESTED, &CAPTURE_MANA, &CAPTURE_DAMAGE])));
+            Box::leak(Box::new(CardTable::new([&FILLER, &DOUBLER, &GAINER, &GRAVE_GAINER, &LIMITER, &DENIER, &PEACE, &LASTING_DENIER, &LASTING_ONCE, &LASTING_MANA, &PRINTED_DAMAGE, &LASTING_DAMAGE, &ONCE_DAMAGE, &LASTING_TOKENS, &CAPTURE, &CAPTURE_NESTED, &CAPTURE_MANA, &CAPTURE_DAMAGE, &CAPTURE_CHOICE])));
         let deck: Vec<CardId> = std::iter::repeat_n(table.id_of(&FILLER), 17).collect();
         let mut game = Game::new(table, &crate::Setup { decks: vec![deck, Vec::new()], ..Default::default() });
         for &(def, to) in cards {
