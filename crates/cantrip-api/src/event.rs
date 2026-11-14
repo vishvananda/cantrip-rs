@@ -134,6 +134,8 @@ pub enum Event {
     ResolutionPaymentBegan { payment: u32, source: ObjectId, payer: PlayerId, resolving: Option<u32> },
     /// An object paid one component of that resolution payment, identified before any zone change.
     ResolutionCostObjectPaid { payment: u32, source: ObjectId, payer: PlayerId, object: ObjectId, receipt: u32 },
+    /// A token made by an ability, with the exact linked text and acquisition (CR 607.2c, 607.5).
+    TokenCreatedByAbility { token: ObjectId, by: Linked, ability: AbilityRef },
     /// An ability copy's serial and the serial it copied, including copies of copies.
     AbilityCopied { copy: u32, original: u32 },
     /// An actual permanent sacrificed by an entering object's own replacement (CR 614.1c, 701.21a).
@@ -587,7 +589,7 @@ impl Event {
             Event::ResolutionPaymentBegan { source, .. } => source == object,
             Event::ResolutionCostObjectPaid { source, object: paid, .. } => source == object || paid == object,
             Event::CombatFirstStrike { creature } => creature == object,
-            Event::AbilityCopied { .. } | Event::ActivatedAs { .. } => false,
+            Event::TokenCreatedByAbility { .. } | Event::AbilityCopied { .. } | Event::ActivatedAs { .. } => false,
             Event::PaidAlternative { spell, .. } | Event::PaidRepeatedly { spell, .. } => spell == object,
             Event::LandPlayed { land, .. } => land == object,
             Event::Copied { copy, original, .. } => copy == object || original == object,
@@ -757,7 +759,7 @@ impl EventMask {
             Event::Looked { .. } => EventMask::LOOKED,
             Event::Countered { .. } => EventMask::COUNTERED,
             Event::AbilityActivated { .. } => EventMask::ABILITY_ACTIVATED,
-            Event::ActivatedAs { .. } => EventMask(0),
+            Event::TokenCreatedByAbility { .. } | Event::ActivatedAs { .. } => EventMask(0),
             // The alternative cost a cast was paid with is part of the cast's record.
             Event::Cast(_) | Event::PaidAlternative { .. } | Event::PaidRepeatedly { .. } => EventMask::CAST,
             Event::LandPlayed { .. } => EventMask::LAND_PLAYED,

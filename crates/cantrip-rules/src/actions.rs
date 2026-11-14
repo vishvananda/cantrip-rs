@@ -2159,6 +2159,11 @@ fn variable_candidates(cx: &Cx, source: ObjectId, player: PlayerId, variable: Va
         VariableCost::ExileFromGraveyardWithTypes(_) => {
             cx.s().zone(Zone::graveyard(player)).iter().copied().filter(|&c| c != source).collect()
         }
+        VariableCost::ExileAnyNumber(spec) => {
+            let by = by.or_else(|| cx.resolving().map(|item| Query::linked(cx, item)));
+            let asker = Asker { instance: None, source, controller: player, by, spell: false };
+            (spec.candidates)(cx, &asker)
+        }
         // Counters on the source, not objects.
         VariableCost::RemoveAnyNumberOfCounters(_) => Vec::new(),
         VariableCost::DiscardOneOrMore(filter) => {
@@ -2222,6 +2227,11 @@ fn variable_payable(cx: &Cx, source: ObjectId, player: PlayerId, variable: Varia
         VariableCost::SacrificeWithPowerX(_) => !variable_candidates(cx, source, player, variable, paid, None).is_empty(),
         VariableCost::ExileFromGraveyardWithTypes(n) => {
             types_among(cx, &variable_candidates(cx, source, player, variable, paid, None)) >= n.max(1) as usize
+        }
+        VariableCost::ExileAnyNumber(spec) => {
+            let by = cx.resolving().map(|item| Query::linked(cx, item));
+            let asker = Asker { instance: None, source, controller: player, by, spell: false };
+            (spec.valid)(cx, &asker, &variable_candidates(cx, source, player, variable, paid, by))
         }
     }
 }
@@ -2306,6 +2316,14 @@ fn choose_variable_permanents(cx: &mut Cx, player: PlayerId, source: ObjectId, v
                 chosen.extend(rest.into_iter().filter(|c| more.contains(c)));
             }
             Ok((chosen, Vec::new()))
+        }
+        VariableCost::ExileAnyNumber(spec) => {
+            let by = cx.resolving().map(|item| Query::linked(cx, item));
+            let asker = Asker { instance: None, source, controller: player, by, spell: false };
+            let count = candidates.len();
+            let chosen = if count == 0 { Vec::new() } else { ask_cards(cx, player, source, Purpose::ExileToPay, candidates, count, true)? };
+            if !(spec.valid)(cx, &asker, &chosen) { return Err(Stop::Cancel); }
+            Ok((Vec::new(), chosen))
         }
         VariableCost::ExileFromGraveyardWithTypes(n) => {
             if types_among(cx, &candidates) < n.max(1) as usize {
@@ -2897,6 +2915,11 @@ fn pay_scheduled_costs(cx: &mut Cx, player: PlayerId, spell: ObjectId, scope: Pa
                     VariableCost::SacrificeWithPowerX(_) => candidates.iter().any(|id| power_at_least(cx, *id, *amount)),
                     VariableCost::SacrificeOneOrMore(_) | VariableCost::DiscardOneOrMore(_) => !candidates.is_empty(),
                     VariableCost::ExileFromGraveyardWithTypes(n) => types_among(cx, &candidates) >= usize::from(n.max(1)),
+                    VariableCost::ExileAnyNumber(spec) => {
+                        let by = cx.resolving().map(|item| Query::linked(cx, item));
+                        let asker = Asker { instance: None, source: spell, controller: player, by, spell: false };
+                        (spec.valid)(cx, &asker, &candidates)
+                    }
                     _ => false,
                 };
                 available.then_some(i)
@@ -3000,6 +3023,7 @@ fn pay_scheduled_costs(cx: &mut Cx, player: PlayerId, spell: ObjectId, scope: Pa
                         VariableCost::SacrificeWithPowerX(_) => (format!("Sacrifice a permanent with power {amount} or greater"), CostPaymentKind::Sacrifice),
                         VariableCost::SacrificeOneOrMore(_) => ("Sacrifice one or more permanents".into(), CostPaymentKind::Sacrifice),
                         VariableCost::ExileFromGraveyardWithTypes(n) => (format!("Exile cards with {n} card types"), CostPaymentKind::Exile),
+                        VariableCost::ExileAnyNumber(_) => ("Exile chosen objects".into(), CostPaymentKind::Exile),
                         VariableCost::DiscardOneOrMore(_) => ("Discard one or more cards".into(), CostPaymentKind::Discard),
                         _ => unreachable!("other variable costs are not scheduled here"),
                     };
@@ -15281,6 +15305,10 @@ mod activation_players_tests;
 #[cfg(test)]
 #[path = "resolution_counter_cost_tests.rs"]
 mod resolution_counter_cost_tests;
+
+#[cfg(test)]
+#[path = "resolution_exile_any_tests.rs"]
+mod resolution_exile_any_tests;
 
 #[cfg(test)]
 #[path = "priority_only_tests.rs"]
