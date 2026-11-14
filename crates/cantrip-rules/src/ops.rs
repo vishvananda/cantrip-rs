@@ -679,6 +679,12 @@ fn move_together_entering_event(
         (together || p.m.aura_host_left == Some(host)).then_some((p.m.id, host))
     }).collect();
     let turn = cx.s().turn.number;
+    let retained_statics = if layers::has_lingering_statics(cx.cards(), cx.s()) {
+        let departing: Vec<ObjectId> = plans.iter()
+            .filter(|p| p.from.is(ZoneKind::Battlefield) && !p.to.is(ZoneKind::Battlefield))
+            .map(|p| p.m.id).collect();
+        layers::departing_statics(cx.cards(), cx.s(), &cx.g.log, &departing)
+    } else { Vec::new() };
     for Plan { m, reason, old, from, to, requested_to, change, madness, entering, mut new, counts, counts_by, last_known, components, .. } in plans {
         let m = &m;
         let row = cx.st().last_known_push(last_known);
@@ -873,6 +879,9 @@ fn move_together_entering_event(
         crate::merge::arrange_in_library(cx, owner, &group);
     }
     created.extend(separated);
+    for effect in retained_statics {
+        cx.st().effect_push(effect);
+    }
     // What each permanent was as it entered (CR 603.6a, 614.12): judged once they are all there, as each one's continuous effects
     // reach the ones entering with it, and recorded with the moves so the history can say it however they change after.
     for permanent in entered {
@@ -1762,11 +1771,15 @@ pub(crate) fn as_it_would_exist(cx: &mut Cx, entering: &Entering) -> WouldExist 
     let from = cx.s().obj(id).zone;
     // The permanents leaving the battlefield in the same move (CR 101.4: Goblin Welder's sacrifice) are gone as it arrives.
     let leaving = cx.s().leaving_together.borrow().clone();
+    let retained_statics = layers::departing_statics(cx.cards(), cx.s(), &cx.g.log, &leaving);
     for gone in leaving {
         if gone != id && cx.s().obj(gone).zone.is(ZoneKind::Battlefield) && cx.s().battlefield().contains(&gone) {
             cx.st().zone_remove(Zone::BATTLEFIELD, gone);
             cx.st().update_obj(gone, |o| o.zone = Zone::GONE);
         }
+    }
+    for effect in retained_statics {
+        cx.st().effect_push(effect);
     }
     cx.st().zone_remove(from, id);
     let timestamp = cx.st().timestamp();
@@ -2633,6 +2646,10 @@ pub fn cease_to_exist(cx: &mut Cx, zone: Zone, id: ObjectId) {
 /// end together): each one's last-known information is taken before any of them is gone, so none misses the effects of
 /// another (a Glorious Anthem leaving with the creatures it pumped).
 pub fn cease_together(cx: &mut Cx, objects: &[(Zone, ObjectId)]) {
+    let retained_statics = if layers::has_lingering_statics(cx.cards(), cx.s()) {
+        let leaving: Vec<_> = objects.iter().filter_map(|&(zone, id)| zone.is(ZoneKind::Battlefield).then_some(id)).collect();
+        layers::departing_statics(cx.cards(), cx.s(), &cx.g.log, &leaving)
+    } else { Vec::new() };
     let rows: Vec<LastKnown> = objects.iter().map(|&(zone, id)| if zone.is(ZoneKind::Battlefield) { departure_known_of(cx, id) } else { last_known_of(cx, id) }).collect();
     for (&(zone, id), row) in objects.iter().zip(rows) {
         let row = cx.st().last_known_push(row);
@@ -2642,6 +2659,7 @@ pub fn cease_together(cx: &mut Cx, objects: &[(Zone, ObjectId)]) {
             o.last_known = Some(row);
         });
     }
+    for effect in retained_statics { cx.st().effect_push(effect); }
 }
 
 /// `id` as it is now, for last-known information once it has ceased to be this object (CR 400.7, 608.2h, 113.7a): it

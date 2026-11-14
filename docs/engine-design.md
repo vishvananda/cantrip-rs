@@ -3765,3 +3765,11 @@ boundaries. It clears ordinary/restricted pools and their duration, source and
 snow provenance together, and returns the lost types within native per-type
 bounds. It is separate from producing/doubling mana and from asking a player
 to activate a land's mana abilities. All state changes are journalled.
+
+### Static characteristic effects with an extended lifetime
+
+`StaticDef::lingers_until_end_of_turn` marks the first printed part, a layer-4 one (the builder refuses any other), of a static characteristic effect whose text expressly continues after its source leaves (Titania’s Song; CR 611.3a). Later parts use the existing `continues()` relationship (CR 613.6). These are distinct lifetimes: `continues()` alone does not extend an effect beyond its source.
+
+Immediately before an actual simultaneous departure, the layers identify the first part at its original stage, before that entry applies. A source that lost its text before that stage contributes nothing; a first part that starts before ability loss in layer6 retains its later parts. The existing journaled continuous-effect list keeps the printed definition, linked context, acquisition identity and original timestamp until cleanup. It evaluates the current affected objects on every pass, including later arrivals and an initially empty affected set. It never snapshots that set or preserves unrelated abilities of the departed source. Copies and merged text retain the definition they actually had. Prospective entry projects the surviving effect before excluding simultaneously departing sources. Phasing is not a departure.
+
+The existing epoch-derived static-source cache guards departure work on a live source with this lifetime and notes the retained parts’ layer and ability-loss interests. Ordinary games allocate no extra list; there is no new per-object field or persistent game-state collection. Retained effects are journaled and expire through the existing end-of-turn cleanup.

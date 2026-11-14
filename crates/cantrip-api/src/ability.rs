@@ -1171,6 +1171,14 @@ impl StaticDef {
         StaticDef { continues: true, ..self }
     }
 
+    /// The same dynamic static effect continues until end of turn if its source leaves the battlefield (CR 611.3a).
+    /// Mark its first part, a layer-4 one (Titania's Song, the one printed card that says so); later layers of that effect
+    /// still use `continues()` (CR 613.6).
+    pub const fn lingers_until_end_of_turn(self) -> StaticDef {
+        assert!(matches!(self.layer, Layer::Type) && !self.continues, "a lingering effect's first part is a layer-4 one");
+        StaticDef { lingers_until_end_of_turn: true, ..self }
+    }
+
     /// The zone its source functions from, where not the battlefield (CR 113.6b).
     pub const fn from(self, from: ZoneKind) -> StaticDef {
         StaticDef { from, ..self }
