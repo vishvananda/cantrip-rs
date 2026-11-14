@@ -1024,6 +1024,7 @@ impl<'a> Projector<'a> {
             Duration::UntilNextTurnOf(q) => format!(" until {}'s next turn", self.names.get(q.index()).cloned().unwrap_or_default()),
             Duration::DuringControllersNextTurn(_) => " during its controller's next turn".to_string(),
             Duration::DuringItsControllersNextUntapStep => " during its controller's next untap step".to_string(),
+            Duration::UntilItsControllersNextUntapStep => " until its controller's next untap step".to_string(),
             Duration::DuringNextUntapStepOf(q) if q == self.viewer => " during your next untap step".to_string(),
             Duration::DuringNextUntapStepOf(q) => format!(" during {}'s next untap step", self.names.get(q.index()).cloned().unwrap_or_default()),
             Duration::EndOfExtraTurn(_) => " during the extra turn".to_string(),
@@ -2061,6 +2062,27 @@ mod tests {
         let mut handles = HandleSpace::new();
         let handle = handles.handle(id);
         assert_eq!(projector.describe(id, handle, None, &mut handles).lost_abilities, ["Snow forestwalk"]);
+    }
+
+    /// An effect lasting until its controller's next untap step (Orcish Farmer) shows that duration.
+    #[test]
+    fn until_its_controllers_next_untap_step_is_named() {
+        let cards = cantrip_engine::cards();
+        let mut game = Game::new(cards, &Setup { decks: vec![vec![], vec![]], ..Default::default() });
+        let owner = PlayerId(0);
+        let id = game.state.push_obj(Obj::new(cards.find("Grizzly Bears").unwrap(), owner, Zone::BATTLEFIELD));
+        game.state.zone_push(Zone::BATTLEFIELD, id);
+        let timestamp = game.state.timestamp();
+        game.state.effect_push(ContinuousEffect { source: id, controller: owner, timestamp, affected: id,
+            kind: EffectKind::MustBlockEach, duration: Duration::UntilItsControllersNextUntapStep, words: Words::NONE });
+        let names = vec!["A".to_string(), "B".to_string()];
+        let faces = HashSet::new();
+        let projector = Projector { game: &game, viewer: owner, names: &names, conceded: &[false, false], faces: &faces };
+        let mut handles = HandleSpace::new();
+        let handle = handles.handle(id);
+        let view = projector.describe(id, handle, None, &mut handles);
+        let lines: Vec<_> = view.granted_abilities.iter().map(|a| a.text.as_str()).collect();
+        assert_eq!(lines, ["Blocks each attacking creature until its controller's next untap step if able."]);
     }
 
     /// Source-dependent durations must tell every seat which permanent must remain tapped,
