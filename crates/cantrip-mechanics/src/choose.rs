@@ -16,7 +16,7 @@ use cantrip_api::*;
 pub fn one_target(g: &mut dyn Game, player: PlayerId, source: ObjectId, candidates: Vec<Target>, label: &'static str) -> Result<Option<Target>, Suspend> {
     if candidates.is_empty() { return Ok(None) }
     let ask = RequestKind::ChooseTarget { source, purpose: Purpose::Choose, candidates, optional: false, least: 1, count: 1,
-        any_number: false, label, slot_player: None, together: None, replacing: None };
+        any_number: false, label, slot_player: None, together: None, context: None, replacing: None };
     Ok(match g.ask(player, ask)? { Answer::Targets(chosen) => chosen.first().copied(), _ => None })
 }
 

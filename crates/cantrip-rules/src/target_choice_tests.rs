@@ -24,8 +24,31 @@ static MODES:ModalDef=ModalDef{modes:&[mode(gain_chooser,"B chooses").targets(&[
 static MODAL:CardDef=CardDef{name:"Target chooser modal ability",abilities:&[modal_ability(TAP,&MODES,"Choose both")],..CREATURE};
 fn slot_opponent(q:&dyn Query,_:&Asker)->PlayerId{q.slot_opponent().expect("this opponent's slot")}
 static EACH:CardDef=CardDef{name:"Target chooser per opponent",abilities:&[ability(TAP,noop,"Each opponent chooses one of their creatures.").targets(&[TargetSpec{min:0,max:TargetSpec::EACH_OPPONENT,..target(their_creature).chosen_by(slot_opponent)}])],..CREATURE};
+// A set rule which needs the triggering event and the player chosen to choose the slot.
+// Its candidates all have the same quality, so it is downward-closed.
+fn event_and_chooser(q: &dyn Query) -> bool { q.event_data() == [42, 7] && q.target_chooser() == Some(B) }
+fn contextual_set(q: &dyn Query, choice: &cantrip_api::select::Choice, _: u32) -> cantrip_api::select::Verdict {
+    cantrip_api::select::Verdict::each(choice, |_| event_and_chooser(q) && choice.chooser == A)
+}
+fn largest_contextual_set(q: &dyn Query, choice: &cantrip_api::select::Choice, _: u32) -> Vec<ObjectId> {
+    if event_and_chooser(q) && choice.chooser == A { choice.candidates.to_vec() } else { Vec::new() }
+}
+const CONTEXTUAL_SET: Part = cantrip_api::select::set_part(
+    &(contextual_set as cantrip_api::select::SelectFn),
+    &(largest_contextual_set as cantrip_api::select::LargestFn), 0, "with the event and chooser context",
+);
+fn begins_with_data(_: &dyn Query, _: ObjectId, e: &Event) -> Option<Fired> {
+    matches!(e, Event::StepBegan { step: Step::PrecombatMain }).then_some(Fired { subject: Target::None, data: [42, 7] })
+}
+static CONTEXT_TRIGGER: CardDef = CardDef {
+    name: "Target chooser event data set", types: TypeSet::of(&[CardType::Enchantment]),
+    abilities: &[triggered(when(EventMask::STEP_BEGAN, begins_with_data), noop, "An opponent chooses two targets.")
+        .targets(&[target(their_creature).between(2, 2).chosen_by(fixed).together(CONTEXTUAL_SET)])],
+    ..CardDef::BLANK
+};
+
 fn game(seats:usize)->Game{
- let cards=Box::leak(Box::new(CardTable::new([&FILLER,&CREATURE,&HEXPROOF,&WITCHES,&PREACHER,&FIXED,&DOUBLE,&TRIGGER,&MODAL,&EACH])));let fill=cards.id_of(&FILLER);
+ let cards=Box::leak(Box::new(CardTable::new([&FILLER,&CREATURE,&HEXPROOF,&WITCHES,&PREACHER,&FIXED,&DOUBLE,&TRIGGER,&MODAL,&EACH,&CONTEXT_TRIGGER])));let fill=cards.id_of(&FILLER);
  let mut g=Game::new(cards,&Setup{decks:vec![vec![fill;20];seats],shuffle:false,..Default::default()});g.verify=true;
  while !g.state.agenda.is_empty(){g.state.frame_remove(0);}g.state.frame_push(Frame::new(FrameKind::Priority));
  g.state.update_turn(|t|{t.active=A;t.priority=A;t.number=2;t.set_step(Step::PrecombatMain);});g.state.update_player(A,|p|p.turn_began=1);g
@@ -94,4 +117,74 @@ fn modal_resolution_reads_each_modes_own_retained_player() {
  targets(&mut g,B,&[Target::Player(A)]);targets(&mut g,C,&[Target::Player(A)]);
  for _ in 0..20{let r=pending(&mut g);if g.state.stack.is_empty(){break;}answer(&mut g,r,Answer::Pass);}
  assert_eq!((g.state.player(A).life,g.state.player(B).life,g.state.player(C).life),(20,21,21));
+}
+
+/// A triggered target-set answer must retain both event data and the separate choosing player.
+#[test]
+fn trigger_target_set_answer_keeps_event_data_and_chooser() {
+    let mut g = game(2);
+    put(&mut g, &CONTEXT_TRIGGER, A);
+    let first = put(&mut g, &CREATURE, B);
+    let second = put(&mut g, &CREATURE, B);
+    put(&mut g, &CREATURE, B);
+    while !g.state.agenda.is_empty() { g.state.frame_remove(0); }
+    g.state.frame_push(Frame::new(FrameKind::BeginStep));
+    let r = pending(&mut g);
+    assert_eq!(r.player, B);
+    let RequestKind::ChooseTarget { ref candidates, .. } = r.kind else { panic!("expected target question: {:?}", r.kind) };
+    assert!(candidates.contains(&Target::Object(first)) && candidates.contains(&Target::Object(second)));
+    let (objects, empty) = crate::validate::selection_verdict(&g, &r, &[]).unwrap();
+    assert!(empty.addable.get(objects.iter().position(|&o| o == first).unwrap()));
+    let (objects, partial) = crate::validate::selection_verdict(&g, &r, &[first]).unwrap();
+    assert!(partial.addable.get(objects.iter().position(|&o| o == second).unwrap()));
+    let (_, complete) = crate::validate::selection_verdict(&g, &r, &[first, second]).unwrap();
+    assert!(complete.complete);
+    let result = g.answer(r.id, r.player, Answer::Targets(vec![Target::Object(first), Target::Object(second)]));
+    assert!(result.is_ok(), "the answer chosen with the event and chooser context must be accepted: {result:?}");
+}
+
+fn contextual_item(g: &mut Game, source: ObjectId, first: ObjectId, second: ObjectId) -> StackItem {
+    let ability = AbilityRef { card: g.cards.id_of(&CONTEXT_TRIGGER), index: 0 };
+    let mut item = actions::stack_item(StackKind::Triggered, source, ability, A, &[Target::Object(first), Target::Object(second)]);
+    item.data = [42, 7];
+    item.serial = 711;
+    g.state.set_item_target_choosers(&mut item, &[Some(B), Some(B)]);
+    item
+}
+
+/// Revalidation must preserve the exact same context used when the targets were chosen.
+#[test]
+fn trigger_target_set_revalidation_keeps_event_data_and_chooser() {
+    let mut g = game(2);
+    let source = put(&mut g, &CONTEXT_TRIGGER, A);
+    let first = put(&mut g, &CREATURE, B);
+    let second = put(&mut g, &CREATURE, B);
+    let item = contextual_item(&mut g, source, first, second);
+    assert!(resolve::target_legal(g.cards, &g.state, g.events(), &item, 0), "first member remains legal with its event data and chooser");
+    assert!(resolve::target_legal(g.cards, &g.state, g.events(), &item, 1), "second member remains legal with its event data and chooser");
+}
+
+/// Change-target effects judge each resulting set with the original trigger's context.
+#[test]
+fn trigger_target_set_retargeting_keeps_event_data_and_chooser() {
+    let mut g = game(2);
+    let source = put(&mut g, &CONTEXT_TRIGGER, A);
+    let first = put(&mut g, &CREATURE, B);
+    let second = put(&mut g, &CREATURE, B);
+    let replacement1 = put(&mut g, &CREATURE, B);
+    let replacement2 = put(&mut g, &CREATURE, B);
+    let item = contextual_item(&mut g, source, first, second);
+    g.state.stack_push(item);
+    g.state.update_frame(0, |f| {
+        f.answers.push((Some(A), Answer::Targets(vec![Target::Object(replacement1)])));
+        f.answers.push((Some(A), Answer::Targets(vec![Target::Object(replacement2)])));
+    });
+    ops::change_target(&mut cx(&mut g), Target::Ability(711), A).unwrap();
+    let changed = *g.state.stack.last().unwrap();
+    assert_eq!(g.state.targets(&changed), &[Target::Object(replacement1), Target::Object(replacement2)]);
+}
+
+#[test]
+fn target_context_layout() {
+    assert_eq!((std::mem::size_of::<RequestKind>(), std::mem::size_of::<Request>(), std::mem::size_of::<Frame>(), std::mem::size_of::<Obj>()), (288, 296, 440, 896));
 }

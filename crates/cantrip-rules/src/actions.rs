@@ -11361,7 +11361,7 @@ fn choose_slots_after(cx: &mut Cx, player: PlayerId, source: ObjectId, spell: bo
             let (candidates, together) = within_together(&context, &asker, spec, counted, candidates);
             let (least, most) = spec.bounds(counted);
             // Fewer legal targets than the slot's minimum is not a legal announcement (CR 601.2c, 602.2b): given up whole.
-            if !enough_together(cx, &asker, &together, &candidates, least) {
+            if !enough_together(&context, &asker, &together, &candidates, least) {
                 return Err(Stop::Cancel);
             }
             if candidates.is_empty() {
@@ -11375,7 +11375,8 @@ fn choose_slots_after(cx: &mut Cx, player: PlayerId, source: ObjectId, spell: bo
             }
             // No more than there are candidates to choose (CR 601.2c: each target is a different object or player).
             let count = most.min(cantrip_state::count_u32(candidates.len()));
-            let ask = RequestKind::ChooseTarget { replacing: None, label: spec.label, slot_player: *slot_player,
+            let target_context = together.as_ref().map(|_| Box::new(context.snapshot(asker.controller)));
+            let ask = RequestKind::ChooseTarget { context: target_context, replacing: None, label: spec.label, slot_player: *slot_player,
                 source,
                 purpose: Purpose::Targets,
                 candidates,

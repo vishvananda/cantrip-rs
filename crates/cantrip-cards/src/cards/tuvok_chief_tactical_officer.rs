@@ -20,7 +20,7 @@ fn reselect_what_it_attacks(g: &mut dyn Game, item: &StackItem) -> Result<(), Su
         let Some(creature) = targets::object(g, item, slot).filter(|&c| g.is_attacking(c)) else { continue };
         let candidates = g.enter_attacking_targets(g.obj(creature).controller);
         let ask = RequestKind::ChooseTarget {
-            replacing: None,
+            context: None, replacing: None,
             label: "Reselect which player or permanent that creature is attacking (choose none to leave it attacking what it was).",
             slot_player: None,
             together: None,

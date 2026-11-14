@@ -3241,7 +3241,7 @@ fn retarget(cx: &mut Cx, mut item: StackItem, asked_about: ObjectId, chooser: Pl
                     } else {
                         "Choose a new target or none to keep the current one."
                     };
-                    let ask = RequestKind::ChooseTarget { replacing: Some((index as u32, current)), label, slot_player, source: asked_about,
+                    let ask = RequestKind::ChooseTarget { context: None, replacing: Some((index as u32, current)), label, slot_player, source: asked_about,
                         purpose: Purpose::Targets, candidates, optional: true, least: 0, count: 1,
                         any_number: false, together: None };
                     if let Answer::Targets(chosen) = cx.ask_core(chooser, ask, false)?
@@ -3286,9 +3286,13 @@ fn fits_together(cx: &Cx, item: &StackItem, targets: &[Target], slot: usize, spe
         return true;
     }
     let run = cx.s().spec_targets(item, cx.s().spec(item, slot) as usize);
+    let earlier = &targets[..run.start.min(targets.len())];
     let set: Vec<Target> =
         run.map(|i| if i == slot { to } else { targets.get(i).copied().unwrap_or(Target::None) }).filter(|&t| t != Target::None).collect();
-    select::targets_together(&crate::resolve::as_item(cx, item), spec.together_at(u32::from(item.counted)).as_slice(), item.controller, item.object, &set)
+    let slot_player = crate::resolve::slot_spec(cx.cards(), cx.s(), item, slot).and_then(|(_, player)| player);
+    let given = crate::resolve::Given { q: cx, data: item.data, chooser: cx.s().target_chooser(item, slot), earlier,
+        subject: item.subject, slot_player, gift: false, x: crate::resolve::announced_x(item), text: crate::resolve::item_text(item) };
+    select::targets_together(&given, spec.together_at(u32::from(item.counted)).as_slice(), item.controller, item.object, &set)
 }
 
 /// `chooser` may choose new targets for a spell on the stack (CR 115.7d): Sudden Substitution's "then the spell's controller
@@ -3353,7 +3357,7 @@ pub fn change_target(cx: &mut Cx, of: Target, chooser: PlayerId) -> R<()> {
         let new = if others.len() == 1 {
             others[0]
         } else {
-            let ask = RequestKind::ChooseTarget { replacing: None, label: "", slot_player: None, together: None,
+            let ask = RequestKind::ChooseTarget { context: None, replacing: None, label: "", slot_player: None, together: None,
                 source: item.object,
                 purpose: Purpose::Targets,
                 candidates: others.clone(),
@@ -3447,7 +3451,7 @@ pub fn change_a_target_to(cx: &mut Cx, of: Target, to: ObjectId, chooser: Player
             }
         }
         _ => {
-            let ask = RequestKind::ChooseTarget { replacing: None,
+            let ask = RequestKind::ChooseTarget { context: None, replacing: None,
                 label: "The target to change to this creature",
                 slot_player: None,
                 together: None,
@@ -4873,7 +4877,7 @@ pub fn proliferate(cx: &mut Cx, player: PlayerId, source: ObjectId) -> R<()> {
     if candidates.is_empty() {
         return Ok(());
     }
-    let ask = RequestKind::ChooseTarget { replacing: None, label: "", slot_player: None, together: None,
+    let ask = RequestKind::ChooseTarget { context: None, replacing: None, label: "", slot_player: None, together: None,
         source,
         purpose: Purpose::Targets,
         count: cantrip_state::count_u32(candidates.len()),
@@ -5223,7 +5227,7 @@ fn choose_entering_defender(cx: &mut Cx, id: ObjectId, controller: PlayerId, can
         [only] => Some(only),
         _ => {
             let first = candidates[0];
-            let ask = RequestKind::ChooseTarget { replacing: None,
+            let ask = RequestKind::ChooseTarget { context: None, replacing: None,
                 label: "Choose what it attacks as it enters attacking: a player, a planeswalker or a battle.",
                 slot_player: None,
                 together: None,

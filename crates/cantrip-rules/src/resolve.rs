@@ -226,7 +226,7 @@ pub fn target_legal(cards: &'static CardTable, state: &GameState, events: &[Reco
     (spec.filter)(&given, &asker, target)
         && layers::can_target(cards, state, events, &asker, target)
         && (spec.together.is_none()
-            || together_legal(&Given { data: [u32::MAX; 2], chooser: None, q: &q, earlier: &[], subject: Target::None, slot_player: None, gift: false, x: None, text }, state, item, slot, &spec))
+            || together_legal(&Given { earlier: &state.targets(item)[..state.spec_targets(item, state.spec(item, slot) as usize).start], ..given }, state, item, slot, &spec))
 }
 
 /// Whether the targets of the slot target `slot` of `item` was chosen for are still allowed together by `spec`'s rule
@@ -241,12 +241,6 @@ fn together_legal(q: &dyn Query, state: &GameState, item: &StackItem, slot: usiz
 /// it was put on the stack with (`StackItem::words`, CR 113.7a). None for a spell, which reads its own words.
 pub fn item_text(item: &StackItem) -> Option<(ObjectId, Words)> {
     (item.kind != StackKind::Spell).then_some((item.object, item.words))
-}
-
-/// `q` reading `item`'s source's words as `item`'s own text has them (`item_text`): what the rule of its targets together is
-/// judged with as they are changed or chosen anew (CR 115.7, 601.2c).
-pub fn as_item<'a>(q: &'a dyn Query, item: &StackItem) -> Given<'a> {
-    Given { data: [u32::MAX; 2], chooser: None, q, earlier: &[], subject: Target::None, slot_player: None, gift: false, x: None, text: item_text(item) }
 }
 
 /// The X announced for a spell or an activated ability on the stack (CR 107.3a, 601.2b, 602.2b), its own (CR 107.3k): what
@@ -274,6 +268,15 @@ pub struct Given<'a> {
     /// For an ability on the stack, its source and the words of its text as it was put there (`StackItem::words`): what
     /// `Query::words` of that source answers, the source's text since notwithstanding (CR 113.7a). None otherwise.
     pub text: Option<(ObjectId, Words)>,
+}
+
+impl Given<'_> {
+    /// Snapshot the rule context for a pending target-set question. The controller supplies the rule-relative
+    /// "you"; `chooser` independently records a player specifically instructed to choose the targets.
+    pub fn snapshot(&self, controller: PlayerId) -> cantrip_state::TargetContext {
+        cantrip_state::TargetContext { controller, chooser: self.chooser, data: self.data, subject: self.subject,
+            earlier: self.earlier.to_vec(), slot_player: self.slot_player, gift: self.gift, x: self.x, text: self.text }
+    }
 }
 
 impl Query for Given<'_> {

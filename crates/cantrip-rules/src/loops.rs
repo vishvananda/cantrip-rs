@@ -677,7 +677,7 @@ mod tests {
     /// CR 104.4b: a question with one legal answer is no choice; one with more is.
     #[test]
     fn only_a_question_with_one_legal_answer_is_forced() {
-        let choose = |candidates: Vec<Target>, optional: bool| RequestKind::ChooseTarget { replacing: None,
+        let choose = |candidates: Vec<Target>, optional: bool| RequestKind::ChooseTarget { context: None, replacing: None,
             source: ObjectId(0),
             purpose: Purpose::Targets,
             candidates,
@@ -693,7 +693,7 @@ mod tests {
         assert!(!forced(&choose(vec![Target::Object(ObjectId(1))], true)), "choosing none is another answer");
         assert!(!forced(&choose(vec![Target::Object(ObjectId(1)), Target::Object(ObjectId(2))], false)));
         // "One or two targets" with two candidates: choosing one of them is another answer (CR 601.2c).
-        let one_or_two = RequestKind::ChooseTarget { replacing: None,
+        let one_or_two = RequestKind::ChooseTarget { context: None, replacing: None,
             source: ObjectId(0),
             purpose: Purpose::Targets,
             candidates: vec![Target::Object(ObjectId(1)), Target::Object(ObjectId(2))],

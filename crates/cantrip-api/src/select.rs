@@ -31,7 +31,9 @@ use cantrip_state::{ObjectId, PlayerId, Target};
 /// A question's cards, and the ones chosen so far, as a part of its rule judges them.
 #[derive(Clone, Copy, Debug)]
 pub struct Choice<'a> {
-    /// The player choosing.
+    /// The player relative to whose text the rule is judged. For a target-set rule this is the
+    /// ability or spell controller, even when another player chooses its targets; that player is
+    /// available separately as `Query::target_chooser`.
     pub chooser: PlayerId,
     /// The object whose text asks the question.
     pub source: ObjectId,

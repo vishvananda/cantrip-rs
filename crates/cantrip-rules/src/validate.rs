@@ -6,6 +6,16 @@ use cantrip_api::*;
 
 use crate::{Game, Rejected};
 
+// Reconstruct the same query and rule-relative controller used to offer this target set. Questions
+// constructed outside the target-slot machinery retain their previous default context.
+fn target_context<'a>(game: &'a Game, context: Option<&'a cantrip_state::TargetContext>, player: PlayerId) -> (crate::resolve::Given<'a>, PlayerId) {
+    let given = crate::resolve::Given { q: game, chooser: context.and_then(|c| c.chooser),
+        data: context.map_or([u32::MAX; 2], |c| c.data), subject: context.map_or(Target::None, |c| c.subject),
+        earlier: context.map_or(&[], |c| c.earlier.as_slice()), slot_player: context.and_then(|c| c.slot_player),
+        gift: context.is_some_and(|c| c.gift), x: context.and_then(|c| c.x), text: context.and_then(|c| c.text) };
+    (given, context.map_or(player, |c| c.controller))
+}
+
 fn no(why: impl Into<String>) -> Result<(), Rejected> {
     Err(Rejected(why.into()))
 }
@@ -143,10 +153,11 @@ pub fn selection_verdict(game: &Game, request: &Request, selected: &[ObjectId]) 
             (cards.clone(), verdict)
         }
         // The slot's own count beside its rule (CR 601.2c): complete within `least` to `count`, and nothing addable past it.
-        RequestKind::ChooseTarget { candidates, least, count, together, .. } if together.is_some() => {
+        RequestKind::ChooseTarget { candidates, least, count, together, context, .. } if together.is_some() => {
             let objects: Vec<ObjectId> = candidates.iter().filter_map(|t| if let Target::Object(id) = *t { Some(id) } else { None }).collect();
             let chosen: Vec<Target> = selected.iter().map(|&c| Target::Object(c)).collect();
-            let judged = select::judge_targets(game, together.as_slice(), request.player, source, candidates, &chosen);
+            let (given, controller) = target_context(game, context.as_deref(), request.player);
+            let judged = select::judge_targets(&given, together.as_slice(), controller, source, candidates, &chosen);
             let n = selected.len();
             let room = n < *count as usize;
             let addable = Bits::of(objects.len(), |i| {
@@ -221,13 +232,14 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
                 Ok(())
             }
         }
-        (RequestKind::ChooseTarget { source, candidates, least, count, together, .. }, Answer::Targets(targets)) => {
+        (RequestKind::ChooseTarget { source, candidates, least, count, together, context, .. }, Answer::Targets(targets)) => {
+            let (given, controller) = target_context(game, context.as_deref(), request.player);
             let n = targets.len();
             if !distinct(targets) || !targets.iter().all(|t| candidates.contains(t)) {
                 no("not among the candidates")
             } else if n > *count as usize || n < *least as usize {
                 no(format!("{n} chosen, {least} to {count} wanted (CR 601.2c)"))
-            } else if together.is_some() && !select::judge_targets(game, together.as_slice(), request.player, *source, candidates, targets).complete {
+            } else if together.is_some() && !select::judge_targets(&given, together.as_slice(), controller, *source, candidates, targets).complete {
                 // The rule of the slot's targets together judges them as it judged each pick (`selection_verdict`).
                 let words: Vec<String> = together.as_slice().iter().filter(|p| !p.words.is_empty()).map(|p| p.worded(&|id| game.cards.get(CardId(id as u16)).name.to_string())).collect();
                 no(format!("targets that are not {} together (CR 601.2c)", words.join(", ")))

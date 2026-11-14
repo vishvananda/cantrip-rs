@@ -1120,7 +1120,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 ..Default::default()
             })
         }
-        RequestKind::ChooseTarget { source, purpose, candidates, optional, least, count, any_number, label, slot_player, together, replacing } => {
+        RequestKind::ChooseTarget { source, purpose, candidates, optional, least, count, any_number, label, slot_player, together, replacing, .. } => {
             let source_handle = source_handle(game, handles, *source);
             // A rule of the slot's targets together that keeps a running total of mana value (CR 202.3): its most, and each
             // candidate's mana value, read where it is (an {X} in a graveyard is 0, CR 202.3e).
@@ -1821,7 +1821,7 @@ mod tests {
             id: 1,
             player: seat,
             kind: RequestKind::ChooseTarget {
-                replacing: Some((1, Target::Object(hand[0]))),
+                context: None, replacing: Some((1, Target::Object(hand[0]))),
                 source: hand[0], purpose: Purpose::Targets,
                 candidates: vec![Target::Object(hand[1])], optional: true, least: 0, count: 1,
                 any_number: false, label: "Choose a new target or none to keep the current one.",
@@ -1911,7 +1911,7 @@ mod tests {
             let request = Request {
                 id: 1,
                 player: seat,
-                kind: RequestKind::ChooseTarget { replacing: None,
+                kind: RequestKind::ChooseTarget { context: None, replacing: None,
                     source: hand[0],
                     purpose: Purpose::Targets,
                     candidates: hand[..3].iter().map(|&c| Target::Object(c)).collect(),
@@ -1954,7 +1954,7 @@ mod tests {
         let request = Request {
             id: 1,
             player: seat,
-            kind: RequestKind::ChooseTarget { replacing: None,
+            kind: RequestKind::ChooseTarget { context: None, replacing: None,
                 source: hand[0],
                 purpose: Purpose::Targets,
                 candidates: hand[..3].iter().map(|&c| Target::Object(c)).collect(),

@@ -126,6 +126,21 @@ pub enum FrameKind {
     Resolve { serial: u32 },
 }
 
+/// Context for judging the targets of a single slot together. The question's answerer can differ from the ability's
+/// controller, whose text supplies "you"; the independently chosen target chooser remains in `chooser`.
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct TargetContext {
+    pub controller: PlayerId,
+    pub chooser: Option<PlayerId>,
+    pub data: [u32; 2],
+    pub subject: Target,
+    pub earlier: Vec<Target>,
+    pub slot_player: Option<PlayerId>,
+    pub gift: bool,
+    pub x: Option<u32>,
+    pub text: Option<(ObjectId, Words)>,
+}
+
 /// A question for one player.
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Request {
@@ -532,6 +547,8 @@ pub enum RequestKind {
         source: ObjectId, purpose: Purpose, candidates: Vec<Target>, optional: bool,
         least: u32, count: u32, any_number: bool, label: &'static str,
         slot_player: Option<PlayerId>, together: Option<Part>,
+        /// Rare, owned context for a target-set rule while this question is pending.
+        context: Option<Box<TargetContext>>,
         /// The original target occurrence; an empty answer keeps it, even if illegal (CR 115.7d).
         /// It is display context, not a candidate or a newly chosen target.
         replacing: Option<(u32, Target)>,

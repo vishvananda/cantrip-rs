@@ -650,10 +650,11 @@ fn choose_trigger_targets_after(
             }
             // No more than there are candidates to choose (CR 601.2c: each target is a different object or player).
             let count = most.min(cantrip_state::count_u32(candidates.len()));
+            let context = together.as_ref().map(|_| Box::new(own.snapshot(asker.controller)));
             if left_the_game(cx, trigger.controller) {
                 return Ok(false);
             }
-            let ask = RequestKind::ChooseTarget { replacing: None, label: spec.label, slot_player: *slot_player,
+            let ask = RequestKind::ChooseTarget { context, replacing: None, label: spec.label, slot_player: *slot_player,
                 source: trigger.source,
                 purpose: Purpose::Targets,
                 candidates,
