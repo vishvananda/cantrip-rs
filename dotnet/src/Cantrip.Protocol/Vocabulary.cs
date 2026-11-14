@@ -467,6 +467,8 @@ public enum ManaSpendFilterView
     SubtypeSpellsOrEquipAbilities = 27,
     /// <summary>Only to cast the payer's own commander (CR 903.3d): "spend this mana only to cast your commander".</summary>
     YourCommander = 28,
+    /// <summary>Only to pay cumulative upkeep costs (CR 702.24a).</summary>
+    CumulativeUpkeep = 29,
 }
 
 /// <summary>What spending some mana does to whatever it pays for (CR 106.6): the effect half of a restriction.</summary>
