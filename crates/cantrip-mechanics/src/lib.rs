@@ -238,6 +238,17 @@ pub fn discard_chosen(g: &mut dyn Game, player: PlayerId, source: ObjectId, coun
     Ok(chosen)
 }
 
+/// Discard a chosen card as the mandatory cost of a resolving instruction (CR 118.12).
+pub fn discard_one_as_cost(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Result<bool, Suspend> {
+    let hand = g.state().zone(Zone::hand(player)).to_vec();
+    if hand.is_empty() || !g.may_pay_discard_cost(player) { return Ok(false); }
+    let rule = select::cards(select::exactly(1));
+    let chosen = choose::select_cost(g, player, source, Purpose::Discard, hand, rule)?;
+    if chosen.is_empty() { return Ok(false); }
+    g.discard_cost(&chosen);
+    Ok(true)
+}
+
 /// "A player exiles `count` cards from their hand" (CR 406.2, 608.2c): they choose them (all of the hand if it has fewer),
 /// asked even when the choice is forced except of an empty hand, and they are exiled together. The cards chosen. Ruthless
 /// Negotiation (one) and Perfect Intimidation (two) print it.
@@ -291,10 +302,11 @@ pub fn discard_two_unless_discarding(
         }
         let hand = g.state().zone(Zone::hand(player)).to_vec();
         let qualifying: Vec<ObjectId> = hand.iter().copied().filter(|&c| qualifies(&g.chars(c))).collect();
-        if !qualifying.is_empty() {
+        if !qualifying.is_empty() && g.may_pay_discard_cost(player) {
             let card = g.obj(source).card;
             if choose::one_of(g, player, source, vec![Label::Card(card, 0), Label::Card(card, 1)])? == 0 {
-                let one = choose::cards_from(g, player, source, Purpose::Discard, hand, qualifying, 1, false)?;
+                let selection = select::Selection::listed(select::Count::Exactly(1), &hand, qualifying);
+                let one = choose::select_cost(g, player, source, Purpose::Discard, hand, selection)?;
                 paying.extend_from_slice(&one);
                 chosen.extend(one);
                 continue;

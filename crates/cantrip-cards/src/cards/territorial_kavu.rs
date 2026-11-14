@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::statics::itself;
-use cantrip_mechanics::{discard_chosen, targets};
+use cantrip_mechanics::{discard_one_as_cost, targets};
 use cantrip_oracle as oracle;
 
 /// Domain (CR 604.3, 305.6): power and toughness each equal the number of basic land types among lands its controller
@@ -13,7 +13,7 @@ fn domain(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 
 /// Mode 0: discard a card, and draw a card if you do. The discard is asked of any hand that is not empty.
 fn discard_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if !discard_chosen(g, item.controller, item.object, 1)?.is_empty() {
+    if discard_one_as_cost(g, item.controller, item.object)? {
         g.draw(item.controller, 1);
     }
     Ok(())

@@ -3,7 +3,7 @@ use cantrip_mechanics::{effects, library};
 use cantrip_oracle as oracle;
 
 fn discard_and_tutor(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if effects::may_discard_a_card(g, item)? {
+    if effects::may_discard_a_card_as_cost(g, item)? {
         library::search_to_hand(g, item.controller, item.object, library::Find::ONE.revealed(),
             |q, card| q.chars(card).is(CardType::Enchantment))?;
     }

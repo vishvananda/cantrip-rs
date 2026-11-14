@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{casualty, choose_from_hand, effects, players, targets, tokens};
+use cantrip_mechanics::{casualty, choose, effects, players, select, targets, tokens};
 use cantrip_mechanics::triggers::THIS_DIES;
 use cantrip_oracle as oracle;
 
@@ -37,13 +37,14 @@ fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         if !players::reached(g, opponent) {
             continue;
         }
-        if g.state().zone(Zone::hand(opponent)).is_empty() || !effects::ask_may(g, opponent, item.object, Purpose::Ask(&DISCARD))? {
+        if g.state().zone(Zone::hand(opponent)).is_empty() || !g.may_pay_discard_cost(opponent) || !effects::ask_may(g, opponent, item.object, Purpose::Ask(&DISCARD))? {
             losses.push((opponent, -2));
         } else {
-            discards.extend(choose_from_hand(g, opponent, item.object, 1)?);
+            let hand = g.state().zone(Zone::hand(opponent)).to_vec();
+            discards.extend(choose::select_cost(g, opponent, item.object, Purpose::Discard, hand, select::cards(select::exactly(1)))?);
         }
     }
-    g.together(Together { discards: &discards, life: &losses, ..Default::default() });
+    g.together(Together { discard_costs: &discards, life: &losses, ..Default::default() });
     g.end_sentence();
     let words = g.words(item.object);
     let (demon, devil) = (words.subtype(Subtype::Demon), words.subtype(Subtype::Devil));

@@ -35,6 +35,15 @@ pub fn select(g: &mut dyn Game, player: PlayerId, source: ObjectId, purpose: Pur
     }
 }
 
+/// Choose cards to pay a resolving cost, retaining the enclosing effect's restrictions (CR 101.2, 118.12).
+pub fn select_cost(g: &mut dyn Game, player: PlayerId, source: ObjectId, purpose: Purpose, cards: Vec<ObjectId>, rule: Selection) -> Result<Vec<ObjectId>, Suspend> {
+    if cards.is_empty() { return Ok(Vec::new()); }
+    match g.ask_cost(player, select_question(source, purpose, cards, rule))? {
+        Answer::Cards(chosen) => Ok(chosen),
+        _ => Ok(Vec::new()),
+    }
+}
+
 /// The question `select` asks, for a card written as explicit stages, which asks it with `Game::ask_then` (Duress).
 pub fn select_question(source: ObjectId, purpose: Purpose, cards: Vec<ObjectId>, rule: Selection) -> RequestKind {
     RequestKind::ChooseCards { source, purpose, cards, rule: Box::new(rule) }

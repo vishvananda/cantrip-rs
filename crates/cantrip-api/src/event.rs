@@ -4,6 +4,15 @@ use cantrip_state::*;
 
 use crate::history::Cast;
 
+/// The immediate rules action that caused a discard (CR 609.1, 701.9).
+/// The effect controller is frozen when the discard begins, before replacements.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum DiscardCause {
+    Effect { controller: PlayerId },
+    Cost,
+    TurnOrRule,
+}
+
 /// What a coin flip came to (CR 705.2): a flip its player called is won or lost; one that cares only whether it comes up
 /// heads (Ral Zarek, Guest Lecturer's "the number of coins that came up heads") is heads or tails, and no one wins or
 /// loses it. An effect may fix a flip's result and that its player wins it (CR 705.3): such a flip came up heads and was
@@ -79,6 +88,8 @@ pub struct MillResult {
 pub struct Together<'a> {
     pub sacrifices: &'a [(PlayerId, ObjectId)],
     pub discards: &'a [ObjectId],
+    /// Cards discarded to pay costs within this instruction, simultaneous with its other parts.
+    pub discard_costs: &'a [ObjectId],
     pub life: &'a [(PlayerId, i32)],
 }
 
@@ -195,7 +206,7 @@ pub enum Event {
     /// characteristics is undefined (CR 701.9c), its abilities among them (CR 109.3), for its own triggers and for anything
     /// that asks what was discarded (`cantrip_mechanics::hand::discarded_card`) - though the card itself, in that zone, is
     /// what it is to a later search or draw.
-    Discarded { player: PlayerId, card: ObjectId, undefined: bool },
+    Discarded { player: PlayerId, card: ObjectId, undefined: bool, cause: DiscardCause },
     /// Cards were revealed to every player (CR 701.20a).
     Revealed { player: PlayerId, card: ObjectId },
     Countered { spell: ObjectId },

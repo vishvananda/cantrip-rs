@@ -89,6 +89,7 @@ pub struct Moving {
     pub revealed: bool,
     /// It is discarded to pay a cost that specifies a characteristic of it (`ZoneChange::pays_characteristic`, CR 701.9c).
     pub pays_characteristic: bool,
+    pub discard_cause: Option<cantrip_api::DiscardCause>,
     /// A spell leaving the stack, its own replacements of that move (`ZoneChange::flashback`, `ZoneChange::exile_instead`):
     /// set by the spell's leaving (`resolve::leave_stack`, `resolve::send_spell`).
     pub flashback: bool,
@@ -107,7 +108,7 @@ pub struct Moving {
 
 impl Moving {
     pub fn to(id: ObjectId, to: Zone) -> Moving {
-        Moving { id, to, entering: None, put_by: PutBy::Current, reason: None, revealed: false, pays_characteristic: false, flashback: false, exile_instead: ExileInstead::Never, adventure: false, omen: false, rebound: false, destroy: false, aura_host_left: None }
+        Moving { id, to, entering: None, put_by: PutBy::Current, reason: None, revealed: false, pays_characteristic: false, discard_cause: None, flashback: false, exile_instead: ExileInstead::Never, adventure: false, omen: false, rebound: false, destroy: false, aura_host_left: None }
     }
 }
 
@@ -303,6 +304,7 @@ fn moving_proposal(cx: &Cx, mut m: Moving, reason: ZoneReason) -> (Moving, ZoneC
         from,
         to,
         reason,
+        discard_cause: m.discard_cause,
         controller: entry.map_or(old.controller, |e| e.controller),
         put_by: to.is(ZoneKind::Battlefield).then(|| m.put_by.player(cx)).flatten(),
         tapped: entry.is_some_and(|e| e.tapped),
@@ -1395,7 +1397,8 @@ pub fn prepare_entry(cx: &mut Cx, entering: &mut Entering) -> R<()> {
         && let Some(enters_as_copy) = cx.cards().get(face).enters_as_copy
         && !lost(cx, entering)
     {
-        enters_as_copy(cx, entering)?;
+        let controller = entering.controller;
+        cx.with_discard_cause(cantrip_api::DiscardCause::Effect { controller }, |cx| enters_as_copy(cx, entering))?;
         copied_by = Some(face);
     }
     // CR 616.1d, 702.145b: then, at night, daybound has a permanent represented by a double-faced card enter transformed -
@@ -1427,7 +1430,8 @@ pub fn prepare_entry(cx: &mut Cx, entering: &mut Entering) -> R<()> {
     {
         let def = cx.cards().get(copy.card);
         if let Some(enters_as_copy) = def.enters_as_copy {
-            enters_as_copy(cx, entering)?;
+            let controller = entering.controller;
+            cx.with_discard_cause(cantrip_api::DiscardCause::Effect { controller }, |cx| enters_as_copy(cx, entering))?;
             entering_keeps_colors(cx, entering, copy, face);
         }
         let card = entering.copy.map_or(copy.card, |c| c.card);
@@ -1607,7 +1611,7 @@ pub(crate) fn apply_own_entering(cx: &mut Cx, entering: &mut Entering, controlle
     entering.controller = controller;
     entering.tapped = tapped;
     let before = *entering;
-    let _ = enters(cx, entering);
+    let _ = cx.with_discard_cause(cantrip_api::DiscardCause::Effect { controller }, |cx| enters(cx, entering));
     if layers::verifying()
         && let Some(fault) = enters_tier_fault(&before, entering)
     {
@@ -2983,6 +2987,7 @@ fn create_tokens_onto(
             from: if spell.is_some() { Zone::STACK } else { Zone::GONE },
             to: Zone::BATTLEFIELD,
             reason: if spell.is_some() { ZoneReason::Resolve } else { ZoneReason::Created },
+            discard_cause: None,
             controller,
             put_by: Some(spell.map_or(controller, |spell| spell.controller)),
             tapped: entering.tapped,
@@ -3805,13 +3810,18 @@ fn discard_events(cx: &mut Cx, cards: &[ObjectId], paying: &[ObjectId], revealed
 /// The moves of a discard: each card still the card it was (CR 400.7) to its owner's graveyard - but one an opponent's spell
 /// or ability can't make its owner discard, which stays where it is (CR 101.2).
 fn discard_moves(cx: &Cx, cards: &[ObjectId], paying: &[ObjectId], revealed: bool) -> Vec<Moving> {
-    let causer = cx.effect_controller();
+    if cards.iter().all(|&card| !live(cx.s(), card)) { return Vec::new(); }
+    let cause = cx.discard_cause.expect("discard requires an explicit rules, cost, or effect scope");
     cards
         .iter()
         .filter(|&&c| live(cx.s(), c))
-        .filter(|&&c| causer.is_none_or(|by| cantrip_api::may_cause(cx, by, cx.s().obj(c).owner, cantrip_api::CauseKind::Discard)))
+        .filter(|&&c| match cause {
+            cantrip_api::DiscardCause::Effect { controller } => cantrip_api::may_cause(cx, controller, cx.s().obj(c).owner, cantrip_api::CauseKind::Discard),
+            _ => true,
+        })
         .map(|&c| Moving {
             reason: Some(ZoneReason::Discard),
+            discard_cause: Some(if paying.contains(&c) { cantrip_api::DiscardCause::Cost } else { cause }),
             pays_characteristic: paying.contains(&c),
             revealed,
             ..Moving::to(c, Zone::graveyard(cx.s().obj(c).owner))
@@ -3834,7 +3844,7 @@ fn discarded_events(cx: &Cx, moves: &[Moving], seen: &[ObjectId]) -> Vec<Event> 
             continue;
         }
         let undefined = !seen.contains(&m.id) && matches!(cx.s().obj(card).zone.kind(), ZoneKind::Hand | ZoneKind::Library);
-        events.push(Event::Discarded { player: cx.s().obj(card).owner, card, undefined });
+        events.push(Event::Discarded { player: cx.s().obj(card).owner, card, undefined, cause: m.discard_cause.expect("discard cause") });
     }
     events
 }
@@ -4559,6 +4569,14 @@ pub fn pay_life_with_permanents(cx: &mut Cx, source: ObjectId, permanents: &[Obj
 pub fn together(cx: &mut Cx, parts: cantrip_api::Together) -> i32 {
     let life: Vec<(PlayerId, i64)> = parts.life.iter().filter(|&&(_, n)| n != 0).map(|&(player, n)| (player, i64::from(n))).collect();
     let mut moves = discard_moves(cx, parts.discards, &[], false);
+    let allowed_costs: Vec<ObjectId> = parts.discard_costs.iter().copied().filter(|&card| {
+        !live(cx.s(), card) || match cx.discard_cause {
+            Some(cantrip_api::DiscardCause::Effect { controller }) => cantrip_api::may_cause(cx, controller, cx.s().obj(card).owner, cantrip_api::CauseKind::Discard),
+            _ => true,
+        }
+    }).collect();
+    let cost_moves = cx.with_discard_cause(cantrip_api::DiscardCause::Cost, |cx| discard_moves(cx, &allowed_costs, &[], false));
+    moves.extend(cost_moves);
     let discarding = moves.len();
     moves.extend(sacrifice_moves(cx, parts.sacrifices));
     if moves.is_empty() {
@@ -6200,7 +6218,7 @@ mod tests {
     fn entering_counters(on_battlefield: &[&'static CardDef]) -> Vec<(&'static str, i32)> {
         let (mut game, held) = game_with(on_battlefield);
         let hand = Zone::hand(PlayerId(0));
-        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
         let mut out = Vec::new();
         for &id in &held {
             let mut entering = entering(id);
@@ -6242,7 +6260,7 @@ mod tests {
         let relic = held[1];
         let row = *game.state.obj(relic);
         let battlefield = game.state.battlefield().to_vec();
-        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
         let would = as_it_would_exist(&mut cx, &entering(relic));
         assert!(would.chars.is(CardType::Creature) && would.chars.is(CardType::Artifact) && would.lost);
         assert!(*cx.s().obj(relic) == row && cx.s().battlefield() == battlefield.as_slice());
@@ -6259,7 +6277,7 @@ mod tests {
     fn a_name_an_effect_set_is_the_last_known_name_of_a_permanent_that_left() {
         let (mut game, _) = game_with(&[&ANIMATOR]);
         let animator = game.state.battlefield()[0];
-        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
         cantrip_api::Game::add_effect(&mut cx, animator, animator, EffectKind::SetName("Everflame"), Duration::Indefinite);
         assert_eq!(cx.chars(animator).name, "Everflame");
         let card = move_to(&mut cx, animator, Zone::graveyard(PlayerId(0)));
@@ -6286,7 +6304,7 @@ mod tests {
     /// it" (persist's words, CR 702.79a), `on_battlefield` there first.
     fn minus_counters(on_battlefield: &[&'static CardDef]) -> Vec<(&'static str, i32)> {
         let (mut game, held) = game_with(on_battlefield);
-        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
         let mut out = Vec::new();
         for &id in &held {
             let new = put_onto_battlefield_with(&mut cx, &[(id, PlayerId(0), false)], ZoneReason::Other, &[(CounterKind::MinusOne, 1)]).expect("nothing is asked")[0];
@@ -6319,7 +6337,7 @@ mod tests {
         // The object left its zone before the effect resolves: its old reference no longer moves anything, but the
         // owner's library is still shuffled.
         let (mut game, source) = game_with_library();
-        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
         put_into_graveyard(&mut cx, &[source]);
         let rng = cx.s().rng;
         put_into_library(&mut cx, &[source], LibraryPlace::ShuffledIn);
@@ -6339,7 +6357,7 @@ mod tests {
         });
         game.state.zone_push(Zone::BATTLEFIELD, source);
         game.state.see_statics();
-        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
         let rng = cx.s().rng;
         let moved = put_into_library(&mut cx, &[source], LibraryPlace::ShuffledIn);
         assert_eq!(cx.s().obj(moved[0]).zone, Zone::exile(PlayerId(0)));
@@ -6351,7 +6369,7 @@ mod tests {
         game.state.zone_remove(hand, source);
         game.state.update_obj(source, |o| o.zone = Zone::PHASED_OUT);
         game.state.zone_push(Zone::PHASED_OUT, source);
-        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
         let rng = cx.s().rng;
         put_into_library(&mut cx, &[source], LibraryPlace::ShuffledIn);
         assert_eq!(cx.s().obj(source).zone, Zone::PHASED_OUT);
@@ -6365,7 +6383,7 @@ mod tests {
     fn tap_only_changes_a_live_untapped_permanent_on_the_battlefield() {
         let (mut game, held) = game_with(&[&ANIMATOR]);
         let permanent = game.state.battlefield()[0];
-        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
         cantrip_api::Game::tap(&mut cx, permanent);
         assert!(cx.s().obj(permanent).tapped);
         assert_eq!(cx.g.log.iter().filter(|r| matches!(r.event, Event::Tapped { permanent: id } if id == permanent)).count(), 1);

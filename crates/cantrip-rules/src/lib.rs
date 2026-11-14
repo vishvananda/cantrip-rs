@@ -6,6 +6,8 @@
 pub mod tree;
 mod actions;
 #[cfg(test)]
+mod discard_cause_tests;
+#[cfg(test)]
 mod ability_acquisition_identity_tests;
 #[cfg(test)]
 mod linked_created_tokens_tests;
@@ -616,7 +618,7 @@ impl Game {
         } else {
             // A scenario's deal: seven each, in turn order, kept.
             for p in game.state.apnap().collect::<Vec<_>>() {
-                let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+                let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
                 for _ in 0..7 {
                     ops::draw(&mut cx, p);
                 }
@@ -685,7 +687,7 @@ impl Game {
             }
             // RX-1: a game as long as the engine records is a draw, between two frames, so that no frame is left half done.
             if self.log.len() >= self.max_events {
-                let mut cx = Cx { g: self, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+                let mut cx = Cx { g: self, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
                 ops::end_game(&mut cx, Outcome::Draw);
                 cx.record(Event::GameDrawn { reason: DrawReason::EventLimit });
                 return;
@@ -704,7 +706,7 @@ impl Game {
 
             let kind = self.state.agenda[at].kind;
             let (flow, asked_at) = {
-                let mut cx = Cx { g: self, frame: at, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+                let mut cx = Cx { g: self, frame: at, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
                 let flow = match kind {
                     FrameKind::Opening => turn::opening(&mut cx),
                     FrameKind::BeginStep => turn::begin_step(&mut cx),
@@ -803,13 +805,13 @@ impl Game {
                 Err(Stop::Cancel) => {
                     // Everything the announcement did is undone (CR 733.1) but the mana abilities that may not be
                     // (`takeback`), and the frame goes.
-                    let mut cx = Cx { g: self, frame: at, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+                    let mut cx = Cx { g: self, frame: at, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
                     takeback::take_back(&mut cx, mark, log_mark as usize, takeback::Since::frame(objects_mark));
                     self.state.frame_remove(at);
                 }
             }
             {
-                let mut cx = Cx { g: self, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+                let mut cx = Cx { g: self, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
                 library_visibility::sync(&mut cx);
             }
             self.forget();
@@ -946,7 +948,7 @@ impl Game {
         if self.state.is_over() || outcome == Outcome::InProgress {
             return;
         }
-        let mut cx = Cx { g: self, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+        let mut cx = Cx { g: self, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
         ops::end_game(&mut cx, outcome);
     }
 
@@ -984,7 +986,7 @@ impl Game {
             }
         }
         if now {
-            let mut cx = Cx { g: self, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+            let mut cx = Cx { g: self, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
             ops::concede(&mut cx, player);
         }
         // A staged run's question to the player who left is made by another, or not at all (CR 800.4f-h).
@@ -1343,6 +1345,8 @@ pub(crate) struct Cx<'a> {
     /// to whichever player's pool (Spectral Searchlight's "that player adds"). None outside such an ability, and while nothing
     /// could replace its mana.
     pub producing: Option<Vec<Produced>>,
+    /// The immediate effect or cost currently executing; scoped and restored for nesting.
+    pub discard_cause: Option<DiscardCause>,
 }
 
 /// One addition of mana to a pool held as part of a production (`Cx::producing`): the player whose pool it goes to, its type,
@@ -1789,9 +1793,18 @@ impl<'a> Cx<'a> {
     /// effects it begins (CR 611.2a) - stays its controller's.
     pub(crate) fn acting_as<T>(&mut self, player: PlayerId, f: impl FnOnce(&mut Self) -> T) -> T {
         let outer = self.doer.replace(player);
+        let cause = self.discard_cause.replace(DiscardCause::Effect { controller: player });
         let done = f(self);
+        self.discard_cause = cause;
         self.doer = outer;
         done
+    }
+
+    pub(crate) fn with_discard_cause<T>(&mut self, cause: DiscardCause, f: impl FnOnce(&mut Self) -> T) -> T {
+        let outer = self.discard_cause.replace(cause);
+        let result = f(self);
+        self.discard_cause = outer;
+        result
     }
 
     /// Counters one instruction of an effect puts (`Game::add_counters_together`, `add_counters_together_by`): what it puts on
@@ -2189,7 +2202,7 @@ impl Cx<'_> {
     fn as_allowed(&self, player: PlayerId, mut kind: RequestKind) -> Result<RequestKind, Answer> {
         match &mut kind {
             RequestKind::ChooseCards { purpose: Purpose::Discard, .. }
-                if self.effect_controller().is_some_and(|causer| !cantrip_api::may_cause(self, causer, player, CauseKind::Discard)) =>
+                if matches!(self.discard_cause, Some(DiscardCause::Effect { controller }) if !cantrip_api::may_cause(self, controller, player, CauseKind::Discard)) =>
             {
                 Err(Answer::Cards(Vec::new()))
             }
@@ -2220,6 +2233,20 @@ impl cantrip_api::Game for Cx<'_> {
         match self.as_allowed(player, kind) {
             Ok(kind) => self.ask_core(player, kind, false).map_err(|_| Suspend),
             Err(answer) => Ok(answer),
+        }
+    }
+
+    fn ask_cost(&mut self, player: PlayerId, kind: RequestKind) -> Result<Answer, Suspend> {
+        match self.as_allowed(player, kind) {
+            Ok(kind) => self.with_discard_cause(DiscardCause::Cost, |cx| cx.ask_core(player, kind, false).map_err(|_| Suspend)),
+            Err(answer) => Ok(answer),
+        }
+    }
+
+    fn may_pay_discard_cost(&self, player: PlayerId) -> bool {
+        match self.discard_cause {
+            Some(DiscardCause::Effect { controller }) => cantrip_api::may_cause(self, controller, player, CauseKind::Discard),
+            _ => true,
         }
     }
 
@@ -2335,6 +2362,16 @@ impl cantrip_api::Game for Cx<'_> {
 
     fn discard_paying(&mut self, cards: &[ObjectId], paying: &[ObjectId]) -> Vec<ObjectId> {
         ops::discard_paying(self, cards, paying)
+    }
+
+    fn discard_cost(&mut self, cards: &[ObjectId]) -> Vec<ObjectId> {
+        if let Some(DiscardCause::Effect { controller }) = self.discard_cause
+            && cards.iter().copied().filter(|&card| layers::live(self.s(), card))
+                .any(|card| !cantrip_api::may_cause(self, controller, self.s().obj(card).owner, CauseKind::Discard))
+        {
+            return Vec::new();
+        }
+        self.with_discard_cause(DiscardCause::Cost, |cx| ops::discard_together(cx, cards))
     }
 
     fn discard_revealed(&mut self, cards: &[ObjectId]) -> Vec<ObjectId> {

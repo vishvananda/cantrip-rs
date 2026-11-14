@@ -134,7 +134,7 @@ fn put(game: &mut Game, table: &CardTable, def: &'static CardDef, zone: Zone, co
 }
 
 fn cx(game: &mut Game) -> Cx<'_> {
-    Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None }
+    Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None }
 }
 
 fn entering(id: ObjectId, controller: PlayerId, tapped: bool) -> Entering {
@@ -240,6 +240,7 @@ fn it_is_judged_again_after_a_replacement_changes_how_it_enters() {
         shuffle: false,
         is_card: true,
         madness: false,
+        discard_cause: None,
         pays_characteristic: false,
         exiled_with: None,
         flashback: false,

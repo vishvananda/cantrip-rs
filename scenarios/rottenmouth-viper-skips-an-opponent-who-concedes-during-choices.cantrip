@@ -1,0 +1,33 @@
+# Bot2 concedes between its two Viper choices. It leaves before the second choice; Bot3 still makes both of its choices
+# and loses 8 life, without inheriting an extra question (CR 101.4, 104.3a, 800.4a).
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Rottenmouth Viper
+Island x15
+[Bot2 Deck]
+Mountain x20
+[Bot3 Deck]
+Mountain x20
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Rottenmouth Viper)
+Bot2.Choose()
+Bot3.Choose()
+Bot2.Modes(Lose 4 life)
+Bot3.Modes(Lose 4 life)
+[T4 Bot1.Main1]
+Bot1.Attack(Rottenmouth Viper > Bot3)
+Bot2.Modes(Discard a card)
+Bot2.Choose(Mountain)
+Bot2.Concede
+Bot3.Modes(Lose 4 life)
+Bot3.Modes(Lose 4 life)
+[Expect]
+Bot2.Status = Lost
+Bot3.Life = 8
+Bot1.Battlefield.Rottenmouth Viper.Counters.Blight = 2

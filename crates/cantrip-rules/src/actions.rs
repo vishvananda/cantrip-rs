@@ -847,7 +847,7 @@ fn payable_after_life(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Co
     let top = (u64::from(required) + optional).min(most) as u32;
     let mut copy = cx.g.hypothetical();
     let mut sim = Cx { g: &mut copy, frame: cx.frame, cursor: cx.cursor, mana_source: cx.mana_source, entering: cx.entering,
-        lineage: Vec::new(), damage: None, asked_at: cx.asked_at, doer: cx.doer, producing: None };
+        lineage: Vec::new(), damage: None, asked_at: cx.asked_at, doer: cx.doer, discard_cause: cx.discard_cause, producing: None };
     for lost in required..=top {
         for energy_paid in [true, false] {
             if !energy_paid && (energy == 0 || lost == 0) {
@@ -2063,7 +2063,7 @@ fn pay_discards(cx: &mut Cx, chosen: &Discarding) {
     if chosen.cards.is_empty() {
         return;
     }
-    ops::discard_paying(cx, &chosen.cards, &chosen.paying);
+    cx.with_discard_cause(cantrip_api::DiscardCause::Cost, |cx| ops::discard_paying(cx, &chosen.cards, &chosen.paying));
 }
 
 /// Whether `player` can still pay this much energy (CR 107.14) and life (CR 119.4) once the mana of the cost is paid: the
@@ -3300,8 +3300,10 @@ fn pay_scheduled_costs(cx: &mut Cx, player: PlayerId, spell: ObjectId, scope: Pa
                         return Ok(false);
                     }
                     MoveSelf::Discard => {
-                        if matches!(scope, PaymentScope::Ability { cycling: true, .. }) { ops::cycle(cx, player, spell); }
-                        else { ops::discard(cx, spell); }
+                        cx.with_discard_cause(cantrip_api::DiscardCause::Cost, |cx| {
+                            if matches!(scope, PaymentScope::Ability { cycling: true, .. }) { ops::cycle(cx, player, spell); }
+                            else { ops::discard(cx, spell); }
+                        });
                         CostPart::DiscardSelf
                     }
                     MoveSelf::Library(place) => { ops::put_into_library(cx, &[spell], place); CostPart::LibrarySelf }
@@ -4726,7 +4728,7 @@ pub fn activation_costs(game: &crate::Game, player: PlayerId, source: ObjectId, 
     }
     // The rules read the game through a frame's view; a copy of the position (no tree) is enough to ask it.
     let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), producible_path: Default::default(), hypothetical_chance: None, effect_words: Default::default(), mana_activation_x: None, mana_rider: 0, mana_interval: None, takeback: Default::default() };
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
     // The ability asked as it is (CR 607.5): its own cost change reads its own links.
     let by = cx.link_of_nth(source, index as usize);
     if candidates.is_empty() {
@@ -4751,7 +4753,7 @@ pub fn replaced_mana_yields(game: &crate::Game, player: PlayerId, source: Object
         return None;
     }
     let mut copy = advice_game(game);
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
     // Asked as the ability it is (CR 607.5): one an effect gave the source reads only its own links.
     let by = cx.link_of_nth(source, index as usize);
     let types = if def.adds_any > 0 { any_types(&cx, source, player, def, by) } else { 0 };
@@ -4797,7 +4799,7 @@ pub fn options_with_mana_to_spare(game: &crate::Game, player: PlayerId) -> Vec<A
             p.pool.0[mana as usize] += 1000;
         }
     });
-    let mut cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+    let mut cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
     priority_options(&mut cx, player)
 }
 
@@ -4811,7 +4813,7 @@ pub fn payment_mana_options_with_mana_to_spare(game: &crate::Game, player: Playe
             p.pool.0[mana as usize] += 1000;
         }
     });
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
     let mut options = Vec::new();
     mana_ability_options(&cx, player, ManaWindow::Payment, &mut options);
     options
@@ -4849,7 +4851,7 @@ pub fn cast_costs(game: &crate::Game, player: PlayerId, option: &ActionOption, c
     };
     let (_, face) = option_face(game, card, option.index);
     let mut copy = advice_game(game);
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
     candidates.iter().map(|&t| change_total(&cx, &cost_change_sources(&cx), player, Costed::Spell(card), base, face, &[t])).collect()
 }
 
@@ -4861,7 +4863,7 @@ pub fn sacrifices_for_reduction(game: &crate::Game, spell: ObjectId, player: Pla
     let def = game.cards.get(obj.copied_card().unwrap_or(obj.card));
     let Some(variable @ VariableCost::SacrificeAnyNumber { less_each, .. }) = def.additional_cost.and_then(|c| c.variable) else { return None };
     let mut copy = advice_game(game);
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
     Some((less_each, variable_candidates(&cx, spell, player, variable, Some(CostFor::Spell), None).len()))
 }
 
@@ -4878,7 +4880,7 @@ pub fn most_affordable_x(game: &crate::Game, player: PlayerId, source: ObjectId,
         return None;
     }
     let mut copy = advice_game(game);
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
     // What pays for it is the same at every X, unless a waterbend cost's {X} lets more be tapped for it.
     let bends = match paid.costed {
         XCosted::Ability(ability, _) | XCosted::SpecialAction(ability) => activated(&cx, ability).is_some_and(|d| d.waterbend),
@@ -5078,7 +5080,7 @@ pub fn cast_total(game: &crate::Game, player: PlayerId, option: &ActionOption) -
         return None;
     }
     let mut copy = advice_game(game);
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
     let face_id = (!std::ptr::eq(face, whole)).then(|| cx.card_id(face));
     let (total, life) = change_total(&cx, &cost_change_sources(&cx), player, Costed::Spell(card), base, face_id, &[]);
     Some((base, total, life))
@@ -5093,7 +5095,7 @@ pub fn granted_cast_total(game: &crate::Game, player: PlayerId, option: &ActionO
     let cost = granted_cast_cost(game, player, option)?;
     let (_, face) = option_face(game, card, option.index);
     let mut copy = advice_game(game);
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
     let mana = change_with(&cx, &cost_change_sources(&cx), player, Costed::Spell(card), cost.mana, face, &[]);
     Some((cost, mana))
 }
@@ -5109,7 +5111,7 @@ pub fn alternative_cast_total(game: &crate::Game, player: PlayerId, option: &Act
     let cost = alternative.what.cost.cost();
     let (_, face) = option_face(game, card, option.index);
     let mut copy = advice_game(game);
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
     let total = change_with(&cx, &cost_change_sources(&cx), player, Costed::Spell(card), cost.mana, face, &[]);
     Some((cost, total))
 }
@@ -5123,7 +5125,7 @@ pub fn granted_cast_cost(game: &crate::Game, player: PlayerId, option: &ActionOp
     let Some(Through::Way(way)) = through(game, game.cards, player, card, option.granted_by) else { return None };
     let (_, face) = option_face(game, card, option.index);
     let mut copy = advice_game(game);
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
     match face {
         Some(face) => usable_cost(way.what, &AsFace { cx: &cx, spell: card, face }, &way.asker(), card, player),
         None => usable_cost(way.what, &cx, &way.asker(), card, player),
@@ -12472,7 +12474,7 @@ pub fn special_action_costs(game: &crate::Game, player: PlayerId, source: Object
         return None;
     }
     let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false, max_events: game.max_events, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), producible_path: Default::default(), hypothetical_chance: None, effect_words: Default::default(), mana_activation_x: None, mana_rider: 0, mana_interval: None, takeback: Default::default() };
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
     let printed = special_action_printed_cost(&cx, source, ability, def);
     let cost = special_action_cost(&cx, player, source, ability, def);
     (cost != printed).then_some(cost)
@@ -12556,7 +12558,7 @@ fn special_action(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abil
     // How the source acquired the ability (CR 607.5): what its effect is linked by.
     item.acquired = by.map_or_else(|| cx.s().copy_acquired(source), |by| by.acquired);
     // A special action's effect is done at once; a question it asked would have nowhere to be answered.
-    let _ = (def.effect)(cx, &item);
+    let _ = cx.acting_as(player, |cx| (def.effect)(cx, &item));
     Ok(())
 }
 
@@ -13063,14 +13065,14 @@ fn activate_player_mana_effect(cx: &mut Cx, player: PlayerId, source: ObjectId, 
 /// its cost has {T} (CR 106.12b).
 pub(crate) fn producible_types_in(game: &crate::Game, permanent: ObjectId) -> (ColorSet, bool) {
     let mut copy = advice_game(game);
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
     producible_types(&cx, permanent)
 }
 
 /// A rules query over a read-only state, as target and cost checks outside a frame read it.
 pub(crate) fn producible_types_on(cards: &'static CardTable, state: &GameState, events: &[Record], permanent: ObjectId) -> (ColorSet, bool) {
     let mut copy = crate::Game { state: state.clone(), log: events.to_vec(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards, verify: false, max_events: crate::MAX_GAME_EVENTS, history_end: None, check: crate::StateCheck::NONE, spells_as_cast: Default::default(), own_text: Default::default(), producible_path: Default::default(), hypothetical_chance: None, effect_words: Default::default(), mana_activation_x: None, mana_rider: 0, mana_interval: None, takeback: Default::default() };
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
     producible_types(&cx, permanent)
 }
 
@@ -13351,7 +13353,7 @@ fn effect_productions(cx: &Cx, id: ObjectId, player: PlayerId, definition: &Abil
                         damage: None,
                         asked_at: None,
                         doer: None,
-                        producing: Some(Vec::new()),
+                        discard_cause: None, producing: Some(Vec::new()),
                     };
                     let asker = Asker { instance: Some(AbilityInstance { ability, acquisition: instance_nth(cx, id, &chars, nth) }), source: id, controller: player, by, spell: false };
                     let result = run.acting_as(player, |run| -> R<()> {
@@ -14846,7 +14848,10 @@ fn may_sacrifice_for(cx: &Cx, player: PlayerId, id: ObjectId, paid: Option<CostF
 /// Whether the spell or ability resolving now, if any, may cause `player` to do `kind` (CR 101.2, `cantrip_api::may_cause`):
 /// what a cost it has them pay may take (CR 118.12). Nothing is resolving for a special action's cost, which it leaves alone.
 fn resolution_may_cause(cx: &Cx, player: PlayerId, kind: CauseKind) -> bool {
-    cx.effect_controller().is_none_or(|by| cantrip_api::may_cause(cx, by, player, kind))
+    match cx.discard_cause {
+        Some(cantrip_api::DiscardCause::Effect { controller }) => cantrip_api::may_cause(cx, controller, player, kind),
+        _ => true,
+    }
 }
 
 /// The most life `player` may pay (CR 119.4): their life total, or none at all while they can't lose life (CR 119.8: "a cost
@@ -15420,7 +15425,7 @@ mod tests {
     }
 
     fn cx(game: &mut Game) -> Cx<'_> {
-        Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None }
+        Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None }
     }
 
     /// "Spend this mana only to cast your commander" (Queen's Diamond, CR 106.6): your commander is a commander you own (CR
@@ -15700,7 +15705,7 @@ mod tests {
         let serial = game.state.stack.last().expect("the resolving ability").serial;
         game.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Resolve { serial }));
         let frame = game.state.agenda.len() - 1;
-        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
         assert!(cast_during_resolution(&mut cx, ids[1], CastTerms::default()).is_err(), "the cost is asked for");
         let Some(Request { kind: RequestKind::ChooseModes { modes, .. }, .. }) = cx.s().agenda[frame].pending.clone() else { panic!("a choice of costs") };
         assert_eq!(modes, vec![Label::ManaCost, Label::AlternativeCost(genesis, 0)]);
@@ -15708,7 +15713,7 @@ mod tests {
             f.pending = None;
             f.answers = vec![(None, Answer::Modes(vec![1]))];
         });
-        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
         assert_eq!(cast_during_resolution(&mut cx, ids[1], CastTerms::default()).ok(), Some(true));
         let s = cx.s();
         assert_eq!(s.stack.len(), 2);
@@ -15719,7 +15724,7 @@ mod tests {
         let serial = game.state.stack.last().expect("the resolving ability").serial;
         game.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Resolve { serial }));
         let frame = game.state.agenda.len() - 1;
-        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
         let free = CastTerms { instead: Some(ManaCost::ZERO), ..CastTerms::default() };
         assert_eq!(cast_during_resolution(&mut cx, ids[1], free).ok(), Some(true));
     }
@@ -15734,7 +15739,7 @@ mod tests {
         let serial = game.state.stack.last().expect("the resolving ability").serial;
         game.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Resolve { serial }));
         let frame = game.state.agenda.len() - 1;
-        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
         assert!(cast_during_resolution(&mut cx, ids[1], CastTerms::default()).is_err(), "the cost is asked for");
         let Some(Request { kind: RequestKind::ChooseModes { modes, .. }, .. }) = cx.s().agenda[frame].pending.clone() else { panic!("a choice of costs") };
         assert_eq!(modes, vec![Label::AlternativeCost(genesis, 0)]);
@@ -15744,7 +15749,7 @@ mod tests {
         let serial = game.state.stack.last().expect("the resolving ability").serial;
         game.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Resolve { serial }));
         let frame = game.state.agenda.len() - 1;
-        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
         assert_eq!(cast_during_resolution(&mut cx, ids[1], CastTerms::default()).ok(), Some(false));
         assert!(cx.s().stack.len() == 1);
     }
@@ -16084,7 +16089,7 @@ mod delayed_watched_mana_tests {
             members: Span::default(), since: 0, acquired: Acquired::OWN,
             words: Some(Words::NONE.changed(Word::Subtype(Subtype::Goblin), Word::Subtype(Subtype::Elf))),
         });
-        let mut c = Cx { g: &mut g, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: vec![], damage: None, asked_at: None, doer: None, producing: None };
+        let mut c = Cx { g: &mut g, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: vec![], damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
         let waiting = waiting_mana_triggers(&c);
         let (ordinary, _, snow, _) = tap_triggers(&c, &waiting, watched, you, 1 << Mana::G as usize);
         assert_eq!(ordinary[Mana::G as usize], 0);

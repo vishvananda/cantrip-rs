@@ -9,7 +9,7 @@ use cantrip_oracle as oracle;
 /// put it into your hand, then shuffle. An empty hand asks nothing; choosing no card declines.
 fn discard_and_search(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
-    if !effects::may_discard_a_card(g, item)? {
+    if !effects::may_discard_a_card_as_cost(g, item)? {
         return Ok(());
     }
     search_to_hand(g, player, item.object, Find::ONE.revealed(), |q, c| q.chars(c).is(CardType::Creature))?;

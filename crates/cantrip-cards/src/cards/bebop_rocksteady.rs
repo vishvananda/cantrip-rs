@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{discard_chosen, effects::ask_may, sacrifice_chosen, triggers::THIS_ATTACKS_OR_BLOCKS};
+use cantrip_mechanics::{sacrifice_chosen, triggers::THIS_ATTACKS_OR_BLOCKS};
 use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new(
@@ -10,15 +10,12 @@ const ASK: Question = Question::new(
     "Sacrifice a permanent",
 );
 
-/// "Sacrifice a permanent unless you discard a card" (CR 608.2d): the controller chooses to discard a card of their hand,
+/// "Sacrifice a permanent unless you discard a card" (CR 118.12a): the controller chooses to discard a card of their hand,
 /// which they can only do with a card in it, or else sacrifices a permanent of their choice (any permanent they control,
 /// this creature included).
 fn sacrifice_unless_discard(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    let has_a_card = !g.state().zone(Zone::hand(you)).is_empty();
-    if has_a_card && ask_may(g, you, item.object, Purpose::Ask(&ASK))? {
-        discard_chosen(g, you, item.object, 1)?;
-    } else {
+    if !g.may_pay(you, item.object, item.object, discard_cards(1), &ASK)? {
         sacrifice_chosen(g, you, item.object, 1, |_| true)?;
     }
     Ok(())

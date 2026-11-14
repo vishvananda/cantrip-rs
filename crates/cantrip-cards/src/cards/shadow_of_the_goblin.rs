@@ -1,11 +1,11 @@
 use cantrip_api::*;
-use cantrip_mechanics::{discard_chosen, effects, triggers};
+use cantrip_mechanics::{discard_one_as_cost, effects, triggers};
 use cantrip_oracle as oracle;
 
 /// "Discard a card. If you do, draw a card" (CR 701.9, 608.2c): the controller chooses a card of their hand and discards it, an
-/// empty hand being asked nothing; the draw follows a card actually discarded.
+/// empty hand being asked nothing; the draw follows a started payment (CR 118.12).
 fn discard_to_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if !discard_chosen(g, item.controller, item.object, 1)?.is_empty() {
+    if discard_one_as_cost(g, item.controller, item.object)? {
         g.draw(item.controller, 1);
     }
     Ok(())

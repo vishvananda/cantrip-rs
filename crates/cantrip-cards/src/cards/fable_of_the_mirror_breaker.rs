@@ -26,10 +26,12 @@ fn chapter_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn chapter_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
     let hand = g.state().zone(Zone::hand(player)).to_vec();
-    let chosen = choose::cards(g, player, item.object, Purpose::Discard, hand, 2, true)?;
-    g.discard_together(&chosen);
+    if !g.may_pay_discard_cost(player) { return Ok(()); }
+    let rule = cantrip_mechanics::select::cards(cantrip_mechanics::select::up_to(2));
+    let chosen = choose::select_cost(g, player, item.object, Purpose::Discard, hand, rule)?;
+    let discarded = g.discard_cost(&chosen);
     if !chosen.is_empty() {
-        g.draw(player, chosen.len() as u32);
+        g.draw(player, discarded.len() as u32);
     }
     Ok(())
 }

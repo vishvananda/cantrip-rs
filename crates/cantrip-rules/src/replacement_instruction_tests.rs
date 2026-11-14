@@ -221,7 +221,7 @@ fn cx(g: &mut Game) -> Cx<'_> {
         lineage: vec![], damage: None,
         asked_at: None,
         doer: None,
-        producing: None,
+        discard_cause: None, producing: None,
     }
 }
 fn resolving(cx: &mut Cx, source: ObjectId) {

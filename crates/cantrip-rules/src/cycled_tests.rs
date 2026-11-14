@@ -73,7 +73,7 @@ fn a_cycling_cost_cycles_the_card_where_the_discard_put_it() {
     let (mut g, card) = game(&CYCLER);
     let events = activate(&mut g, card);
     let discarded = events.iter().position(|e| matches!(e, Event::Discarded { .. })).expect("the card is discarded");
-    let Event::Discarded { card: in_graveyard, .. } = events[discarded] else { unreachable!() };
+    let Event::Discarded { card: in_graveyard, cause: DiscardCause::Cost, .. } = events[discarded] else { unreachable!() };
     assert!(g.state.obj(in_graveyard).zone.is(ZoneKind::Graveyard));
     assert_eq!(g.state.obj(card).became, Some(in_graveyard));
     assert!(
@@ -87,6 +87,6 @@ fn a_cycling_cost_cycles_the_card_where_the_discard_put_it() {
 fn a_discard_this_card_cost_of_no_cycling_ability_is_no_cycle() {
     let (mut g, card) = game(&CHANNELER);
     let events = activate(&mut g, card);
-    assert!(events.iter().any(|e| matches!(e, Event::Discarded { .. })), "the card is discarded: {events:?}");
+    assert!(events.iter().any(|e| matches!(e, Event::Discarded { cause: DiscardCause::Cost, .. })), "the card is discarded to pay a cost: {events:?}");
     assert!(!events.iter().any(|e| matches!(e, Event::Cycled { .. })), "a channel cost is not cycling (CR 702.29c): {events:?}");
 }

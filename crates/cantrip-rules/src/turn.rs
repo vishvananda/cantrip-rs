@@ -85,7 +85,7 @@ pub fn next_step(game: &mut Game) {
         };
         // Except what a static ability keeps (CR 500.5: Electro, Assaulting Battery), asked as the step ends.
         let kept = {
-            let cx = Cx { g: &mut *game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+            let cx = Cx { g: &mut *game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
             crate::static_rules::mana_kept(&cx)
         };
         let s = &mut game.state;
@@ -101,7 +101,7 @@ pub fn next_step(game: &mut Game) {
     // the new step's beginning triggers inspect its permanents (CR 500.4, 611.2a).
     if game.state.effects.iter().any(|e| e.duration == Duration::EndOfStep) {
         game.state.effects_retain(|e| e.duration != Duration::EndOfStep);
-        let mut cx = Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+        let mut cx = Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None };
         ops::settle_lasting_and_control(&mut cx);
     }
     let s = &mut game.state;
@@ -1877,7 +1877,7 @@ pub(crate) fn cleanup(cx: &mut Cx) -> R<()> {
     if let Some(maximum) = maximum.filter(|&m| hand.len() > m as usize) {
         let count = count_u32(hand.len() - maximum as usize);
         if let Some(Answer::Cards(cards)) = cx.ask_rule(active, RequestKind::DiscardToHandSize { count, hand })? {
-            ops::discard_together(cx, &cards);
+            cx.with_discard_cause(cantrip_api::DiscardCause::TurnOrRule, |cx| ops::discard_together(cx, &cards));
         }
     }
     // CR 514.2: all damage marked on permanents, phased-out ones included, is removed, except where a static ability says it

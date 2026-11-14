@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{discard_chosen, effects, pump, targets};
+use cantrip_mechanics::{discard_one_as_cost, effects, pump, targets};
 use cantrip_oracle as oracle;
 
 /// "Target Klingon": a permanent of the creature type, read through the words of this card's text (CR 115.1, 612.2).
@@ -19,9 +19,9 @@ fn klingon(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 /// "I Am Starfleet — Discard a card. If you do, draw two cards." (CR 701.9): the discard is asked of any hand that is not
-/// empty, and the draw follows only when a card was discarded.
+/// empty, and the draw follows a started payment (CR 118.12).
 fn starfleet(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if !discard_chosen(g, item.controller, item.object, 1)?.is_empty() {
+    if discard_one_as_cost(g, item.controller, item.object)? {
         g.draw(item.controller, 2);
     }
     Ok(())

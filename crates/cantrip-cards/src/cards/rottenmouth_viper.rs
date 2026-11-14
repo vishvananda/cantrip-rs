@@ -39,7 +39,7 @@ fn blight_and_punish(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
             if !permanents.is_empty() {
                 options.push(SACRIFICE);
             }
-            if !cards.is_empty() {
+            if !cards.is_empty() && g.may_pay_discard_cost(opponent) {
                 options.push(DISCARD);
             }
             options.push(LOSE);
@@ -51,12 +51,15 @@ fn blight_and_punish(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
             };
             match choice {
                 SACRIFICE => sacrificed.extend(choose::cards(g, opponent, item.object, Purpose::Sacrifice, permanents, 1, false)?.into_iter().map(|id| (opponent, id))),
-                DISCARD => discarded.extend(choose::cards_from(g, opponent, item.object, Purpose::Discard, hand, cards, 1, false)?),
+                DISCARD => {
+                    let rule = Selection::listed(cantrip_mechanics::select::exactly(1), &hand, cards);
+                    discarded.extend(choose::select_cost(g, opponent, item.object, Purpose::Discard, hand, rule)?);
+                }
                 _ => losses.push((opponent, -4)),
             }
         }
     }
-    g.together(Together { sacrifices: &sacrificed, discards: &discarded, life: &losses });
+    g.together(Together { sacrifices: &sacrificed, discard_costs: &discarded, life: &losses, ..Together::default() });
     Ok(())
 }
 

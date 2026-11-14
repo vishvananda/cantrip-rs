@@ -946,10 +946,10 @@ pub fn draw_three_then_discard_two(g: &mut dyn Game, item: &StackItem) -> Result
 }
 
 /// "You may discard a card. If you do, draw `n` cards" (CR 701.9, 121.1): the controller chooses a card of their hand to
-/// discard or none; the draw follows a card that was actually discarded, and nothing is asked of an empty hand. Melded
+/// discard or none; the draw follows a chosen payment (CR 118.12), and nothing is asked of an empty hand. Melded
 /// Moxite and Bitter Reunion draw two, Giott, King of the Dwarves and Lorehold, the Historian draw one.
 pub fn may_discard_to_draw(g: &mut dyn Game, item: &StackItem, n: u32) -> Result<(), Suspend> {
-    if may_discard_a_card(g, item)? {
+    if may_discard_a_card_as_cost(g, item)? {
         g.draw(item.controller, n);
     }
     Ok(())
@@ -968,13 +968,25 @@ pub fn may_put_a_card_from_hand_on_the_bottom_to_draw(g: &mut dyn Game, item: &S
 }
 
 /// "You may discard a card" (CR 701.9): the controller chooses a card of their hand to discard or none, as the ability
-/// resolves and not as a cost, so nothing is asked of an empty hand. Whether a card was discarded, for the "if you do" or the
-/// reflexive "when you do" (CR 603.12) that follows: a card chosen that its owner can't be made to discard stays (CR 101.2),
-/// and then nothing was done. `may_discard_to_draw`, Inti, Seneschal of the Sun and Awaken the Honored Dead use it.
+/// resolves and not as a cost, so nothing is asked of an empty hand. Whether a card was discarded, for the reflexive
+/// "when you do" (CR 603.12) that follows: a card its owner can't be made to discard stays (CR 101.2), and nothing was done.
+/// Inti, Seneschal of the Sun and Awaken the Honored Dead use it.
 pub fn may_discard_a_card(g: &mut dyn Game, item: &StackItem) -> Result<bool, Suspend> {
     let hand = g.state().zone(Zone::hand(item.controller)).to_vec();
     let Some(&card) = crate::choose::cards(g, item.controller, item.object, Purpose::Discard, hand, 1, true)?.first() else { return Ok(false) };
     Ok(!g.discard_together(&[card]).is_empty())
+}
+
+/// Optional unrestricted discard cost of a resolving ability (CR 118.12).
+/// The subsequent "if you do" checks that the cost was chosen, even if replaced.
+pub fn may_discard_a_card_as_cost(g: &mut dyn Game, item: &StackItem) -> Result<bool, Suspend> {
+    let hand = g.state().zone(Zone::hand(item.controller)).to_vec();
+    if hand.is_empty() || !g.may_pay_discard_cost(item.controller) { return Ok(false); }
+    let rule = crate::select::cards(crate::select::up_to(1));
+    let chosen = crate::choose::select_cost(g, item.controller, item.object, Purpose::Discard, hand, rule)?;
+    if chosen.is_empty() { return Ok(false); }
+    g.discard_cost(&chosen);
+    Ok(true)
 }
 
 /// "You may discard a [kind of] card" (CR 701.9): the player chooses, as the effect resolves and not as a cost (CR 608.2d), up to
@@ -1021,10 +1033,14 @@ pub fn may_sacrifice(g: &mut dyn Game, player: PlayerId, source: ObjectId, rule:
 /// "You may sacrifice an artifact or discard [a kind of] card" (CR 608.2c-d, 701.9, 701.21): the player chooses as the effect
 /// resolves which of the two to do, or neither; the discard is one card `discard` allows of their hand. An option with nothing
 /// to do it with (no artifact, no card of the kind in hand) is not offered, and nothing is asked with neither possible.
-/// Returns whether the sacrifice or the discard actually happened, for the "if you do" or reflexive "when you do" (CR 608.2c,
-/// 603.12) that follows. The options are the card's `labels`, in the order "Sacrifice an artifact", "Discard ...", "Neither".
+/// Returns whether the sacrifice or discard actually happened, for the reflexive "when you do" (CR 603.12) that follows.
+/// The options are the card's `labels`, in the order "Sacrifice an artifact", "Discard ...", "Neither".
 /// Chandra, Spark Hunter and Vision of Love (a card) and Bullseye, Death Dealer (a nonland card) print it.
 pub fn may_sacrifice_an_artifact_or_discard(g: &mut dyn Game, player: PlayerId, source: ObjectId, discard: Selection) -> Result<bool, Suspend> {
+    sacrifice_or_discard(g, player, source, discard, false)
+}
+
+fn sacrifice_or_discard(g: &mut dyn Game, player: PlayerId, source: ObjectId, discard: Selection, cost: bool) -> Result<bool, Suspend> {
     const SACRIFICE: u8 = 0;
     const DISCARD: u8 = 1;
     const NEITHER: u8 = 2;
@@ -1037,7 +1053,7 @@ pub fn may_sacrifice_an_artifact_or_discard(g: &mut dyn Game, player: PlayerId, 
     if !artifacts.is_empty() {
         options.push(SACRIFICE);
     }
-    if cantrip_api::select::first_answer(&*g, &rule, player, source, &hand, true).is_some_and(|cards| !cards.is_empty()) {
+    if (!cost || g.may_pay_discard_cost(player)) && cantrip_api::select::first_answer(&*g, &rule, player, source, &hand, true).is_some_and(|cards| !cards.is_empty()) {
         options.push(DISCARD);
     }
     if options.is_empty() {
@@ -1049,21 +1065,30 @@ pub fn may_sacrifice_an_artifact_or_discard(g: &mut dyn Game, player: PlayerId, 
     Ok(match options[crate::choose::one_of(g, player, source, labels)? as usize] {
         SACRIFICE => {
             let chosen = crate::choose::cards(g, player, source, Purpose::Sacrifice, artifacts, 1, false)?;
-            !g.sacrifice(player, &chosen).is_empty()
+            let paid = !chosen.is_empty();
+            let sacrificed = g.sacrifice(player, &chosen);
+            if cost { paid } else { !sacrificed.is_empty() }
         }
         DISCARD => {
-            let chosen = crate::choose::select(g, player, source, Purpose::Discard, hand, rule)?;
-            !g.discard_together(&chosen).is_empty()
+            if cost {
+                let chosen = crate::choose::select_cost(g, player, source, Purpose::Discard, hand, rule)?;
+                let paid = !chosen.is_empty();
+                g.discard_cost(&chosen);
+                paid
+            } else {
+                let chosen = crate::choose::select(g, player, source, Purpose::Discard, hand, rule)?;
+                !g.discard_together(&chosen).is_empty()
+            }
         }
         _ => false,
     })
 }
 
-/// "You may sacrifice an artifact or discard a card. If you do, draw `n` cards" (CR 608.2c-d, 701.9, 701.21):
-/// `may_sacrifice_an_artifact_or_discard` for any card, then the cards are drawn only if it happened. Chandra, Spark Hunter
+/// "You may sacrifice an artifact or discard a card. If you do, draw `n` cards" (CR 118.12, 701.9, 701.21):
+/// the chosen action is a cost; the cards are drawn when payment is chosen. Chandra, Spark Hunter
 /// (one card) and Vision of Love (two) print it.
 pub fn may_sacrifice_an_artifact_or_discard_to_draw(g: &mut dyn Game, item: &StackItem, n: u32) -> Result<(), Suspend> {
-    if may_sacrifice_an_artifact_or_discard(g, item.controller, item.object, crate::select::CARD)? {
+    if sacrifice_or_discard(g, item.controller, item.object, crate::select::CARD, true)? {
         g.draw(item.controller, n);
     }
     Ok(())
@@ -1086,18 +1111,19 @@ pub fn discard_hand_then_draw(g: &mut dyn Game, item: &StackItem, n: u32) -> Res
     Ok(())
 }
 
-/// "You may discard your hand" (CR 608.2c-d, 701.9): its controller is asked as the ability resolves, and their whole hand
-/// goes at once if they accept. An empty hand may be discarded too, and that counts as having done it.
+/// "You may discard your hand. If you do" (CR 118.12, 701.9): its controller is asked as the ability resolves, and their
+/// whole hand goes at once if they accept. An empty hand may be discarded too, and that counts as having paid.
 ///
 /// Says how many cards were discarded, for a "draw a card for each card discarded this way" (CR 121.1) - which is settled
 /// before any card is drawn - or `None` when the player declined. Narset, Jeskai Waymaster, Vaultguard Trooper, Phyrexian
 /// Dragon Engine and U.S.S. Enterprise-C, Time-Tossed print it.
 pub fn may_discard_hand(g: &mut dyn Game, item: &StackItem, question: &'static Question) -> Result<Option<u32>, Suspend> {
     let player = item.controller;
-    if !ask_may(g, player, item.object, Purpose::Ask(question))? {
+    let hand = g.state().zone(Zone::hand(player)).to_vec();
+    if (!hand.is_empty() && !g.may_pay_discard_cost(player)) || !ask_may(g, player, item.object, Purpose::Ask(question))? {
         return Ok(None);
     }
-    Ok(Some(g.discard_hand(player).len() as u32))
+    Ok(Some(g.discard_cost(&hand).len() as u32))
 }
 
 /// "Each player discards their hand, then draws seven cards": every player, in turn order from the active player

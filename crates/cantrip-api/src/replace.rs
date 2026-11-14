@@ -19,6 +19,8 @@ pub struct ZoneChange {
     /// Where it is going. Setting this is how "exile it instead" and "shuffle it into its library instead" work.
     pub to: Zone,
     pub reason: ZoneReason,
+    /// Immediate discard cause, frozen before replacement; none for other moves.
+    pub discard_cause: Option<crate::DiscardCause>,
     /// For an object entering the battlefield, the player it enters under (CR 110.2a): the affected player, and the
     /// "you" of an effect about what enters under your control. The object's controller otherwise.
     pub controller: PlayerId,

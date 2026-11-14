@@ -534,13 +534,15 @@ pub(crate) fn its_own_exile(cx: &Cx, item: &StackItem, moving: ops::Moving, reas
 }
 
 pub fn resolve(cx: &mut Cx) -> R<Flow> {
-    resolve_inner(cx, false)
+    let Some(controller) = cx.resolving().map(|item| item.controller) else { return resolve_inner(cx, false) };
+    cx.with_discard_cause(cantrip_api::DiscardCause::Effect { controller }, |cx| resolve_inner(cx, false))
 }
 
 /// The normal resolver, allowed to summarize only a declared terminal mana instruction for
 /// CR 106.7. Opaque effects and all preparation instructions still execute normally.
 pub(crate) fn resolve_for_mana_capability(cx: &mut Cx) -> R<Flow> {
-    resolve_inner(cx, true)
+    let Some(controller) = cx.resolving().map(|item| item.controller) else { return resolve_inner(cx, true) };
+    cx.with_discard_cause(cantrip_api::DiscardCause::Effect { controller }, |cx| resolve_inner(cx, true))
 }
 
 /// Executes the generated effect itself, in play and in hypothetical resolution. Summarization

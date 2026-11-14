@@ -1020,11 +1020,14 @@ fn ward_discard_paid(g: &mut dyn Game, item: &StackItem, by: ObjectId, at_random
             Answer::Yes
         )
     {
-        if at_random {
-            crate::discard_at_random(g, payer, 1);
+        let cards = if at_random {
+            crate::cards_at_random_from_hand(g, payer, 1)
         } else {
-            crate::discard_chosen(g, payer, item.object, 1)?;
-        }
+            let hand = g.state().zone(Zone::hand(payer)).to_vec();
+            let rule = crate::select::cards(crate::select::exactly(1));
+            crate::choose::select_cost(g, payer, item.object, Purpose::Discard, hand, rule)?
+        };
+        g.discard_cost(&cards);
         return Ok(true);
     }
     Ok(false)

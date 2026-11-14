@@ -1,11 +1,11 @@
 use cantrip_api::*;
-use cantrip_mechanics::{blight, discard_chosen};
+use cantrip_mechanics::{blight, discard_one_as_cost};
 use cantrip_oracle as oracle;
 
-/// "Discard a card. If you do, draw a card" (CR 701.9, 608.2c): the draw follows a card actually discarded; nothing is asked
+/// "Discard a card. If you do, draw a card" (CR 701.9, 608.2c): the draw follows a started payment (CR 118.12); nothing is asked
 /// of an empty hand. Blight 1 (CR 701.68a) is paid as the cost.
 fn loot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if !discard_chosen(g, item.controller, item.object, 1)?.is_empty() {
+    if discard_one_as_cost(g, item.controller, item.object)? {
         g.draw(item.controller, 1);
     }
     Ok(())

@@ -21,7 +21,7 @@ static C: CardDef = CardDef { name: "Library C", types: TypeSet::of(&[CardType::
 
 fn cx(game: &mut Game) -> Cx<'_> {
     Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None,
-        lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None }
+        lineage: Vec::new(), damage: None, asked_at: None, doer: None, discard_cause: None, producing: None }
 }
 
 fn put(game: &mut Game, def: &'static CardDef, zone: Zone) -> ObjectId {

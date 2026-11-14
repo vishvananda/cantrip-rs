@@ -878,6 +878,10 @@ pub trait Game: Query {
     /// Asks `player` a question. The first time, the effect stops here (`Err(Suspend)`); once answered, the effect
     /// runs again from its start and this returns the answer.
     fn ask(&mut self, player: PlayerId, kind: RequestKind) -> Result<Answer, Suspend>;
+    /// Ask for a choice that pays a cost, even inside a resolving effect.
+    fn ask_cost(&mut self, player: PlayerId, kind: RequestKind) -> Result<Answer, Suspend>;
+    /// Whether the current effect permits this player to pay a discard cost (CR 101.2, 118.3).
+    fn may_pay_discard_cost(&self, player: PlayerId) -> bool;
 
     /// For an effect written as explicit stages: the stage it is at, and the answer that brought it there.
     fn stage(&self) -> u16;
@@ -906,6 +910,9 @@ pub trait Game: Query {
     /// card instead". Those can't be put into a hidden zone unrevealed (CR 701.9c): no replacement that would is offered
     /// for them (`ZoneChange::pays_characteristic`).
     fn discard_paying(&mut self, cards: &[ObjectId], paying: &[ObjectId]) -> Vec<ObjectId>;
+    /// Discard these cards to pay one cost without a characteristic restriction (CR 118.12). An enclosing effect's
+    /// prohibition is enforced at movement too; callers offering an optional payment check `may_pay_discard_cost` first.
+    fn discard_cost(&mut self, cards: &[ObjectId]) -> Vec<ObjectId>;
     /// `discard_together` for cards the same instruction revealed ("target opponent reveals their hand. You choose a card
     /// from it. That player discards that card", CR 701.20a): each moves revealed, so a replacement that puts it into a hand
     /// or a library puts it there seen by all, not undefined (CR 603.10a, 701.9c).

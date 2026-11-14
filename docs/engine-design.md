@@ -183,6 +183,13 @@ the original effect's actor on its `ExileLink`, rather than inheriting a later s
 that makes the exiler leave. Non-entry moves and genuinely actorless rules/setup
 events retain `None`; neither the active player nor entering controller substitutes
 for an unknown actor. No new trigger point or observation tensor layout is added.
+A discard freezes its immediate `DiscardCause` on each move, before replacement selection: an effect carries its
+controller, a cost and a turn/rule action are distinct. The cause passes unchanged through redirection and appears on
+`Event::Discarded`; it is not reconstructed from the agenda or from current source control. Cost choices retain the
+enclosing effect's restrictions (CR 101.2); `discard_cost`, `discard_paying` and `Together::discard_costs` identify the
+payments themselves, including a resolving "if you do" cost (CR 118.12). Nested replacement and mana effects use their
+own scoped controller and restore the outer action afterward. `pays_characteristic` independently enforces CR 701.9c.
+
 Every rules event since the game began is a `Record` (serial, turn, step, the active player, its cause, and the
 `Event`), recorded after its triggers are collected and its replacements applied. Records name objects and copy
 nothing out of them: what an object was is read from its row, frozen as it left, or its last-known snapshot. It is

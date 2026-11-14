@@ -4,10 +4,10 @@ use cantrip_mechanics::{effects, mayhem};
 use cantrip_oracle as oracle;
 
 /// "You may discard a card. If you do, put a +1/+1 counter on him" (CR 701.9, 122.1): the discard is chosen as the ability resolves
-/// and is not a cost, so an empty hand does nothing; Kaine gets the counter only if a card was discarded, and only if he is still
+/// as a resolving cost (CR 118.12), so an empty hand does nothing; the counter follows a chosen payment, and only if he is still
 /// the same object on the battlefield (CR 400.7).
 fn discard_for_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if effects::may_discard_a_card(g, item)? {
+    if effects::may_discard_a_card_as_cost(g, item)? {
         g.add_counters(item.object, CounterKind::PlusOne, 1);
     }
     Ok(())

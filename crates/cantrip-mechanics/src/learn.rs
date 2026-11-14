@@ -4,7 +4,7 @@
 use cantrip_api::select::part;
 use cantrip_api::*;
 
-use crate::effects::may_discard_a_card;
+use crate::effects::may_discard_a_card_as_cost;
 use crate::select::{up_to, Part, Selection};
 
 fn lesson(q: &dyn Query, choice: &Choice, _: u32) -> Verdict {
@@ -27,7 +27,7 @@ pub const LESSON_CARD: Selection = Selection::of(up_to(1), &[LESSON]).called("Le
 /// card; if they didn't, they may reveal a Lesson card they own from outside the game (CR 400.11b) and put it into their hand.
 pub fn learn(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    if may_discard_a_card(g, item)? {
+    if may_discard_a_card_as_cost(g, item)? {
         g.draw(you, 1);
         return Ok(());
     }
