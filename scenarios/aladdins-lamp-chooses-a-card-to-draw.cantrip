@@ -30,6 +30,7 @@ Bot1.Pass
 Bot1.Battlefield.Mox Sapphire.Activate
 Bot1.Hand.Brainstorm.Cast
 Bot1.Choose(Mountain)
+? Bot1.Looked = Plains; Mountain
 ? Bot2.Sees.Bot1.LibraryTop = (hidden)
 Bot1.Choose(Forest; Swamp)
 [Expect]
