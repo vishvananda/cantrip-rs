@@ -90,6 +90,7 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-159](#ki-159-a-scenarios-spend-that-no-payment-asks-about-is-ignored) | A scenario's `Spend:` that no payment asks about is ignored | Pri-3 | Open |
 | [KI-160](#ki-160-a-granted-replicate-cost-is-announced-at-most-tens-of-millions-of-times) | A granted replicate cost is announced at most tens of millions of times | Pri-3 | Won't fix: beyond practical scale |
 | [KI-161](#ki-161-a-scenarios--modes-refusal-does-not-check-what-a-subtype-question-offers) | A scenario's `! Modes(...)` refusal does not check what a subtype question offers | Pri-3 | Open |
+| [KI-162](#ki-162-the-client-shows-no-duration-for-an-effect-that-changes-a-lands-types) | The client shows no duration for an effect that changes a land's types | Pri-2 | Open |
 
 ## Issues
 
@@ -107,6 +108,20 @@ the host test `illusionary_terrain_choices` catches it instead. A fix makes `! M
 offered subtypes (in `cantrip-script`'s refusal check) and fail when one is offered.
 
 **Scenarios.** `illusionary-terrain-first-and-second-types-are-ordered` has the line that cannot fail.
+
+### KI-162: The client shows no duration for an effect that changes a land's types
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | client | 2026-11-14, reviewing Orcish Farmer (PR #3010) |
+
+**Notes.** The host's per-permanent effect list (`crates/cantrip-host/src/view.rs`, the `EffectKind` match around lines
+1650-1756) skips `EffectKind::SetLandType` (`_ => continue`), so a land made a Swamp by Orcish Farmer, or another basic land
+type by Vision Charm or Phantasmal Terrain-style effects with a duration, shows its new type in its characteristics but no
+line saying how long that lasts ("until its controller's next untap step", "until end of turn"). `until_text` already words
+every duration; a fix lists `SetLandType` effects with it.
+
+**Scenarios.** None yet; Orcish Farmer's and Vision Charm's are the cards that reach it.
 
 ### KI-160: A granted replicate cost is announced at most tens of millions of times
 
