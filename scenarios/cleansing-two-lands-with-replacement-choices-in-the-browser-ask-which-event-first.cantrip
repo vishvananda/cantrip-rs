@@ -1,0 +1,46 @@
+# Browser
+# Bot2 pays 1 life for its Swamp; Bot1's two Plains are destroyed with that payment as one action (CR 101.4, 118.12a). Each
+# Plains would go to the graveyard, so Bot1's Rest in Peace and Bot2's Leyline of the Void both want to exile it instead, and
+# Bot1, who controls both lands, chooses which applies to each (CR 616.1). With two simultaneous events to choose for, the
+# page first asks which event's choice Bot1 makes next (CR 101.4c); Bot1 takes the second Plains, then Rest in Peace for it,
+# then Leyline of the Void for the other. Both Plains are exiled and none reaches a graveyard.
+[Bot1 Deck]
+Plains
+Black Lotus
+Black Lotus
+Rest in Peace
+Cleansing
+Plains
+Island x20
+[Bot2 Deck]
+Leyline of the Void
+Swamp
+Island x24
+[Actions]
+Bot2.Accept
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus#1.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Hand.Rest in Peace.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Cleansing.Cast
+Bot1.Choose()
+Bot2.Choose(Swamp)
+? Client.Bot1.Prompt.Title = Which event's replacements do you choose next?
+Bot1.Replace(2)
+Bot1.Replace(Rest in Peace)
+Bot1.Replace(Leyline of the Void)
+[T3 Bot1.Main2]
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 19
+Bot2.Battlefield.Swamp.Types = Land
+Bot1.Battlefield = Rest in Peace
+Bot1.Graveyard.Count = 0
+Exile = Black Lotus; Black Lotus; Cleansing; Plains; Plains
