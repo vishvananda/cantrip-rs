@@ -4331,7 +4331,7 @@ fn some_cast(
     let x_life = def.additional_cost.is_some_and(|c| c.pay_x_life);
     let x_sacrifices = matches!(variable, Some(VariableCost::SacrificeX(_) | VariableCost::SacrificeWithPowerX(_) | VariableCost::BlightX));
     let cap = if x_life {
-        payable_life_for(cx, player, Some(CostFor::Spell)).clamp(0, 1000) as u32
+        payable_life_for(cx, player, Some(CostFor::Spell)).max(0) as u32
     } else if matches!(variable, Some(VariableCost::BlightX)) {
         blight_x_most(cx, player)
     } else if let Some(v @ VariableCost::SacrificeX(_)) = variable {
@@ -4893,7 +4893,11 @@ fn x_available(cx: &Cx, player: PlayerId, source: ObjectId, paid: &XCost, n: u32
     };
     let plain = std::cell::OnceCell::new();
     let own = def.and_then(|def| {
-        let bend = def.cost.mana.generic + n * u32::from(def.cost.mana.x);
+        // Waterbend can tap at most the available permanents, whose count is in the native u32 object domain.
+        let bend = if def.waterbend {
+            let total = u64::from(def.cost.mana.generic) + u64::from(n) * u64::from(def.cost.mana.x);
+            u32::try_from(total).unwrap_or(u32::MAX)
+        } else { 0 };
         activation_available(cx, player, source, def, bend, || plain.get_or_init(|| available(cx, player)))
     });
     own.or_else(|| plain.into_inner()).unwrap_or_else(|| available(cx, player))
@@ -4910,6 +4914,13 @@ pub(crate) fn defined_x_payable(cx: &Cx, player: PlayerId, source: ObjectId, pai
 }
 
 fn x_payable(cx: &Cx, a: &Available, player: PlayerId, source: ObjectId, paid: &XCost, n: u32) -> bool {
+    // Even an X which itself fits can cross the payment domain after a mode or
+    // target adds a cost, then return to it after reductions (CR 601.2f).
+    wide_x_payable(cx, a, player, source, paid, n)
+}
+
+
+fn wide_x_payable(cx: &Cx, a: &Available, player: PlayerId, source: ObjectId, paid: &XCost, n: u32) -> bool {
     let (costed, by, spell, ability) = match paid.costed {
         XCosted::Spell => (Costed::Spell(source), None, true, None),
         XCosted::Ability(ability, by) => (Costed::Ability(source, ability, by), by, false, activated(cx, ability)),
@@ -4938,14 +4949,14 @@ fn x_payable(cx: &Cx, a: &Available, player: PlayerId, source: ObjectId, paid: &
         || spell && lasting_changes(cx)
         || card.is_some_and(|d| !d.own_cost_changes.is_empty())
         || ability.is_some_and(|d| d.cost_change.is_some());
-    let covered = |cost: ManaCost, targets: &[Target]| -> bool {
+    let covered = |cost: WideGenericCost, targets: &[Target]| -> bool {
         let mut cost = cost;
         if let Some(of) = of_targets {
             let added = of(&view, &asker, targets);
             if !can_pay_other(cx, source, player, &added) {
                 return false;
             }
-            cost = add_cost(cost, added.mana);
+            cost.add_mana(added.mana);
         }
         if changes {
             let (_, _, added, _, _) = deltas_as(cx, &a.changers, player, costed, None, targets, earlier);
@@ -4953,15 +4964,12 @@ fn x_payable(cx: &Cx, a: &Available, player: PlayerId, source: ObjectId, paid: &
                 return false;
             }
         }
-        change_any(cx, &a.changers, player, costed, cost, None, targets, earlier, &mut |total, least| {
-            let mut total = total;
-            // A reduction announced before X comes off once the total is determined (CR 601.2f, 118.7a), as the cast takes it:
-            // the cards exiled for it, and the power of the creature harmonize taps (CR 702.180a).
-            total.generic = total.generic.saturating_sub(paid.reduced).saturating_sub(paid.reducer.map_or(0, |c| reduction_of(cx, c)));
-            affordable_with(cx, a, player, source, &ManaCost { x: 0, ..at_least(total, least) })
+        wide_change_any(cx, &a.changers, player, costed, cost, None, targets, earlier, &mut |mut total, least| {
+            total.reduce_generic(u64::from(paid.reduced) + u64::from(paid.reducer.map_or(0, |c| reduction_of(cx, c))));
+            total.finish().is_some_and(|total| affordable_with(cx, a, player, source, &ManaCost { x: 0, ..at_least(total, least) }))
         })
     };
-    let pre = x_total(paid, n);
+    let pre = wide_x_total(paid, n);
     let modal = card.and_then(|d| d.modal).or(ability.and_then(|d| d.modal));
     // Modes chosen after X (CR 601.2b, 700.2: "choose both instead" if kicked) are some choice of them, with their costs.
     let masks: Vec<Option<u32>> = match (paid.modes, modal) {
@@ -4986,10 +4994,10 @@ fn x_payable(cx: &Cx, a: &Available, player: PlayerId, source: ObjectId, paid: &
     let counted = if n > 0 { n } else { u32::from(announced.kicked) };
     let mut budget = ANNOUNCEMENT_BUDGET;
     for mask in masks {
-        let cost = match (mask, modal) {
-            (Some(mask), Some(modal)) => modal_cost(modal, mask, pre),
-            _ => pre,
-        };
+        let mut cost = pre;
+        if let (Some(mask), Some(modal)) = (mask, modal) {
+            cost.add_mana(modal_cost(modal, mask, ManaCost::ZERO));
+        }
         // Targets the action announced, or none to choose: the total is judged once.
         if !paid.targets_later || !changes && of_targets.is_none() && !card.is_some_and(|d| crate::x_rules::defines(d.x_rule)) {
             if covered(cost, &paid.targets) {
@@ -5178,6 +5186,33 @@ fn change_parts_split(
     (reduced(first, &less, discount), life, least)
 }
 
+/// Apply the same ordered cost changes while carrying generic mana wider than the payment domain. The caller keeps
+/// the result wide until all of its additional reductions have been applied (CR 601.2f, 118.7a).
+#[allow(clippy::too_many_arguments)]
+fn wide_change_parts_split(
+    cx: &Cx,
+    sources: &[ObjectId],
+    player: PlayerId,
+    costed: Costed,
+    mut cost: WideGenericCost,
+    face: Option<CardId>,
+    targets: &[Target],
+    split: &[bool],
+) -> (WideGenericCost, u32, u8) {
+    let (more, less, life, least, discount) = deltas(cx, sources, player, costed, face, targets);
+    let less = split_reduction(&less, split);
+    cost.add_generic(more);
+    let mut proxy = cost.cost;
+    proxy.generic = u32::try_from(cost.generic).unwrap_or(u32::MAX);
+    proxy.not_x = u32::try_from(cost.not_x.min(u64::from(proxy.generic))).unwrap_or(proxy.generic);
+    any_announcement(&proxy, &less, &mut |c| {
+        cost.cost = c;
+        true
+    });
+    cost.reduce(&less, discount);
+    (cost, life, least)
+}
+
 /// Whether `covered` holds for `change_parts` at some announcement of the hybrid symbols a reduction meets (CR 601.2b,
 /// 601.2f): each total the cost could come to, with the least it may come to, as the advice judges it.
 #[allow(clippy::too_many_arguments)]
@@ -5201,6 +5236,37 @@ fn change_any(
         let split: Vec<bool> = (0..n).map(|i| mask & (1 << i) != 0).collect();
         let less = split_reduction(&whole, &split);
         any_announcement(&cost, &less, &mut |c| covered(reduced(c, &less, discount), least))
+    })
+}
+
+/// The wide-generic counterpart of `change_any`, used only when the unmodified X cost exceeds the payment domain.
+#[allow(clippy::too_many_arguments)]
+fn wide_change_any(
+    cx: &Cx,
+    sources: &[ObjectId],
+    player: PlayerId,
+    costed: Costed,
+    mut cost: WideGenericCost,
+    face: Option<CardId>,
+    targets: &[Target],
+    announced: Option<&Obj>,
+    covered: &mut dyn FnMut(WideGenericCost, u8) -> bool,
+) -> bool {
+    let (more, whole, _, least, discount) = deltas_as(cx, sources, player, costed, face, targets, announced);
+    cost.add_generic(more);
+    let n = reduction_choices(&whole).min(8);
+    (0u32..1 << n).any(|mask| {
+        let split: Vec<bool> = (0..n).map(|i| mask & (1 << i) != 0).collect();
+        let less = split_reduction(&whole, &split);
+        let mut proxy = cost.cost;
+        proxy.generic = u32::try_from(cost.generic).unwrap_or(u32::MAX);
+        proxy.not_x = u32::try_from(cost.not_x.min(u64::from(proxy.generic))).unwrap_or(proxy.generic);
+        any_announcement(&proxy, &less, &mut |c| {
+            let mut candidate = cost;
+            candidate.cost = c;
+            candidate.reduce(&less, discount);
+            covered(candidate, least)
+        })
     })
 }
 
@@ -6807,7 +6873,7 @@ impl Available {
             demand.retain(|d| d.n > 0);
             return transports(&supply, &demand);
         }
-        let flex: u32 = self.flex.iter().sum();
+        let flex: u64 = self.flex.iter().map(|&n| u64::from(n)).sum();
         let mut left = fixed;
         // The symbols the fixed mana leaves unpaid, by the mana types that could pay each.
         let mut unpaid = [0u32; 64];
@@ -6835,8 +6901,8 @@ impl Available {
         if flex_needed > 0 && !flex_pays(&unpaid, &self.flex) {
             return false;
         }
-        let spare: u32 = left.iter().map(|&n| n as u32).sum::<u32>() + (flex - flex_needed);
-        spare >= cost.generic
+        let spare = left.iter().map(|&n| u64::from(n)).sum::<u64>() + (flex - u64::from(flex_needed));
+        spare >= u64::from(cost.generic)
     }
 }
 
@@ -10235,6 +10301,7 @@ fn cast(
     if !crate::x_rules::defines(def.x_rule) && x_only_zero(def.x_cant_be_zero, def.cost.x, x_symbols) {
         return Err(Stop::Cancel);
     }
+    let mut wide_cast: Option<WideGenericCost> = None;
     if x_symbols > 0 || def.kicker.is_some() || extra.pay_x_life || sacrifices_x || crate::x_rules::defines(def.x_rule) {
         // "Spend only black mana on X" (CR 107.3, 601.2h): the X announced, its mana cost's or its kicker's, is generic mana
         // only that mana may pay (`ManaCost::plus_x`).
@@ -10243,7 +10310,7 @@ fn cast(
         // X paid in life is announced up to the life there is (CR 119.4), and X creatures sacrificed up to the creatures
         // there are (CR 601.2b).
         let cap: u32 = if extra.pay_x_life {
-            payable_life_for(cx, player, Some(CostFor::Spell)).clamp(0, 1000) as u32
+            payable_life_for(cx, player, Some(CostFor::Spell)).max(0) as u32
         } else if matches!(extra.variable, Some(VariableCost::SacrificeWithPowerX(_))) {
             // A power read as the cost is paid (CR 601.2h), after the mana abilities that may change it (CR 601.2g): X up
             // to the most a power can be, the payment refusing one nothing has.
@@ -10262,8 +10329,8 @@ fn cast(
             // refuses a count that still can't be.
             let paid_with = extra;
             (1..=more.most_times()).take_while(|&n| can_pay_other(cx, spell, player, &paid_with.and(more.times(n as u8)))).count() as u32
-        } else if crate::x_rules::defines(def.x_rule) { u32::MAX } else {
-            1000
+        } else {
+            u32::MAX
         };
         let x_asker = Asker { instance: None, source: spell, controller: player, by: None, spell: true };
         let cap = cap.min(crate::x_rules::upper(cx, &x_asker, def.x_rule, targets));
@@ -10298,7 +10365,15 @@ fn cast(
         if let Some(k) = def.kicker {
             if k.cost.x > 0 {
                 // Kicker {X} (CR 702.33a, 107.3): X is the number announced, and kicked when it is not 0.
-                cost.mana = paid.as_ref().map_or_else(|| kicker_total(cost.mana, k, n), |c| x_total(c, n));
+                if let Some(c) = &paid {
+                    let wide = wide_x_total(c, n);
+                    cost.mana = wide.cost;
+                    cost.mana.generic = 0;
+                    cost.mana.not_x = 0;
+                    wide_cast = Some(wide);
+                } else {
+                    cost.mana = kicker_total(cost.mana, k, n);
+                }
                 item.kicked = (n > 0) as u8;
                 item.x = n;
                 cx.st().update_obj(spell, |o| {
@@ -10325,7 +10400,11 @@ fn cast(
             // What a cost paid instead was reduced by that its own generic mana could not take comes off X's (CR 118.7a,
             // `x_total`).
             if let Some(c) = &paid {
-                cost.mana = x_total(c, n);
+                let wide = wide_x_total(c, n);
+                cost.mana = wide.cost;
+                cost.mana.generic = 0;
+                cost.mana.not_x = 0;
+                wide_cast = Some(wide);
             }
             item.x = n;
             cx.st().update_obj(spell, |o| o.x = n);
@@ -10467,10 +10546,21 @@ fn cast(
         extra = add_extra_totals(extra, added);
         cost.mana = add_cost(cost.mana, added.mana);
     }
-    announce_hybrids(cx, player, spell, Costed::Spell(spell), &mut cost.mana, &targets, any)?;
-    let split = announce_reduction(cx, player, spell, Costed::Spell(spell), &cost.mana, &targets, any)?;
+    let own_reduction = u64::from(hand_reduction) + u64::from(reducer.map_or(0, |c| reduction_of(cx, c)))
+        + u64::from(sacrificed_any_number) * u64::from(less_each);
+    announce_hybrids(cx, player, spell, Costed::Spell(spell), &mut cost.mana, &targets, any, wide_cast, own_reduction)?;
+    let split = announce_reduction(cx, player, spell, Costed::Spell(spell), &cost.mana, &targets, any, wide_cast, own_reduction)?;
     let (added_life, least);
-    (cost.mana, added_life, least) = apply_cost_changes_before_least(cx, player, Costed::Spell(spell), cost.mana, &targets, &split);
+    if let Some(mut wide) = wide_cast {
+        wide.add_generic(cost.mana.generic);
+        wide.cost = cost.mana;
+        let (changed, life, minimum) = wide_change_parts_split(cx, &cost_change_sources(cx), player, Costed::Spell(spell), wide, None, &targets, &split);
+        wide_cast = Some(changed);
+        added_life = life;
+        least = minimum;
+    } else {
+        (cost.mana, added_life, least) = apply_cost_changes_before_least(cx, player, Costed::Spell(spell), cost.mana, &targets, &split);
+    }
     if added_life > 0 {
         cost.life += added_life;
         let owed = i64::from(cost.life) + i64::from(extra.life) + i64::from(life) + i64::from(x_life);
@@ -10481,15 +10571,20 @@ fn cast(
     // CR 702.180a, 601.2f: the total cost comes down by generic mana equal to the tapped creature's power, read as the total
     // cost is determined, after what raises it; colored mana never comes down.
     if let Some(creature) = reducer {
-        cost.mana.generic = cost.mana.generic.saturating_sub(reduction_of(cx, creature));
+        let amount = reduction_of(cx, creature);
+        if let Some(wide) = &mut wide_cast { wide.reduce_generic(u64::from(amount)); }
+        else { cost.mana.generic = cost.mana.generic.saturating_sub(amount); }
     }
     // "This spell costs {1} less to cast for each permanent sacrificed this way" (CR 601.2f, 118.7a): a reduction by the
     // number announced, after what raises the cost.
     if less_each > 0 {
-        cost.mana.generic = cost.mana.generic.saturating_sub(sacrificed_any_number * u32::from(less_each));
+        let amount = u64::from(sacrificed_any_number) * u64::from(less_each);
+        if let Some(wide) = &mut wide_cast { wide.reduce_generic(amount); }
+        else { cost.mana.generic = cost.mana.generic.saturating_sub(amount.min(u64::from(u32::MAX)) as u32); }
     }
     // "This spell costs {2} less to cast for each card exiled this way" (CR 601.2f, 118.7a): by the cards chosen, the same way.
-    cost.mana.generic = cost.mana.generic.saturating_sub(hand_reduction);
+    if let Some(wide) = &mut wide_cast { wide.reduce_generic(u64::from(hand_reduction)); }
+    else { cost.mana.generic = cost.mana.generic.saturating_sub(hand_reduction); }
     // Emerge's permanent is chosen while determining the cost: its mana value determines the reduction (CR 702.119a).
     // Other fixed-permanent choices are made as their payment operation is selected.
     let late = permanents_after_mana(&cost);
@@ -10498,8 +10593,10 @@ fn cast(
     // moved yet, so the permanents are still there to be read.
     if cost.emerge {
         let reduction: u32 = chosen.iter().map(|&id| cx.mana_value(id)).sum();
-        cost.mana.generic = cost.mana.generic.saturating_sub(reduction);
+        if let Some(wide) = &mut wide_cast { wide.reduce_generic(u64::from(reduction)); }
+        else { cost.mana.generic = cost.mana.generic.saturating_sub(reduction); }
     }
+    if let Some(wide) = wide_cast { cost.mana = wide.finish().ok_or(Stop::Cancel)?; }
     // CR 601.2f: "once the total cost is determined, any effects that directly affect the total cost are applied" - the least
     // it may come to (Trinisphere), after every increase and reduction, before the total is locked in and paid.
     cost.mana = at_least(cost.mana, least);
@@ -11641,8 +11738,8 @@ fn announce_twobrids(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &mut
 /// reduction is applied - of {U/R} {U} or {R}, of {2/R} {R} or {2} of generic mana (`Label::ReduceAs`, `Label::ReduceGeneric`,
 /// each the second half; unchosen, the first). Asked only where a reduction has such a symbol. The halves, for
 /// `split_reduction`.
-fn announce_reduction(cx: &mut Cx, player: PlayerId, source: ObjectId, costed: Costed, cost: &ManaCost, targets: &[Target], any: AnyMana) -> R<Vec<bool>> {
-    let (more, whole, ..) = deltas(cx, &cost_change_sources(cx), player, costed, None, targets);
+fn announce_reduction(cx: &mut Cx, player: PlayerId, source: ObjectId, costed: Costed, cost: &ManaCost, targets: &[Target], any: AnyMana, wide: Option<WideGenericCost>, own_reduction: u64) -> R<Vec<bool>> {
+    let (more, whole, _, least, discount) = deltas(cx, &cost_change_sources(cx), player, costed, None, targets);
     let n = reduction_choices(&whole);
     if n == 0 {
         return Ok(Vec::new());
@@ -11659,9 +11756,18 @@ fn announce_reduction(cx: &mut Cx, player: PlayerId, source: ObjectId, costed: C
             .into_iter()
             .find(|&mask| {
                 let split: Vec<bool> = (0..n).map(|i| mask & (1 << i) != 0).collect();
-                let mut total = *cost;
-                total.add_generic(more);
-                can_afford(cx, player, source, &any.view(&reduce(total, &split_reduction(&whole, &split))))
+                let less = split_reduction(&whole, &split);
+                if let Some(mut total) = wide {
+                    total.add_generic(cost.generic);
+                    total.cost = *cost;
+                    total.add_generic(more);
+                    total.reduce(&less, discount);
+                    wide_advice_affordable(cx, player, source, total, any, own_reduction, least)
+                } else {
+                    let mut total = *cost;
+                    total.add_generic(more);
+                    can_afford(cx, player, source, &any.view(&reduce(total, &less)))
+                }
             })
             .map(|mask| (0..n as u8).filter(|&i| mask & (1 << i) != 0).collect())
             .unwrap_or_default()
@@ -11685,6 +11791,16 @@ fn announce_reduction(cx: &mut Cx, player: PlayerId, source: ObjectId, costed: C
     Ok((0..n as u8).map(|i| chosen.contains(&i)).collect())
 }
 
+/// Advice only: the final payable cost is in the payment domain after the known
+/// increases and reductions. An unknown mana yield remains potentially payable.
+fn wide_advice_affordable(cx: &Cx, player: PlayerId, source: ObjectId, mut total: WideGenericCost, any: AnyMana, own_reduction: u64, least: u8) -> bool {
+    total.reduce_generic(own_reduction);
+    match total.finish() {
+        Some(cost) => can_afford(cx, player, source, &any.view(&at_least(cost, least))),
+        None => available(cx, player).unknown,
+    }
+}
+
 /// Announces the half each two-color hybrid symbol of a cost is paid with (CR 601.2b), where a reduction meets it
 /// (`met_hybrids`): announced as a half the reduction takes, the symbol is reduced to nothing (CR 118.7c); as the other, it
 /// is paid with that half and the reduction takes generic mana instead - which a player may want, to spend mana of that
@@ -11693,11 +11809,11 @@ fn announce_reduction(cx: &mut Cx, player: PlayerId, source: ObjectId, costed: C
 /// which comes to the same, and is not asked about. Asked once the targets are announced, since a reduction may read
 /// them (CR 601.2f): an announcement nothing reads before the total cost is determined is the same then as before them.
 /// `any`: what mana may pay the cost (CR 609.4b), which the advice reads.
-fn announce_hybrids(cx: &mut Cx, player: PlayerId, source: ObjectId, costed: Costed, cost: &mut ManaCost, targets: &[Target], any: AnyMana) -> R<()> {
+fn announce_hybrids(cx: &mut Cx, player: PlayerId, source: ObjectId, costed: Costed, cost: &mut ManaCost, targets: &[Target], any: AnyMana, wide: Option<WideGenericCost>, own_reduction: u64) -> R<()> {
     if cost.hybrid.iter().all(Option::is_none) {
         return Ok(());
     }
-    let (more, whole, ..) = deltas(cx, &cost_change_sources(cx), player, costed, None, targets);
+    let (more, whole, _, least, discount) = deltas(cx, &cost_change_sources(cx), player, costed, None, targets);
     // A reduction by hybrid mana is split after this (CR 118.7e): a cost symbol either half could meet is asked about.
     let less = reduction_reach(&whole);
     let met = met_hybrids(cost, &less);
@@ -11734,10 +11850,18 @@ fn announce_hybrids(cx: &mut Cx, player: PlayerId, source: ObjectId, costed: Cos
             .into_iter()
             .find(|&mask| {
                 let chosen: Vec<bool> = (0..n).map(|i| mask & (1 << i) != 0).collect();
-                let mut total = announced(&chosen);
-                total.add_generic(more);
-                let total = reduce(total, &less);
-                can_afford(cx, player, source, &any.view(&total))
+                let mut symbols = announced(&chosen);
+                if let Some(mut total) = wide {
+                    total.add_generic(symbols.generic);
+                    total.cost = symbols;
+                    total.add_generic(more);
+                    total.reduce(&less, discount);
+                    wide_advice_affordable(cx, player, source, total, any, own_reduction, least)
+                } else {
+                    symbols.add_generic(more);
+                    let total = reduce(symbols, &less);
+                    can_afford(cx, player, source, &any.view(&total))
+                }
             })
             .map(|mask| (0..n as u8).filter(|&i| mask & (1 << i) != 0).collect())
             .unwrap_or_default()
@@ -11833,6 +11957,82 @@ fn announce_life(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &mut Man
     Ok(life)
 }
 
+/// The generic portions of a cost while its X and cost changes are being determined. The other symbols stay in
+/// `ManaCost`; these two values remain wide only until the final, representable payment is locked in.
+#[derive(Clone, Copy, Debug)]
+struct WideGenericCost {
+    cost: ManaCost,
+    generic: u64,
+    not_x: u64,
+}
+
+impl WideGenericCost {
+    fn from_cost(cost: ManaCost) -> Self {
+        Self { generic: u64::from(cost.generic), not_x: u64::from(cost.not_x), cost }
+    }
+
+    fn add_x(&mut self, amount: u64) {
+        self.generic += amount;
+    }
+
+    fn add_generic(&mut self, amount: u32) {
+        self.generic += u64::from(amount);
+        if !self.cost.x_mana.is_any() { self.not_x += u64::from(amount); }
+    }
+
+    fn add_mana(&mut self, other: ManaCost) {
+        self.add_generic(other.generic);
+        let mut plain = self.cost;
+        plain.generic = 0;
+        plain.not_x = 0;
+        self.cost = add_cost(plain, ManaCost { generic: 0, not_x: 0, ..other });
+    }
+
+    fn reduce_generic(&mut self, amount: u64) {
+        self.generic = self.generic.saturating_sub(amount);
+    }
+
+    fn reduce(&mut self, less: &ManaCost, discount: u32) {
+        let less = split_reduction(less, &[]);
+        let mut generic_reduction = u64::from(less.generic);
+        for i in 0..6 {
+            let n = u64::from(less.symbols[i]) + if i < 5 { u64::from(less.phyrexian[i]) } else { 0 };
+            let off = n.min(u64::from(self.cost.symbols[i]));
+            self.cost.symbols[i] -= off as u32;
+            generic_reduction += n - off;
+        }
+        self.reduce_generic(generic_reduction);
+        // A less-to-one discount cannot take the final mana symbol.
+        let mut remainder = self.cost;
+        remainder.generic = 0;
+        let total = self.generic + u64::from(remainder.mana_value());
+        self.reduce_generic(u64::from(discount).min(total.saturating_sub(1)));
+    }
+
+    fn finish(mut self) -> Option<ManaCost> {
+        self.cost.generic = u32::try_from(self.generic).ok()?;
+        self.cost.not_x = u32::try_from(self.not_x.min(self.generic)).ok()?;
+        let other = u64::from(self.cost.snow)
+            + self.cost.symbols.iter().map(|&n| u64::from(n)).sum::<u64>()
+            + self.cost.hybrid.iter().flatten().count() as u64
+            + 2 * self.cost.twobrid.iter().map(|&n| u64::from(n)).sum::<u64>()
+            + self.cost.phyrexian.iter().map(|&n| u64::from(n)).sum::<u64>();
+        (self.generic + other <= u64::from(u32::MAX)).then_some(self.cost)
+    }
+}
+
+/// Expands X without narrowing its generic mana before the later cost changes have been applied.
+fn wide_x_total(c: &XCost, n: u32) -> WideGenericCost {
+    let mut base = c.base;
+    if let Some(rest) = c.kicker.filter(|_| n != 0) {
+        base = add_cost(base, rest);
+    }
+    let mut wide = WideGenericCost::from_cost(base);
+    let x = u64::from(c.per) * u64::from(n);
+    wide.add_x(if c.kicker.is_none() { x.saturating_sub(u64::from(c.less)) } else { x });
+    wide
+}
+
 /// A cost with a kicker with {X} paid for the X announced, `n` (CR 702.33a, 107.3): the rest of the kicker (`rest`) once
 /// and `per` generic mana for each X, when `n` is not 0.
 fn kicker_x_total(base: ManaCost, rest: ManaCost, per: u32, n: u32) -> ManaCost {
@@ -11844,16 +12044,38 @@ fn kicker_x_total(base: ManaCost, rest: ManaCost, per: u32, n: u32) -> ManaCost 
     total.plus_x(n * per, total.x_mana)
 }
 
+/// Greatest X whose pre-cost-change X mana can be represented by `ManaCost` (CR 601.2b, 107.3).
+/// Work in u64 so multiple X symbols and the already-announced `less` reduction cannot overflow while deriving the bound.
+fn x_cost_upper(c: &XCost) -> u32 {
+    if c.per == 0 { return u32::MAX; }
+    // `ManaCost::mana_value` is itself u32, so reserve room for every non-X symbol as well as generic mana.
+    let value = |cost: ManaCost| -> u64 {
+        u64::from(cost.generic) + u64::from(cost.snow)
+            + cost.symbols.iter().map(|&n| u64::from(n)).sum::<u64>()
+            + cost.hybrid.iter().flatten().count() as u64
+            + 2 * cost.twobrid.iter().map(|&n| u64::from(n)).sum::<u64>()
+            + cost.phyrexian.iter().map(|&n| u64::from(n)).sum::<u64>()
+    };
+    let base = value(c.base) + c.kicker.map_or(0, value);
+    if base > u64::from(u32::MAX) { return 0; }
+    let room = u64::from(u32::MAX) - base;
+    let allowance = room + if c.kicker.is_none() { u64::from(c.less) } else { 0 };
+    (allowance / u64::from(c.per)).min(u64::from(u32::MAX)) as u32
+}
+
 /// The total cost once X is announced as `n` (CR 601.2b, 107.3a), before the targets and the cost changes (CR 601.2c,
 /// 601.2f): what the cast, the activation and the special action take as their cost, and what the advice of how much X
-/// could be paid starts from (`most_affordable_x`).
+/// could be paid starts from (`most_affordable_x`). Callers use this narrow form only up to `x_cost_upper(c)`;
+/// cost determination and affordability keep larger intermediate values wide.
 pub fn x_total(c: &XCost, n: u32) -> ManaCost {
     match c.kicker {
         Some(rest) => kicker_x_total(c.base, rest, c.per, n),
         None => {
             // What a cost paid instead was reduced by that its own generic mana could not take, off X's (CR 118.7a).
-            let xs = n * c.per;
-            c.base.plus_x(xs - xs.min(c.less), c.base.x_mana)
+            let xs = u64::from(n) * u64::from(c.per);
+            let added = xs.saturating_sub(u64::from(c.less));
+            debug_assert!(added <= u64::from(u32::MAX - c.base.generic));
+            c.base.plus_x(added as u32, c.base.x_mana)
         }
     }
 }
@@ -12120,7 +12342,8 @@ fn at_least_x(cost: ManaCost, x_cant_be_zero: bool) -> ManaCost {
 #[allow(clippy::too_many_arguments)]
 fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, kicker: Option<Kicker>, paid: Option<&XCost>, least: u32, cap: u32, loyalty: bool, less_each: u8, governs: &'static str) -> R<u32> {
     let most: u32 = match kicker {
-        Some(Kicker { multi: false, cost, .. }) if cost.x == 0 => 1,
+        Some(Kicker { multi: false, cost, .. }) if cost.x == 0 => 1.min(cap),
+        Some(Kicker { multi: true, cost, .. }) if cost.x == 0 => cap.min(u32::from(u8::MAX)),
         _ => cap,
     };
     if least > most {
@@ -12137,12 +12360,20 @@ fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, ki
         match (paid, kicker) {
             // A reduction past the generic mana there is takes it all, never colored mana (CR 118.7a).
             (Some(c), _) => {
-                total = x_total(c, n);
-                total.generic = total.generic.saturating_sub(c.reduced);
+                if n > x_cost_upper(c) {
+                    // The symbolic cost remains truthful while the full-width number waits for cost changes.
+                    total = c.base;
+                } else {
+                    total = x_total(c, n);
+                    total.generic = total.generic.saturating_sub(c.reduced);
+                }
             }
             (None, Some(k)) => total = kicker_total(total, k, n),
             // A reduction past the generic mana there is takes it all, so the most it is matters, never the rest (CR 118.7a).
-            (None, None) => total.generic = total.generic.saturating_sub(n * u32::from(less_each)),
+            (None, None) => {
+                let reduction = u64::from(n) * u64::from(less_each);
+                total.generic -= reduction.min(u64::from(total.generic)) as u32;
+            }
         }
         let mut options = Vec::new();
         if n < most {
@@ -12215,6 +12446,7 @@ fn activate(
     let slot = chars.abilities.iter().enumerate().filter(|(_, a)| a.is_some()).nth(index as usize).map_or(0, |(slot, _)| slot);
     item.words = layers::granted_words_at(cx.cards(), cx.s(), &cx.g.log, source, &chars, slot).unwrap_or_else(|| cantrip_api::words(cx.s(), source));
     let mut mana = def.cost.mana;
+    let mut wide_mana: Option<WideGenericCost> = None;
     // CR 118.9, 602.2b: a static ability may let the player pay another cost rather than the ability's mana cost: the
     // option it was offered as names which (`ActionOption::paid_by`), and it is paid if it still applies.
     if let Some(g) = paid_by {
@@ -12269,7 +12501,11 @@ fn activate(
             Some(n) => n,
             None => announce(cx, player, source, &paid, least_x(def.x_cant_be_zero), cap)?,
         };
-        mana = x_total(&paid, n);
+        let wide = wide_x_total(&paid, n);
+        mana = wide.cost;
+        mana.generic = 0;
+        mana.not_x = 0;
+        wide_mana = Some(wide);
         item.x = n;
     }
     // CR 606.4, 107.3, 601.2b by way of 602.2b: "−X" announces X, up to the loyalty counters there are to remove (CR 118.3).
@@ -12329,10 +12565,15 @@ fn activate(
     // change may read them ("equip abilities you activate that target this creature cost {2} less"). It is locked in
     // here, so nothing that happens to a target later changes what is paid. Life a change adds (CR 118.8) is payable only
     // with that much life, the rest of the cost's included (CR 119.4, 118.3), or the activation is taken back.
-    announce_hybrids(cx, player, source, Costed::Ability(source, ability, by), &mut mana, &targets, AnyMana::No)?;
-    let split = announce_reduction(cx, player, source, Costed::Ability(source, ability, by), &mana, &targets, AnyMana::No)?;
+    announce_hybrids(cx, player, source, Costed::Ability(source, ability, by), &mut mana, &targets, AnyMana::No, wide_mana, 0)?;
+    let split = announce_reduction(cx, player, source, Costed::Ability(source, ability, by), &mana, &targets, AnyMana::No, wide_mana, 0)?;
     let added_life;
-    (mana, added_life) = {
+    (mana, added_life) = if let Some(mut wide) = wide_mana {
+        wide.add_generic(mana.generic);
+        wide.cost = mana; // Preserve the hybrid and Phyrexian symbols announced above.
+        let (cost, life, least) = wide_change_parts_split(cx, &cost_change_sources(cx), player, Costed::Ability(source, ability, by), wide, None, &targets, &split);
+        (at_least(cost.finish().ok_or(Stop::Cancel)?, least), life)
+    } else {
         let (cost, life, least) = change_parts_split(cx, &cost_change_sources(cx), player, Costed::Ability(source, ability, by), mana, None, &targets, &split);
         (at_least(cost, least), life)
     };
@@ -12487,10 +12728,13 @@ fn special_action(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abil
     // An X in a morph or disguise cost is chosen as the special action is taken (CR 702.37f, 702.168e, 107.3a): announced
     // first, and kept on the permanent for its other abilities to read.
     let mut x = None;
+    let mut wide_mana = None;
     if printed.x > 0 {
         let paid = untargeted_x(printed, XCosted::SpecialAction(ability));
-        let n = announce(cx, player, source, &paid, 0, 1000)?;
-        printed = ManaCost { x: 0, ..x_total(&paid, n) };
+        let n = announce(cx, player, source, &paid, 0, u32::MAX)?;
+        let wide = wide_x_total(&paid, n);
+        printed = ManaCost { x: 0, generic: 0, not_x: 0, ..wide.cost };
+        wide_mana = Some(wide);
         x = Some(n);
     }
     // How each {2/C} and each Phyrexian symbol is paid is announced first, as for a cast or an activation (CR 601.2b, 107.4f,
@@ -12498,9 +12742,17 @@ fn special_action(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abil
     announce_twobrids(cx, player, source, &mut printed, AnyMana::No)?;
     // A special action is no activation (CR 116.2): what forbids paying life to activate abilities leaves it alone.
     let life = announce_life(cx, player, source, &mut printed, AnyMana::No, None)?;
-    announce_hybrids(cx, player, source, costed, &mut printed, &[], AnyMana::No)?;
-    let split = announce_reduction(cx, player, source, costed, &printed, &[], AnyMana::No)?;
-    let (mana, _, least) = change_parts_split(cx, &cost_change_sources(cx), player, costed, printed, None, &[], &split);
+    announce_hybrids(cx, player, source, costed, &mut printed, &[], AnyMana::No, wide_mana, 0)?;
+    let split = announce_reduction(cx, player, source, costed, &printed, &[], AnyMana::No, wide_mana, 0)?;
+    let (mana, least) = if let Some(mut wide) = wide_mana {
+        wide.add_generic(printed.generic);
+        wide.cost = printed;
+        let (cost, _, least) = wide_change_parts_split(cx, &cost_change_sources(cx), player, costed, wide, None, &[], &split);
+        (cost.finish().ok_or(Stop::Cancel)?, least)
+    } else {
+        let (cost, _, least) = change_parts_split(cx, &cost_change_sources(cx), player, costed, printed, None, &[], &split);
+        (cost, least)
+    };
     let mana = at_least(mana, least);
     let counter = choose_counter_kind(cx, player, source, &whole)?;
     if mana != ManaCost::ZERO {
@@ -12704,8 +12956,8 @@ fn activate_mana_as(
     let paid = Some(CostFor::ManaAbility);
     let life = announce_life(cx, player, source, &mut mana, AnyMana::No, paid)?;
     let costed = Costed::Ability(source, ability, by);
-    announce_hybrids(cx, player, source, costed, &mut mana, &[], AnyMana::No)?;
-    let split = announce_reduction(cx, player, source, costed, &mana, &[], AnyMana::No)?;
+    announce_hybrids(cx, player, source, costed, &mut mana, &[], AnyMana::No, None, 0)?;
+    let split = announce_reduction(cx, player, source, costed, &mana, &[], AnyMana::No, None, 0)?;
     let (total, added_life, least) = change_parts_split(cx, &cost_change_sources(cx), player, costed, mana, None, &[], &split);
     mana = at_least(total, least);
     let life = life + added_life;
@@ -12982,8 +13234,8 @@ fn activate_player_mana_effect(cx: &mut Cx, player: PlayerId, source: ObjectId, 
     let paid = Some(CostFor::ManaAbility);
     let life = announce_life(cx, player, source, &mut mana, AnyMana::No, paid)?;
     let costed = Costed::PlayerAbility(player, ability, effect);
-    announce_hybrids(cx, player, source, costed, &mut mana, &[], AnyMana::No)?;
-    let split = announce_reduction(cx, player, source, costed, &mana, &[], AnyMana::No)?;
+    announce_hybrids(cx, player, source, costed, &mut mana, &[], AnyMana::No, None, 0)?;
+    let split = announce_reduction(cx, player, source, costed, &mana, &[], AnyMana::No, None, 0)?;
     let (total, added_life, least) = change_parts_split(cx, &cost_change_sources(cx), player, costed, mana, None, &[], &split);
     let mut total = total;
     if let Some(VariableCost::SacrificeAnyNumber { less_each, .. }) = def.cost.variable {
@@ -14642,10 +14894,25 @@ fn pay_mana_inner(cx: &mut Cx, player: PlayerId, source: ObjectId, mut total: Ma
                 break;
             }
             let Some(mana) = Mana::ALL.into_iter().find(|m| spent[*m as usize] > 0) else { break };
+            // The payer may stop after any amount to pay another cost (CR 601.2h).
+            // Ask for a batch only when all remaining symbols are unrestricted generic;
+            // the single-unit choice retains every possible interleaving.
+            let generic_only = owed.x_mana.is_any() && owed.snow == 0
+                && owed.symbols.iter().all(|&n| n == 0)
+                && owed.hybrid.iter().all(Option::is_none);
+            let available = spent[mana as usize];
+            let count = if generic_only && available > 1 {
+                match cx.ask_core(player, RequestKind::ChooseNumber {
+                    source, least: 1, most: available, heading: "Spend mana",
+                }, true)? {
+                    Answer::Announce(n) => n,
+                    _ => return Err(Stop::Cancel),
+                }
+            } else { 1 };
             let mut one = [0; 6];
-            one[mana as usize] = 1;
+            one[mana as usize] = count;
             spend_pool(cx, &mut paid, &mut used, &mut taken, one);
-            any.spend(&mut owed, mana);
+            if generic_only { owed.generic -= count; } else { any.spend(&mut owed, mana); }
             let mut left = owed;
             left.generic -= generic_paid.min(left.generic);
             if !convoked(&left, &convoking).is_zero() {
@@ -14688,10 +14955,20 @@ fn pay_mana_inner(cx: &mut Cx, player: PlayerId, source: ObjectId, mut total: Ma
                     if groups.is_some() {
                         let from = action.source.map(|source| (source, action.rider));
                         let group = ManaGroup { mana, snow: action.snow, restriction: action.restriction, from, n: 1 };
-                        if take_group(cx, player, group, 1, &told, &mut taken, record) != 1 { return Err(Stop::Cancel); }
+                        let generic_only = owed.x_mana.is_any() && owed.snow == 0
+                            && owed.symbols.iter().all(|&n| n == 0)
+                            && owed.hybrid.iter().all(Option::is_none);
+                        let available = groups.as_ref().and_then(|gs| gs.iter().find(|g| g.mana == mana && g.snow == action.snow && g.restriction == action.restriction && g.from == from)).map_or(1, |g| g.n).min(due.generic);
+                        let count = if generic_only && available > 1 {
+                            match cx.ask_core(player, RequestKind::ChooseNumber { source, least: 1, most: available, heading: "Spend mana" }, true)? {
+                                Answer::Announce(n) => n,
+                                _ => return Err(Stop::Cancel),
+                            }
+                        } else { 1 };
+                        if take_group(cx, player, group, count, &told, &mut taken, record) != count { return Err(Stop::Cancel); }
                         if let Some(r) = action.restriction { used |= r.effects(); }
-                        paid.0[mana as usize] += 1;
-                        if action.pay_snow { owed.snow -= 1; } else { any.spend(&mut owed, mana); }
+                        paid.0[mana as usize] += count;
+                        if action.pay_snow { owed.snow -= 1; } else if generic_only { owed.generic -= count; } else { any.spend(&mut owed, mana); }
                         let mut left = owed;
                         left.generic -= generic_paid.min(left.generic);
                         if !convoked(&left, &convoking).is_zero() {
@@ -14699,12 +14976,29 @@ fn pay_mana_inner(cx: &mut Cx, player: PlayerId, source: ObjectId, mut total: Ma
                         }
                         continue;
                     }
+                    // Ordinary unrestricted mana of a single type can be spent in a
+                    // batch while leaving the next cost-order checkpoint available.
+                    let generic_only = owed.x_mana.is_any() && owed.snow == 0
+                        && owed.symbols.iter().all(|&n| n == 0)
+                        && owed.hybrid.iter().all(Option::is_none);
+                    let available = match (action.restriction, action.source) {
+                        (Some(r), _) => restricted_for(cx, player, source, helpers.purpose).iter().find(|(kind, _)| *kind == r).map_or(0, |(_, pool)| pool.get(mana)),
+                        (None, Some(from)) => told_mana.iter().find(|(part, _)| *part == (from, action.rider)).map_or(0, |(_, pool)| pool.get(mana)),
+                        (None, None) => cx.s().player(player).pool.get(mana) - told_mana.iter().map(|(_, pool)| pool.get(mana)).sum::<u32>(),
+                    };
+                    let batch = if generic_only { available.min(due.generic) } else { 1 };
+                    let count = if batch > 1 {
+                        match cx.ask_core(player, RequestKind::ChooseNumber { source, least: 1, most: batch, heading: "Spend mana" }, true)? {
+                            Answer::Announce(n) => n,
+                            _ => return Err(Stop::Cancel),
+                        }
+                    } else { 1 };
                     match action.restriction {
                         // Only mana of a restriction that may pay for this (CR 106.6): `validate` holds the answer
                         // to the options, which offer no other.
                         Some(r) => {
                             used |= r.effects();
-                            crate::takeback::spend(cx, player, Some(r), mana, 1, cantrip_state::ManaPick::Any, &mut taken, record);
+                            crate::takeback::spend(cx, player, Some(r), mana, count, cantrip_state::ManaPick::Any, &mut taken, record);
                         }
                         // Mana of the source the option names, or of none a rule tells apart (CR 106.3).
                         None => {
@@ -14712,11 +15006,11 @@ fn pay_mana_inner(cx: &mut Cx, player: PlayerId, source: ObjectId, mut total: Ma
                                 Some(from) => cantrip_state::ManaPick::From((from, action.rider)),
                                 None => cantrip_state::ManaPick::Except(&told),
                             };
-                            crate::takeback::spend(cx, player, None, mana, 1, pick, &mut taken, record);
+                            crate::takeback::spend(cx, player, None, mana, count, pick, &mut taken, record);
                         }
                     }
-                    paid.0[mana as usize] += 1;
-                    any.spend(&mut owed, mana);
+                    paid.0[mana as usize] += count;
+                    if generic_only { owed.generic -= count; } else { any.spend(&mut owed, mana); }
                     let mut left = owed;
                     left.generic -= generic_paid.min(left.generic);
                     if !convoked(&left, &convoking).is_zero() {
@@ -16084,3 +16378,67 @@ mod delayed_watched_mana_tests {
 #[cfg(test)]
 #[path = "random_discard_cost_tests.rs"]
 mod random_discard_cost_tests;
+
+#[cfg(test)]
+mod x_representable_bound_tests {
+    use super::*;
+
+    fn paid(base: u32, per: u32, less: u32, kicker: Option<ManaCost>) -> XCost {
+        XCost { base: ManaCost { generic: base, ..ManaCost::ZERO }, per, kicker, less, reduced: 0,
+            reducer: None, costed: XCosted::Spell, modes: None, targets: Vec::new(), targets_later: false }
+    }
+
+    #[test]
+    fn bound_accounts_for_multiple_x_base_and_prior_reduction() {
+        let c = paid(17, 2, 31, None);
+        let expected = ((u64::from(u32::MAX) - 17 + 31) / 2) as u32;
+        assert_eq!(x_cost_upper(&c), expected);
+        assert_eq!(x_total(&c, 1001).generic, 17 + 2002 - 31);
+        assert_eq!(x_total(&c, expected).generic, u32::MAX - 1);
+    }
+
+    #[test]
+    fn multiple_x_can_exceed_u32_before_known_reduction() {
+        let c = paid(0, 2, u32::MAX, None);
+        assert_eq!(x_cost_upper(&c), u32::MAX);
+        assert_eq!(x_total(&c, u32::MAX).generic, u32::MAX);
+    }
+
+    #[test]
+    fn colored_mana_also_occupies_the_bounded_cost_value() {
+        let mut c = paid(0, 1, 0, None);
+        c.base.symbols[Mana::R as usize] = 2;
+        assert_eq!(x_cost_upper(&c), u32::MAX - 2);
+        assert_eq!(x_total(&c, u32::MAX - 2).mana_value(), u32::MAX);
+    }
+
+    #[test]
+    fn kicker_includes_its_own_base_and_no_kicker_is_valid_at_zero() {
+        let c = paid(11, 2, 0, Some(ManaCost { generic: 19, ..ManaCost::ZERO }));
+        assert_eq!(x_cost_upper(&c), (u32::MAX - 30) / 2);
+        assert_eq!(x_total(&c, 0).generic, 11);
+        assert_eq!(x_total(&c, 1001).generic, 2032);
+    }
+}
+
+#[cfg(test)]
+mod wide_generic_cost_tests {
+    use super::*;
+
+    #[test]
+    fn reductions_bring_a_wide_intermediate_back_into_payment_range() {
+        let mut cost = WideGenericCost::from_cost(ManaCost::ZERO);
+        cost.add_x(1u64 << 32);
+        cost.add_generic(1);
+        let less = ManaCost { generic: 3, ..ManaCost::ZERO };
+        cost.reduce(&less, 0);
+        assert_eq!(cost.finish().unwrap().generic, u32::MAX - 1);
+    }
+
+    #[test]
+    fn only_final_representable_cost_can_be_locked_in() {
+        let mut cost = WideGenericCost::from_cost(ManaCost::ZERO);
+        cost.add_x(1u64 << 32);
+        assert!(cost.finish().is_none());
+    }
+}

@@ -2782,6 +2782,11 @@ public sealed class PayCostsPromptMessage : PromptPayload
     [Key(35)]
     public bool ManaAbilities { get; set; }
 
+    /// <summary>Exact X values when the legal bound exceeds the signed announcement controls.</summary>
+    [Key(36)] public uint? WideX { get; set; }
+    [Key(37)] public uint? WideXLeast { get; set; }
+    [Key(38)] public uint? WideXMost { get; set; }
+    [Key(39)] public uint? WideXAffordable { get; set; }
 }
 
 /// <summary>The steps of a payment with assist (CR 702.132a), as <see cref="PayCostsPromptMessage.AssistStep"/> names them.</summary>

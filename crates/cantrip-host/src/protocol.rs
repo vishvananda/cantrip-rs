@@ -1256,6 +1256,15 @@ pub struct PayCostsPrompt {
     /// While announcing: the largest value an `AnnounceAnswer` may announce (CR 601.2b) - the rules' limit, as many as the
     /// legal targets an "X target" spell has, once for a kicker paid at most once; how much could be paid for is
     /// `most_affordable`. Zero while paying.
+    /// Exact X announcement values when the offered bound exceeds the legacy signed UI range.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub wide_x: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub wide_x_least: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub wide_x_most: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub wide_x_affordable: Option<u32>,
     pub most_announced: i32,
     /// While announcing: the smallest value an `AnnounceAnswer` may announce: 1 for an X that can't be 0 (CR 107.3a, 601.2b),
     /// else 0. The announcement starts at `x`: this, or the X a reduction already announced pays for (the cards a March

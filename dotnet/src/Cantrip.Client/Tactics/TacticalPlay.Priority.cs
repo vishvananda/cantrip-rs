@@ -2030,8 +2030,11 @@ public sealed partial class TacticalPlay
     /// tapped by a seat that would be dead of it, and the spell is given up instead (CR 733.1).
     /// </para>
     /// </summary>
-    private TakeActionAnswer Pay(GameClient client, PayCostsPromptMessage prompt)
+    private AnswerPayload Pay(GameClient client, PayCostsPromptMessage prompt)
     {
+        // The tactical policy uses signed bounded estimates; keep an already-announced wider X exact.
+        if (prompt.AnnouncesXOrKicks && prompt.WideX is uint current && current > int.MaxValue)
+            return new NumberChosenAnswer { Value = current };
         TakeActionAnswer answer = Paid(client, prompt);
 
         // A spell given up while paying is not tried again this turn: the rewind can leave the board reading otherwise

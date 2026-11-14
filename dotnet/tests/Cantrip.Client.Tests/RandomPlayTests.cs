@@ -25,6 +25,16 @@ public sealed class RandomPlayTests
     /// <summary>Enough draws that a choice taken one time in three would have to show up.</summary>
     private const int Draws = 400;
 
+    [Fact]
+    public void Wide_x_advice_does_not_overflow_or_step_billions_of_times()
+    {
+        var prompt = new PayCostsPromptMessage { AnnouncesXOrKicks = true, HasX = true,
+            MostAffordable = int.MaxValue, MostAnnounced = int.MaxValue,
+            WideX = 0, WideXLeast = 0, WideXMost = uint.MaxValue, WideXAffordable = uint.MaxValue - 1 };
+        var answer = Assert.IsType<NumberChosenAnswer>(new RandomPlay(seed: 7).Decide(prompt));
+        Assert.InRange(answer.Value, 0u, uint.MaxValue);
+    }
+
     // --- Priority ---------------------------------------------------------------------------------------------------
 
     [Fact]

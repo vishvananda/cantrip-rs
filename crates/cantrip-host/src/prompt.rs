@@ -899,6 +899,8 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             let spends_no_mana = game.chars(*source).has(Keyword::CantSpendManaToCast);
             // "You may sacrifice any number of ... This spell costs {1} less for each" (CR 601.2b): what the number announced is.
             let sacrifices = if *announcing { sacrifices_for_reduction(game, *source, request.player) } else { None };
+            let affordable_x = x_cost.as_deref().filter(|_| *announcing && governs.is_empty())
+                .and_then(|paid| most_affordable_x(game, request.player, *source, paid, *least, *most));
             PromptPayload::PayCostsPromptMessage(PayCostsPrompt {
                 player,
                 spell: source_handle(game, handles, *source),
@@ -929,11 +931,9 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     i32::from(game.state.obj(*source).counters(CounterKind::Loyalty).max(0))
                 } else if let Some((_, could)) = sacrifices {
                     could.min(i32::MAX as usize) as i32
-                } else if let Some(paid) = x_cost.as_deref().filter(|_| *announcing && governs.is_empty()) {
-                    // An X paid in mana: the most the mana at hand could pay for, with the total the cast or activation
-                    // would lock in at each X - the cost changes applied (CR 601.2f) - and split between X and the rest as
-                    // the payment splits it where only some mana may pay X (`most_affordable_x`).
-                    most_affordable_x(game, request.player, *source, paid, *least, *most).map_or(-1, wire)
+                } else if x_cost.is_some() && *announcing && governs.is_empty() {
+                    // Advice uses the actual cost changes and mana restrictions at each X.
+                    affordable_x.map_or(-1, wire)
                 } else {
                     -1
                 },
@@ -941,6 +941,10 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 x_mana_one_each: remaining.x_mana.one_each,
                 remaining_x: wire(remaining.x_part()),
                 sacrifice_reduces: sacrifices.map_or(0, |(each, _)| i32::from(each)),
+                wide_x: (*announcing && *most > i32::MAX as u32).then_some(*x),
+                wide_x_least: (*announcing && *most > i32::MAX as u32).then_some(*least),
+                wide_x_most: (*announcing && *most > i32::MAX as u32).then_some(*most),
+                wide_x_affordable: if *announcing && *most > i32::MAX as u32 { affordable_x } else { None },
                 most_announced: wire(*most),
                 least_announced: wire(*least),
                 x_removes_loyalty: *loyalty,
@@ -1739,6 +1743,35 @@ mod tests {
         let (payload, _) = prompt(&game, &request, &mut handles).unwrap();
         assert_eq!(crate::answer::translate(&payload.default_answer(), &request, &handles, &game).ok(), Some(Answer::Announce(300)));
     }
+    #[test]
+    fn x_wire_values_do_not_grow_native_request_layout() {
+        assert_eq!(std::mem::size_of::<RequestKind>(), 288);
+        assert_eq!(std::mem::size_of::<Request>(), 296);
+        assert_eq!(std::mem::size_of::<cantrip_state::Frame>(), 416);
+    }
+
+    #[test]
+    fn x_announcement_accepts_exact_unsigned_answer_within_its_bounds() {
+        let (game, hand) = game_with(&["Forest"]);
+        let mut handles = HandleSpace::new();
+        let request = Request { id: 1, player: PlayerId(0), may_cancel: true,
+            kind: RequestKind::PayCosts {
+                source: hand[0], total: ManaCost::ZERO, remaining: ManaCost::ZERO, options: Vec::new(),
+                mana_abilities: false, announcing: true, x: 0, least: 0, most: u32::MAX,
+                loyalty: false, attackers: Vec::new(), life: 0, governs: "", assist: AssistStep::None, x_cost: None,
+            } };
+        let (view, _) = prompt(&game, &request, &mut handles).unwrap();
+        let PromptPayload::PayCostsPromptMessage(view) = view else { panic!("pay-costs prompt") };
+        assert_eq!((view.wide_x, view.wide_x_least, view.wide_x_most), (Some(0), Some(0), Some(u32::MAX)));
+        let native = Answer::Announce(1u32 << 31);
+        let payload = crate::answer::payload_of(&native, &request, &mut handles, &game);
+        assert!(matches!(payload, AnswerPayload::NumberChosenAnswer(_)));
+        assert_eq!(crate::answer::translate(&payload, &request, &handles, &game).ok(), Some(native));
+        let mut not_offered = request.clone();
+        if let RequestKind::PayCosts { ref mut most, .. } = not_offered.kind { *most = 1001; }
+        assert!(crate::answer::translate(&payload, &not_offered, &handles, &game).is_err());
+    }
+
     #[test]
     fn wide_number_small_high_range_retains_modes_and_exact_native_answer_values() {
         let (game, hand) = game_with(&["Forest"]); let mut handles = HandleSpace::new();

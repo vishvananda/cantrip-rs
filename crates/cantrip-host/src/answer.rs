@@ -101,10 +101,12 @@ pub fn translate(
             u32::try_from(a.value).map_err(|_| Untranslatable::Illegal(format!("{} cannot be announced (CR 107.1)", a.value)))?,
         ),
         AnswerPayload::NumberChosenAnswer(a) => {
-            let RequestKind::ChooseNumber { least, most, .. } = &request.kind else {
-                return Err(Untranslatable::Illegal("this request is not a number choice".into()));
+            let (least, most) = match &request.kind {
+                RequestKind::ChooseNumber { least, most, .. } => (*least, *most),
+                RequestKind::PayCosts { announcing: true, least, most, .. } => (*least, *most),
+                _ => return Err(Untranslatable::Illegal("this request does not announce a number".into())),
             };
-            if !(*least..=*most).contains(&a.value) { return Err(Untranslatable::Illegal("not a number offered".into())); }
+            if !(least..=most).contains(&a.value) { return Err(Untranslatable::Illegal("not a number offered".into())); }
             Answer::Announce(a.value)
         }
         AnswerPayload::CardsChosenAnswer(a) => Answer::Cards(cards(handles, game, &a.cards)?),
@@ -297,7 +299,8 @@ pub fn payload_of(answer: &Answer, request: &Request, handles: &mut HandleSpace,
         Answer::Pass => AnswerPayload::PassAnswer(PassAnswer {}),
         Answer::Cancel => AnswerPayload::CancelAnnouncementAnswer(CancelAnnouncementAnswer {}),
         Answer::Announce(value) if matches!(request.kind, RequestKind::ChooseNumber { least, most, .. }
-            if most >= least && (most - least > 255 || *value > i32::MAX as u32)) => {
+            if most >= least && (most - least > 255 || *value > i32::MAX as u32))
+            || matches!(request.kind, RequestKind::PayCosts { announcing: true, .. } if *value > i32::MAX as u32) => {
             AnswerPayload::NumberChosenAnswer(NumberChosenAnswer { value: *value })
         }
         Answer::Announce(value) => AnswerPayload::AnnounceAnswer(AnnounceAnswer { value: crate::prompt::wire(*value) }),

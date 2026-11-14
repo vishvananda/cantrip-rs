@@ -16,6 +16,18 @@ namespace Cantrip.Server.Tests;
 /// </summary>
 public sealed class ProtocolJsonTests
 {
+    [Fact]
+    public void Wide_x_announcement_values_round_trip_in_json_and_messagepack()
+    {
+        const string json = """{"WideX":2147483648,"WideXLeast":0,"WideXMost":4294967295,"WideXAffordable":4294967294}""";
+        var prompt = JsonSerializer.Deserialize<PayCostsPromptMessage>(json)!;
+        var roundTrip = MessagePackSerializer.Deserialize<PayCostsPromptMessage>(MessagePackSerializer.Serialize(prompt));
+        Assert.Equal(2147483648u, roundTrip.WideX);
+        Assert.Equal(0u, roundTrip.WideXLeast);
+        Assert.Equal(uint.MaxValue, roundTrip.WideXMost);
+        Assert.Equal(uint.MaxValue - 1, roundTrip.WideXAffordable);
+    }
+
     // Retain the old numeric DTO types independently of the production types.
     // Comparing the complete union bytes proves compact old-range compatibility.
     [Union(1, typeof(LegacyLife))]

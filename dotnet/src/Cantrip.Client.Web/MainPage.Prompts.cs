@@ -620,6 +620,8 @@ public sealed partial class MainPage
     /// </summary>
     private void FillAnnouncement(GameClient client, PayCostsPromptMessage prompt, string name)
     {
+        if (prompt.WideX is uint wide && wide > int.MaxValue)
+            _selection.NumberTyped ??= wide.ToString(System.Globalization.CultureInfo.InvariantCulture);
         int x = Announced(prompt);
         bool kickerPaid = Announcement.KickerPaid(prompt, x);
         string total = Announcement.TotalAt(prompt, x);
@@ -700,7 +702,9 @@ public sealed partial class MainPage
         }
 
         bool kicker = prompt.Kicker.Length > 0;
-        string reach = prompt.MostAffordable < 0
+        string reach = prompt.WideXAffordable is uint exact && exact > int.MaxValue
+            ? $"enough mana for X up to {exact}"
+            : prompt.MostAffordable < 0
             ? "not enough mana for it"
             : prompt.XPaidInLife
                 ? prompt.MostAffordable > 0
@@ -729,18 +733,21 @@ public sealed partial class MainPage
         string xMana = Announcement.XManaNote(prompt) is { Length: > 0 } note ? $"  ·  {note}" : string.Empty;
         Prompt(
             Announcement.Title(prompt, name),
-            prompt.XPaidInLife
-                ? $"{total} and {x} life  ·  {reach}  ·  targets and paying come next"
-                : $"{total} in all{xMana}  ·  {reach}{planning}  ·  targets and paying come next");
+            prompt.WideXMost is not null && _selection.NumberTyped is not null
+                ? "The final cost depends on X and later cost changes  ·  targets and paying come next"
+                : prompt.XPaidInLife
+                    ? $"{total} and {x} life  ·  {reach}  ·  targets and paying come next"
+                    : $"{total} in all{xMana}  ·  {reach}{planning}  ·  targets and paying come next");
 
-        if (announce is not null)
+        if (announce is not null && _selection.NumberTyped is null)
         {
             _pass = announce;
             AddButton("Okay", announce, primary: true).Tooltip =
                 (kicker ? $"Cast {Paid(prompt, x, kickerPaid)}" : $"Announce X = {x}") + Suffix(PassKey);
         }
 
-        AddXStepper(prompt, x, kickerPaid, lower, raise);
+        if (_selection.NumberTyped is null) AddXStepper(prompt, x, kickerPaid, lower, raise);
+        AddWideXEntry(client, prompt);
 
         if (_actions.Cancel is { } giveUp)
         {
@@ -751,6 +758,44 @@ public sealed partial class MainPage
         {
             1 => "once",
             _ => $"{times} times",
+        };
+    }
+
+    /// <summary>Enter an exact X beyond the signed stepper without changing ordinary announcement controls.</summary>
+    private void AddWideXEntry(GameClient client, PayCostsPromptMessage prompt)
+    {
+        if (prompt.WideXLeast is not uint least || prompt.WideXMost is not uint most) return;
+        if (_selection.NumberTyped is null)
+        {
+            AddButton("Enter X", () =>
+            {
+                _selection.NumberTyped = (prompt.WideX ?? least).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                _needsRedraw = true;
+                RedrawNow();
+            }, primary: false);
+            return;
+        }
+        if (prompt.WideX is not uint current || current <= int.MaxValue)
+            AddButton("Use stepper", () =>
+            {
+                _selection.NumberTyped = null;
+                _needsRedraw = true;
+                RedrawNow();
+            }, primary: false);
+        _buttons.Children.Add(new SymbolText(13, Theme.Fg) { Text = $"X from {least} to {most}" });
+        var field = new TextBox { PlaceholderText = "X", Text = _selection.NumberTyped, Width = 160, FontSize = 13 };
+        _buttons.Children.Add(field);
+        bool Valid(out uint value) => uint.TryParse(_selection.NumberTyped, out value) && value >= least && value <= most;
+        void Submit()
+        {
+            if (Valid(out uint value)) Send(client, new NumberChosenAnswer { Value = value });
+        }
+        var submit = AddButton("Announce X", Submit, primary: false);
+        submit.Enabled = Valid(out _);
+        field.TextChanged += (_, _) => { _selection.NumberTyped = field.Text; submit.Enabled = Valid(out _); };
+        field.KeyDown += (_, e) =>
+        {
+            if (e.Key == Windows.System.VirtualKey.Enter) { Submit(); e.Handled = true; }
         };
     }
 

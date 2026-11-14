@@ -353,13 +353,15 @@ public sealed class RandomPlay : IAutoPlayer
                 }
 
                 _targetX = prompt.VariableKicker
-                    ? (Coin() ? _random.Next(most + 1) : 0)
+                    ? (Coin() ? (most == int.MaxValue ? (int)_random.NextInt64((long)most + 1) : _random.Next(most + 1)) : 0)
                     : prompt.Kicker.Length > 0
                     ? Math.Min(most, prompt.Multikicker ? _random.Next(3) : Coin() ? 1 : 0)
-                    : _random.Next(most + 1);
+                    : (most == int.MaxValue ? (int)_random.NextInt64((long)most + 1) : _random.Next(most + 1));
             }
 
-            return AutoPlay.Announce(prompt, _targetX);
+            return prompt.WideXMost is not null
+                ? new NumberChosenAnswer { Value = Math.Max((uint)_targetX, prompt.WideXLeast ?? 0) }
+                : AutoPlay.Announce(prompt, _targetX);
         }
 
         if (prompt.ManaAbilities)

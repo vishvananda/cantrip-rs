@@ -454,7 +454,7 @@ public sealed class Decisions
                 : prompt.XPaidInLife
                 ? "X is paid in life. You can pay up to X = " + reach.ToString(CultureInfo.InvariantCulture)
                     + " and still be alive; every point of X is a point of life gone."
-                : "Your mana will stretch to X = " + reach.ToString(CultureInfo.InvariantCulture)
+                : "Your mana will stretch to X = " + (prompt.WideXAffordable?.ToString(CultureInfo.InvariantCulture) ?? reach.ToString(CultureInfo.InvariantCulture))
                     + ". Everything you spend on X is mana you will not have for anything else this turn.",
             Choices = [.. Enumerable.Range(0, most + 1).Select(x => $"X = {x}")],
         });
@@ -510,7 +510,9 @@ public sealed class Decisions
                 _targetX = prompt.Kicker.Length > 0 ? Kicker(client, prompt) : X(client, prompt);
             }
 
-            return AutoPlay.Announce(prompt, _targetX);
+            return prompt.WideXMost is not null
+                ? new NumberChosenAnswer { Value = Math.Max((uint)_targetX, prompt.WideXLeast ?? 0) }
+                : AutoPlay.Announce(prompt, _targetX);
         }
 
         if (prompt.ManaAbilities)

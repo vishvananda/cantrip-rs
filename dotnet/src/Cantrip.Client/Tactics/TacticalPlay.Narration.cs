@@ -280,7 +280,7 @@ public sealed partial class TacticalPlay
     private static string Asked(GameClient client, PromptPayload prompt) => prompt switch
     {
         PriorityPromptMessage => "priority",
-        PayCostsPromptMessage pay => $"pay {pay.Remaining} for {NameOf(client, pay.Spell)}{(pay.HasX ? $" with X={pay.X}" : string.Empty)}",
+        PayCostsPromptMessage pay => $"pay {pay.Remaining} for {NameOf(client, pay.Spell)}{(pay.HasX ? $" with X={pay.WideX ?? (uint)Math.Max(0, pay.X)}" : string.Empty)}",
         UnlessPaysPromptMessage unless => $"pay {unless.CostText()} or not ({unless.Verb}, {NameOf(client, unless.Source)})",
         DeclareAttackersPromptMessage => "attack",
         DeclareBlockersPromptMessage => "block",
