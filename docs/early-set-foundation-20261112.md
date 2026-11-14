@@ -359,7 +359,8 @@ abilities, including Manabarbs and Burning Earth (CR 106.12, 603.3). They queue
 for the stack after a mana ability completes. Triggered mana abilities still
 resolve immediately within the activation (CR 605.4a), and the ordinary trigger
 collector excludes them even if they use the new mask. A production replaced
-by zero triggers ordinary observers, but no additional-mana trigger.
+by zero triggers neither ordinary observers nor additional-mana triggers (CR 106.12a),
+following the upstream correction retained during the November 14 rebase.
 
 An interest guard examines actual game objects, their possible copied/granted
 texts, delayed abilities and functioning zones before collecting observers.
