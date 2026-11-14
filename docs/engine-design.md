@@ -3751,3 +3751,12 @@ boundaries. It clears ordinary/restricted pools and their duration, source and
 snow provenance together, and returns the lost types within native per-type
 bounds. It is separate from producing/doubling mana and from asking a player
 to activate a land's mana abilities. All state changes are journalled.
+
+### Captured group departures
+
+`DelayedWhen::AnyOfObjectsLeaves` watches the real object identities in a delayed ability's existing members span
+(CR 603.7b-e, 603.10a). A battlefield departure of any member triggers it once with no event-specific payload; the
+trigger uses the normal stack and retains its creating source, controller, text and captured members. Independent
+creations remain independent. Stangg and Mechtitan Core use this fixed-outcome procedure for the token group an
+instruction creates, including additional tokens made by replacement effects. Simultaneous matches have the same
+outcome; this mode does not expose an event choice or implement general event-specific delayed-trigger selection.
