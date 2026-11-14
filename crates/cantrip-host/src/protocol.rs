@@ -378,6 +378,8 @@ pub enum ManaSpendFilterView {
     SubtypeSpellsOrEquipAbilities,
     /// Only to cast the payer's own commander (CR 903.3d): "spend this mana only to cast your commander".
     YourCommander,
+    /// Only to pay cumulative upkeep costs (CR 702.24a).
+    CumulativeUpkeep,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]

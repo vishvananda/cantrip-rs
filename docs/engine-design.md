@@ -2487,7 +2487,7 @@ type), `NonSpells(types)` only for casting a spell with none of the card types (
 of the Ancient Way's "a noncreature spell": an artifact creature spell is a creature spell), `ManaValue(ManaValueSpells)`
 only for casting a spell whose mana value on the stack is N or greater, X counted as announced and a split card's cast
 half alone, or, where it says so, whose mana cost has {X} (Ashling, Rimebound's 4; Troyan, Gutsy Explorer's 5 or {X}),
-`LegendarySpells` only for casting a legendary spell (Plaza of Heroes), and `NotNonartifactSpells`, `GainsHaste` and `LegendaryUncounterable` are the three single cards' own. A subtype
+`LegendarySpells` only for casting a legendary spell (Plaza of Heroes), `CumulativeUpkeep` only for the keyword cost (Adarkar Unicorn and Snowfall; CR 702.24a), and `NotNonartifactSpells`, `GainsHaste` and `LegendaryUncounterable` are the three single cards' own. A subtype
 is any of hundreds, so the pool's list holds whatever restrictions the game made; those with no subtype or number are a named list
 (`ManaRestriction::NAMED`, which the build checks a card's `.only_for` against). A mana ability's restriction is made
 concrete as it is activated (`actions::restriction_from`): its subtype words read through its source's words (CR 612),
@@ -2500,7 +2500,7 @@ face's its front face's, CR 712.8c) and whether its mana cost has {X}: a card wi
 some X would bring it to a mana value the restricted mana pays for (`Available::covers_for`). A copy of a spell had
 no mana spent on it, so it gets nothing the mana did to the original (CR 707.10). What a payment is for
 is `ManaPayment`, judged as the cost is paid (`actions::payment_for`): casting a spell on the stack (CR 601.2g), activating
-an ability of a source in any zone - a mana ability's own mana cost too (CR 605.3a) - or anything else, which no
+an ability of a source in any zone - a mana ability's own mana cost too (CR 605.3a) - the cumulative upkeep keyword cost, or anything else, which no
 "abilities" mana pays: a special action (CR 116.2, turning a face-down permanent up, unlocking a door), "unless ... pays"
 (CR 118.12). `ManaRestriction::may_pay` is the one rule, read by the payment (`restricted_for`), by the advice whether a
 cost can be paid (`Available::covers_for`), and by the options offered while paying: a mana ability whose mana could pay
@@ -3773,3 +3773,7 @@ to activate a land's mana abilities. All state changes are journalled.
 Immediately before an actual simultaneous departure, the layers identify the first part at its original stage, before that entry applies. A source that lost its text before that stage contributes nothing; a first part that starts before ability loss in layer6 retains its later parts. The existing journaled continuous-effect list keeps the printed definition, linked context, acquisition identity and original timestamp until cleanup. It evaluates the current affected objects on every pass, including later arrivals and an initially empty affected set. It never snapshots that set or preserves unrelated abilities of the departed source. Copies and merged text retain the definition they actually had. Prospective entry projects the surviving effect before excluding simultaneously departing sources. Phasing is not a departure.
 
 The existing epoch-derived static-source cache guards departure work on a live source with this lifetime and notes the retained parts’ layer and ability-loss interests. Ordinary games allocate no extra list; there is no new per-object field or persistent game-state collection. Retained effects are journaled and expire through the existing end-of-turn cleanup.
+
+### Cumulative-upkeep mana
+
+Cumulative upkeep pays through `Game::may_pay_cumulative_upkeep`, used by the shared keyword procedure (CR 702.24a). Its immutable payment purpose passes through resolving-cost advice, mana assignment and payment; a nested mana ability pays its activation cost with its own activation purpose (CR 605.3a). The restricted pool, provenance and journal are unchanged.

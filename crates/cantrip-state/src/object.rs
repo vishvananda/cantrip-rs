@@ -2651,6 +2651,8 @@ pub enum ManaRestriction {
     /// ability: Purple Dragon Punks. This is for restrictions of different kinds; "any of these subtypes" (Dragon spells or
     /// Omen spells) is the set of subtypes `SubtypeSpells` holds, not a union.
     AnyOf(&'static [ManaRestriction]),
+    /// Mana spent only on cumulative upkeep costs (CR 106.6, 702.24a): Adarkar Unicorn and Snowfall.
+    CumulativeUpkeep,
 }
 
 /// Where the source of an ability that restricted mana may pay for must be (CR 106.6, 109.2).
@@ -2797,6 +2799,8 @@ pub enum ManaPayment {
     PlayerAbility,
     /// Anything else: a special action, "unless ... pays", a cost a resolving effect asks for.
     Other,
+    /// Paying the cost of cumulative upkeep (CR 702.24a).
+    CumulativeUpkeep,
 }
 
 /// What mana spent on a spell does to it (CR 106.6), as bits of `ManaRestriction::effects`: it gains haste, it can't be
@@ -2856,7 +2860,8 @@ impl ManaRestriction {
     /// of `Subtypes` are named for their subtypes and those of `ManaValue` for their number (`name`). A card naming a
     /// restriction of card types not here fails the build (`Adds::only_for` is checked at compile time), since the host
     /// has no word for it on the wire.
-    pub const NAMED: [(ManaRestriction, &'static str); 21] = [
+    pub const NAMED: [(ManaRestriction, &'static str); 22] = [
+        (ManaRestriction::CumulativeUpkeep, "CumulativeUpkeep"),
         (ManaRestriction::NotNonartifactSpells, "NotNonartifactSpells"),
         (ManaRestriction::GainsHaste, "GainsHaste"),
         (ManaRestriction::LegendaryUncounterable, "LegendarySpells, CantBeCountered"),
@@ -2883,6 +2888,7 @@ impl ManaRestriction {
     const fn same(self, other: ManaRestriction) -> bool {
         match (self, other) {
             (ManaRestriction::NotNonartifactSpells, ManaRestriction::NotNonartifactSpells)
+            | (ManaRestriction::CumulativeUpkeep, ManaRestriction::CumulativeUpkeep)
             | (ManaRestriction::GainsHaste, ManaRestriction::GainsHaste)
             | (ManaRestriction::LegendaryUncounterable, ManaRestriction::LegendaryUncounterable)
             | (ManaRestriction::LegendarySpells, ManaRestriction::LegendarySpells)
@@ -2965,6 +2971,7 @@ impl ManaRestriction {
     /// Whether mana under this restriction may be spent on `payment` (CR 106.6).
     pub fn may_pay(self, payment: &ManaPayment) -> bool {
         match (self, *payment) {
+            (ManaRestriction::CumulativeUpkeep, ManaPayment::CumulativeUpkeep) => true,
             (ManaRestriction::AnyOf(parts), _) => parts.iter().any(|r| r.may_pay(payment)),
             (ManaRestriction::NonSpells(barred), ManaPayment::Spell { types, .. }) => barred.0 & types.0 == 0,
             (ManaRestriction::ManaValue(m), ManaPayment::Spell { mana_value, x, .. }) => m.admits(mana_value, x),
