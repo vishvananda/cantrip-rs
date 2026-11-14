@@ -666,3 +666,21 @@ fn chosen_bundle_keeps_its_upkeep_restriction_through_replacement() {
     let (_, made) = g.state.restricted_of(YOU).find(|(r, _)| *r == ManaRestriction::CumulativeUpkeep).unwrap();
     assert_eq!(made, pool(&[(Mana::U, 2), (Mana::C, 2)]));
 }
+
+#[test]
+fn bundle_alternatives_cannot_be_spent_together() {
+    static DISJOINT: [ManaPool; 2] = [ManaPool([0, 1, 0, 0, 0, 0]), ManaPool([0, 0, 0, 0, 0, 1])];
+    static SOURCE: CardDef = CardDef {
+        name: "Disjoint bundle source", types: TypeSet::of(&[CardType::Land]),
+        abilities: &[mana_ability(TAP, add_one_bundle_of(&DISJOINT, 0), "{T}: Add {U} or {C}.")],
+        labels: &["Add {U}", "Add {C}"], ..CardDef::BLANK
+    };
+    let cards = Box::leak(Box::new(CardTable::new([&SOURCE])));
+    let mut g = Game::new(cards, &Setup { decks: vec![vec![], vec![]], ..Setup::default() });
+    put(&mut g, &SOURCE);
+    let mut symbols = [0; 6];
+    symbols[Mana::U as usize] = 1;
+    symbols[Mana::C as usize] = 1;
+    let cost = ManaCost { symbols, ..ManaCost::ZERO };
+    assert!(!crate::actions::available(&cx(&mut g), YOU).covers_for(&cost, &ManaPayment::Other));
+}
