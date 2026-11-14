@@ -497,6 +497,10 @@ pub enum RequestKind {
     /// (`ANY_NUMBER_OF_TIMES`), as one payment whose number is chosen as it is paid (CR 603.12a): `x` is then the number of
     /// times so far, from 1 (declining is paying it no times), `total` the cost that many times over, and `IncreaseX` and
     /// `DecreaseX` change the number within 1 to `most`.
+    ///
+    /// `removes` is the kind of counter `x` counts when the X is "remove any number of [kind] counters from" the source
+    /// (`VariableCost::RemoveAnyNumberOfCounters`, CR 118.3) rather than mana - paying removes X of them, and `total` has no
+    /// part of it. `None` for any other cost.
     UnlessPays {
         source: ObjectId,
         subject: ObjectId,
@@ -508,6 +512,7 @@ pub enum RequestKind {
         options: Vec<ActionOption>,
         x: Option<u32>,
         times: Option<u32>,
+        removes: Option<CounterKind>,
     },
     /// Choose cards from among `cards`, every one of which the player sees: which sets of them are an answer is `rule`'s to
     /// say (`Selection`; the core checks every answer with it), and what may be chosen next as the player picks is asked of

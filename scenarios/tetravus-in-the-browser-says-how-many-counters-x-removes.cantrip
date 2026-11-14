@@ -1,0 +1,30 @@
+# Browser
+# Tetravus at a table, Bot1 a browser page: its upkeep payment's X is a number of +1/+1 counters removed from it (CR 118.3),
+# not mana, and the dock says so - "remove 2 +1/+1 counters from Tetravus" once Bot1 raises X to 2 with the stepper, never
+# "{0}". Bot1 pays: two counters come off and two Tetravites are made.
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Tetravus
+Island x30
+[Bot2 Deck]
+Island x30
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Tetravus.Cast
+Bot1.Pass
+[T3 Bot1.Upkeep]
+Bot1.Decline
+Bot1.Pass
+? Client.Bot1.Prompt.Title = remove counters from Tetravus?
+? Client.Bot1.Prompt.Detail = X = 2, so remove 2 +1/+1 counters from Tetravus  ·  − and + change X
+Bot1.PayCost(X: 2)
+[T3 Bot1.Draw]
+[Expect]
+Bot1.Battlefield.Tetravus.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield = Tetravus; Tetravite Token; Tetravite Token

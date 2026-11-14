@@ -653,6 +653,37 @@ public sealed class DecisionTests
     }
 
     [Fact]
+    public void Asks_a_counter_payments_x_as_counters_up_to_those_on_the_source()
+    {
+        // Tetravus: "you may remove any number of +1/+1 counters from this creature" (CR 118.3). X is counters removed, up to
+        // the three it has - not mana - and choosing two raises X toward it.
+        var chooser = new ScriptedChooser([3]);
+        ObjectView tetravus = Creature(1, "Tetravus", 4, 4);
+        tetravus.Counters = [new CounterView { Name = "+1/+1", Count = 3 }];
+
+        AnswerPayload answer = new Decisions(chooser).Answer(
+            Seated(tetravus),
+            new UnlessPaysPromptMessage
+            {
+                Player = Me,
+                Source = Handle(1),
+                Subject = Handle(1),
+                Verb = "RemoveCounters",
+                Question = "remove counters from {source}?",
+                Total = "{0}",
+                Remaining = "{0}",
+                ChoosingX = true,
+                X = 0,
+                XCounter = "+1/+1",
+                Options = [new() { Kind = ActionKindView.PayCost }, new() { Kind = ActionKindView.IncreaseX }, new() { Kind = ActionKindView.DeclineCost }],
+            });
+
+        Assert.Equal(ActionKindView.IncreaseX, Assert.IsType<TakeActionAnswer>(answer).Kind);
+        Assert.Contains("number of +1/+1 counters you remove from", chooser.Asked[0].Heading, StringComparison.Ordinal);
+        Assert.Equal(["Don't pay.", "Remove X = 0.", "Remove X = 1.", "Remove X = 2.", "Remove X = 3."], chooser.Asked[0].Choices);
+    }
+
+    [Fact]
     public void Puts_the_trigger_chosen_to_resolve_first_on_the_stack_last()
     {
         // The last ability named goes on the stack last and therefore resolves first (CR 603.3b), so the question is

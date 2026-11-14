@@ -617,7 +617,20 @@ public sealed class Decisions
             string question = prompt.Question.Length > 0 ? prompt.Words(prompt.Question, subject) : $"pay {prompt.CostText()}?";
             string detail = prompt.Words(prompt.Detail, subject);
             string no = prompt.No.Length > 0 ? $" Declining: {prompt.Words(prompt.No, subject)}." : string.Empty;
-            if (prompt.ChoosingX)
+            if (prompt.ChoosingX && prompt.XCounter.Length > 0)
+            {
+                // "You may remove any number of [kind] counters" (CR 118.3): X is counters, up to the ones on the source.
+                int most = client.Object(prompt.Source)?.Counters.FirstOrDefault(counter => counter.Name == prompt.XCounter)?.Count ?? 0;
+                int picked = One(new Question
+                {
+                    Heading = $"{source}: {question}{(detail.Length > 0 ? $" ({detail}.)" : string.Empty)}{no} "
+                        + $"X is the number of {prompt.XCounter} counters you remove from {source}, which has {most}. How many do you remove?",
+                    Choices = ["Don't pay.", .. Enumerable.Range(0, most + 1).Select(x => $"Remove X = {x}.")],
+                });
+                _paying = picked > 0;
+                _xWanted = Math.Max(0, picked - 1);
+            }
+            else if (prompt.ChoosingX)
             {
                 // "You may pay {X}" with X yours to choose (CR 107.3f): how much X, up to the mana there is to make, or nothing.
                 int pool = client.View?.Players.FirstOrDefault(player => player.Seat == client.Seat)?.Mana.Sum() ?? 0;

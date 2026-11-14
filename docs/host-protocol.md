@@ -165,6 +165,11 @@ have left it ("2 damage from Pyroclasm to your opponent's Ornithopter"), and who
 to (no handle for a player). Both are empty for any other "you may". The web client shows `Event` as the prompt's detail.
 Version 234.
 
+**A resolving payment of counters says what X removes.** An `UnlessPaysPromptMessage` whose X is "remove any number of
+[kind] counters from" the source (Tetravus, CR 118.3) rather than mana has `XCounter`, the counters' kind as the table names
+them ("+1/+1"): paying removes `X` of them, and `Total` is `{0}`, the payment having no mana. Empty for any other payment.
+The web client captions the X with it ("X = 2, so remove 2 +1/+1 counters from Tetravus"). Version 235.
+
 **Checking a declaration of blockers.** A declaration of blockers (`DeclareBlockersPromptMessage`) is judged by one validator
 in the engine (`BlockRequirements::judge`, `crates/cantrip-state/src/blocks.rs`) against every restriction, requirement and
 cost (CR 509.1a-d): each block allowed, each creature blocking as many attackers as it may, each attacker within its fewest

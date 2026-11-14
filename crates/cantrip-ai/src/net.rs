@@ -590,6 +590,7 @@ mod guard_tests {
                 ],
                 x: None,
                 times: None,
+                removes: None,
             },
             may_cancel: false,
         };

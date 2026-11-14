@@ -2267,6 +2267,13 @@ public sealed class UnlessPaysPromptMessage : PromptPayload
     [Key(21)]
     public uint RemainingSnow { get; set; }
 
+    /// <summary>
+    /// For an <see cref="X"/> that is "remove any number of [kind] counters from" the source (CR 118.3), as Tetravus's: the
+    /// kind ("+1/+1"). Paying removes X of them, and <see cref="Total"/> has no part of it. Empty for an X of mana and any other cost.
+    /// </summary>
+    [Key(22)]
+    public string XCounter { get; set; } = string.Empty;
+
 }
 
 /// <summary>

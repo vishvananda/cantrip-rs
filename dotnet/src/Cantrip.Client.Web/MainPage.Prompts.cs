@@ -1885,7 +1885,10 @@ public sealed partial class MainPage
         // "You may pay {X}" (CR 107.3f): X is chosen here, as it is paid, and the payment is of the X shown.
         // "You may pay {G} up to three times" (CR 603.12a): how many times is chosen here too, and the payment is the cost
         // that many times over.
-        string chosen = prompt.ChoosingX ? $"X = {prompt.X}, so {prompt.Total}  ·  − and + change X"
+        // An X that counts counters removed from the source (Tetravus's) is no mana: the caption says what paying removes.
+        string chosen = prompt.ChoosingX && prompt.XCounter.Length > 0
+                ? $"X = {prompt.X}, so remove {prompt.X} {prompt.XCounter} counter{(prompt.X == 1 ? "" : "s")} from {source}  ·  − and + change X"
+            : prompt.ChoosingX ? $"X = {prompt.X}, so {prompt.Total}  ·  − and + change X"
             : prompt.ChoosingTimes ? $"{Times(prompt.X)}, so {prompt.Total}  ·  − and + change how many times{(prompt.MostTimes > 0 ? $" (up to {Spelled(prompt.MostTimes)})" : string.Empty)}"
             : "";
 

@@ -1373,6 +1373,10 @@ pub struct UnlessPaysPrompt {
     /// options change it within 1 to `MostTimes` - 0 for any number of times.
     pub choosing_times: bool,
     pub most_times: i32,
+    /// For an X that is "remove any number of [kind] counters from" the source (CR 118.3), the kind ("+1/+1"): paying
+    /// removes `X` of them, and `Total` has no part of it. Empty for an X of mana, and for any other cost.
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub x_counter: String,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

@@ -963,7 +963,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 ..Default::default()
             })
         }
-        RequestKind::UnlessPays { source, subject, total, remaining, life, life_payable, question, options, x, times } => PromptPayload::UnlessPaysPromptMessage(UnlessPaysPrompt {
+        RequestKind::UnlessPays { source, subject, total, remaining, life, life_payable, question, options, x, times, removes } => PromptPayload::UnlessPaysPromptMessage(UnlessPaysPrompt {
             remaining_snow: remaining.snow,
             player,
             source: source_handle(game, handles, *source),
@@ -991,6 +991,8 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 Some(cantrip_engine::ANY_NUMBER_OF_TIMES) | None => 0,
                 Some(most) => *most as i32,
             },
+            // An X that is a number of counters removed from the source (Tetravus), named as the counters on the table are.
+            x_counter: removes.map_or_else(String::new, |kind| kind.name().to_string()),
         }),
         // The protocol already shows an unrestricted, non-targeted set choice. Keep that presentation for pile
         // separation while the engine asks and validates it through its selection rule.
