@@ -74,6 +74,7 @@ static ONCE_REDIRECT: CardDef = CardDef {
     types: TypeSet::of(&[CardType::Enchantment]),
     granted_replacements: &[GrantedReplacementDef {
         hint: "redirect the next damage",
+        show_captured_value: false,
         kind: ReplacementKind::Damage,
         applies: to_other,
         apply: to_affected,

@@ -429,6 +429,8 @@ pub struct CapturedReplacementCallbacks {
 pub struct GrantedReplacementDef {
     /// What it does, in a few words: shown beside its source when a player orders several (CR 616.1).
     pub hint: &'static str,
+    /// Whether the captured value is public and should be shown when ordering effects.
+    pub show_captured_value: bool,
     pub kind: ReplacementKind,
     pub applies: GrantedApplies,
     pub apply: GrantedApply,

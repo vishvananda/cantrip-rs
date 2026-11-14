@@ -702,10 +702,10 @@ fn skip_turn(cx: &mut Cx, player: PlayerId) -> R<bool> {
     };
     if !optional.is_empty() {
         let mut sources = vec![cx.s().effects[at].source];
-        let mut hints = vec![SKIP_NEXT_TURN_HINT];
+        let mut hints = vec![SKIP_NEXT_TURN_HINT.into()];
         for &(id, rule) in &optional {
             sources.push(id);
-            hints.push(rule.hint);
+            hints.push(rule.hint.into());
         }
         let ask = RequestKind::ChooseReplacement { subject: None, life: None, sources, hints, damage: None, turn: true, counters: Vec::new(), draw: false };
         if let Some(Answer::Index(i)) = cx.ask_rule(player, ask)?

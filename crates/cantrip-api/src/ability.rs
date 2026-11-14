@@ -1237,7 +1237,7 @@ impl ReplacementDef {
 
 /// A replacement effect a resolving spell or ability makes for a while (CR 611.2), about the object it was made for.
 pub const fn granted_replacement(kind: ReplacementKind, applies: GrantedApplies, apply: GrantedApply, hint: &'static str) -> GrantedReplacementDef {
-    GrantedReplacementDef { hint, kind, applies, apply, captured: None, then: None, damage: None, optional: None, once: false, text: "" }
+    GrantedReplacementDef { hint, show_captured_value: false, kind, applies, apply, captured: None, then: None, damage: None, optional: None, once: false, text: "" }
 }
 
 /// A lasting replacement whose callbacks receive the value captured in its effect kind (CR 611.2d).
@@ -1251,6 +1251,12 @@ impl GrantedReplacementDef {
     /// Use callbacks that receive the captured value from this particular effect.
     const fn captured(self, callbacks: &'static crate::replace::CapturedReplacementCallbacks) -> GrantedReplacementDef {
         GrantedReplacementDef { captured: Some(callbacks), ..self }
+    }
+
+    /// Show the captured value beside the hint when ordering effects. Use only for public values.
+    pub const fn show_captured_value(self) -> GrantedReplacementDef {
+        assert!(self.captured.is_some(), "only a captured replacement has a value");
+        GrantedReplacementDef { show_captured_value: true, ..self }
     }
 
     /// The effect controller chooses whether to apply it (CR 614.1a).
