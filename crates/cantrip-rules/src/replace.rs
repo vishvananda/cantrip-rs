@@ -2897,6 +2897,26 @@ mod tests {
         assert_eq!(sources, &[source, source]);
         assert_eq!(hints.iter().map(|s| s.as_ref()).collect::<Vec<_>>(), ["gain captured life (value: 1)", "gain captured life (value: 3)"]);
     }
+    static PRIVATE: CardDef = CardDef {
+        name: "Private capture probe", types: TypeSet::of(&[CardType::Enchantment]),
+        granted_replacements: &[cantrip_api::captured_granted_replacement(ReplacementKind::Draw, &CAPTURE_CALLBACKS, "gain captured life").once()],
+        ..CardDef::BLANK
+    };
+    #[test]
+    fn captured_order_prompt_keeps_unmarked_values_private() {
+        let mut g = game(&[(&PRIVATE, Zone::BATTLEFIELD)], vec![]);
+        let source = g.state.battlefield()[0];
+        let card = g.cards.id_of(&PRIVATE);
+        let frame = g.state.agenda.len() - 1;
+        let mut cx = Cx { g: &mut g, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+        for value in [1, 3] {
+            cantrip_api::Game::add_player_effect(&mut cx, ME, source, EffectKind::CapturedReplacementRule { card, index: 0, value }, Duration::EndOfTurn);
+        }
+        crate::ops::draw_cards(&mut cx, ME, 1);
+        let request = cx.s().agenda[frame].pending.as_ref().expect("replacement choice");
+        let RequestKind::ChooseReplacement { hints, .. } = &request.kind else { panic!("replacement choice") };
+        assert_eq!(hints.iter().map(|s| s.as_ref()).collect::<Vec<_>>(), ["gain captured life", "gain captured life"]);
+    }
     fn captured_choice_then(g: &mut dyn cantrip_api::Game, a: &Asker, _: ObjectId, value: u32, _: &Proposal, _: &Proposal) {
         if let Ok(Answer::Yes) = g.ask(a.controller, RequestKind::May { source: a.source, purpose: Purpose::Ask(&SKIP) }) {
             g.gain_life(a.controller, value as i32);
@@ -3105,7 +3125,7 @@ mod tests {
     /// library, and a frame whose run is given `answers`.
     fn game(cards: &[(&'static CardDef, Zone)], answers: Vec<Answer>) -> Game {
         let table: &'static CardTable =
-            Box::leak(Box::new(CardTable::new([&FILLER, &DOUBLER, &GAINER, &GRAVE_GAINER, &LIMITER, &DENIER, &PEACE, &LASTING_DENIER, &LASTING_ONCE, &LASTING_MANA, &PRINTED_DAMAGE, &LASTING_DAMAGE, &ONCE_DAMAGE, &LASTING_TOKENS, &CAPTURE, &CAPTURE_NESTED, &CAPTURE_MANA, &CAPTURE_DAMAGE, &CAPTURE_CHOICE])));
+            Box::leak(Box::new(CardTable::new([&FILLER, &DOUBLER, &GAINER, &GRAVE_GAINER, &LIMITER, &DENIER, &PEACE, &LASTING_DENIER, &LASTING_ONCE, &LASTING_MANA, &PRINTED_DAMAGE, &LASTING_DAMAGE, &ONCE_DAMAGE, &LASTING_TOKENS, &CAPTURE, &PRIVATE, &CAPTURE_NESTED, &CAPTURE_MANA, &CAPTURE_DAMAGE, &CAPTURE_CHOICE])));
         let deck: Vec<CardId> = std::iter::repeat_n(table.id_of(&FILLER), 17).collect();
         let mut game = Game::new(table, &crate::Setup { decks: vec![deck, Vec::new()], ..Default::default() });
         for &(def, to) in cards {
