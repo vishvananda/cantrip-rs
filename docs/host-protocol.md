@@ -345,3 +345,11 @@ Each choice carries a semantic `Label`, the real `Objects` involved (empty for a
 `Key`. A `CostPaymentChosenAnswer` returns that key exactly. Keys are decimal strings rather than JSON numbers, so
 large native ordinals are not rounded by JavaScript or narrowed by a client. The engine rejects malformed or unoffered
 keys. The prompt is asked again after each operation, with the still-legal choices; its first choice is the default.
+Simultaneous event order (protocol 236, CR 101.4c, 616.1): when one instruction's life changes and zone changes are
+replaced together (`Game::pay_life_with_permanents`: Cleansing) and a player has replacement choices to make for more
+than one of those events, the engine asks which event's choice they make next with a `ChooseReplacementPromptMessage`
+whose `OccurrenceOrder` is true. Its `Sources`, `SourceNames` and `Hints` name the events, not replacement effects: an
+object event's source is the object, or `ViewHandle.None` and "Hidden object N" where the seat may not look into its
+zone; a life event's source is `ViewHandle.None`, named for whose life total it is. The answer is a
+`CostPaymentChosenAnswer` whose `Key` is the event's zero-based index in decimal (not a `ReplacementChosenAnswer`,
+whose index is a byte); the first event is the default. The replacement for that event is then asked as usual.
