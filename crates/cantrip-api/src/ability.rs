@@ -1237,10 +1237,22 @@ impl ReplacementDef {
 
 /// A replacement effect a resolving spell or ability makes for a while (CR 611.2), about the object it was made for.
 pub const fn granted_replacement(kind: ReplacementKind, applies: GrantedApplies, apply: GrantedApply, hint: &'static str) -> GrantedReplacementDef {
-    GrantedReplacementDef { hint, kind, applies, apply, then: None, damage: None, optional: None, once: false, text: "" }
+    GrantedReplacementDef { hint, kind, applies, apply, captured: None, then: None, damage: None, optional: None, once: false, text: "" }
+}
+
+/// A lasting replacement whose callbacks receive the value captured in its effect kind (CR 611.2d).
+pub const fn captured_granted_replacement(kind: ReplacementKind, callbacks: &'static crate::replace::CapturedReplacementCallbacks, hint: &'static str) -> GrantedReplacementDef {
+    fn unused_applies(_: &dyn crate::Query, _: &crate::Asker, _: ObjectId, _: &crate::replace::Proposal) -> bool { unreachable!("capture callbacks required") }
+    fn unused_apply(_: &dyn crate::Query, _: &crate::Asker, _: ObjectId, _: &mut crate::replace::Proposal) { unreachable!("capture callbacks required") }
+    granted_replacement(kind, unused_applies, unused_apply, hint).captured(callbacks)
 }
 
 impl GrantedReplacementDef {
+    /// Use callbacks that receive the captured value from this particular effect.
+    const fn captured(self, callbacks: &'static crate::replace::CapturedReplacementCallbacks) -> GrantedReplacementDef {
+        GrantedReplacementDef { captured: Some(callbacks), ..self }
+    }
+
     /// The effect controller chooses whether to apply it (CR 614.1a).
     pub const fn optional(self, question: &'static Question) -> GrantedReplacementDef {
         GrantedReplacementDef { optional: Some(question), ..self }
@@ -1248,11 +1260,13 @@ impl GrantedReplacementDef {
 
     /// What the effect does to the game as it applies, besides reshaping the event.
     pub const fn then(self, then: GrantedThen) -> GrantedReplacementDef {
+        assert!(self.captured.is_none(), "use the captured callback group");
         GrantedReplacementDef { then: Some(then), ..self }
     }
 
     /// Adds damage components to this same damage event (CR 120.4b-d, 614.6).
     pub const fn with_damage(self, damage: GrantedDamage) -> GrantedReplacementDef {
+        assert!(self.captured.is_none(), "use the captured callback group");
         assert!(matches!(self.kind, ReplacementKind::Damage), "only a damage replacement adds damage components");
         GrantedReplacementDef { damage: Some(damage), ..self }
     }

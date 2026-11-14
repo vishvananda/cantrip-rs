@@ -1803,6 +1803,10 @@ pub enum EffectKind {
     /// The same, about a player or the game and not an object ("if a card would be put into your graveyard from
     /// anywhere this turn, exile it instead"): its `affected` object is only the source, and it outlives it.
     ReplacementRule { card: CardId, index: u8 },
+    /// A replacement about an object with a value fixed when it was created (CR 611.2d).
+    CapturedReplacement { card: CardId, index: u8, value: u32 },
+    /// A player or game replacement with a value fixed when it was created (CR 611.2d).
+    CapturedReplacementRule { card: CardId, index: u8, value: u32 },
     /// "You may play lands and cast spells from your graveyard" (CR 305.1, 601.3) for the effect's controller. About the
     /// player, and outlives its `affected` object, which is only the source.
     PlayFromGraveyard,
@@ -1905,6 +1909,7 @@ impl EffectKind {
                 | EffectKind::LifeTotalCantChange(_)
                 | EffectKind::CantCastSpellsFrom(..)
                 | EffectKind::ReplacementRule { .. }
+                | EffectKind::CapturedReplacementRule { .. }
                 | EffectKind::CreaturesAssignDamageByToughness
                 | EffectKind::PlayFromGraveyard
                 | EffectKind::PlayerManaAbility(_)

@@ -77,6 +77,7 @@ static ONCE_REDIRECT: CardDef = CardDef {
         kind: ReplacementKind::Damage,
         applies: to_other,
         apply: to_affected,
+        captured: None,
         then: None,
         damage: None,
         optional: None,

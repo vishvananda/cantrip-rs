@@ -412,6 +412,16 @@ pub type GrantedThen = fn(&mut dyn Game, &Asker, ObjectId, &Proposal, &Proposal)
 /// [`ReplacementDamage`] for an effect made about an object.
 pub type GrantedDamage = fn(&dyn Query, &Asker, ObjectId, &DamageEvent, &DamageEvent) -> Vec<DamageComponent>;
 
+/// Callbacks for a replacement whose value was fixed as its creating spell or ability resolved (CR 611.2d).
+/// The value is supplied from the particular effect, including during hypothetical evaluation.
+#[derive(Clone, Copy)]
+pub struct CapturedReplacementCallbacks {
+    pub applies: fn(&dyn Query, &Asker, ObjectId, u32, &Proposal) -> bool,
+    pub apply: fn(&dyn Query, &Asker, ObjectId, u32, &mut Proposal),
+    pub then: Option<fn(&mut dyn Game, &Asker, ObjectId, u32, &Proposal, &Proposal)>,
+    pub damage: Option<fn(&dyn Query, &Asker, ObjectId, u32, &DamageEvent, &DamageEvent) -> Vec<DamageComponent>>,
+}
+
 /// A replacement effect (CR 614) that a resolving spell or ability makes for a duration (CR 611.2), as opposed to a static
 /// ability's (`ReplacementDef`): it is not a card's standing ability, but a continuous effect that lasts, and it is
 /// about the object it was made for.
@@ -422,6 +432,8 @@ pub struct GrantedReplacementDef {
     pub kind: ReplacementKind,
     pub applies: GrantedApplies,
     pub apply: GrantedApply,
+    /// Capture-aware callbacks, used with a captured replacement effect.
+    pub captured: Option<&'static CapturedReplacementCallbacks>,
     /// Game operations the effect performs as it applies (see [`GrantedThen`]).
     pub then: Option<GrantedThen>,
     /// Additional components of a damage event; see [`ReplacementDamage`].

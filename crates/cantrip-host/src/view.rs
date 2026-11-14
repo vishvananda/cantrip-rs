@@ -1726,7 +1726,7 @@ impl<'a> Projector<'a> {
                     }
                     // A resolved replacement about this permanent remains relevant after its source leaves or changes.
                     // Use the creating card and captured words, just as the rules do, rather than its source's current text.
-                    EffectKind::Replacement { card, index } => {
+                    EffectKind::Replacement { card, index } | EffectKind::CapturedReplacement { card, index, .. } => {
                         let def = game.cards.get(card);
                         let Some(rule) = def.granted_replacements.get(index as usize) else { continue };
                         let text = if rule.text.is_empty() {

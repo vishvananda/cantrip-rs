@@ -1995,6 +1995,11 @@ is a new object the effect knows nothing of, and the effect is dropped with the 
 A lasting replacement effect names the card it is defined on (`EffectKind::Replacement { card, index }`, as `Prevention`
 does), the card of the spell or ability that made it (`item.ability.card`) or of the way: never read from its source as
 the source is later, which may have become a copy of something else, turned over or left (CR 707.2, 712.8).
+A replacement that needs a number fixed at resolution (CR 611.2d), such as Aladdin's Lamp or Taii Wakeen,
+stores it in `CapturedReplacement` or `CapturedReplacementRule` with that individual effect. Its
+`captured_granted_replacement` callbacks receive the value during applicability, reshaping, additional damage and
+continuation, including hypothetical evaluation. The effect is copied before a one-shot replacement is consumed;
+its value therefore survives consumption, nested replacements and journal replay without consulting its source.
 
 ### Alternative costs a permanent gives the spells a player casts
 

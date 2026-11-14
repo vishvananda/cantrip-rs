@@ -390,7 +390,7 @@ pub(crate) fn possible(cx: &Cx, subject: Option<ObjectId>) -> bool {
         return true;
     }
     // An effect a spell or ability made, which lasts (CR 611.2).
-    if cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::Replacement { .. } | EffectKind::ReplacementRule { .. } | EffectKind::Prevention { .. })) {
+    if cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::Replacement { .. } | EffectKind::ReplacementRule { .. } | EffectKind::CapturedReplacement { .. } | EffectKind::CapturedReplacementRule { .. } | EffectKind::Prevention { .. })) {
         return true;
     }
     let cards = cx.cards();
@@ -591,7 +591,8 @@ fn candidates_for(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Opti
     for e in &cx.s().effects {
         let (card, index, about_player) = match e.kind {
             EffectKind::Replacement { card, index } => (card, index, false),
-            EffectKind::ReplacementRule { card, index } => (card, index, true),
+            EffectKind::ReplacementRule { card, index } | EffectKind::CapturedReplacementRule { card, index, .. } => (card, index, true),
+            EffectKind::CapturedReplacement { card, index, .. } => (card, index, false),
             // A prevention effect a spell or ability made (CR 615.3): of damage to whom it names, if it names anyone, and of
             // the damage its definition describes. One about an object ends with it (CR 400.7).
             EffectKind::Prevention { card, index, to, .. } => {
@@ -623,17 +624,19 @@ fn candidates_for(cx: &Cx, proposal: &Proposal, applied: &[Applied], entry: Opti
         let asker = Asker { instance: None, source: e.source, controller: e.controller, by: None, spell: false };
         let reads = WithWords { q: cx, source: e.source, words: e.words };
         let Some(selected) = select((e.source, index, Origin::Granted(e.timestamp))) else { continue };
-        if (def.applies)(&reads, &asker, e.affected, &selected)
-            && valid_redirection(cx, &selected, |after| (def.apply)(&reads, &asker, e.affected, after))
+        if granted_applies(def, e, &reads, &asker, &selected)
+            && valid_redirection(cx, &selected, |after| granted_apply(def, e, &reads, &asker, after))
         {
             // An optional partial redirect cannot be offered when its destination has left (CR 614.9).
             // Preview only this combination; `apply_granted` checks the same components when applying it.
-            if let (Some(_), Some(damage), Proposal::Damage(before)) = (def.optional, def.damage, selected) {
+            if let (Some(_), Proposal::Damage(before)) = (def.optional, selected)
+                && (def.damage.is_some() || def.captured.is_some_and(|c| c.damage.is_some()))
+            {
                 let mut after = selected;
-                (def.apply)(&reads, &asker, e.affected, &mut after);
+                granted_apply(def, e, &reads, &asker, &mut after);
                 normalize_damage(&mut after);
                 if let Proposal::Damage(after) = after {
-                    let components = damage(&reads, &asker, e.affected, &before, &after);
+                    let components = granted_damage(def, e, &reads, &asker, &before, &after);
                     if !valid_damage_components(cx, &selected, &components) { continue; }
                 }
             }
@@ -770,11 +773,31 @@ fn commander_components(cx: &Cx, object: ObjectId) -> Vec<(ObjectId, bool)> {
     }
 }
 
+fn captured_value(e: &ContinuousEffect) -> u32 {
+    match e.kind {
+        EffectKind::CapturedReplacement { value, .. } | EffectKind::CapturedReplacementRule { value, .. } => value,
+        _ => panic!("capture-aware replacement requires a captured effect"),
+    }
+}
+
+fn granted_applies(def: &GrantedReplacementDef, e: &ContinuousEffect, q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
+    if let Some(c) = def.captured { (c.applies)(q, asker, e.affected, captured_value(e), proposal) }
+    else { (def.applies)(q, asker, e.affected, proposal) }
+}
+fn granted_apply(def: &GrantedReplacementDef, e: &ContinuousEffect, q: &dyn Query, asker: &Asker, proposal: &mut Proposal) {
+    if let Some(c) = def.captured { (c.apply)(q, asker, e.affected, captured_value(e), proposal) }
+    else { (def.apply)(q, asker, e.affected, proposal) }
+}
+fn granted_damage(def: &GrantedReplacementDef, e: &ContinuousEffect, q: &dyn Query, asker: &Asker, before: &DamageEvent, after: &DamageEvent) -> Vec<DamageComponent> {
+    if let Some(c) = def.captured { c.damage.map_or_else(Vec::new, |f| f(q, asker, e.affected, captured_value(e), before, after)) }
+    else { def.damage.map_or_else(Vec::new, |f| f(q, asker, e.affected, before, after)) }
+}
+
 /// The lasting replacement effect a spell or ability made (CR 611.2) that has this timestamp, with its definition: one of
 /// the `granted_replacements` of the card the effect names, whatever its source has become since.
 fn granted<'a>(cx: &'a Cx, timestamp: u32) -> Option<(&'a ContinuousEffect, &'static GrantedReplacementDef)> {
     let e = cx.s().effects.iter().find(|e| e.timestamp == timestamp)?;
-    let (EffectKind::Replacement { card, index } | EffectKind::ReplacementRule { card, index }) = e.kind else { return None };
+    let (EffectKind::Replacement { card, index } | EffectKind::ReplacementRule { card, index } | EffectKind::CapturedReplacement { card, index, .. } | EffectKind::CapturedReplacementRule { card, index, .. }) = e.kind else { return None };
     Some((e, &cx.cards().get(card).granted_replacements[index as usize]))
 }
 
@@ -1504,16 +1527,15 @@ fn apply_granted(
     use_up: bool,
     added: &mut Vec<DamageComponent>,
 ) -> bool {
-    let (apply, then) = (def.apply, def.then);
     let asker = Asker { instance: None, source, controller: e.controller, by: None, spell: false };
     let before = *proposal;
     let reads = WithWords { q: &*cx, source: e.source, words: e.words };
     let mut after = before;
-    apply(&reads, &asker, e.affected, &mut after);
+    granted_apply(def, &e, &reads, &asker, &mut after);
     normalize_damage(&mut after);
     if !valid_redirection(&*cx, &before, |p| *p = after) { return false; }
-    let components = if let (Some(damage), Proposal::Damage(before), Proposal::Damage(after)) = (def.damage, before, after) {
-        damage(&reads, &asker, e.affected, &before, &after)
+    let components = if let (Proposal::Damage(before), Proposal::Damage(after)) = (before, after) {
+        granted_damage(def, &e, &reads, &asker, &before, &after)
     } else { Vec::new() };
     if !valid_damage_components(&*cx, &before, &components) { return false; }
     *proposal = after;
@@ -1521,9 +1543,13 @@ fn apply_granted(
     note_counters_by(&before, proposal, e.controller);
     note_put_by(&before, proposal, e.controller);
     added.extend(components);
-    if let Some(then) = then {
+    if def.then.is_some() || def.captured.is_some_and(|c| c.then.is_some()) {
         let after = *proposal;
-        cx.effect_text(&e, |cx| run_then(cx, applied, e.source, e.controller, |cx| then(cx, &asker, e.affected, &before, &after)));
+        cx.effect_text(&e, |cx| run_then(cx, applied, e.source, e.controller, |cx| {
+            if let Some(c) = def.captured {
+                if let Some(then) = c.then { then(cx, &asker, e.affected, captured_value(&e), &before, &after); }
+            } else if let Some(then) = def.then { then(cx, &asker, e.affected, &before, &after); }
+        }));
     }
     true
 }
@@ -1641,7 +1667,7 @@ fn reshape(cx: &Cx, c: &Candidate, proposal: &mut Proposal) {
         Origin::Granted(timestamp) => {
             let Some((e, def)) = granted(cx, timestamp) else { return };
             let reads = WithWords { q: cx, source: e.source, words: e.words };
-            (def.apply)(&reads, &Asker { instance: None, source: c.source, controller: e.controller, by: None, spell: false }, e.affected, proposal);
+            granted_apply(def, e, &reads, &Asker { instance: None, source: c.source, controller: e.controller, by: None, spell: false }, proposal);
         }
         // No other kind of effect applies to the mana a permanent produces.
         _ => {}
@@ -1659,7 +1685,7 @@ pub(crate) fn mana_may_be_replaced(cx: &Cx) -> bool {
 pub(crate) fn mana_may_be_replaced_in(s: &GameState, cards: &CardTable) -> bool {
     s.battlefield().iter().any(|&id| cards.texts(s, s.obj(id)).any(|c| cards.mana_replaces[c.0 as usize]))
         || s.effects.iter().any(|e| match e.kind {
-            EffectKind::Replacement { card, index } | EffectKind::ReplacementRule { card, index } => {
+            EffectKind::Replacement { card, index } | EffectKind::ReplacementRule { card, index } | EffectKind::CapturedReplacement { card, index, .. } | EffectKind::CapturedReplacementRule { card, index, .. } => {
                 cards.get(card).granted_replacements[index as usize].kind == ReplacementKind::ManaProduction
             }
             _ => false,
@@ -1786,7 +1812,7 @@ pub(crate) fn combination_types(cx: &Cx, permanent: ObjectId, player: PlayerId, 
 pub(crate) fn damage_may_change(cx: &Cx) -> bool {
     let cards = cx.cards();
     cx.s().effects.iter().any(|e| match e.kind {
-        EffectKind::Replacement { card, index } | EffectKind::ReplacementRule { card, index } => {
+        EffectKind::Replacement { card, index } | EffectKind::ReplacementRule { card, index } | EffectKind::CapturedReplacement { card, index, .. } | EffectKind::CapturedReplacementRule { card, index, .. } => {
             cards.get(card).granted_replacements[index as usize].kind == ReplacementKind::Damage
         }
         _ => false,
@@ -2804,6 +2830,138 @@ mod tests {
         granted_replacements: &[granted_replacement(ReplacementKind::Draw, any_draw, skip_draw, "skip the next draw").optional(&SKIP).once()],
         ..CardDef::BLANK
     };
+    fn captured_applies(_: &dyn Query, _: &Asker, _: ObjectId, value: u32, p: &Proposal) -> bool {
+        value > 0 && matches!(p, Proposal::Draw(_))
+    }
+    fn captured_skip(q: &dyn Query, a: &Asker, object: ObjectId, _: u32, p: &mut Proposal) { skip_draw(q, a, object, p); }
+    fn captured_then(g: &mut dyn cantrip_api::Game, a: &Asker, _: ObjectId, value: u32, _: &Proposal, _: &Proposal) {
+        g.gain_life(a.controller, value as i32);
+    }
+    static CAPTURE_CALLBACKS: cantrip_api::CapturedReplacementCallbacks = cantrip_api::CapturedReplacementCallbacks {
+        applies: captured_applies, apply: captured_skip, then: Some(captured_then), damage: None,
+    };
+    static CAPTURE: CardDef = CardDef {
+        name: "Captured value probe", types: TypeSet::of(&[CardType::Enchantment]),
+        granted_replacements: &[cantrip_api::captured_granted_replacement(ReplacementKind::Draw, &CAPTURE_CALLBACKS, "gain captured life").once()],
+        ..CardDef::BLANK
+    };
+    #[test]
+    fn captured_effects_keep_independent_values_through_consumption_and_clone() {
+        for (choice, first, second) in [(0, 21, 24), (1, 23, 24)] {
+            let mut g = game(&[(&CAPTURE, Zone::BATTLEFIELD)], vec![Answer::Index(choice)]);
+            let source = g.state.battlefield()[0];
+            let card = g.cards.id_of(&CAPTURE);
+            let frame = g.state.agenda.len() - 1;
+            let mut cx = Cx { g: &mut g, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+            for value in [1, 3] {
+                cantrip_api::Game::add_player_effect(&mut cx, ME, source, EffectKind::CapturedReplacementRule { card, index: 0, value }, Duration::EndOfTurn);
+            }
+            let mut copied = g.clone();
+            let before = g.state.clone();
+            let mark = g.state.mark();
+            let log = g.log.len();
+            assert_eq!(draw(&mut g, 1).2, first);
+            let after = g.state.clone();
+            g.state.rollback(mark);
+            g.log.truncate(log);
+            assert!(g.state == before);
+            assert_eq!(draw(&mut g, 1).2, first);
+            assert!(g.state == after);
+            assert_eq!(draw(&mut copied, 1).2, first);
+            assert_eq!(draw(&mut g, 1).2, second);
+            assert_eq!(draw(&mut copied, 1).2, second);
+        }
+    }
+    fn captured_nested_then(g: &mut dyn cantrip_api::Game, a: &Asker, _: ObjectId, value: u32, _: &Proposal, _: &Proposal) {
+        g.gain_life(a.controller, value as i32);
+        g.draw(a.controller, 1);
+    }
+    static NESTED_CALLBACKS: cantrip_api::CapturedReplacementCallbacks = cantrip_api::CapturedReplacementCallbacks {
+        applies: captured_applies, apply: captured_skip, then: Some(captured_nested_then), damage: None,
+    };
+    static CAPTURE_NESTED: CardDef = CardDef {
+        name: "Nested captured value probe", types: TypeSet::of(&[CardType::Enchantment]),
+        granted_replacements: &[cantrip_api::captured_granted_replacement(ReplacementKind::Draw, &NESTED_CALLBACKS, "gain life and draw").once()],
+        ..CardDef::BLANK
+    };
+    #[test]
+    fn captured_once_effects_survive_source_departure_and_apply_to_nested_draw() {
+        for choice in [0, 1] {
+            let mut g = game(&[(&CAPTURE_NESTED, Zone::BATTLEFIELD)], vec![Answer::Index(choice)]);
+            let source = g.state.battlefield()[0];
+            let card = g.cards.id_of(&CAPTURE_NESTED);
+            let frame = g.state.agenda.len() - 1;
+            let mut cx = Cx { g: &mut g, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+            for value in [1, 3] {
+                cantrip_api::Game::add_player_effect(&mut cx, ME, source, EffectKind::CapturedReplacementRule { card, index: 0, value }, Duration::EndOfTurn);
+            }
+            cx.st().update_obj(source, |o| o.controller = PlayerId(1));
+            cantrip_api::Game::exile(&mut cx, source);
+            assert_eq!(draw(&mut g, 1), (8, 9, 24));
+            assert!(!g.state.effects.iter().any(|e| matches!(e.kind, EffectKind::CapturedReplacementRule { .. })));
+        }
+    }
+    fn captured_mana_applies(_: &dyn Query, _: &Asker, _: ObjectId, value: u32, p: &Proposal) -> bool {
+        value > 0 && matches!(p, Proposal::ManaProduction(_))
+    }
+    fn captured_mana_apply(_: &dyn Query, _: &Asker, _: ObjectId, value: u32, p: &mut Proposal) {
+        if let Proposal::ManaProduction(m) = p { m.mana.0[Mana::G as usize] = value; }
+    }
+    static MANA_CALLBACKS: cantrip_api::CapturedReplacementCallbacks = cantrip_api::CapturedReplacementCallbacks {
+        applies: captured_mana_applies, apply: captured_mana_apply, then: None, damage: None,
+    };
+    static CAPTURE_MANA: CardDef = CardDef {
+        name: "Captured mana probe", types: TypeSet::of(&[CardType::Enchantment]),
+        granted_replacements: &[cantrip_api::captured_granted_replacement(ReplacementKind::ManaProduction, &MANA_CALLBACKS, "captured mana")],
+        ..CardDef::BLANK
+    };
+    #[test]
+    fn captured_value_is_used_in_hypothetical_and_actual_mana() {
+        let mut g = game(&[(&CAPTURE_MANA, Zone::BATTLEFIELD)], vec![]);
+        let source = g.state.battlefield()[0];
+        let card = g.cards.id_of(&CAPTURE_MANA);
+        let frame = g.state.agenda.len() - 1;
+        let mut cx = Cx { g: &mut g, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+        cantrip_api::Game::add_player_effect(&mut cx, ME, source, EffectKind::CapturedReplacementRule { card, index: 0, value: 3 }, Duration::EndOfTurn);
+        let mut mana = ManaPool::default();
+        mana.0[Mana::G as usize] = 1;
+        let production = ManaProduction { permanent: source, player: ME, to: ME, mana, restriction: None, lasts: ManaLasts::Step };
+        let outcomes = mana_outcomes(&cx, production);
+        assert_eq!(outcomes.len(), 1);
+        assert_eq!(outcomes[0].mana.get(Mana::G), 3);
+        assert_eq!(mana_production(&mut cx, production).mana.get(Mana::G), 3);
+    }
+    fn captured_damage_applies(_: &dyn Query, _: &Asker, _: ObjectId, value: u32, p: &Proposal) -> bool {
+        matches!(p, Proposal::Damage(d) if d.target == Target::Player(ME) && d.amount > value)
+    }
+    fn captured_damage_apply(_: &dyn Query, _: &Asker, _: ObjectId, value: u32, p: &mut Proposal) {
+        if let Proposal::Damage(d) = p { d.amount -= value; }
+    }
+    fn captured_damage_components(_: &dyn Query, _: &Asker, _: ObjectId, value: u32, _: &DamageEvent, _: &DamageEvent) -> Vec<DamageComponent> {
+        vec![DamageComponent::Redirected { target: Target::Player(PlayerId(1)), amount: value }]
+    }
+    static DAMAGE_CALLBACKS: cantrip_api::CapturedReplacementCallbacks = cantrip_api::CapturedReplacementCallbacks {
+        applies: captured_damage_applies, apply: captured_damage_apply, then: None, damage: Some(captured_damage_components),
+    };
+    static CAPTURE_DAMAGE: CardDef = CardDef {
+        name: "Captured damage probe", types: TypeSet::of(&[CardType::Enchantment]),
+        granted_replacements: &[cantrip_api::captured_granted_replacement(ReplacementKind::Damage, &DAMAGE_CALLBACKS, "redirect captured damage").optional(&SKIP)],
+        ..CardDef::BLANK
+    };
+    #[test]
+    fn captured_damage_is_used_in_preview_and_application() {
+        let mut g = game(&[(&CAPTURE_DAMAGE, Zone::BATTLEFIELD)], vec![Answer::Yes]);
+        let source = g.state.battlefield()[0];
+        let card = g.cards.id_of(&CAPTURE_DAMAGE);
+        let frame = g.state.agenda.len() - 1;
+        let mut cx = Cx { g: &mut g, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), damage: None, asked_at: None, doer: None, producing: None };
+        cantrip_api::Game::add_player_effect(&mut cx, ME, source, EffectKind::CapturedReplacementRule { card, index: 0, value: 3 }, Duration::EndOfTurn);
+        let event = DamageEvent { source, target: Target::Player(ME), amount: 5, combat: false, heal_marked: false, shielded: None };
+        let parts = damage_event(&mut cx, &[event], &mut Vec::new(), &mut Vec::new());
+        assert!(cx.s().agenda[frame].pending.is_none());
+        assert!(parts.iter().any(|p| p.event.target == Target::Player(ME) && p.event.amount == 2));
+        assert!(parts.iter().any(|p| p.event.target == Target::Player(PlayerId(1)) && p.event.amount == 3));
+    }
     fn any_mana(_: &dyn Query, _: &Asker, _: ObjectId, p: &Proposal) -> bool {
         matches!(p, Proposal::ManaProduction(_))
     }
@@ -2886,7 +3044,7 @@ mod tests {
     /// library, and a frame whose run is given `answers`.
     fn game(cards: &[(&'static CardDef, Zone)], answers: Vec<Answer>) -> Game {
         let table: &'static CardTable =
-            Box::leak(Box::new(CardTable::new([&FILLER, &DOUBLER, &GAINER, &GRAVE_GAINER, &LIMITER, &DENIER, &PEACE, &LASTING_DENIER, &LASTING_ONCE, &LASTING_MANA, &PRINTED_DAMAGE, &LASTING_DAMAGE, &ONCE_DAMAGE, &LASTING_TOKENS])));
+            Box::leak(Box::new(CardTable::new([&FILLER, &DOUBLER, &GAINER, &GRAVE_GAINER, &LIMITER, &DENIER, &PEACE, &LASTING_DENIER, &LASTING_ONCE, &LASTING_MANA, &PRINTED_DAMAGE, &LASTING_DAMAGE, &ONCE_DAMAGE, &LASTING_TOKENS, &CAPTURE, &CAPTURE_NESTED, &CAPTURE_MANA, &CAPTURE_DAMAGE])));
         let deck: Vec<CardId> = std::iter::repeat_n(table.id_of(&FILLER), 17).collect();
         let mut game = Game::new(table, &crate::Setup { decks: vec![deck, Vec::new()], ..Default::default() });
         for &(def, to) in cards {
