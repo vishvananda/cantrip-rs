@@ -914,6 +914,28 @@ pub fn choose_color_for(g: &mut dyn Game, player: PlayerId, source: ObjectId, pu
     Ok(colors[0])
 }
 
+/// "The color or colors of your choice" (CR 105.1, 608.2d): one to five of the five colors, asked of `player` in one question.
+/// The options are `card`'s first five `labels`, in the order white, blue, black, red, green (color names that are options
+/// of the choice, not words of the card's rules text). Dream Coat and Shyft print it.
+pub fn choose_one_or_more_colors(g: &mut dyn Game, player: PlayerId, source: ObjectId, card: CardId) -> Result<ColorSet, Suspend> {
+    let Answer::Modes(picked) = g.ask(
+        player,
+        RequestKind::ChooseModes {
+            source,
+            modes: (0..5u8).map(|n| Label::Card(card, n)).collect(),
+            eligible: (0..5u8).collect(),
+            count: 1,
+            at_most: 5,
+            affordable: Vec::new(),
+            additional_cost: false,
+            repeat: false,
+        },
+    )? else {
+        unreachable!("the core answers a choice of modes with modes")
+    };
+    Ok(picked.into_iter().fold(ColorSet::NONE, |set, index| set.with(Color::ALL[usize::from(index)])))
+}
+
 /// "`count` mana in any combination of [colors]" (CR 106.1b): a color for each mana, among `choices`, repeats allowed,
 /// asked of `player` in one question. Manamorphose, Orcish Lumberjack, Relic of Sauron, Sunken Ruins, Vivi Ornitier,
 /// Coalition Relic, Wizard's Rockets, Desolation of Smaug and Sarkhan, Fireblood ask it.

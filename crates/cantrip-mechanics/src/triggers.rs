@@ -545,6 +545,19 @@ pub fn this_attacks_or_blocks(q: &dyn Query, source: ObjectId, event: &Event) ->
     }
 }
 
+/// "Whenever enchanted creature attacks or blocks" (CR 508.1m, 509.1, 603.2): the creature this Aura is attached to is declared
+/// as an attacker, or as a blocker. The creature is the trigger's subject, which "it" is. Imprison and Super Soldier Serum print it.
+pub fn enchanted_creature_attacks_or_blocks(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Attacks { attacker: creature, .. } | Event::Blocks { blocker: creature, declared: true, .. }
+            if q.attached_to(source) == Some(*creature) =>
+        {
+            Fired::about(Target::Object(*creature))
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever this creature blocks" (CR 509.1, 509.3a, 603.2): its own block, once however many attackers it blocks (the attacker
 /// it was declared to block), itself the subject. Chub Toad ("blocks or becomes blocked") and Goblin Snowman print it.
 pub fn this_blocks(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
@@ -2579,6 +2592,7 @@ fn put_into_your_graveyard_from_your_library(q: &dyn Query, source: ObjectId, ev
 }
 pub const MAGECRAFT: Trigger = when_asked(EventMask(EventMask::SPELL_CAST.0 | EventMask::COPIED.0), you_cast_or_copy_instant_or_sorcery);
 pub const THIS_ATTACKS_OR_BLOCKS: Trigger = when(EventMask(EventMask::ATTACKS.0 | EventMask::BLOCKS.0), this_attacks_or_blocks);
+pub const ENCHANTED_CREATURE_ATTACKS_OR_BLOCKS: Trigger = when(EventMask(EventMask::ATTACKS.0 | EventMask::BLOCKS.0), enchanted_creature_attacks_or_blocks);
 pub const A_SOURCE_DEALS_DAMAGE_TO_THIS: Trigger = when(EventMask::DAMAGE, a_source_deals_damage_to_this);
 pub const THIS_TAKES_DAMAGE: Trigger = when(EventMask::DAMAGE, this_takes_damage);
 pub const THIS_DEALT_DAMAGE: Trigger = THIS_TAKES_DAMAGE;
