@@ -1,0 +1,33 @@
+[package]
+name = "cantrip-codegen-source-tests"
+version = "0.1.0"
+edition = "2021"
+publish = false
+[workspace]
+[lib]
+name = "mtgish_ast"
+[features]
+default = ["cantrip"]
+cantrip = []
+[dependencies]
+cantrip-oracle-codegen = { path = ".." }
+mtgish-source = { package = "mtgish-ast", git = "https://github.com/vishvananda/mtgish.git", rev = "a4ca676381065d25b35e865b1d18aecbae0e78d8" }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order", "unbounded_depth"] }
+ron = "0.8.1"
+bincode = "=2.0.1"
+syn = { version = "2", features = ["full", "visit", "visit-mut"] }
+quote = "1"
+proc-macro2 = "1"
+[profile.dev]
+debug = 0
+[profile.dev.package."*"]
+opt-level = 2
+
+# These formerly were workspace packages; keep their cheap edit/build profile.
+[profile.dev.package.rust_syntax]
+opt-level = 0
+[profile.dev.package.mtgish-ast]
+opt-level = 0
+[profile.dev.package.cantrip-oracle-codegen]
+opt-level = 0

@@ -2,6 +2,7 @@
 # one card does not rebuild the engine. Card crates depend on cantrip-api alone: the compiler is the boundary.
 [workspace]
 resolver = "3"
+exclude = ["tools/oracle-codegen"]
 members = [
     "crates/cantrip-state",
     "crates/cantrip-api",
