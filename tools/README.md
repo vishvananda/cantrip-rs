@@ -93,3 +93,17 @@ Each drafts, builds a deck from what was taken, and plays the games. Events are 
   `bot-duel.cmd`, `bot-train.cmd` and `bot-draft.cmd`.
 - `ai/` - the AI player's Python side (setting it up on CUDA, ROCm or the CPU, and running training: `docs/ai-training.md`): `shards.py` reads the training shards `cantrip-native-host --ai-record DIR` writes, and with `--check` checks every sample's chosen option is legal. `python -m cantrip_ai.train` trains a network on them and `python -m cantrip_ai.export` writes it as the ONNX model directory `cantrip_ai::eval` loads (`ai/cantrip_ai/__init__.py`). `--data DIR:WEIGHT` mixes several directories (self-play's visit targets with soft cross-entropy), and `--init CHECKPOINT` fine-tunes. `python -m cantrip_ai.generation --root ../ai-data --generation N` runs one generation of expert iteration end to end. Its stages are build, `cantrip-selfplay`, train, export, parity, the SPRT gate against `champions/current`, promote and retire. Each stage is logged to `genN/logs/`, and the generation's times and numbers to `genN/README.md`. `--dry-run` prints the commands, `--tiny` runs a generation at toy scale, a rerun resumes after the last stage done, and `--retrain REASON` runs a rejected generation again from its training (its self-play kept, the earlier attempt recorded under `attempts` and `genN/logs/attemptK/`). `python -m cantrip_ai.retention --root ../ai-data --keep 8` deletes the shards and models of all but the last eight generations, except gen0 and those with a `PINNED` file or `--pin` (docs/ai-player-plan.md, Phase 4). `cantrip-selfplay` (`crates/cantrip-ai-host`) is the self-play binary (`docs/ai-host.md`).
 - `dotnet\tools\Cantrip.WebHost` - serves the Release client for `play-release-build.cmd`.
+
+
+## Oracle IR tooling
+
+[oracle-codegen](oracle-codegen/README.md) is the standalone published-AST →
+Cantrip generator and capability survey. [card-lane](card-lane/SETUP.md) contains
+the implementation/review/verification pipeline, dashboard, accounting and cache
+cleanup. Both moved from the MTGish fork; runtime campaign state stays outside
+Git. Generator inputs are versioned IR exports, so normal engine and tooling
+builds do not require a Source parser or a local MTGish checkout.
+
+These extracted Python tools, card-lane scripts and templates retain the original
+MTGish MIT license in [ORACLE-TOOLING-LICENSE](ORACLE-TOOLING-LICENSE). The generator
+and card-lane directories also include their own copy of that notice.

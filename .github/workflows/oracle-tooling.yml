@@ -1,0 +1,47 @@
+name: Oracle IR tooling
+on:
+  push:
+    paths: ['tools/oracle-codegen/**', 'tools/card-lane/**', 'tools/*.py', '.claude/skills/card-lane/**', '.github/workflows/oracle-tooling.yml']
+  pull_request:
+    paths: ['tools/oracle-codegen/**', 'tools/card-lane/**', 'tools/*.py', '.github/workflows/oracle-tooling.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  tooling:
+    runs-on: ubuntu-latest
+    env:
+      RUST_MIN_STACK: 67108864
+      CARGO_BUILD_JOBS: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: tools/oracle-codegen
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: cargo test --locked --manifest-path tools/oracle-codegen/Cargo.toml
+      - run: python3 -m unittest discover -s tools/card-lane
+      - run: python3 -m unittest discover -s tools -p 'test_*.py'
+  source-contract:
+    runs-on: ubuntu-latest
+    env:
+      RUST_MIN_STACK: 67108864
+      CARGO_BUILD_JOBS: 4
+      MTGISH_THREADS: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: vishvananda/mtgish
+          ref: a4ca676381065d25b35e865b1d18aecbae0e78d8
+          path: fixtures/mtgish
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: tools/oracle-codegen/source-tests
+      - run: cargo test --locked --manifest-path tools/oracle-codegen/source-tests/Cargo.toml
+        env:
+          MTGISH_SOURCE_ROOT: ${{ github.workspace }}/fixtures/mtgish
