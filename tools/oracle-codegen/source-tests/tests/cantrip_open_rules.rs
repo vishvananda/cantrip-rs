@@ -67,7 +67,7 @@ const CARDS: &[(&str, &str, bool)] = &[
     ("War Tax", "rule: LastingRuleKind::ObjectRule(0)", false),
     ("War Tax", "lasting_object_rules: LastingObjectRule {", false),
     // ... and one of no test is the effect each permanent of the set has.
-    ("Runesword", "LastingRuleKind::Effect(", false),
+    ("Runesword", "LastingRuleKind::CantBeRegenerated", false),
 ];
 
 /// The cards whose whole file is one Cantrip's PR commits, as it commits it.
@@ -187,7 +187,7 @@ fn without_lasting_rules_the_same_code_is_in_holes() {
     // its table and its call stay holes.
     // The current native vocabulary also supports CantAttack. Its cards above
     // exercise both the enabled form and the legacy feature-disabled holes.
-    for name in ["Alluring Scent", "Taunt", "Legion Loyalist", "War Tax", "Runesword", "Jace, Arcane Strategist", "Reverse the Polarity"] {
+    for name in ["Alluring Scent", "Taunt", "Legion Loyalist", "War Tax", "Jace, Arcane Strategist", "Reverse the Polarity"] {
         let module = &whole[name];
         assert!(!module.contains("add_open_effect"), "{name}:\n{module}");
         assert!(module.contains("=> g.add_lasting_rule(item, 0, about_0, until_0);)"), "{name}:\n{module}");

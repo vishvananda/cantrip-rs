@@ -1874,9 +1874,12 @@ impl Compiler {
             .and_then(|subject| subject.borrow().clone());
         let mut effect = kind;
         if subject.is_some() {
+            let to = if planned::switched_on("explicit-redirection-destinations") {
+                "let _ = to; g.add_effect(item.object, about, EffectKind::ReplacementRule {"
+            } else { "let _ = to; g.add_effect(item.object, about, EffectKind::Replacement {" };
             effect = effect.replace(
                 "let _ = (to, about); g.add_player_effect(item.controller, item.object, EffectKind::ReplacementRule {",
-                "let _ = to; g.add_effect(item.object, about, EffectKind::Replacement {",
+                to,
             );
         }
         // An effect keeps one object: what it is about, or what it reads.
@@ -2185,7 +2188,8 @@ impl Compiler {
                     writeln!(self.functions, "#[allow(unused_variables)] fn produces_{id}_apply(q: &dyn Query, asker: &Asker, affected: ObjectId, proposal: &mut Proposal) {{ if let Proposal::ManaProduction(m) = proposal {{ let n = std::mem::take(&mut m.mana.0[Mana::{color} as usize]); m.mana.0[Mana::{instead} as usize] += n; }} }}").unwrap();
                     self.add_made_replacement(format!("granted_replacement(ReplacementKind::ManaProduction, produces_{id}_applies, produces_{id}_apply, \"produces another type of mana instead\")"));
                     let index = self.made_replacements.len() - 1;
-                    writeln!(out, "if let Some(object) = {object} {{ g.add_effect(item.object, object, EffectKind::Replacement {{ card: item.ability.card, index: {index} }}, Duration::Indefinite); }}").unwrap();
+                    let kind = if planned::switched_on("explicit-redirection-destinations") { "ReplacementRule" } else { "Replacement" };
+                    writeln!(out, "if let Some(object) = {object} {{ g.add_effect(item.object, object, EffectKind::{kind} {{ card: item.ability.card, index: {index} }}, Duration::Indefinite); }}").unwrap();
                     return Ok(true);
                 }
                 let until = self.stated_until(duration)?;

@@ -219,6 +219,40 @@ const KEEPS_NO_LIST: &str = "engine: a delayed ability on an event keeps no list
 
 /// A reflexive ability about a list of objects: Cantrip's carries one target.
 const REFLEXIVE_LIST: &str = "reflexive ability about a list of objects";
+
+/// CR 400.7e: an instruction moving the creature watched dying finds the card
+/// that death produced, not its obsolete battlefield identity. Other reads
+/// still see the old event subject; never follow a later move of that card.
+fn follow_departed_move(event: &EventSpec, body: &Program) -> Option<Program> {
+    let EventSpec::ZoneChange {
+        objects: ObjectFilter::SameObject(watched), from: Some(EventZone::Battlefield),
+        to: EventZone::Graveyard,
+    } = event else { return None };
+    use crate::visit::{VisitorMut, WalkMut};
+    struct Follow<'a> { watched: &'a ObjectRef, changed: bool }
+    impl VisitorMut for Follow<'_> {
+        fn ability(&mut self, _: &mut Ability) -> bool { false }
+        fn operation(&mut self, operation: &mut Operation) -> bool {
+            match operation {
+                Operation::CreateTrigger { .. } | Operation::CreateDelayedTrigger { .. }
+                    | Operation::CreateReplacement { .. } | Operation::ReflexiveTrigger { .. }
+                    | Operation::WithReflexive { .. } => false,
+                Operation::Move { objects: ObjectSet::One(object), .. }
+                    if format!("{object:?}") == format!("{:?}", self.watched) =>
+                {
+                    *object = ObjectRef::EventDestination;
+                    self.changed = true;
+                    false
+                }
+                _ => true,
+            }
+        }
+    }
+    let mut followed = body.clone();
+    let mut follow = Follow { watched, changed: false };
+    followed.walk_mut(&mut follow);
+    follow.changed.then_some(followed)
+}
 pub(super) const ABOUT: &str = "fn about(q: &dyn Query, item: &StackItem, part: usize) -> Vec<ObjectId> { assert_eq!(part, 0, \"one real-object list\"); q.event_objects(item).to_vec() }\n";
 
 impl Compiler {
@@ -1102,7 +1136,9 @@ impl Compiler {
         };
         let original_event_reads_source = reads_creator(event);
         let watched_is_subject = watched_is_event_subject(event) || source_is_event_subject(event);
+        let followed = follow_departed_move(event, body);
         let (event, source, each) = self.watching_source(event, body)?;
+        let body = followed.as_ref().unwrap_or(body);
         let (maker, _, _) = self.maker();
         let separate = source != format!("Some({maker})");
         if separate && original_event_reads_source {

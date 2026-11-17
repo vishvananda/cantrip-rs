@@ -436,3 +436,59 @@ fn spell_x_receipts_do_not_claim_snow_provenance_or_repeatable_activation_identi
     } }];
     assert!(cantrip::gaps(&delayed).iter().any(|gap|gap.feature=="numeric expression ManaOf"));
 }
+
+#[test]
+fn paid_damage_prevention_is_a_native_shield_and_keeps_the_original_damage_amount() {
+    use cantrip_oracle_codegen::ir::*;
+    for name in ["Errant Minion", "Power Leak"] {
+        let face = native_face(name);
+        let generated = cantrip::module(&face).unwrap();
+        assert!(generated.contains("g.damage_preventing("));
+        assert!(generated.contains("cantrip_mechanics::prevention::DAMAGE_DEALT_BY"));
+        assert!(generated.contains("g.may_pay_times("));
+        assert!(!generated.contains("g.may_pay_x("), "this payment has no X cost");
+        assert!(!generated.contains("damage::partly_prevented"));
+        assert!(cantrip::planned::without_features(&["damage-with-prevention"], || cantrip::module(&face)).is_err());
+        assert!(cantrip::planned::without_features(&["repeated-mana-payments"], || cantrip::module(&face)).is_err());
+    }
+    let mut face = native_face("Errant Minion");
+    let Ability::Triggered { body, .. } = &mut face.abilities[1] else { panic!() };
+    let Instruction::Effect { operation: Operation::DealDamageWith { recipients, .. }, .. } = &mut body.instructions[1] else { panic!() };
+    *recipients = Recipients::Players(PlayerSet::All);
+    assert!(cantrip::gaps(&face).iter().any(|gap|gap.feature=="partly prevented damage to multiple recipients"));
+}
+
+#[test]
+fn regeneration_bans_remain_open_sets_and_scoped_replacements_use_the_native_variant() {
+    let face = native_face("Runesword");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("LastingRuleKind::CantBeRegenerated"));
+    assert!(generated.contains("EffectKind::ReplacementRule {"));
+    assert!(!generated.contains("EffectKind::Replacement {"));
+    assert!(cantrip::planned::without_features(&["lasting-rules"], || cantrip::module(&face)).is_err());
+    let legacy = cantrip::planned::without_features(&["explicit-redirection-destinations"], || cantrip::module(&face)).unwrap();
+    assert!(legacy.contains("EffectKind::Replacement {"));
+}
+
+#[test]
+fn the_legacy_named_damage_rule_keeps_both_prevention_and_redirection_prohibitions() {
+    let mut face = native_face("Whippoorwill");
+    face.name = "Another bird".into();
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("LastingRuleKind::DamageCantBePrevented"));
+    assert!(generated.contains("LastingRuleKind::DamageCantBeRedirected"));
+    assert!(generated.contains("EffectKind::CantBeRegenerated") || generated.contains("LastingRuleKind::CantBeRegenerated"));
+    assert!(generated.contains("let data = [new.0, u32::MAX]"));
+    assert!(generated.contains("Some(ObjectId(item.data[0]))"), "move the card produced by the death event");
+    assert!(cantrip::planned::without_features(&["lasting-rules"], || cantrip::module(&face)).is_err());
+}
+
+#[test]
+fn every_native_interface_fixture_generates_a_real_card_definition() {
+    let records = corpus::read_cards(&std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("tests/fixtures/native_interface_records.jsonl")).unwrap();
+    for face in records.into_iter().flat_map(|record|record.card.faces) {
+        let generated = cantrip::module(&face).unwrap_or_else(|error|panic!("{}: {error:?}",face.name));
+        assert!(generated.contains("pub static CARD: CardDef ="), "{}", face.name);
+    }
+}

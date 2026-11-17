@@ -3,6 +3,7 @@
 import argparse
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -47,6 +48,8 @@ def main():
         modules = ['#![allow(dead_code,unused_imports,unused_variables,unused_mut)]']
         for index, name in enumerate(names):
             generated = subprocess.check_output([str(generator), "module", str(records), name], text=True)
+            if not re.search(r"^pub static CARD:\s*CardDef\s*=", generated, re.MULTILINE):
+                raise RuntimeError(f"{name}: generator did not produce a card definition:\n{generated}")
             (project / "src" / f"card_{index}.rs").write_text(generated)
             modules.append(f'pub mod card_{index};')
         (project / "src/lib.rs").write_text("\n".join(modules) + "\n")

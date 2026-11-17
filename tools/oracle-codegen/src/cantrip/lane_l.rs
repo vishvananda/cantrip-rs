@@ -1297,7 +1297,10 @@ impl Compiler {
             PaidResource::Energy => format!("let mut paid = 0i64; while g.state().player(player).energy() > 0 && {M}::effects::ask_may(g, player, asker.source, Purpose::Optional)? {{ g.change_energy(player, -1); paid += 1; }} paid"),
             PaidResource::Mana => {
                 self.helpers.insert("pay_question");
-                "i64::from(g.may_pay_x(player, asker.source, asker.source, cost(\"{X}\"), &PAY_QUESTION)?.unwrap_or(0))".to_string()
+                if !planned::switched_on("repeated-mana-payments") {
+                    return Err(gap("pay any amount of mana without an X cost"));
+                }
+                "i64::from(g.may_pay_times(player, asker.source, asker.source, mana(\"{1}\"), ANY_NUMBER_OF_TIMES, &PAY_QUESTION)?)".to_string()
             }
             // `life` holds a byte: no one payment passes 255 life.
             PaidResource::Life => {
@@ -1783,7 +1786,20 @@ impl Compiler {
                     DamageRider::Prevented(prevented) => {
                         let prevented =
                             self.fetch(self.number(prevented)?.quantity(Quantity::Prevention)?);
-                        self.plan_code(&feature, &format!("if let Some(source) = {source} {{ {M}::damage::partly_prevented(g, source, &{targets}, {amount}, {prevented}); }}"), out);
+                        if planned::switched_on("damage-with-prevention") && self.stack_item {
+                            if !matches!(recipients, Recipients::Players(PlayerSet::One(_)) | Recipients::Objects(ObjectSet::One(_))) {
+                                return Err(gap("partly prevented damage to multiple recipients"));
+                            }
+                            if lane_n::read_as_objects(&self.after, result) || lane_n::read_as_damaged(&self.after, result) {
+                                return Err(gap("object receipts for partly prevented damage"));
+                            }
+                            let index = u8::try_from(self.made_preventions.len()).map_err(|_| gap("more than 256 granted preventions"))?;
+                            self.made_preventions.push("cantrip_mechanics::prevention::DAMAGE_DEALT_BY".into());
+                            writeln!(out, "let source_{id} = {source}; let targets_{id} = {targets}; let amount_{id} = {amount}; let prevented_{id} = {prevented}; let mut done_{id}: i64 = 0; if let (Some(source), Some(&target)) = (source_{id}, targets_{id}.first()) {{ done_{id} = i64::from(g.damage_preventing(source, target, amount_{id}, prevented_{id}, item.ability.card, {index})); }}").unwrap();
+                            self.report_quantity(result.0, format!("done_{id}"), Quantity::Damage);
+                        } else {
+                            self.plan_code(&feature, &format!("if let Some(source) = {source} {{ {M}::damage::partly_prevented(g, source, &{targets}, {amount}, {prevented}); }}"), out);
+                        }
                     }
                     DamageRider::DividedBy(player) => {
                         let player = self.fetch(self.certain_player(player)?);

@@ -16,7 +16,7 @@ fn rows(features: &[&str], tag: &str) -> BTreeMap<String, serde_json::Value> {
 #[test]
 fn regeneration_prohibitions_are_held_on_old_targets_and_use_native_rules_when_available() {
     let old = rows(&[], "old");
-    let new = rows(&["regeneration-bans", "next-turn-delayed"], "new");
+    let new = rows(&["regeneration-bans", "next-turn-delayed", "lasting-rules"], "new");
     for name in ["Clergy of the Holy Nimbus", "Disintegrate", "Gravebind", "Hurr Jackal", "Incinerate",
         "Lim-Dûl's Cohort", "Orcish Healer", "Whippoorwill"] {
         assert!(old[name]["faces"][0]["gaps"].as_array().unwrap().iter()
@@ -24,10 +24,14 @@ fn regeneration_prohibitions_are_held_on_old_targets_and_use_native_rules_when_a
         let gaps = new[name]["faces"][0]["gaps"].as_array().unwrap();
         assert!(!gaps.iter().any(|gap| gap["feature"].as_str().unwrap().contains("Prohibit Regenerate")), "{name}: {gaps:?}");
         let code = new[name]["faces"][0]["rust"].as_str().unwrap();
-        assert!(code.contains("EffectKind::CantBeRegenerated"), "{name}: {code}");
+        assert!(code.contains(if name == "Whippoorwill" { "LastingRuleKind::CantBeRegenerated" } else { "EffectKind::CantBeRegenerated" }), "{name}: {code}");
         match name {
             "Clergy of the Holy Nimbus" => assert!(gaps.iter().any(|gap| gap["feature"] == "engine: no activation by other players")),
-            "Whippoorwill" => assert!(gaps.iter().any(|gap| gap["feature"] == "continuous rule Unique")),
+            "Whippoorwill" => {
+                assert!(!gaps.iter().any(|gap| gap["feature"] == "continuous rule Unique"));
+                assert!(code.contains("LastingRuleKind::DamageCantBePrevented"));
+                assert!(code.contains("LastingRuleKind::DamageCantBeRedirected"));
+            }
             _ => assert!(gaps.is_empty(), "{name}: {}", new[name]),
         }
     }

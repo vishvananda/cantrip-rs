@@ -8,7 +8,7 @@
   "frozen_oracle_sha256": "2281f3d715e8ee6127825154b31202918ef83a9d9a3641a0d23b0163ebea3065",
   "source_ron_sha256": "7c1f493906004497a6682071481ddabf1ce15e9efc63834a904554ffd35a14a7",
   "backlog_records_sha256": "4baa58c98b4bff1e017a7c99ddacf1fd4a85dfed77467a05c9b8154a71735e91",
-  "tracked_rows_sha256": "b49bea80093b0fb89ef611a5a02c5180561e63185a7086b01e50d11d52ff45c7",
+  "tracked_rows_sha256": "75c17d6c5590ce02e75ba800466babf6ccefcb33cbff8ea129c96c76689634cb",
   "native_api_sha256": "235fbb1780747dbaa038447d8463320b09a1ba299857305ab5d5ca9e03af3952",
   "counts": {
     "landed_upstream": 43,
@@ -17,14 +17,14 @@
   },
   "validation": {
     "native_full_suite": "Engine baseline 5441ecd742: bash tools/test.sh passed; 27,853 Rust tests (15 ignored), managed tests and client build. Later fork-main host/client/test commits do not change the audited API.",
-    "generator": "95 Rust tests pass, including block taxes, restricted retargeting, actual spell-X receipts, and simultaneous untap replacements. Unsupported activation/delayed/snow receipt layouts stay explicit gaps.",
+    "generator": "99 Rust tests pass. Every native fixture is additionally required to generate a complete module; no unsupported diagnostic comments count as compilable cards.",
     "pipeline_python": "437 tests passed",
     "tooling_python": "52 tests passed",
     "mtgish": "1,596 Rust tests passed; 33,529 exported records, zero lowering diagnostics",
     "library_of_leng": "Generated module compiles as a standalone Rust library against the checked-profile current cantrip-api. Card registration and runtime scenarios are not implemented by this audit.",
     "latest_refresh": "Upstream advanced during the audit: rebased from 90204df367 to 5441ecd742. New original-draw receipts, nest counters and unrelated cards do not change the 43/1/13 result.",
-    "source_integration": "Full preceding-batch no-fail-fast sweep: 606 passed, 12 ignored, one stale Alabaster Leech gap expectation failed. Corrected that expectation; all 46 tests in five affected Source targets now pass (1 ignored), including Tangle\u2019s exact generated-file snapshot.",
-    "native_api_check": "24 generated examples type-check against the native API/mechanics. Latest additions: Hipparion, Reflecting Mirror, Soul Burn and Freyalise\u2019s Winds."
+    "source_integration": "Full preceding sweep: 606 passed, 12 ignored, one stale Alabaster expectation subsequently fixed. Last focused sweeps: 46 tests for batch four and 28 tests for batch five pass, each with one ignored; include exact snapshots, legacy profiles and delayed watched-source coverage.",
+    "native_api_check": "28 real generated card modules type-check against native API/mechanics. The smoke checker rejects missing CARD definitions; unsupported Word of Command was manually confirmed to fail before compilation."
   },
   "cards": [
     {
@@ -215,13 +215,7 @@
       "module": "crates/cantrip-cards/src/cards/errant_minion.rs",
       "data": "content/mtg/cards/errant-minion.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "abilities[1].instructions[1]",
-          "feature": "operation DealDamageWith",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "fb229e7956c26598aa867a86e81f47e776a303a6",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Errant Minion"
@@ -691,13 +685,7 @@
       "module": "crates/cantrip-cards/src/cards/power_leak.rs",
       "data": "content/mtg/cards/power-leak.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "abilities[1].instructions[1]",
-          "feature": "operation DealDamageWith",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "fc026611e70e27332218c7d3380a165ed4946539",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Power Leak"
@@ -804,13 +792,7 @@
       "module": "crates/cantrip-cards/src/cards/runesword.rs",
       "data": "content/mtg/cards/runesword.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "abilities[0].instructions[2]",
-          "feature": "engine: no resolving rule on an open set: Prohibit Regenerate",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "f4c6d0899518fb326e878ffc002b67b7ea1c5441",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Runesword"
@@ -964,13 +946,7 @@
       "module": "crates/cantrip-cards/src/cards/whippoorwill.rs",
       "data": "content/mtg/cards/whippoorwill.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "",
-          "feature": "continuous rule Unique",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "0d7e8ef853ed0485d3e531793a8e98017c67dbcb",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Whippoorwill"
@@ -1010,8 +986,8 @@
   "fork_main_commit": "9889dd28f90c484fde557fa25cf30beb2b45621d",
   "authorship_note": "All 43 original card-addition commits are authored by jschibel. This does not attribute all shared foundation/engine work to that author.",
   "generator_counts": {
-    "landed_and_generated": 15,
-    "landed_needing_adapters": 28,
+    "landed_and_generated": 19,
+    "landed_needing_adapters": 24,
     "unimplemented_but_generated": 1
   }
 }

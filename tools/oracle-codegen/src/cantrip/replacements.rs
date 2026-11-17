@@ -1367,7 +1367,9 @@ impl Compiler {
         let made = if shield.is_some() {
             lane_n::shielded_redirect(index)
         } else if about {
-            let kind = if self.capture_made_x { "CapturedReplacement" } else { "Replacement" };
+            let kind = if self.capture_made_x { "CapturedReplacement" }
+                else if planned::switched_on("explicit-redirection-destinations") { "ReplacementRule" }
+                else { "Replacement" };
             let value = if self.capture_made_x { ", value: created_x" } else { "" };
             format!("let _ = to; g.add_effect(item.object, about, EffectKind::{kind} {{ card: item.ability.card, index: {index}{value} }}, DURATION);")
         } else {

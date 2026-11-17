@@ -158,3 +158,28 @@ Library of Leng. **95 generator tests** and **24 native interface examples** pas
 The preceding full Source sweep had 606 passes, 12 ignored and one stale Alabaster
 Leech expectation; that is fixed and all 46 tests in the five affected targets
 pass (one ignored). Tangle’s exact snapshot also passes with the new defaults.
+
+## Damage shields and scoped replacements
+
+Errant Minion and Power Leak use the native damage-with-prevention interface;
+prevention remains a shield, not subtraction from the damage amount. An arbitrary
+mana payment uses repeated {1} payments, not an {X} cost, preserving restrictions
+on mana that can pay only an X cost. Runesword uses the native regeneration ban
+on an open set. Scoped non-redirection replacements now use `ReplacementRule`,
+separate from redirections with explicit `to` and `into` fields.
+
+Whippoorwill’s legacy named rule represents both prevention and redirection bans:
+its Source is `DamageDealtToItCantBePreventedOrRedirected`. Both native lasting
+rules are emitted. A move of the watched dying creature follows the actual card
+produced by that death through `EventDestination`; reads of the old event subject
+are unchanged, and the effect never chases later zone moves. The adapter rewrite
+is limited to known battlefield-to-graveyard watches and stops at nested future
+abilities. No Source, reference or owned schema was changed.
+
+The original 43 are now **19 cleanly generated / 24 awaiting adapters**, plus
+Library of Leng. **99 generator tests**, including generation of every native
+fixture, pass. **28 actual modules** compile against the native API. The checker
+previously accepted diagnostic-only comments as empty modules; it now rejects
+those, and a deliberately unsupported Word of Command record verifies failure.
+The current 28 fixtures all pass the strict check. All 28 focused Source tests
+pass (one ignored), including delayed source/subject and legacy rule profiles.

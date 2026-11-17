@@ -39,6 +39,9 @@ const LANDED: &[&str] = &[
 /// holes. `tools/update_cantrip_vocabulary.py` reads this table to write
 /// `FEATURES`: keep each entry on one line, its name a literal.
 const SWITCHED: &[(&str, &str, &[&str])] = &[
+    ("repeated-mana-payments", "fn may_pay_times(&mut self, payer: PlayerId", &[]),
+    ("explicit-redirection-destinations", "Replacement { card: CardId, index: u8, to: Target, into: Target }", &[]),
+    ("damage-with-prevention", "fn damage_preventing(&mut self, source: ObjectId, target: Target, amount: u32, prevent: u32, card: CardId, index: u8)", &[]),
     ("untap-replacement-proposals", "pub untap_step: Option<PlayerId>", &[]),
     ("mana-block-costs", "pub block_costs: &'static [BlockCostRule]", &[]),
     ("restricted-retargeting", "fn change_target_where(", &[]),

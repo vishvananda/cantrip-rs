@@ -4714,6 +4714,18 @@ impl Compiler {
         let EffectSubjects::Objects(affected) = affected else {
             return Err(gap("continuous effect on players"));
         };
+        if changes.iter().any(|change| matches!(change,
+            Change::Rule(RuleChange::Unique(UniqueObjectRule::DamageToItUnpreventable))))
+        {
+            let objects = match affected {
+                ObjectSet::One(object) => ObjectSet::Zone {
+                    scope: ZoneScope::Shared(EventZone::Battlefield), kind: ObjectKind::Permanent,
+                    filter: ObjectFilter::SameObject(object.clone()),
+                },
+                _ => affected.clone(),
+            };
+            if self.lasting_rules(&objects, changes, duration, out)? { return Ok(()); }
+        }
         if matches!(source, ObjectRef::Source)
             && matches!(affected, ObjectSet::One(_))
             && matches!(changes, [Change::Rule(RuleChange::RequireCombat {

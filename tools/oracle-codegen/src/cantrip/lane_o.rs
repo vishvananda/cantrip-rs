@@ -616,6 +616,15 @@ impl Compiler {
         // (the kind's code, its requirement, whether #897 has it, its words)
         let mut kinds: Vec<(String, String, bool, &str)> = Vec::new();
         for change in changes {
+            // This legacy named rule means both prohibitions: its Source is
+            // DamageDealtToItCantBePreventedOrRedirected, not prevention alone.
+            if matches!(change, Change::Rule(RuleChange::Unique(UniqueObjectRule::DamageToItUnpreventable))) {
+                for kind in ["DamageCantBePrevented", "DamageCantBeRedirected"] {
+                    let present = crate::cantrip_vocab::LASTING_RULE_KINDS.contains(&kind);
+                    kinds.push((format!("LastingRuleKind::{kind}"), open_set_feature(change), !present, kind));
+                }
+                continue;
+            }
             if let Change::Rule(RuleChange::BlockCapacity(capacity)) = change {
                 let value = match capacity {
                     BlockCapacity::Additional(Expr::Constant(n))
@@ -5082,6 +5091,7 @@ fn lasting_rule_kind(change: &Change) -> Option<&'static str> {
         R::Prohibit(ObjectAction::Attack(AttackDefenders::Any)) => "CantAttack",
         R::Prohibit(ObjectAction::Block(ObjectFilter::Any)) => "CantBlock",
         R::Prohibit(ObjectAction::BeBlocked(ObjectFilter::Any)) => "CantBeBlocked",
+        R::Prohibit(ObjectAction::Regenerate) => "CantBeRegenerated",
         R::RequireCombat {
             action: ObjectAction::Attack(AttackDefenders::Any),
             amount: RequirementAmount::AtLeast(Expr::Constant(1)),
