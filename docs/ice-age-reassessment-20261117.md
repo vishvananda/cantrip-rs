@@ -207,3 +207,12 @@ batch-six full sweep found only the old Land Equilibrium expected-gap string;
 that is corrected, with all six affected Source tests passing. The later family5
 CI failure was another stale Semester’s End field assertion, now corrected to
 the fully specified scoped replacement. No engine/card registrations changed.
+
+
+The latest generator adapter checkpoint covers **28 of43** landed cards, plus
+Library of Leng, with **39 actual modules** type-checked against native APIs.
+Fifteen landed cards retain generator/reference holds; these are separate from
+the thirteen engine gaps above. Sacred Boon's hold is confirmed reference
+modeling, reported in [Oracle Grammar #35](https://github.com/vishvananda/oracle-grammar/issues/35).
+See the [interface adoption review](ice-age-api-shape-review-20261117.md) for
+semantic boundaries and validation of each batch.

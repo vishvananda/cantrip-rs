@@ -883,6 +883,13 @@ impl Compiler {
         if self.every_slot_chosen && self.chosen_by_subject(chooser) {
             return Ok(());
         }
+        if planned::switched_on("opponent-target-choices") && matches!(chooser,
+            PlayerRef::OneOf(players) if matches!(&**players, PlayerSet::OpponentsOf(PlayerRef::AbilityController)))
+        {
+            if self.dividing.is_some() { return Err(gap("divided targets chosen by another player")); }
+            rule.planned.push(("target chosen by an opponent".into(), ".of_an_opponents_choice()".into()));
+            return Ok(());
+        }
         if self.choosing == Some(0) && self.dividing.is_some() && super::planned::switched_on("other-player-targets") {
             return Err(gap("divided targets chosen by another player"));
         }

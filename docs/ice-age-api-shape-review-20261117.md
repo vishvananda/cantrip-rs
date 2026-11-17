@@ -167,3 +167,39 @@ batch-six full sweep found only the old Land Equilibrium expected-gap string;
 that is corrected, with all six affected Source tests passing. The later family5
 CI failure was another stale Semester’s End field assertion, now corrected to
 the fully specified scoped replacement. No engine/card registrations changed.
+
+
+## Prevention follow-ups and damage redirection
+
+Rock Hydra uses a relative native prevention amount and removes the counters in
+its prevention follow-up, including when the damage cannot be prevented.
+Silhouette asks `Query::instructing()` about the spell or ability whose instruction
+causes the damage; it keeps the protected creature's identity in the effect.
+Lava Burst's unconditional printed damage rule emits both native damage callbacks,
+restricted to creature recipients. Conditional instructions/presence are not
+silently promoted to unconditional card rules.
+
+Jade Monolith and Nova Pentacle retain three separate identities: the chosen
+damage source, the protected recipient and, when needed, the new recipient.
+Nova Pentacle uses the native opponent target chooser and stored `into` value;
+its future callback does not reread the original activation's targets. Personal
+Incarnation consumes one point through `DamageComponent::Redirected`, preserving
+the original source/combat status within the same event. Larger cumulative
+redirection budgets remain explicit gaps rather than emitting a nonexistent
+shield variant or moving the entire damage assignment.
+
+Six more original cards are clean: **28 of43**, with **15 awaiting adapters or
+reference corrections**, plus Library of Leng. **108 generator tests** and
+**39 real native interface modules** pass. The additional new control is Dawn
+Elemental, ensuring ordinary static prevention emits the new empty `then` field.
+The preceding full CI passed **607 Source tests** (12 ignored).
+
+**Sacred Boon is a reference hold, not an engine gap.** The published Grammar
+0.3.4 bundle nests end-step trigger registration inside the shield's callback
+and reads an individual prevention occurrence. It must create one delayed
+ability when the spell resolves and later read the shield's cumulative prevented
+amount. The same defect occurs in Scars of the Veteran. This is reported as
+[Oracle Grammar #35](https://github.com/vishvananda/oracle-grammar/issues/35),
+with exact published-bundle provenance. MTGish already fixed the Source grammar
+in closed #144; no duplicate Source report or upstream pull is needed. The
+native Cantrip card already implements the correct cumulative-history behavior.

@@ -1230,6 +1230,27 @@ impl Compiler {
         }
         Ok(())
     }
+    /// A printed spell damage rule is represented as a prefix EffectOn in the
+    /// portable IR. Only an unconditional prefix becomes the spell's static
+    /// damage callbacks; a conditional instruction must not become global.
+    fn spell_damage_prefix(&mut self, label: &str, body: &Program, parts: &mut Parts) -> Result<Option<Program>> {
+        if !planned::switched_on("spell-damage-recipient-rules") || self.ability_guard.is_some()
+            || self.static_guard.is_some() || self.outer.is_some() { return Ok(None); }
+        let Some(Instruction::Effect { operation: Operation::EffectOn {
+            subject: EffectSubject::Objects(ObjectSet::One(ObjectRef::Source)), effects, until: None,
+        }, .. }) = body.instructions.first() else { return Ok(None) };
+        let [Operand::Term { family, form, operands }] = effects.as_slice() else { return Ok(None) };
+        if family != "SpellEffect" || form != "DamageToPermanentsCantBePreventedOrRedirected" { return Ok(None); }
+        let [Operand::Objects(crate::battlefield_query!(filter))] = operands.as_slice() else { return Ok(None) };
+        let reader = std::mem::replace(&mut self.reader, Reader::Query);
+        let test = self.filter(filter, &Candidate::of("id"));
+        self.reader = reader;
+        let test = test?;
+        let function = format!("{label}_damage_rule");
+        writeln!(self.functions, "#[allow(unused_variables)] fn {function}(q: &dyn Query, asker: &Asker, source: ObjectId, target: Target, combat: bool) -> bool {{ source == asker.source && matches!(target, Target::Object(id) if {test}) }}").unwrap();
+        for table in ["unpreventable_damage", "unredirectable_damage"] { parts.table(table, function.clone()); }
+        Ok(Some(Program { instructions: body.instructions[1..].to_vec() }))
+    }
     /// Add one ability to the card.
     pub(super) fn ability(
         &mut self,
@@ -1378,6 +1399,8 @@ impl Compiler {
                 }
             }
             Ability::Spell { announcement, body } => {
+                let prefix = self.spell_damage_prefix(label, body, parts)?;
+                let body = prefix.as_ref().unwrap_or(body);
                 if parts.spell != "None" {
                     return self.later_spell(announcement, body, label, parts);
                 }

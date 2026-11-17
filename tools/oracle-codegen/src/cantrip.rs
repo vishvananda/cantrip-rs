@@ -672,6 +672,9 @@ struct Compiler {
     stack_item: bool,
     /// A lasting replacement's callbacks receive this resolution's captured X.
     capture_made_x: bool,
+    /// A redirection's named new recipient is kept separately from its
+    /// protected recipient and chosen damage source by the native effect.
+    redirect_into: Option<Recipients>,
     pending: Pending,
     reader: Reader,
     event_at: EventAt,
@@ -1254,6 +1257,7 @@ impl Compiler {
             history: None,
             stack_item: true,
             capture_made_x: false,
+            redirect_into: None,
             pending: Pending::Nothing,
             reader: Reader::Resolution,
             event_at: EventAt::Nowhere,

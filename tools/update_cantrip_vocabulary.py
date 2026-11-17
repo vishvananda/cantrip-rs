@@ -76,6 +76,7 @@ def switched_features():
                    and 'fn event_other_object(&self)' in (state/'object.rs').read_text())
     return [name for name, shown in entries
             if (capture_api if name == 'event-object-capture' else
+                has_fields('PreventionDef', ['then']) if name == 'static-prevention-side-effects' else
                 has_fields('ExileCast', ['from', 'any_color']) if name == 'exile-cast-fields' else
                 has_fields('SpellAlternative', ['kind']) if name == 'spell-alternative-kinds' else
                 bool(re.search(r'pub fn search_zone_and_or_library\s*\([^)]*zones:\s*&\[Zone\]', api, re.S)) if name == 'multi-zone-search' else

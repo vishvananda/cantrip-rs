@@ -554,3 +554,85 @@ fn object_specific_entry_replacements_end_with_their_object_instead_of_becoming_
     let generated = cantrip::module(&face).unwrap();
     assert!(generated.contains("EffectKind::Replacement { card: item.ability.card, index: 1, to: Target::None, into: Target::None }"));
 }
+
+#[test]
+fn counter_backed_prevention_removes_counters_even_when_the_damage_is_unpreventable() {
+    let face = native_face("Rock Hydra");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("PreventionAmount::Relative("));
+    assert!(generated.contains("damage.amount.min("));
+    assert!(generated.contains("then: Some(ability_1_remove)"));
+    assert!(generated.contains("let removed = ability_1_amount(g, asker, damage)"));
+    assert!(!generated.contains("before.amount - after.amount"), "counter removal does not depend on successful prevention");
+    assert!(cantrip::planned::without_features(&["static-prevention-side-effects"], || cantrip::module(&face)).is_err());
+    assert!(cantrip::module(&native_face("Dawn Elemental")).unwrap().contains("then: None"));
+}
+
+#[test]
+fn damage_causation_tests_the_instructing_ability_and_captures_the_protected_object() {
+    let face = native_face("Silhouette");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("q.instructing().is_some_and(|e|"));
+    assert!(generated.contains("q.state().targets(e)"));
+    assert!(generated.contains("Some(affected)"));
+    assert!(!generated.contains("proposal_cause"));
+    assert!(cantrip::planned::without_features(&["instructing-damage-context"], || cantrip::module(&face)).is_err());
+}
+
+#[test]
+fn printed_spell_damage_rules_keep_the_recipient_filter_and_do_not_escape_conditions() {
+    use cantrip_oracle_codegen::ir::*;
+    let mut face = native_face("Lava Burst");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("source == asker.source"));
+    assert!(generated.contains("q.chars(id).is(CardType::Creature)"));
+    assert!(generated.contains("unpreventable_damage: &[ability_0_damage_rule]"));
+    assert!(generated.contains("unredirectable_damage: &[ability_0_damage_rule]"));
+    assert!(cantrip::planned::without_features(&["spell-damage-recipient-rules"], || cantrip::module(&face)).is_err());
+    let condition = Condition::Not(Box::new(Condition::ObjectMatches { object: ObjectRef::Source, filter: ObjectFilter::Any }));
+    let original = face.abilities[0].clone();
+    face.abilities[0] = Ability::Conditional { condition: condition.clone(), then: vec![original.clone()], otherwise: vec![] };
+    assert!(cantrip::module(&face).is_err(), "conditional presence must not become an unconditional damage table");
+    face.abilities[0] = original;
+    let Ability::Spell { body, .. } = &mut face.abilities[0] else { panic!() };
+    body.instructions[0] = Instruction::If { condition, then: Program { instructions: vec![body.instructions[0].clone()] }, otherwise: Program { instructions: vec![] } };
+    assert!(cantrip::module(&face).is_err(), "a conditional instruction must not be hoisted");
+}
+
+#[test]
+fn named_redirections_keep_damage_source_protected_recipient_and_new_recipient_separate() {
+    for name in ["Jade Monolith", "Nova Pentacle"] {
+        let face = native_face(name);
+        let generated = cantrip::module(&face).unwrap();
+        assert!(generated.contains("prevention::by_chosen_source(q, affected, e)"));
+        assert!(generated.contains("EffectKind::Replacement { card: item.ability.card, index: 0, to, into:"));
+        assert!(generated.contains(".once()"));
+        assert!(cantrip::planned::without_features(&["explicit-redirection-destinations"], || cantrip::module(&face)).is_err());
+    }
+    let face = native_face("Nova Pentacle");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains(".of_an_opponents_choice()"));
+    assert!(generated.contains("e.target = q.redirected_to()"));
+    let callback = generated.lines().find(|line|line.contains("fn made_2_apply")).unwrap();
+    assert!(!callback.contains("t_0"), "the callback cannot reread the resolving ability's target slots");
+    assert!(cantrip::planned::without_features(&["opponent-target-choices"], || cantrip::module(&face)).is_err());
+}
+
+#[test]
+fn one_point_redirection_remains_in_the_same_damage_event_and_larger_budgets_stay_blocked() {
+    use cantrip_oracle_codegen::ir::*;
+    let mut face = native_face("Personal Incarnation");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("DamageComponent::Redirected { target, amount }"));
+    assert!(generated.contains("before.amount.saturating_sub(after.amount)"));
+    assert!(generated.contains("e.amount = e.amount.saturating_sub("));
+    assert!(generated.contains(".with_damage("));
+    assert!(generated.contains(".once()"));
+    assert!(!generated.contains("g.damage("));
+    assert!(!generated.contains("EffectKind::Redirect"));
+    assert!(cantrip::planned::without_features(&["simultaneous-replacement-damage"], || cantrip::module(&face)).is_err());
+    let Ability::Activated { body, .. } = &mut face.abilities[0] else { panic!() };
+    let Instruction::Effect { operation: Operation::CreateReplacement { limit, .. }, .. } = &mut body.instructions[0] else { panic!() };
+    *limit = ReplacementLimit::TotalDamage(Expr::Constant(2));
+    assert!(cantrip::gaps(&face).iter().any(|gap|gap.feature=="cumulative redirection budget"));
+}

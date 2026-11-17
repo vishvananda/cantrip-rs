@@ -106,14 +106,17 @@ const DAMAGE_LOCALS: &str =
 /// collect those objects: the resolving ability's references mean nothing later.
 /// Its source is the effect's, which the callbacks are told anyway.
 pub(super) fn capture(event: &mut ReplacementEvent, found: &mut Vec<ObjectRef>) {
+    fn reference(object: &mut ObjectRef, found: &mut Vec<ObjectRef>) {
+        if matches!(object, ObjectRef::Source) { return; }
+        let key = format!("{object:?}");
+        if !found.iter().any(|f| format!("{f:?}") == key) { found.push(object.clone()); }
+        *object = ObjectRef::Affected;
+    }
     fn named(filter: &mut ObjectFilter, found: &mut Vec<ObjectRef>) {
         match filter {
-            ObjectFilter::SameObject(object) if !matches!(object, ObjectRef::Source) => {
-                let key = format!("{object:?}");
-                if !found.iter().any(|f| format!("{f:?}") == key) {
-                    found.push(object.clone());
-                }
-                *object = ObjectRef::Affected;
+            ObjectFilter::SameObject(object) => reference(object, found),
+            ObjectFilter::TargetsAny(recipients) => {
+                if let Recipients::Objects(ObjectSet::One(object)) = &mut **recipients { reference(object, found); }
             }
             ObjectFilter::AllOf(filters) => {
                 for filter in filters {
@@ -138,6 +141,10 @@ pub(super) fn capture(event: &mut ReplacementEvent, found: &mut Vec<ObjectRef>) 
             for event in events {
                 capture(event, found);
             }
+        }
+        ReplacementEvent::Caused { cause, event } => {
+            name(cause);
+            capture(event, found);
         }
         ReplacementEvent::Measured { event, .. } => capture(event, found),
         _ => {}
@@ -387,6 +394,9 @@ impl Compiler {
             }
             ("Damage", EventChange::Cancel) => "e.amount = 0;".into(),
             ("Damage", EventChange::RedirectDamage(recipients)) => {
+                if self.redirect_into.as_ref().is_some_and(|held| format!("{held:?}") == format!("{recipients:?}")) {
+                    return Ok("e.target = q.redirected_to();".into());
+                }
                 if names_target(recipients) && self.outer.is_none() {
                     return Err(gap("redirect to a target the callback cannot read"));
                 }
@@ -558,6 +568,34 @@ impl Compiler {
         )
         .unwrap();
     }
+    fn counter_point_prevention(&mut self, label: &str, active: &ReplacementActive, event: &ReplacementEvent,
+        body: &Program, parts: &mut Parts) -> Result<bool>
+    {
+        if !planned::switched_on("static-prevention-side-effects") || !planned::switched_on(quantity::BOUNDED_32)
+            || !matches!(active, ReplacementActive::Battlefield) { return Ok(false); }
+        let ReplacementEvent::EachPoint(event) = event else { return Ok(false) };
+        let ReplacementEvent::Damage(damage) = &**event else { return Ok(false) };
+        if !matches!(damage.sources, ObjectFilter::Any) || damage.source_kind != ObjectKind::Any
+            || !matches!(damage.recipients, DamageRecipients::Objects(ObjectFilter::SameObject(ObjectRef::Source)))
+            || !matches!(damage.kind, DamageKind::Any) { return Ok(false); }
+        let [Instruction::If { condition: Condition::ObjectMatches { object: ObjectRef::Source,
+            filter: ObjectFilter::Counters { kind: Some(kind), comparison: Comparison::Greater, value: Expr::Constant(0) } }, then, otherwise }] = body.instructions.as_slice()
+        else { return Ok(false) };
+        if !otherwise.instructions.is_empty() { return Ok(false); }
+        let [Instruction::Effect { operation: Operation::RemoveCounters { removals }, .. },
+            Instruction::Effect { operation: Operation::ModifyEvent { change: EventChange::PreventDamage }, .. }] = then.instructions.as_slice()
+        else { return Ok(false) };
+        let [CounterRemoval { player: PlayerRef::AbilityController, recipients: Recipients::Objects(ObjectSet::One(ObjectRef::Source)),
+            kind: Some(removed), amount: CounterAmount::Count(Count::Exactly(Expr::Constant(1))), selection: None }] = removals.as_slice()
+        else { return Ok(false) };
+        if format!("{kind:?}") != format!("{removed:?}") { return Ok(false); }
+        let kind = counter_kind(kind)?;
+        writeln!(self.functions, "fn {label}_applies(q: &dyn Query, asker: &Asker, damage: &DamageEvent) -> bool {{ damage.target == Target::Object(asker.source) && q.state().obj(asker.source).counters({kind}) > 0 }}").unwrap();
+        writeln!(self.functions, "fn {label}_amount(q: &dyn Query, asker: &Asker, damage: &DamageEvent) -> u32 {{ damage.amount.min(q.state().obj(asker.source).counters({kind}).max(0) as u32) }}").unwrap();
+        writeln!(self.functions, "#[allow(unused_variables)] fn {label}_remove(g: &mut dyn Game, asker: &Asker, before: &Proposal, after: &Proposal) {{ if let Proposal::Damage(damage) = before {{ let removed = {label}_amount(g, asker, damage); g.remove_counters(asker.source, {kind}, removed as i32); }} }}").unwrap();
+        parts.preventions.push(format!("PreventionDef {{ hint: \"prevent damage by removing counters\", applies: {label}_applies, amount: PreventionAmount::Relative({label}_amount), then: Some({label}_remove) }}"));
+        Ok(true)
+    }
     fn skip_own_draw_step(&mut self, label: &str, active: &ReplacementActive, event: &ReplacementEvent,
         body: &Program, parts: &mut Parts) -> Result<bool>
     {
@@ -610,6 +648,7 @@ impl Compiler {
         self.replacing = Default::default();
         let guard = self.ability_guard.take();
         if guard.is_none() && self.skip_own_draw_step(label, active, event, body, parts)? { return Ok(()); }
+        if guard.is_none() && self.counter_point_prevention(label, active, event, body, parts)? { return Ok(()); }
         if guard.is_none() && lane_h::reveal_and_shuffle_instead(active, event, body) {
             parts.replacements.push(
                 "cantrip_mechanics::replacements::REVEAL_AND_SHUFFLE_INTO_LIBRARY_INSTEAD_OF_GRAVEYARD"
@@ -903,6 +942,27 @@ impl Compiler {
         writeln!(self.callbacks(), "#[allow(unused_variables)] fn {function}(q: &dyn Query, asker: &Asker, {about}before: &DamageEvent, _: &DamageEvent) -> Vec<DamageComponent> {{ let {} = before; {} {out} }}", arms[0].binding, arms[0].locals).unwrap();
         Ok(Some(function))
     }
+    /// A redirected share preserves the original source and combat flags in
+    /// the same damage event; it is never a second `Game::damage` instruction.
+    fn redirected_damage(&mut self, label: &str, arms: &[Watched], frame: Frame,
+        changes: &[EventChange]) -> Result<Option<String>>
+    {
+        let [EventChange::RedirectSomeDamage(_, recipients)] = changes else { return Ok(None) };
+        if !planned::switched_on("simultaneous-replacement-damage")
+            || !planned::switched_on("explicit-redirection-destinations") {
+            return Err(gap("simultaneous partial redirection"));
+        }
+        if !matches!(recipients, Recipients::Players(PlayerSet::One(_))
+            | Recipients::Objects(ObjectSet::One(_)) | Recipients::Target { .. }) {
+            return Err(gap("partial redirection to several recipients"));
+        }
+        let targets = if self.redirect_into.as_ref().is_some_and(|held| format!("{held:?}") == format!("{recipients:?}")) {
+            "vec![q.redirected_to()]".to_string()
+        } else { self.matching(frame, |c| c.recipients(recipients))? };
+        let function = format!("{label}_redirected_damage");
+        writeln!(self.callbacks(), "#[allow(unused_variables)] fn {function}(q: &dyn Query, asker: &Asker, affected: ObjectId, before: &DamageEvent, after: &DamageEvent) -> Vec<DamageComponent> {{ let {} = before; {} let amount = before.amount.saturating_sub(after.amount); ({targets}).into_iter().map(|target| DamageComponent::Redirected {{ target, amount }}).collect() }}", arms[0].binding, arms[0].locals).unwrap();
+        Ok(Some(function))
+    }
     /// The callbacks of an effect that reshapes its event: `made` for one a
     /// spell or ability made, whose callbacks are told the object it is about.
     fn reshaping(
@@ -1068,6 +1128,21 @@ impl Compiler {
         body: &Program,
         out: &mut String,
     ) -> Result<()> {
+        // A one-point total budget can be consumed by one partial assignment.
+        // Larger budgets need persistent accounting and remain explicit gaps.
+        if planned::switched_on("explicit-redirection-destinations")
+            && planned::switched_on("simultaneous-replacement-damage")
+            && matches!(limit, ReplacementLimit::TotalDamage(Expr::Constant(1)))
+        {
+            if let [Instruction::Effect { result, operation: Operation::ModifyEvent {
+                change: EventChange::RedirectDamage(recipients),
+            } }] = body.instructions.as_slice() {
+                let body = Program { instructions: vec![Instruction::Effect { result: result.clone(),
+                    operation: Operation::ModifyEvent { change: EventChange::RedirectSomeDamage(
+                        Expr::Constant(1), recipients.clone()) } }] };
+                return self.create_replacement(event, &ReplacementLimit::NextOccurrence, duration, &body, out);
+            }
+        }
         if let (
             ReplacementEvent::Object {
                 event: ReplacedObjectEvent::LeavesBattlefield,
@@ -1137,11 +1212,26 @@ impl Compiler {
         out: &mut String,
     ) -> Result<()> {
         let duration = self.duration(duration)?;
-        let shield = self.made_shield(limit, body)?;
+        let partial_redirect = planned::switched_on("simultaneous-replacement-damage")
+            && planned::switched_on("explicit-redirection-destinations")
+            && matches!(body.instructions.as_slice(), [Instruction::Effect {
+                operation: Operation::ModifyEvent { change: EventChange::RedirectSomeDamage(..) }, .. }]);
+        let shield = if partial_redirect && matches!(limit, ReplacementLimit::NextOccurrence | ReplacementLimit::UntilExpired) {
+            None
+        } else { self.made_shield(limit, body)? };
         let previous_capture = self.capture_made_x;
         let captured_x = planned::switched_on("captured-replacement-values")
             && shield.is_none() && reads_creating_x(event, body);
         let mut plain = event.clone();
+        let named_into = if planned::switched_on("explicit-redirection-destinations") {
+            match body.instructions.as_slice() {
+                [Instruction::Effect { operation: Operation::ModifyEvent {
+                    change: EventChange::RedirectDamage(recipients) | EventChange::RedirectSomeDamage(_, recipients),
+                }, .. }] if matches!(recipients, Recipients::Objects(ObjectSet::One(ObjectRef::Target { .. })) | Recipients::Target { .. }) => Some(recipients.clone()),
+                _ => None,
+            }
+        } else { None };
+        let into = named_into.as_ref().map(|recipients| self.recipients(recipients)).transpose()?;
         let to = self.named_recipient_of(&mut plain)?;
         let mut about = Vec::new();
         capture(&mut plain, &mut about);
@@ -1155,6 +1245,7 @@ impl Compiler {
         let functions_from = self.functions.len();
         let results = self.results();
         let scope = self.affected_in_scope;
+        let old_into = std::mem::replace(&mut self.redirect_into, named_into);
         self.reset_results();
         self.affected_in_scope = true;
         // A loop's object is out of reach as well: it has to be the effect's.
@@ -1225,6 +1316,7 @@ impl Compiler {
         };
         self.bound_objects = bound;
         self.affected_in_scope = scope;
+        self.redirect_into = old_into;
         self.restore_results(results);
         self.capture_made_x = previous_capture;
         let kind = compiled?;
@@ -1263,7 +1355,11 @@ impl Compiler {
             let x = self.fetch(self.number(&Expr::AnnouncedX)?.amount(quantity::x_max(), "u32")?);
             format!("let created_x = {x};")
         } else { String::new() };
-        writeln!(out, "{{ {shield} let to = {to}; let about = {about}; if let (Some(to), Some(about)) = (to, about) {{ {capture} {effect} }} }}").unwrap();
+        let made = format!("{{ {shield} let to = {to}; let about = {about}; if let (Some(to), Some(about)) = (to, about) {{ {capture} {effect} }} }}");
+        match into {
+            Some(into) => writeln!(out, "{{ let into = {}; if let Some(into) = into {{ {made} }} }}", self.fetch(format!("({into}).first().copied()"))).unwrap(),
+            None => writeln!(out, "{made}").unwrap(),
+        }
         Ok(())
     }
     /// Whom a made prevention protects, taken out of its event: the recipient
@@ -1272,6 +1368,7 @@ impl Compiler {
         &self,
         event: &mut ReplacementEvent,
     ) -> Result<Option<String>> {
+        if let ReplacementEvent::Caused { event, .. } = event { return self.named_recipient_of(event); }
         let ReplacementEvent::Damage(damage) = event else {
             return Ok(None);
         };
@@ -1365,6 +1462,10 @@ impl Compiler {
                 "g.add_effect(item.object, about, EffectKind::Prevention {{ card: item.ability.card, index: {index}, to, shield: {shield_value} }}, DURATION);"
             )));
         }
+        if shield.is_some() && arms[0].kind == "Damage"
+            && planned::switched_on("explicit-redirection-destinations") {
+            return Err(gap("cumulative redirection budget"));
+        }
         // Only the global, lasting damage rule is lowered here. Other optional
         // granted forms retain their hold until their own semantics are verified.
         if self.replacing.may.is_some()
@@ -1374,7 +1475,7 @@ impl Compiler {
         {
             return Err(gap("engine: optional granted replacement needs a choice"));
         }
-        if to && !self.granting {
+        if to && !self.granting && !planned::switched_on("explicit-redirection-destinations") {
             return Err(gap("replacement of damage to a named recipient"));
         }
         let once = match limit {
@@ -1385,13 +1486,19 @@ impl Compiler {
         };
         // `once` ends with the first assignment, and the next time is all of the
         // event (CR 120.2): only damage to one recipient by one source is that.
-        if once && arms[0].kind == "Damage" && lane_n::parts_alone(event, to) != (true, true) {
+        let partial = arms[0].kind == "Damage" && matches!(changes.as_slice(), [EventChange::RedirectSomeDamage(..)]);
+        let partial_assignment = partial && matches!(event, ReplacementEvent::Damage(damage) if matches!(damage.grouping, DamageGrouping::SourceRecipient));
+        if once && arms[0].kind == "Damage" && !partial_assignment && lane_n::parts_alone(event, to) != (true, true) {
             return Err(gap(
                 "engine: no once-only replacement of a whole damage event",
             ));
         }
-        let damage = self.replacement_damage(label, &arms, frame, &rest, true)?;
+        let damage = if partial {
+            if !rest.is_empty() { return Err(gap("partial redirection mixed with other instructions")); }
+            self.redirected_damage(label, &arms, frame, &changes)?
+        } else { self.replacement_damage(label, &arms, frame, &rest, true)? };
         let remaining = if damage.is_some() { &[][..] } else { &rest };
+        self.replacing.partial_redirect = partial;
         let (kind, applies, apply, then) =
             self.reshaping(label, &arms, frame, &extra, &changes, remaining, true)?;
         let option = |f: Option<&String>| f.map_or("None".to_string(), |f| format!("Some({f})"));
@@ -1416,6 +1523,9 @@ impl Compiler {
         let index = self.made_replacements.len() - 1;
         let made = if shield.is_some() {
             lane_n::shielded_redirect(index)
+        } else if kind == "Damage" && planned::switched_on("explicit-redirection-destinations") && (to || self.redirect_into.is_some()) {
+            let into = if self.redirect_into.is_some() { "into" } else { "Target::None" };
+            format!("g.add_effect(item.object, about, EffectKind::Replacement {{ card: item.ability.card, index: {index}, to, into: {into} }}, DURATION);")
         } else if about {
             let kind = if self.capture_made_x {
                 format!("EffectKind::CapturedReplacement {{ card: item.ability.card, index: {index}, value: created_x }}")
@@ -1479,6 +1589,8 @@ impl Compiler {
         let mut more = String::new();
         if let Some(then) = &then {
             write!(more, ", then: Some({then})").unwrap();
+        } else if planned::switched_on("static-prevention-side-effects") {
+            more.push_str(", then: None");
         }
         if let Some(ask) = &may {
             write!(more, ", optional: Some(&{ask})").unwrap();
@@ -1487,6 +1599,7 @@ impl Compiler {
             format!("PreventionDef {{ hint: {hint}, applies: {applies}, amount: {amount}{more} }}");
         match (then, may) {
             (None, None) => parts.preventions.push(def),
+            (Some(_), None) if planned::switched_on("static-prevention-side-effects") => parts.preventions.push(def),
             (Some(_), _) => self.plan_entry(
                 "engine: no static prevention with an effect besides",
                 "preventions",

@@ -55,6 +55,7 @@ pub(super) struct Replacing {
     putting: bool,
     pub after_steps: Vec<String>,
     pub afterward: Option<String>,
+    pub partial_redirect: bool,
 }
 
 /// The events of one ability that are not one proposal: counters on objects and
@@ -983,8 +984,13 @@ impl Compiler {
                 let player = self.matching(frame, |c| c.certain_player(player))?;
                 format!("z.controller = {player};")
             }
-            ("Damage", C::RedirectSomeDamage(_, recipients)) => {
-                return self.reshape(kind, &C::RedirectDamage(recipients.clone()), frame)
+            ("Damage", C::RedirectSomeDamage(amount, _)) => {
+                if !self.replacing.partial_redirect || !planned::switched_on("simultaneous-replacement-damage")
+                    || !planned::switched_on("explicit-redirection-destinations") {
+                    return Err(gap("simultaneous partial redirection"));
+                }
+                let amount = self.matching(frame, |c| c.number(amount))?.quantity(Quantity::Damage)?;
+                format!("e.amount = e.amount.saturating_sub({amount});")
             }
             ("TokenCreation", C::ReplaceTokens { copies, tokens }) => {
                 self.token_change(*copies, tokens, frame)?
@@ -1539,6 +1545,11 @@ impl Compiler {
             } => {
                 let feature = format!("replacement event {}", form(event));
                 let (mut arms, frame) = self.watched(inner)?;
+                if planned::switched_on("instructing-damage-context") && arms.iter().all(|arm| arm.kind == "Damage") {
+                    let cause = self.matching(frame, |c| c.stack_filter(cause))?;
+                    for arm in &mut arms { arm.tests.push(format!("q.instructing().is_some_and(|e| {cause})")); }
+                    return Ok(Some((arms, frame)));
+                }
                 let cause = self.matching(frame, |c| c.filter(cause, &Candidate::of("cause")))?;
                 for arm in &mut arms {
                     arm.tests.push(planned::planned_value(
