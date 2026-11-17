@@ -200,6 +200,34 @@ impl Compiler {
         );
         Ok(())
     }
+    /// A repeated sacrifice is a native cost addition, sized from the printed
+    /// mana symbols before payment. It is not a resolution-time action or mana value.
+    pub(super) fn symbol_sacrifice_cost(&mut self, label: &str, players: &PlayerSet,
+        scope: &ObjectFilter, cost: &Cost, activating: bool, parts: &mut Parts) -> Result<bool>
+    {
+        if !planned::switched_on("symbol-sized-cost-additions") { return Ok(false); }
+        let [CostPart::Repeated { part, times }] = cost.parts.as_slice() else { return Ok(false) };
+        let CostPart::Sacrifice { objects: crate::battlefield_query!(filter),
+            choose: Some(Count::Exactly(Expr::Constant(1))) } = &**part else { return Ok(false) };
+        let colors = match (activating, times) {
+            (false, Expr::CountManaSymbols { objects, colors })
+                if matches!(&**objects, ObjectSet::One(ObjectRef::Affected)) => colors,
+            (true, Expr::ActivationCostSymbols(colors)) if matches!(scope, ObjectFilter::Any) => colors,
+            _ => return Ok(false),
+        };
+        let [symbol] = colors.as_slice() else { return Ok(false) };
+        let symbol = color(symbol)?;
+        let filter = self.cost_filter(filter, &format!("{label}_sacrificed"))?;
+        let (guard, member) = (self.guard()?, self.player_member(players)?);
+        let (extract, mana, test) = if activating {
+            ("let (Costed::Ability(_, ability, _) | Costed::PlayerAbility(_, ability, _)) = costed else { return None; }; let def = q.activated_ability(ability)?;".to_string(), "def.cost.mana", "true".to_string())
+        } else {
+            ("let Costed::Spell(spell) = costed else { return None; };".to_string(), "q.mana_cost(spell)", self.filter(scope, &cast_card())?)
+        };
+        let function = format!("{label}_additional_sacrifice");
+        self.table_entry(parts, "cost_additions", &function, format!("fn {function}(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed) -> Option<PermanentCost> {{ {PRELUDE} {extract} if !({guard}{member} && {test}) {{ return None; }} let count = {mana}.symbols_of(q.words(source).color(Color::{symbol})); if count == 0 {{ None }} else {{ Cost::sacrifice(count, {filter}).permanents }} }}"));
+        Ok(true)
+    }
     pub(super) fn player_rule(
         &mut self,
         label: &str,
@@ -209,6 +237,9 @@ impl Compiler {
     ) -> Result<()> {
         let yours = matches!(players, PlayerSet::One(PlayerRef::AbilityController));
         let function = format!("{label}_rule");
+        if let PlayerRule::SpellCost { spells, modifier: SpellCostModifier::Increase(cost) } = rule {
+            if self.symbol_sacrifice_cost(label, players, spells, cost, false, parts)? { return Ok(()); }
+        }
         match rule {
             PlayerRule::DamageLifeFloor(Expr::Constant(floor)) => {
                 if !planned::switched_on("damage-life-results-floor") { return Err(gap("damage life-results floor")); }

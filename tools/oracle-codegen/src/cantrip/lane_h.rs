@@ -2830,6 +2830,11 @@ impl Compiler {
         floor: Option<i64>,
         parts: &mut Parts,
     ) -> Result<()> {
+        if floor.is_none() {
+            if let ActivationCostChange::Additional(cost) = change {
+                if self.symbol_sacrifice_cost(label, players, abilities, cost, true, parts)? { return Ok(()); }
+            }
+        }
         let test = self.ability_test(abilities)?;
         let less = |n: &str| match floor {
             None => Ok(format!("CostDelta::less({n})")),

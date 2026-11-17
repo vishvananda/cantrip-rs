@@ -1,5 +1,10 @@
 # Intended gaps versus the interfaces that landed
 
+Current checkpoint: **36/43 landed cards generate without diagnostics**;7 generator
+holds and2 separately recorded reference holds remain. **116 generator tests**
+and **47 real native interface examples** pass. The dated batches below record
+how this total changed; their earlier counts are historical.
+
 The original 57-card pause list is the input, not all unsupported cards in the
 sets. Forty-three now have native implementations; their original addition
 commits are all authored by the maintainer account `jschibel`. Our shared engine
@@ -264,3 +269,32 @@ interface modules** pass; no engine code or registrations were changed. Cantrip
 upstream is still `9889dd28f90c484fde557fa25cf30beb2b45621d`; Grammar0.3.4 remains
 the newest published grammar/face release. The audited API fingerprint is unchanged.
 Family-nine focused Source checks passed **39 tests** (two ignored).
+
+
+## Symbol-sized sacrifice costs and returned-card rules
+
+Drought uses `cost_additions` for spells and activated abilities, including mana
+and player abilities. Costs count the printed mana symbols (including hybrid
+and Phyrexian occurrences), not mana value or which mana was paid. The printed
+color and sacrificed subtype still respect text changes. Zero symbols add no
+cost. Unsupported multi-color unions and other ability filters remain gaps.
+
+Firestorm Phoenix installs the reveal and play-prohibition rules as its death
+replacement applies. Their predicates identify the specific new hand object
+through the original permanent's transition history, without guessing a future
+object ID or chasing later moves. The rules are about that card's **owner**, and
+expire at that owner's next turn; a same-named card is not included.
+
+The current total is **36 of43** landed cards without generator diagnostics,
+**7 with generator holds**, plus Library of Leng. Sacred Boon and Glyph of
+Reincarnation remain separately documented reference holds. **116 generator
+tests** and **47 actual native interface modules** pass. Family-eight full CI
+also passed all **607 Source tests** (12 ignored); current focused Source checks
+precede each push. Tooling CI now cancels superseded runs on the same branch,
+retaining the complete check on the latest revision without parallel redundant
+Source sweeps.
+
+Remaining generator holds: Dance of the Dead, Ice Cauldron, Raging River,
+Sacred Boon, Takklemaggot, Tawnos's Coffin and Worms of the Earth. These require
+further adapters/reference work; they do not add to the13 engine gaps.
+Family-ten focused Source checks passed **37 tests** (one ignored).

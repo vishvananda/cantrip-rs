@@ -568,6 +568,44 @@ impl Compiler {
         )
         .unwrap();
     }
+    /// A death replacement's rules can follow the card it is about to become.
+    /// Register the rules while applying; their predicates read the eventual
+    /// transition from history, without guessing a new object before it exists.
+    fn returned_hand_rules(&mut self, label: &str, active: &ReplacementActive,
+        event: &ReplacementEvent, body: &Program, parts: &mut Parts) -> Result<bool>
+    {
+        if !planned::switched_on("returned-hand-rules") || !planned::switched_on(planned::LASTING_RULES)
+            || !crate::cantrip_vocab::LASTING_RULE_KINDS.contains(&"CantBePlayed")
+            || !matches!(active, ReplacementActive::Battlefield)
+            || !matches!(event, ReplacementEvent::ZoneChange { objects: ObjectFilter::SameObject(ObjectRef::Source),
+                from: Some(EventZone::Battlefield), to: EventZone::Graveyard }) { return Ok(false); }
+        let [Instruction::Effect { operation: Operation::ModifyEvent {
+            change: EventChange::SetDestination(Destination::OwnersHand) }, .. },
+            Instruction::Effect { operation: Operation::CreateContinuousEffect {
+                source: ObjectRef::Source, affected: EffectSubjects::Players(PlayerSet::One(player)),
+                changes, duration: crate::ir::Duration::UntilNextTurn(until),
+                evaluation: EffectEvaluation::LiveObjects }, .. }] = body.instructions.as_slice()
+        else { return Ok(false) };
+        let PlayerRef::OwnerOf(card) = player else { return Ok(false) };
+        let ObjectRef::Query { objects, index: 0 } = &**card else { return Ok(false) };
+        if !matches!(&**objects, ObjectSet::InZone { objects, zone: EventZone::Hand }
+            if matches!(&**objects, ObjectSet::One(ObjectRef::EventDestination)))
+            || format!("{player:?}") != format!("{until:?}") { return Ok(false); }
+        let [Change::PlayerRule(PlayerRule::Visibility { objects: ObjectSet::One(revealed), audience: VisibilityAudience::Everyone }),
+            Change::PlayerRule(PlayerRule::Prohibit(PlayerAction::PlayCard(ObjectFilter::SameObject(unplayable))))] = changes.as_slice()
+            else { return Ok(false) };
+        if format!("{revealed:?}") != format!("{card:?}") || format!("{unplayable:?}") != format!("{card:?}") { return Ok(false); }
+        let predicate = format!("{label}_returned_card");
+        writeln!(self.functions, "#[allow(unused_variables)] fn {predicate}(q: &dyn Query, asker: &Asker, _: Target, id: ObjectId) -> bool {{ q.obj(id).zone.is(ZoneKind::Hand) && q.history().select(EventQuery::kind(EventMask::ZONE_CHANGE).object(id).to(ZoneKind::Hand)).rev().any(|r| matches!(r.event, Event::ZoneChange {{ old, new, .. }} if old == asker.source && new == id)) }}").unwrap();
+        let first = self.made_lasting_rules.len();
+        for kind in ["RevealedInHand", "CantBePlayed"] {
+            self.made_lasting_rules.push(("rules for the returned card".into(), format!("LastingRule {{ text: \"Until its owner's next turn, the returned card is revealed and that player cannot play it.\", rule: LastingRuleKind::{kind}, applies: {predicate} }}"), false));
+        }
+        let callback = format!("{label}_returned_rules");
+        writeln!(self.functions, "#[allow(unused_variables)] fn {callback}(g: &mut dyn Game, asker: &Asker, _: &Proposal, _: &Proposal) {{ let owner = g.obj(asker.source).owner; let card = g.card_id(&CARD); instruction(g, |g| {{ for index in [{first}, {}] {{ g.add_player_effect(asker.controller, asker.source, EffectKind::LastingRule {{ card, index, about: Target::Player(owner) }}, Duration::UntilNextTurnOf(owner)); }} }}); }}", first + 1).unwrap();
+        parts.replacements.push(format!("replacement(ReplacementKind::ZoneChange, cantrip_mechanics::replacements::this_would_die, cantrip_mechanics::replacements::owners_hand_instead_apply, \"Return to its owner's hand instead of dying\").then({callback})"));
+        Ok(true)
+    }
     fn counter_point_prevention(&mut self, label: &str, active: &ReplacementActive, event: &ReplacementEvent,
         body: &Program, parts: &mut Parts) -> Result<bool>
     {
@@ -649,6 +687,7 @@ impl Compiler {
         let guard = self.ability_guard.take();
         if guard.is_none() && self.skip_own_draw_step(label, active, event, body, parts)? { return Ok(()); }
         if guard.is_none() && self.counter_point_prevention(label, active, event, body, parts)? { return Ok(()); }
+        if guard.is_none() && self.returned_hand_rules(label, active, event, body, parts)? { return Ok(()); }
         if guard.is_none() && lane_h::reveal_and_shuffle_instead(active, event, body) {
             parts.replacements.push(
                 "cantrip_mechanics::replacements::REVEAL_AND_SHUFFLE_INTO_LIBRARY_INSTEAD_OF_GRAVEYARD"

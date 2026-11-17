@@ -8,7 +8,7 @@
   "frozen_oracle_sha256": "2281f3d715e8ee6127825154b31202918ef83a9d9a3641a0d23b0163ebea3065",
   "source_ron_sha256": "7c1f493906004497a6682071481ddabf1ce15e9efc63834a904554ffd35a14a7",
   "backlog_records_sha256": "4baa58c98b4bff1e017a7c99ddacf1fd4a85dfed77467a05c9b8154a71735e91",
-  "tracked_rows_sha256": "6e65ba4c10fe24c1f8e2d0d23601146178df10be36131fae076c75ee98ff954a",
+  "tracked_rows_sha256": "e41d01a0abf487a51921d3f182c9e546f6c34daa2e133ba33e6c4ddde6f276e6",
   "native_api_sha256": "235fbb1780747dbaa038447d8463320b09a1ba299857305ab5d5ca9e03af3952",
   "counts": {
     "landed_upstream": 43,
@@ -17,14 +17,14 @@
   },
   "validation": {
     "native_full_suite": "Engine baseline 5441ecd742: bash tools/test.sh passed; 27,853 Rust tests (15 ignored), managed tests and client build. Later fork-main host/client/test commits do not change the audited API.",
-    "generator": "114 Rust tests pass; every smoke fixture must generate a real complete module.",
+    "generator": "116 Rust tests pass; every smoke fixture must generate a real complete module.",
     "pipeline_python": "437 tests passed",
     "tooling_python": "52 tests passed",
     "mtgish": "1,596 Rust tests passed; 33,529 exported records, zero lowering diagnostics",
     "library_of_leng": "Generated module compiles as a standalone Rust library against the checked-profile current cantrip-api. Card registration and runtime scenarios are not implemented by this audit.",
     "latest_refresh": "Upstream advanced during the audit: rebased from 90204df367 to 5441ecd742. New original-draw receipts, nest counters and unrelated cards do not change the 43/1/13 result.",
-    "source_integration": "Family-seven full CI passed607 tests,12 ignored. Family-eight focused37 passed,1 ignored; tooling CI green, Source CI running. Family-nine focused early-set/open-rule/foundation checks passed39 tests,2 ignored.",
-    "native_api_check": "45 actual generated modules compile against native API/mechanics. City in a Bottle captures its state-trigger group; Johan grants a removable attack ban and an independent live-source no-tap rule. Glyph reference correctness remains a separate hold (#36)."
+    "source_integration": "Family-eight full CI passed607 tests,12 ignored. Family-nine focused39 passed,2 ignored; family-ten focused37 passed,1 ignored. Latest full CI runs after push; superseded branch runs are canceled.",
+    "native_api_check": "47 actual generated modules compile against native API/mechanics. Drought adds repeated sacrifices during actual cost payment; Firestorm Phoenix follows only its returned-hand identity and binds the owner\u2019s next turn. Glyph reference correctness remains a separate hold (#36)."
   },
   "cards": [
     {
@@ -153,28 +153,7 @@
       "module": "crates/cantrip-cards/src/cards/drought.rs",
       "data": "content/mtg/cards/drought.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "abilities[2]",
-          "feature": "activation cost with another cost",
-          "message": "Cantrip code generation has not implemented this capability"
-        },
-        {
-          "path": "",
-          "feature": "engine: no cost sized by the game",
-          "message": "Cantrip code generation has not implemented this capability"
-        },
-        {
-          "path": "",
-          "feature": "numeric expression ActivationCostSymbols",
-          "message": "Cantrip code generation has not implemented this capability"
-        },
-        {
-          "path": "",
-          "feature": "spell cost increase other than mana",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "876f09fdf575d338147aab9ec801f6e149764b3a",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Drought"
@@ -234,23 +213,7 @@
       "module": "crates/cantrip-cards/src/cards/firestorm_phoenix.rs",
       "data": "content/mtg/cards/firestorm-phoenix.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "abilities[1].instructions[0]",
-          "feature": "player rule for a while Visibility",
-          "message": "Cantrip code generation has not implemented this capability"
-        },
-        {
-          "path": "abilities[1]",
-          "feature": "player rule for a while Visibility",
-          "message": "Cantrip code generation has not implemented this capability"
-        },
-        {
-          "path": "abilities[1]",
-          "feature": "player rule for a while Prohibit PlayCard",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "a480f9368d959dff3ea99b84cd0e5792efac4d7b",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Firestorm Phoenix"
@@ -859,9 +822,9 @@
     "unimplemented_but_generated": 1
   },
   "generator_adoption": {
-    "landed_cards_clean": 34,
-    "landed_cards_held": 9,
-    "native_smoke_examples": 45,
+    "landed_cards_clean": 36,
+    "landed_cards_held": 7,
+    "native_smoke_examples": 47,
     "reference_holds": [
       "Sacred Boon (oracle-grammar#35)",
       "Glyph of Reincarnation (oracle-grammar#36; historical controller adapter compiles)"

@@ -730,3 +730,49 @@ fn a_granted_attack_ban_is_removable_but_the_open_combat_rule_outlives_the_grant
     assert!(generated.contains("g.add_lasting_rule(item, 0, Target::None, Duration::EndOfCombat)"));
     assert!(cantrip::planned::without_features(&["lasting-attack-no-tap"], || cantrip::module(&face)).is_err());
 }
+
+
+#[test]
+fn symbol_sized_additional_costs_pay_sacrifices_during_both_spell_and_ability_payment() {
+    use cantrip_oracle_codegen::ir::*;
+    let mut face = native_face("Drought");
+    face.name = "Another symbol tax".into();
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("cost_additions: &["));
+    assert!(generated.contains("q.mana_cost(spell).symbols_of(q.words(source).color(Color::Black))"));
+    assert!(generated.contains("def.cost.mana.symbols_of(q.words(source).color(Color::Black))"));
+    assert!(generated.contains("Costed::Ability(_, ability, _) | Costed::PlayerAbility(_, ability, _)"));
+    assert!(generated.contains("if count == 0 { None } else { Cost::sacrifice(count,"));
+    assert!(generated.contains("has_subtype(q.words(asker.source).subtype(Subtype::Swamp))"));
+    assert!(!generated.contains("Cost::reading("));
+    assert!(!generated.contains("q.activation_cost_symbols("));
+    assert!(cantrip::planned::without_features(&["symbol-sized-cost-additions"], || cantrip::module(&face)).is_err());
+    let Ability::Static { changes, .. } = &mut face.abilities[1] else { panic!() };
+    let Change::SpellCost(SpellCostModifier::Increase(cost)) = &mut changes[0] else { panic!() };
+    let CostPart::Repeated { times: Expr::CountManaSymbols { colors, .. }, .. } = &mut cost.parts[0] else { panic!() };
+    colors.push(ManaColor::Red);
+    assert!(cantrip::module(&face).is_err(), "a hybrid symbol matching multiple colors needs an explicit union contract");
+}
+
+
+#[test]
+fn returned_card_rules_follow_only_the_first_hand_identity_and_bind_its_owner() {
+    use cantrip_oracle_codegen::ir::*;
+    let mut face = native_face("Firestorm Phoenix");
+    face.name = "Another reborn creature".into();
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("replacements::this_would_die"));
+    assert!(generated.contains("replacements::owners_hand_instead_apply"));
+    assert!(generated.contains("old == asker.source && new == id"));
+    assert!(generated.contains("q.obj(id).zone.is(ZoneKind::Hand)"));
+    assert!(generated.contains("LastingRuleKind::RevealedInHand"));
+    assert!(generated.contains("LastingRuleKind::CantBePlayed"));
+    assert!(generated.contains("about: Target::Player(owner)"));
+    assert!(generated.contains("Duration::UntilNextTurnOf(owner)"));
+    assert!(!generated.contains(".became"), "do not chase later moves or a same-named copy");
+    assert!(cantrip::planned::without_features(&["returned-hand-rules"], || cantrip::module(&face)).is_err());
+    let Ability::Replacement { body, .. } = &mut face.abilities[1] else { panic!() };
+    let Instruction::Effect { operation: Operation::CreateContinuousEffect { affected, .. }, .. } = &mut body.instructions[1] else { panic!() };
+    *affected = EffectSubjects::Players(PlayerSet::One(PlayerRef::AbilityController));
+    assert!(cantrip::module(&face).is_err(), "another player's visibility/play permission is not silently rebound to the owner");
+}
