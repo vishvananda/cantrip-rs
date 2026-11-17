@@ -49,3 +49,18 @@ batches: supertypes, landwalk, damage life results, partial prevention and then
 more involved casting/payment/combat/history interfaces. Keep generator-only
 work separate from the 13 genuinely missing engine capabilities listed in the
 [backlog reassessment](ice-age-reassessment-20261117.md).
+
+## First interface-family batch
+
+Added native adapters for the four supertype flags, chosen ordinary/snow landwalk
+over all land subtypes, and constant damage-related life floors. Life floors use
+the shared joint-life-results replacement callbacks, preserving damage and
+lifelink. Shared **basic** land types retain the basic-only lookup; unrestricted
+land types use the new full lookup.
+
+Ali from Cairo, Arcum’s Weathervane, Barbarian Guides and Illusionary Presence now
+generate without gaps and type-check against the real API. The current smoke
+fixture contains **11 examples**, and **80 generator tests** pass. Relevant
+Source regressions (8 tests) also pass. This brings the original43 to **5 cleanly
+generated / 38 awaiting adapters**, plus the newly ready Library of Leng.
+The earlier checkpoint figures above are historical.

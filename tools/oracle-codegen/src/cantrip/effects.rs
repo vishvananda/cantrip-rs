@@ -4904,19 +4904,32 @@ impl Compiler {
                     }
                 ) =>
             {
-                let ObjectFilter::Shares { with, .. } = &**land else {
+                let ObjectFilter::Shares { with, property } = &**land else {
                     return Err(gap("landwalk of Shares"));
                 };
+                let lookup = if matches!(property, DistinctProperty::BasicLandTypes) { "landwalk" }
+                    else if planned::switched_on("landwalk-all-types") { "landwalk_of" }
+                    else { return Err(gap("landwalk of all the shared land types")); };
                 vec![format!(
-                    "{{ let walks: Vec<Keyword> = {}.into_iter().flat_map(|o: ObjectId| q.chars(o).subtypes.iter()).filter_map(Keyword::landwalk).collect(); EffectKind::AddKeywords(Keywords::of(&walks)) }}",
+                    "{{ let walks: Vec<Keyword> = {}.into_iter().flat_map(|o: ObjectId| q.chars(o).subtypes.iter()).filter_map(Keyword::{lookup}).collect(); EffectKind::AddKeywords(Keywords::of(&walks)) }}",
                     self.object(with)?
                 )]
             }
             Change::GrantKeyword(Keyword::Landwalk(land))
+                if matches!(&**land, ObjectFilter::AllOf(filters) if filters.len()==2
+                    && filters.iter().any(|f| matches!(f,ObjectFilter::Supertype(crate::mtg_types::SuperType::Snow)))
+                    && filters.iter().any(|f| matches!(f,ObjectFilter::Chosen(ValueKind::LandType | ValueKind::BasicLandType)))) => {
+                if !planned::switched_on("snow-landwalk-all-types") { return Err(gap("snow landwalk of the chosen land type")); }
+                let chosen = self.chosen_local(ValueKind::LandType)?;
+                vec![format!("EffectKind::AddKeywords(Keyword::snow_landwalk_of({chosen}).map_or(Keywords::of(&[]), |walk| Keywords::of(&[walk])))")]
+            }
+            Change::GrantKeyword(Keyword::Landwalk(land))
                 if matches!(&**land, ObjectFilter::Chosen(ValueKind::LandType | ValueKind::BasicLandType)) =>
             {
-                // The native keyword set has each basic landwalk. Broader
-                // subtype choices still need a dynamic landwalk rule.
+                if planned::switched_on("landwalk-all-types") {
+                    let chosen = self.chosen_local(ValueKind::LandType)?;
+                    return Ok(vec![format!("EffectKind::AddKeywords(Keyword::landwalk_of({chosen}).map_or(Keywords::of(&[]), |walk| Keywords::of(&[walk])))")]);
+                }
                 if !self.chosen.iter().any(|(kind, _)| *kind == ValueKind::BasicLandType) {
                     return Err(gap("landwalk of an unrestricted chosen land type"));
                 }
@@ -4972,11 +4985,11 @@ impl Compiler {
             )],
             Change::AddSupertype(t) => vec![lane_g::planned_kind(
                 "engine: no effect changes supertypes",
-                format!("EffectKind::AddSupertype(Supertype::{t:?})"),
+                format!("EffectKind::AddSupertypes({})", supertype_effect(t)?),
             )],
             Change::RemoveSupertype(t) => vec![lane_g::planned_kind(
                 "engine: no effect changes supertypes",
-                format!("EffectKind::LoseSupertype(Supertype::{t:?})"),
+                format!("EffectKind::LoseSupertypes({})", supertype_effect(t)?),
             )],
             Change::RemoveCardType(t) => vec![lane_g::planned_kind(
                 "engine: no effect removes a card type",
@@ -5128,4 +5141,18 @@ mod choice_context_tests {
             }
         }
     }
+}
+
+/// A layer-4 supertype change preserves every flag not named by the effect.
+fn supertype_effect(kind: &crate::mtg_types::SuperType) -> Result<String> {
+    use crate::mtg_types::SuperType;
+    let flags = match kind {
+        SuperType::Basic => [true,false,false],
+        SuperType::Legendary => [false,true,false],
+        SuperType::Snow => [false,false,true],
+        SuperType::World if planned::switched_on("world-rule") => [false,false,false],
+        _ => return Err(gap(format!("supertype effect {kind:?}"))),
+    };
+    let other = if matches!(kind, SuperType::World) { vec!["World".into()] } else { vec![] };
+    Ok(lane_p::printed_supertypes(flags, &other))
 }

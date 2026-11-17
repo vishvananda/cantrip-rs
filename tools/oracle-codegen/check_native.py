@@ -17,7 +17,7 @@ def main():
     args = parser.parse_args()
     tooling = Path(__file__).resolve().parent
     native = args.cantrip.resolve()
-    records = (args.records or tooling / "tests/fixtures/linked_history_records.jsonl").resolve()
+    records = (args.records or tooling / "tests/fixtures/native_interface_records.jsonl").resolve()
     generator = (args.generator or tooling / "target/debug/cantrip-oracle-codegen").resolve()
     if not generator.is_file():
         parser.error("build the generator first: cargo build --locked --manifest-path tools/oracle-codegen/Cargo.toml")

@@ -89,14 +89,14 @@ fn live_discard_replacement_uses_effect_controller_only_on_capable_engines() {
     assert!(cantrip::planned::with_features(&[],||cantrip::module(&face)).is_err());
 }
 
-fn linked_history_face(name: &str) -> cantrip_oracle_codegen::ir::Card {
-    corpus::read_cards(&std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/linked_history_records.jsonl"))
+fn native_face(name: &str) -> cantrip_oracle_codegen::ir::Card {
+    corpus::read_cards(&std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/native_interface_records.jsonl"))
         .unwrap().into_iter().flat_map(|record|record.card.faces).find(|face|face.name==name).unwrap()
 }
 
 #[test]
 fn linked_tokens_use_the_creating_ability_and_acquisition_without_broad_cause_matching() {
-    let face=linked_history_face("Tetravus");
+    let face=native_face("Tetravus");
     let generated=cantrip::module(&face).unwrap();
     assert!(generated.contains("tokens_created_by("));
     assert!(generated.contains("index: 0"));
@@ -109,7 +109,7 @@ fn linked_tokens_use_the_creating_ability_and_acquisition_without_broad_cause_ma
 
 #[test]
 fn historical_deaths_project_only_the_first_surviving_destination() {
-    let face=linked_history_face("Krovikan Vampire");
+    let face=native_face("Krovikan Vampire");
     let generated=cantrip::module(&face).unwrap();
     assert!(generated.contains("q.found_all_after_move(old)"));
     assert!(generated.contains("became.is_none()"));
@@ -118,7 +118,7 @@ fn historical_deaths_project_only_the_first_surviving_destination() {
 
 #[test]
 fn counter_removal_reads_the_recorded_remover_and_resulting_total() {
-    let generated=cantrip::module(&linked_history_face("Divine Intervention")).unwrap();
+    let generated=cantrip::module(&native_face("Divine Intervention")).unwrap();
     assert!(generated.contains("Event::CountersRemoved { object, kind, amount, total, by, .. }"));
     assert!(generated.contains("by.as_ref().is_some_and(|by|"));
     assert!(generated.contains("*total == 0"));
@@ -127,7 +127,7 @@ fn counter_removal_reads_the_recorded_remover_and_resulting_total() {
 
 #[test]
 fn a_chosen_actor_does_not_rebind_the_ability_controller_or_repeat_for_all_players() {
-    let generated=cantrip::module(&linked_history_face("Stardew Valley")).unwrap();
+    let generated=cantrip::module(&native_face("Stardew Valley")).unwrap();
     assert!(generated.contains("choose::player(g, asker.controller, asker.source, among_"));
     assert!(generated.contains("Some(doer_"));
     assert!(!generated.contains("Asker::new(asker.source, doer_"));
@@ -136,10 +136,42 @@ fn a_chosen_actor_does_not_rebind_the_ability_controller_or_repeat_for_all_playe
 
 #[test]
 fn entry_sacrifice_counts_read_the_linked_historical_rows() {
-    let face=linked_history_face("Wood Elemental");
+    let face=native_face("Wood Elemental");
     let generated=cantrip::module(&face).unwrap();
     assert!(generated.contains("sacrificed_as_entered(q.state(), q.linked_to(asker.source))"));
     assert!(generated.contains("row.subtypes.has(q.words(asker.source).subtype(Subtype::Forest))"));
     assert!(!generated.contains("q.chars(row.id)"));
     assert!(cantrip::planned::without_features(&["entry-sacrifice-history"],||cantrip::module(&face)).is_err());
+}
+
+#[test]
+fn supertype_changes_use_independent_native_flags_and_keep_capability_gating() {
+    let face=native_face("Arcum's Weathervane");
+    let generated=cantrip::module(&face).unwrap();
+    assert!(generated.contains("EffectKind::AddSupertypes(Supertypes { basic: false, legendary: false, snow: true, world: false }"));
+    assert!(generated.contains("EffectKind::LoseSupertypes(Supertypes { basic: false, legendary: false, snow: true, world: false }"));
+    assert!(cantrip::planned::without_features(&["supertype-changes"],||cantrip::module(&face)).is_err());
+}
+
+#[test]
+fn damage_floor_replaces_life_results_through_the_native_damage_authority() {
+    let face=native_face("Ali from Cairo");
+    let generated=cantrip::module(&face).unwrap();
+    assert!(generated.contains("replacement(ReplacementKind::LifeChange"));
+    assert!(generated.contains("damage_would_reduce_your_life_below::<{1}>"));
+    assert!(generated.contains("reduces_your_life_to::<{1}>"));
+    assert!(!generated.contains("ReplacementKind::Damage"));
+    assert!(cantrip::planned::without_features(&["damage-life-results-floor"],||cantrip::module(&face)).is_err());
+}
+
+#[test]
+fn chosen_landwalks_keep_the_snow_qualification_and_include_nonbasic_subtypes() {
+    for (name, feature, method) in [("Barbarian Guides","snow-landwalk-all-types","Keyword::snow_landwalk_of("),
+        ("Illusionary Presence","landwalk-all-types","Keyword::landwalk_of(")] {
+        let face=native_face(name);
+        let generated=cantrip::module(&face).unwrap();
+        assert!(generated.contains(method),"{name}: {generated}");
+        assert!(!generated.contains("match chosen_"));
+        assert!(cantrip::planned::without_features(&[feature],||cantrip::module(&face)).is_err());
+    }
 }

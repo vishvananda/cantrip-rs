@@ -210,6 +210,14 @@ impl Compiler {
         let yours = matches!(players, PlayerSet::One(PlayerRef::AbilityController));
         let function = format!("{label}_rule");
         match rule {
+            PlayerRule::DamageLifeFloor(Expr::Constant(floor)) => {
+                if !planned::switched_on("damage-life-results-floor") { return Err(gap("damage life-results floor")); }
+                let floor = i32::try_from(*floor).map_err(|_| gap("numeric range of a damage life-results floor"))?;
+                let guard = self.guard()?;
+                let member = self.player_member(players)?;
+                writeln!(self.functions, "fn {function}(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {{ let Proposal::LifeChange(loss) = proposal else {{ return false }}; let player = loss.player; {guard}{member} && cantrip_mechanics::replacements::damage_would_reduce_your_life_below::<{{{floor}}}>(q, &Asker::new(asker.source, player), proposal) }}").unwrap();
+                parts.entry("replacements", format!("replacement(ReplacementKind::LifeChange, {function}, cantrip_mechanics::replacements::reduces_your_life_to::<{{{floor}}}>, {})", quoted(&format!("damage reduces an affected player's life total to {floor} instead"))));
+            }
             PlayerRule::Primitive { name, .. } => {
                 return Err(gap(format!("primitive player rule {name}")))
             }

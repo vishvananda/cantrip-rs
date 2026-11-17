@@ -8,7 +8,7 @@
   "frozen_oracle_sha256": "2281f3d715e8ee6127825154b31202918ef83a9d9a3641a0d23b0163ebea3065",
   "source_ron_sha256": "7c1f493906004497a6682071481ddabf1ce15e9efc63834a904554ffd35a14a7",
   "backlog_records_sha256": "4baa58c98b4bff1e017a7c99ddacf1fd4a85dfed77467a05c9b8154a71735e91",
-  "tracked_rows_sha256": "0c011a57dc8cc16c17a78423940d9f3c05b49455a68de3b8501a7e04c69f75d3",
+  "tracked_rows_sha256": "5b7430151ce755a2176d4e7a65f2690c1321aa5ed5476d3b4e04b27c82516edc",
   "native_api_sha256": "235fbb1780747dbaa038447d8463320b09a1ba299857305ab5d5ca9e03af3952",
   "counts": {
     "landed_upstream": 43,
@@ -17,14 +17,14 @@
   },
   "validation": {
     "native_full_suite": "Engine baseline 5441ecd742: bash tools/test.sh passed; 27,853 Rust tests (15 ignored), managed tests and client build. Later fork-main host/client/test commits do not change the audited API.",
-    "generator": "77 Rust tests passed",
+    "generator": "80 Rust tests pass; 13 targeted tests repeated after the native-interface fix.",
     "pipeline_python": "437 tests passed",
     "tooling_python": "52 tests passed",
     "mtgish": "1,596 Rust tests passed; 33,529 exported records, zero lowering diagnostics",
     "library_of_leng": "Generated module compiles as a standalone Rust library against the checked-profile current cantrip-api. Card registration and runtime scenarios are not implemented by this audit.",
     "latest_refresh": "Upstream advanced during the audit: rebased from 90204df367 to 5441ecd742. New original-draw receipts, nest counters and unrelated cards do not change the 43/1/13 result.",
     "source_integration": "607 tests passed (12 ignored) against MTGish f7915260; affected targets additionally checked after the final adapters.",
-    "native_api_check": "Seven generated cards type-check against actual cantrip-api and cantrip-mechanics in one isolated crate; full native execution/scenario coverage remains separate."
+    "native_api_check": "11 generated examples type-check against native API/mechanics, including independent supertype flags, broad chosen landwalk and joint damage life-results floors."
   },
   "cards": [
     {
@@ -32,13 +32,7 @@
       "module": "crates/cantrip-cards/src/cards/ali_from_cairo.rs",
       "data": "content/mtg/cards/ali-from-cairo.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "abilities[0]",
-          "feature": "player rule DamageLifeFloor",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "fa44ff5f693a827e3521385b7d6099f75de8bef4",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Ali from Cairo"
@@ -48,13 +42,7 @@
       "module": "crates/cantrip-cards/src/cards/arcums_weathervane.rs",
       "data": "content/mtg/cards/arcums-weathervane.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "",
-          "feature": "engine: no effect changes supertypes",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "a5ba9f7ba84282675c2c55adc233a815fc3c1f24",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Arcum's Weathervane"
@@ -64,13 +52,7 @@
       "module": "crates/cantrip-cards/src/cards/barbarian_guides.rs",
       "data": "content/mtg/cards/barbarian-guides.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "",
-          "feature": "landwalk of AllOf",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "34bcecd533b2148c5c49af42908d6e067e0395fc",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Barbarian Guides"
@@ -510,13 +492,7 @@
       "module": "crates/cantrip-cards/src/cards/illusionary_presence.rs",
       "data": "content/mtg/cards/illusionary-presence.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "abilities[1].instructions[1]",
-          "feature": "landwalk of an unrestricted chosen land type",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "b2b88921a21133f9ba31791e02ce8628fe8014e7",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Illusionary Presence"
@@ -1109,8 +1085,8 @@
   "fork_main_commit": "9889dd28f90c484fde557fa25cf30beb2b45621d",
   "authorship_note": "All 43 original card-addition commits are authored by jschibel. This does not attribute all shared foundation/engine work to that author.",
   "generator_counts": {
-    "landed_and_generated": 1,
-    "landed_needing_adapters": 42,
+    "landed_and_generated": 5,
+    "landed_needing_adapters": 38,
     "unimplemented_but_generated": 1
   }
 }

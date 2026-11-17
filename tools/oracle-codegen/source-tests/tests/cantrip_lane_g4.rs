@@ -19,7 +19,7 @@ const CARDS: &[(&str, &str, bool)] = &[
     // "For as long as it remains exiled": until it moves (CR 400.7).
     ("Kheru Spellsnatcher", "expiry: Expiry::Never, instead: Some(ManaCost::ZERO)", true),
     // The landwalks of the sacrificed land's types.
-    ("Excavator", "filter_map(Keyword::landwalk)", true),
+    ("Excavator", "filter_map(Keyword::landwalk_of)", true),
     ("Excavator", "q.cost_objects(item)", true),
     // The exiled card is linked to the ability the token was given (CR 607.5).
     ("Timothar, Baron of Bats", "acquired: Acquired { by: AcquiredBy::Grant, stamp, part: 0 }", true),

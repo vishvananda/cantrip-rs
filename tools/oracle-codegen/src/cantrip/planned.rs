@@ -39,6 +39,10 @@ const LANDED: &[&str] = &[
 /// holes. `tools/update_cantrip_vocabulary.py` reads this table to write
 /// `FEATURES`: keep each entry on one line, its name a literal.
 const SWITCHED: &[(&str, &str, &[&str])] = &[
+    ("supertype-changes", "AddSupertypes(Supertypes)", &["engine-no-effect-changes-supertypes"]),
+    ("landwalk-all-types", "pub fn landwalk_of(land_type: Subtype)", &[]),
+    ("snow-landwalk-all-types", "pub fn snow_landwalk_of(land_type: Subtype)", &[]),
+    ("damage-life-results-floor", "pub fn damage_would_reduce_your_life_below<const N: i32>", &[]),
     ("entry-sacrifice-history", "pub fn sacrificed_as_entered(self, state:", &[]),
     ("game-draw-effect", "fn draw_game(&mut self)", &["engine-no-effect-draws-the-game"]),
     ("linked-token-creations", "pub fn tokens_created_by(&self, by: Linked, ability: AbilityRef)", &[]),

@@ -89,10 +89,10 @@ For an actual native API check, after building the CLI:
 python3 tools/oracle-codegen/check_native.py --cantrip .
 ```
 
-This type-checks seven producer-neutral schema-192 examples against the native
+This type-checks eleven producer-neutral schema-192 examples against the native
 API and mechanics in a temporary crate, with a reusable dependency cache. It
 does not build the engine, card registry or clients. CI runs this check alongside
-the 77 standalone generator tests and the separate pinned Source integration.
+the 80 standalone generator tests and the separate pinned Source integration.
 Linked token references use the creating ability and its acquisition; historical
 deaths project only their first surviving destinations. Entry-sacrifice counts
 read historical rows. Explicit acting-player scopes preserve the original
