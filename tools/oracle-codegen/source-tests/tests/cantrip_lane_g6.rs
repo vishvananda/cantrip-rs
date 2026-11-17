@@ -35,7 +35,7 @@ const CARDS: &[(&str, &str, bool)] = &[
     // Several objects returned tapped and attacking (CR 508.4).
     ("Noctis, Heir Apparent", "g.enter_attacking(&[entered], defender);", true),
     // "Each of them enters with an additional ... counter if it's a creature".
-    ("Semester's End", "EffectKind::Replacement { card: item.ability.card, index: 1 }", true),
+    ("Semester's End", "EffectKind::Replacement { card: item.ability.card, index: 1, to: Target::None, into: Target::None }", true),
     // "Sacrifice half the lands you control, rounded up" as its total cost is determined.
     ("Tectonic Split", "cost_of_targets: Some(ability_0_of_board)", true),
     // Hexproof from the chosen color; the block rule reading it is Cantrip's gap.

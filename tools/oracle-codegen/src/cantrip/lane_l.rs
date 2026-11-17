@@ -2419,6 +2419,47 @@ impl Compiler {
                 body,
                 payer,
                 mana,
+            } if planned::switched_on("cancelable-delayed-triggers") => {
+                if !self.stack_item { return Err(gap("cancelable delayed trigger without its creating stack item")); }
+                let Operand::Term { family, form, operands } = &**event else { return Err(gap("cancelable delayed trigger with an unnamed deadline")); };
+                if family != "FutureTrigger" || form != "AtTheBeginningOfPlayersNextDrawStep" { return Err(gap("cancelable delayed trigger with another deadline")); }
+                let [Operand::Player(next_player)] = operands.as_slice() else { return Err(gap("cancelable delayed trigger with a plural deadline")); };
+                let Operand::Program(program) = &**body else { return Err(gap("cancelable delayed trigger without a program")); };
+                // The current capture layout carries one player independently
+                // of the payer. Do not let other lexical values leak into it.
+                let [Instruction::Effect { operation: Operation::LoseLife {
+                    players: PlayerSet::One(PlayerRef::EventSubject), amount: Expr::Constant(_),
+                }, .. }] = program.instructions.as_slice() else { return Err(gap("cancelable delayed trigger with an unsupported capture layout")); };
+                let Operand::List(symbols) = &**mana else { return Err(gap("cancelable delayed trigger with an unstated mana cost")); };
+                let [Operand::Term { family, form, operands }] = symbols.as_slice() else { return Err(gap("cancelable delayed trigger with a compound mana cost")); };
+                if family != "ManaSymbol" || form != "ManaCostGeneric" { return Err(gap("cancelable delayed trigger with nongeneric mana")); }
+                let [Operand::Integer(n)] = operands.as_slice() else { return Err(gap("cancelable delayed trigger with a variable payment")); };
+                let n = u32::try_from(*n).map_err(|_| gap("cancelable delayed payment outside u32"))?;
+                let payer = self.fetch(self.player(payer)?);
+                let subject = self.fetch(self.player(&PlayerRef::EventSubject)?);
+                let next = self.fetch(self.player(next_player)?);
+                let label = format!("unless_paid_{}", self.fresh());
+                let index = self.delayed.len();
+                u8::try_from(index + 1).map_err(|_| gap("more than 256 delayed abilities"))?;
+                let results = self.results();
+                let frame = std::mem::replace(&mut self.frame, Frame { player: Some(Carried::Subject), ..Frame::default() });
+                let resolving_spell = std::mem::replace(&mut self.resolving_spell, false);
+                let effect = self.effect(program, &label);
+                self.frame = frame;
+                self.resolving_spell = resolving_spell;
+                self.restore_results(results);
+                let effect = effect?;
+                self.delayed.push(format!("delayed_trigger({effect}, {})", quoted(&ability_text(program))));
+                writeln!(self.functions, "#[allow(unused_variables)] fn {label}_paid(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {{ Ok(()) }}").unwrap();
+                self.delayed.push(format!("ability(Cost::mana({}), {label}_paid, {}).special_action()", super::mana(&[ManaSymbol::Generic(n)])?, quoted(&format!("Pay {{{n}}} before the draw step."))));
+                let (source, controller, card) = self.maker();
+                writeln!(out, "let payer_{id} = {payer}; let subject_{id} = {subject}; let next_{id} = {next}; if let (Some(payer), Some(subject), Some(next)) = (payer_{id}, subject_{id}, next_{id}) {{ g.delayed_trigger_unless(DelayedWhen::Step {{ step: Step::Draw, on_turn_of: Some(next) }}, {source}, {controller}, AbilityRef::delayed({card}, {index}), Target::Player(subject), payer, AbilityRef::delayed({card}, {}), Duration::UntilNextStepOf {{ step: Step::Draw, player: Some(next) }}); }}", index + 1).unwrap();
+            }
+            Operation::DelayedUnlessPaid {
+                event,
+                body,
+                payer,
+                mana,
             } => {
                 let payer = self.fetch(self.player(payer)?);
                 let (event, body, mana) = (

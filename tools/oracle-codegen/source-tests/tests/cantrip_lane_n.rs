@@ -19,8 +19,8 @@ const CARDS: &[(&str, &str)] = &[
     ("Crafty Cutpurse", "t.controller ="),
     // "That player or a planeswalker that player controls": chosen as it resolves.
     ("Vial Smasher the Fierce", "candidates: candidates_"),
+    ("Land Equilibrium", ".afterward("),
     // What Cantrip doesn't have yet is named as a requirement.
-    ("Land Equilibrium", "event change then"),
     ("Twinning Staff", "replacement event CopySpell"),
     ("Vedalken Squirrel-Whacker", "replacement of RollD6"),
     ("Grifter's Blade", "what a permanent could be attached to"),

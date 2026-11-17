@@ -558,6 +558,41 @@ impl Compiler {
         )
         .unwrap();
     }
+    fn skip_own_draw_step(&mut self, label: &str, active: &ReplacementActive, event: &ReplacementEvent,
+        body: &Program, parts: &mut Parts) -> Result<bool>
+    {
+        if !planned::switched_on("draw-step-begin-replacements")
+            || !matches!(active, ReplacementActive::Battlefield)
+            || !matches!(event, ReplacementEvent::Player { event: ReplacedPlayerEvent::BeginDrawStep,
+                players: PlayerSet::One(PlayerRef::AbilityController) }) { return Ok(false); }
+        let [Instruction::Effect { result: paid, operation: Operation::PayCost {
+            player: PlayerRef::AbilityController, cost, optional: true,
+        } }, Instruction::If { condition: Condition::PaymentChosen(chosen), then, otherwise }] = body.instructions.as_slice()
+        else { return Ok(false) };
+        if paid.0 != chosen.0 || !otherwise.instructions.is_empty() { return Ok(false); }
+        let [CostPart::PlayerAction { player: PlayerRef::AbilityController, body: payment }] = cost.parts.as_slice()
+        else { return Ok(false) };
+        if !matches!(payment.instructions.as_slice(), [Instruction::Effect {
+            operation: Operation::ModifyEvent { change: EventChange::Cancel }, ..
+        }]) { return Ok(false); }
+        let saved = (self.reader, self.event_at, self.stack_item, self.frame);
+        let results = self.results();
+        self.reset_results();
+        (self.reader, self.event_at, self.stack_item) = (Reader::Resolution, EventAt::Nowhere, false);
+        self.frame = Frame::default();
+        let mut code = String::new();
+        let compiled = self.program(then, &mut code, true);
+        (self.reader, self.event_at, self.stack_item, self.frame) = saved;
+        self.restore_results(results);
+        compiled?;
+        let function = format!("{label}_on_skip");
+        let question = format!("{}_SKIP", label.to_ascii_uppercase());
+        let text = quoted(&ability_text(then));
+        writeln!(self.functions, "#[allow(unused_variables)] fn {function}(g: &mut dyn Game, asker: &Asker) -> Result<(), Suspend> {{ {code} Ok(()) }}").unwrap();
+        writeln!(self.functions, "static {question}: Question = Question::new(\"SkipDrawStep\", \"skip your draw step?\", {text}, \"Skip it\", \"Decline\").no_default();").unwrap();
+        parts.table("step_begin", format!("StepBeginRule {{ on_skip: {function}, question: &{question} }}"));
+        Ok(true)
+    }
     pub(super) fn replacement(
         &mut self,
         label: &str,
@@ -574,6 +609,7 @@ impl Compiler {
         }
         self.replacing = Default::default();
         let guard = self.ability_guard.take();
+        if guard.is_none() && self.skip_own_draw_step(label, active, event, body, parts)? { return Ok(()); }
         if guard.is_none() && lane_h::reveal_and_shuffle_instead(active, event, body) {
             parts.replacements.push(
                 "cantrip_mechanics::replacements::REVEAL_AND_SHUFFLE_INTO_LIBRARY_INSTEAD_OF_GRAVEYARD"
@@ -712,6 +748,9 @@ impl Compiler {
         }
         if let Some(then) = then {
             def.push_str(&format!(".then({then})"));
+        }
+        if let Some(afterward) = self.replacing.afterward.take() {
+            def.push_str(&format!(".afterward({afterward})"));
         }
         if let Some(ask) = self.replacing.may.take() {
             def.push_str(&format!(".optional(&{ask})"));
@@ -898,6 +937,17 @@ impl Compiler {
         }
         edits.push_str(&self.guarded_edits(shape, frame)?);
         edits.push_str(&self.replacing.edits);
+        let after_steps = std::mem::take(&mut self.replacing.after_steps);
+        if !after_steps.is_empty() {
+            if made || arms.len() != 1 || kind != "ZoneChange" {
+                return Err(gap("post-move callback for a granted or mixed replacement"));
+            }
+            let after = format!("{label}_afterward");
+            let steps = after_steps.into_iter().map(|steps| format!("{{ {steps} }}")).collect::<String>();
+            writeln!(self.functions, "#[allow(unused_variables, unused_mut)] fn {after}_steps(g: &mut dyn Game, asker: &Asker, subject: Target, data: [u32; 2]) -> Result<(), Suspend> {{ {steps} Ok(()) }}").unwrap();
+            writeln!(self.functions, "#[allow(unused_variables)] fn {after}(g: &mut dyn Game, asker: &Asker, _: &Proposal, after: &Proposal) {{ if let Proposal::ZoneChange({binding}) = after {{ if {binding}.put_by.is_none() {{ return; }} let q: &dyn Query = g; {locals} let _ = {after}_steps(g, asker, subject, data); }} }}").unwrap();
+            self.replacing.afterward = Some(after);
+        }
         let apply = format!("{label}_apply");
         // Reads see a copy, so `apply` may write as it reads.
         writeln!(self.callbacks(), "#[allow(unused_variables, unused_mut)] fn {apply}(q: &dyn Query, asker: &Asker, {about}proposal: &mut Proposal) {{ let seen = *proposal; if let Proposal::{variant}(seen) = &seen {{ let {binding} = seen; {locals} if let Proposal::{variant}({binding}) = proposal {{ {edits} }} }} }}").unwrap();
@@ -1367,11 +1417,10 @@ impl Compiler {
         let made = if shield.is_some() {
             lane_n::shielded_redirect(index)
         } else if about {
-            let kind = if self.capture_made_x { "CapturedReplacement" }
-                else if planned::switched_on("explicit-redirection-destinations") { "ReplacementRule" }
-                else { "Replacement" };
-            let value = if self.capture_made_x { ", value: created_x" } else { "" };
-            format!("let _ = to; g.add_effect(item.object, about, EffectKind::{kind} {{ card: item.ability.card, index: {index}{value} }}, DURATION);")
+            let kind = if self.capture_made_x {
+                format!("EffectKind::CapturedReplacement {{ card: item.ability.card, index: {index}, value: created_x }}")
+            } else { lane_n::object_replacement(index) };
+            format!("let _ = to; g.add_effect(item.object, about, {kind}, DURATION);")
         } else {
             let kind = if self.capture_made_x { "CapturedReplacementRule" } else { "ReplacementRule" };
             let value = if self.capture_made_x { ", value: created_x" } else { "" };

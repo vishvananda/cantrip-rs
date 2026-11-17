@@ -41,7 +41,7 @@ const CARDS: &[(&str, &str)] = &[
     ),
     (
         "Semester's End",
-        "EffectKind::ReplacementRule { card: item.ability.card, index: 1 }",
+        "EffectKind::Replacement { card: item.ability.card, index: 1, to: Target::None, into: Target::None }",
     ),
     (
         "Psychic Vortex",

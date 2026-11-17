@@ -492,3 +492,65 @@ fn every_native_interface_fixture_generates_a_real_card_definition() {
         assert!(generated.contains("pub static CARD: CardDef ="), "{}", face.name);
     }
 }
+
+#[test]
+fn optional_draw_step_skipping_uses_the_native_step_rule_and_runs_only_the_chosen_branch() {
+    use cantrip_oracle_codegen::ir::*;
+    let mut face = native_face("Fasting");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("step_begin: &[StepBeginRule"));
+    assert!(generated.contains("skip your draw step?"));
+    assert!(generated.contains(".no_default()"));
+    assert!(generated.contains("g.gain_life("));
+    assert!(!generated.contains("Proposal::BeginDrawStep"));
+    assert!(cantrip::planned::without_features(&["draw-step-begin-replacements"], || cantrip::module(&face)).is_err());
+    let Ability::Replacement { event: ReplacementEvent::Player { players, .. }, .. } = &mut face.abilities[1] else { panic!() };
+    *players = PlayerSet::All;
+    assert!(cantrip::module(&face).is_err(), "the native table asks only its controller");
+}
+
+#[test]
+fn an_advance_payment_cancels_only_its_own_delayed_ability_before_its_deadline() {
+    use cantrip_oracle_codegen::ir::*;
+    let mut face = native_face("Nafs Asp");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("g.delayed_trigger_unless("));
+    assert!(generated.contains(".special_action()"));
+    assert!(generated.contains("Duration::UntilNextStepOf { step: Step::Draw"));
+    assert!(generated.contains("PlayerId(item.data[1] as u8)"), "capture the damaged player");
+    assert!(generated.contains("Target::Player(subject), payer"));
+    assert!(generated.contains("item.subject.player()"), "the future body reads that captured player");
+    assert!(cantrip::planned::without_features(&["cancelable-delayed-triggers"], || cantrip::module(&face)).is_err());
+    let Ability::Triggered { body, .. } = &mut face.abilities[0] else { panic!() };
+    let Instruction::Effect { operation: Operation::DelayedUnlessPaid { body, .. }, .. } = &mut body.instructions[0] else { panic!() };
+    let Operand::Program(body) = &mut **body else { panic!() };
+    let Instruction::Effect { operation: Operation::LoseLife { amount, .. }, .. } = &mut body.instructions[0] else { panic!() };
+    *amount = Expr::AnnouncedX;
+    assert!(cantrip::module(&face).is_err(), "the native player capture does not retain another activation's X");
+}
+
+#[test]
+fn battlefield_put_replacements_keep_the_actor_and_wait_until_after_the_arrival() {
+    use cantrip_oracle_codegen::ir::*;
+    let mut face = native_face("Land Equilibrium");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("z.put_by.is_some_and(|actor|"));
+    assert!(generated.contains(".afterward("));
+    assert!(!generated.contains("z.after("));
+    assert!(generated.contains("z.put_by.is_none()"));
+    for feature in ["post-move-replacements", "putting-player-replacements"] {
+        assert!(cantrip::planned::without_features(&[feature], || cantrip::module(&face)).is_err());
+    }
+    let Ability::Replacement { body, .. } = &mut face.abilities[0] else { panic!() };
+    let Instruction::Effect { operation: Operation::ModifyEvent { change: EventChange::Then(body) }, .. } = &mut body.instructions[0] else { panic!() };
+    let Instruction::Effect { operation: Operation::Sacrifice { objects, .. }, .. } = &mut body.instructions[0] else { panic!() };
+    *objects = ObjectSet::One(ObjectRef::EventSubject);
+    assert!(cantrip::gaps(&face).iter().any(|gap|gap.feature=="post-move replacement reading the moved object's new identity"));
+}
+
+#[test]
+fn object_specific_entry_replacements_end_with_their_object_instead_of_becoming_global_rules() {
+    let face = native_face("Semester's End");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("EffectKind::Replacement { card: item.ability.card, index: 1, to: Target::None, into: Target::None }"));
+}

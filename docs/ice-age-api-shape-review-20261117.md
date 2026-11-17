@@ -125,8 +125,9 @@ Errant Minion and Power Leak use the native damage-with-prevention interface;
 prevention remains a shield, not subtraction from the damage amount. An arbitrary
 mana payment uses repeated {1} payments, not an {X} cost, preserving restrictions
 on mana that can pay only an X cost. Runesword uses the native regeneration ban
-on an open set. Scoped non-redirection replacements now use `ReplacementRule`,
-separate from redirections with explicit `to` and `into` fields.
+on an open set. The native API distinguishes object-scoped replacements with explicit `to` and
+`into` fields from `ReplacementRule` history/global effects; lifetime details are
+covered in the following batch.
 
 Whippoorwill’s legacy named rule represents both prevention and redirection bans:
 its Source is `DamageDealtToItCantBePreventedOrRedirected`. Both native lasting
@@ -143,3 +144,26 @@ previously accepted diagnostic-only comments as empty modules; it now rejects
 those, and a deliberately unsupported Word of Command record verifies failure.
 The current 28 fixtures all pass the strict check. All 28 focused Source tests
 pass (one ignored), including delayed source/subject and legacy rule profiles.
+
+## Draw-step rules, cancelable delays and post-move instructions
+
+Fasting uses the optional native draw-step replacement, with its benefit in the
+chosen skip callback. Nafs Asp retains the damaged player, makes one delayed
+ability and a matching special action, and expires that payment opportunity when
+the next draw step begins. Unsupported deadline/cost/capture layouts stay gaps.
+Land Equilibrium binds the **putting player** (`put_by`), not the incoming
+permanent’s controller, and sacrifices after the battlefield arrival. Unmodeled
+new-object receipts and granted/mixed post-move callbacks are refused.
+
+Ordinary object-specific entry replacements use `Replacement` with empty `to`
+and `into`, preserving their lifetime when the object leaves. Captured history
+rules such as Runesword use `ReplacementRule`, which intentionally outlives that
+object. Semester’s End is now a native fixture for the former contract.
+
+The original 43 are **22 cleanly generated / 21 awaiting adapters**, plus Library
+of Leng. **103 generator tests** and **32 real native modules** pass. Full CI for
+the preceding interface batch passed all 607 Source tests (12 ignored). The local
+batch-six full sweep found only the old Land Equilibrium expected-gap string;
+that is corrected, with all six affected Source tests passing. The later family5
+CI failure was another stale Semester’s End field assertion, now corrected to
+the fully specified scoped replacement. No engine/card registrations changed.

@@ -39,6 +39,10 @@ const LANDED: &[&str] = &[
 /// holes. `tools/update_cantrip_vocabulary.py` reads this table to write
 /// `FEATURES`: keep each entry on one line, its name a literal.
 const SWITCHED: &[(&str, &str, &[&str])] = &[
+    ("post-move-replacements", "pub afterward: Option<ReplacementThen>", &[]),
+    ("putting-player-replacements", "pub put_by: Option<PlayerId>", &[]),
+    ("draw-step-begin-replacements", "pub struct StepBeginRule", &[]),
+    ("cancelable-delayed-triggers", "fn delayed_trigger_unless(", &[]),
     ("repeated-mana-payments", "fn may_pay_times(&mut self, payer: PlayerId", &[]),
     ("explicit-redirection-destinations", "Replacement { card: CardId, index: u8, to: Target, into: Target }", &[]),
     ("damage-with-prevention", "fn damage_preventing(&mut self, source: ObjectId, target: Target, amount: u32, prevent: u32, card: CardId, index: u8)", &[]),

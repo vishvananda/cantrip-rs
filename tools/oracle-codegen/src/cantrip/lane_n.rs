@@ -50,6 +50,11 @@ pub(super) struct Replacing {
     pub each_token: bool,
     /// Changes no `EventChange` says, as statements of `apply`.
     pub edits: String,
+    /// A battlefield-put event binds its putting player independently of who
+    /// will control the permanent.
+    putting: bool,
+    pub after_steps: Vec<String>,
+    pub afterward: Option<String>,
 }
 
 /// The events of one ability that are not one proposal: counters on objects and
@@ -107,6 +112,15 @@ pub(super) fn prevents(changes: &[EventChange]) -> bool {
             | EventChange::PreventSomeDamage(_)
             | EventChange::PreventAllButDamage(_)]
     )
+}
+
+/// A replacement tied to one object's identity ends when that object leaves.
+/// Global/history rules use ReplacementRule instead, so they can outlive it.
+pub(super) fn object_replacement(index: usize) -> String {
+    let destinations = if planned::switched_on("explicit-redirection-destinations") {
+        ", to: Target::None, into: Target::None"
+    } else { "" };
+    format!("EffectKind::Replacement {{ card: item.ability.card, index: {index}{destinations} }}")
 }
 
 /// A pending-damage portion is separate from the shield's total allowance.
@@ -570,6 +584,8 @@ impl Compiler {
         self.replacing.may = None;
         self.replacing.changed.clear();
         self.replacing.edits.clear();
+        self.replacing.after_steps.clear();
+        self.replacing.afterward = None;
         let mut steps = Vec::new();
         lane_m::flat_groups(&program.instructions, &mut steps);
         if let Some((body, rest)) = chosen_instead(&steps) {
@@ -887,6 +903,7 @@ impl Compiler {
     /// What compiling the program of `arms` needs to know of its event.
     pub(super) fn note_event(&mut self, event: &ReplacementEvent, arms: &[Watched]) {
         self.replacing.kind = arms[0].kind;
+        self.replacing.putting = matches!(event, ReplacementEvent::PutOntoBattlefield { .. });
         self.replacing.each_token = matches!(event, ReplacementEvent::Tokens { each: true, .. });
     }
     /// The tokens of a replacement. Those it adds are part of the same event,
@@ -1047,6 +1064,22 @@ impl Compiler {
                 )
             }
             // `ReplacementDef::then` runs as the effect applies: this runs after it.
+            ("ZoneChange", C::Then(program)) if planned::switched_on("post-move-replacements") => {
+                if !self.replacing.putting { return Err(gap("post-move replacement outside a battlefield put")); }
+                use crate::visit::{Visitor, Walk};
+                struct Moved(bool);
+                impl Visitor for Moved {
+                    fn object_ref(&mut self, object: &ObjectRef) -> bool {
+                        self.0 |= matches!(object, ObjectRef::EventSubject | ObjectRef::EventDestination | ObjectRef::Affected);
+                        true
+                    }
+                }
+                let mut moved = Moved(false); program.walk(&mut moved);
+                if moved.0 { return Err(gap("post-move replacement reading the moved object's new identity")); }
+                let steps = self.then_steps(frame, &program.instructions, None)?;
+                self.replacing.after_steps.push(steps);
+                String::new()
+            }
             ("ZoneChange", C::Then(program)) => {
                 let id = self.fresh();
                 let steps = self.then_steps(frame, &program.instructions, None)?;
@@ -1412,7 +1445,9 @@ impl Compiler {
                     object_frame,
                 )
             }
-            ReplacementEvent::PutOntoBattlefield { players, objects } => {
+            ReplacementEvent::PutOntoBattlefield { players, objects }
+                if planned::switched_on("putting-player-replacements") =>
+            {
                 let frame = Frame {
                     object: Some(Carried::Subject),
                     player: Some(Carried::Data(0)),
@@ -1424,13 +1459,14 @@ impl Compiler {
                 };
                 let mut tests = vec!["z.to.is(ZoneKind::Battlefield)".to_string()];
                 tests.push(self.matching(frame, |c| c.filter(objects, &entering))?);
-                tests.push(self.matching(frame, |c| c.player_in(players, "z.controller"))?);
+                let actor = self.matching(frame, |c| c.player_in(players, "actor"))?;
+                tests.push(format!("z.put_by.is_some_and(|actor| {actor})"));
                 one(
                     Watched {
                         kind: "ZoneChange",
                         variant: "ZoneChange",
                         binding: "z",
-                        locals: "let id = z.object; let subject = Target::Object(id); let data = [u32::from(z.controller.0), u32::MAX];".into(),
+                        locals: "let id = z.object; let subject = Target::Object(id); let data = [z.put_by.map_or(u32::MAX, |actor| u32::from(actor.0)), u32::MAX];".into(),
                         tests,
                     },
                     frame,
@@ -2188,8 +2224,8 @@ impl Compiler {
                     writeln!(self.functions, "#[allow(unused_variables)] fn produces_{id}_apply(q: &dyn Query, asker: &Asker, affected: ObjectId, proposal: &mut Proposal) {{ if let Proposal::ManaProduction(m) = proposal {{ let n = std::mem::take(&mut m.mana.0[Mana::{color} as usize]); m.mana.0[Mana::{instead} as usize] += n; }} }}").unwrap();
                     self.add_made_replacement(format!("granted_replacement(ReplacementKind::ManaProduction, produces_{id}_applies, produces_{id}_apply, \"produces another type of mana instead\")"));
                     let index = self.made_replacements.len() - 1;
-                    let kind = if planned::switched_on("explicit-redirection-destinations") { "ReplacementRule" } else { "Replacement" };
-                    writeln!(out, "if let Some(object) = {object} {{ g.add_effect(item.object, object, EffectKind::{kind} {{ card: item.ability.card, index: {index} }}, Duration::Indefinite); }}").unwrap();
+                    let kind = object_replacement(index);
+                    writeln!(out, "if let Some(object) = {object} {{ g.add_effect(item.object, object, {kind}, Duration::Indefinite); }}").unwrap();
                     return Ok(true);
                 }
                 let until = self.stated_until(duration)?;

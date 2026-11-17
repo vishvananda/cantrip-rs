@@ -8,7 +8,7 @@
   "frozen_oracle_sha256": "2281f3d715e8ee6127825154b31202918ef83a9d9a3641a0d23b0163ebea3065",
   "source_ron_sha256": "7c1f493906004497a6682071481ddabf1ce15e9efc63834a904554ffd35a14a7",
   "backlog_records_sha256": "4baa58c98b4bff1e017a7c99ddacf1fd4a85dfed77467a05c9b8154a71735e91",
-  "tracked_rows_sha256": "75c17d6c5590ce02e75ba800466babf6ccefcb33cbff8ea129c96c76689634cb",
+  "tracked_rows_sha256": "bc20de4262cbdcc76c8e2eecf4fcd0b813dcadd3ac4d89298663d136bf9ad999",
   "native_api_sha256": "235fbb1780747dbaa038447d8463320b09a1ba299857305ab5d5ca9e03af3952",
   "counts": {
     "landed_upstream": 43,
@@ -17,14 +17,14 @@
   },
   "validation": {
     "native_full_suite": "Engine baseline 5441ecd742: bash tools/test.sh passed; 27,853 Rust tests (15 ignored), managed tests and client build. Later fork-main host/client/test commits do not change the audited API.",
-    "generator": "99 Rust tests pass. Every native fixture is additionally required to generate a complete module; no unsupported diagnostic comments count as compilable cards.",
+    "generator": "103 Rust tests pass; every smoke fixture must generate a real complete module.",
     "pipeline_python": "437 tests passed",
     "tooling_python": "52 tests passed",
     "mtgish": "1,596 Rust tests passed; 33,529 exported records, zero lowering diagnostics",
     "library_of_leng": "Generated module compiles as a standalone Rust library against the checked-profile current cantrip-api. Card registration and runtime scenarios are not implemented by this audit.",
     "latest_refresh": "Upstream advanced during the audit: rebased from 90204df367 to 5441ecd742. New original-draw receipts, nest counters and unrelated cards do not change the 43/1/13 result.",
-    "source_integration": "Full preceding sweep: 606 passed, 12 ignored, one stale Alabaster expectation subsequently fixed. Last focused sweeps: 46 tests for batch four and 28 tests for batch five pass, each with one ignored; include exact snapshots, legacy profiles and delayed watched-source coverage.",
-    "native_api_check": "28 real generated card modules type-check against native API/mechanics. The smoke checker rejects missing CARD definitions; unsupported Word of Command was manually confirmed to fail before compilation."
+    "source_integration": "Batch-four full CI green: 607 tests passed,12 ignored. Batch-six local full sweep:606 passed,12 ignored, only stale Land Equilibrium expectation failed; corrected and all six affected lane-j/g6/n tests now pass. Family-five 28 affected tests also pass. Full current CI runs after push.",
+    "native_api_check": "32 actual generated modules compile against native API/mechanics, including Fasting, Nafs Asp, Land Equilibrium and Semester\u2019s End. Ordinary object-scoped replacements preserve lifetime with explicit empty destinations; history rules intentionally outlive their captured object."
   },
   "cards": [
     {
@@ -225,13 +225,7 @@
       "module": "crates/cantrip-cards/src/cards/fasting.rs",
       "data": "content/mtg/cards/fasting.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "abilities[1]",
-          "feature": "replacement of BeginDrawStep",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "a44fe93e5a1195a670c1ae3121948b3f3dfb5d32",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Fasting"
@@ -512,13 +506,7 @@
       "module": "crates/cantrip-cards/src/cards/land_equilibrium.rs",
       "data": "content/mtg/cards/land-equilibrium.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "",
-          "feature": "event change then",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "70dbc647d180a216d16b0d36ddc9750f87ec992d",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Land Equilibrium"
@@ -590,13 +578,7 @@
       "module": "crates/cantrip-cards/src/cards/nafs_asp.rs",
       "data": "content/mtg/cards/nafs-asp.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "abilities[0].instructions[0]",
-          "feature": "operation DelayedUnlessPaid",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "9222061f74ce01050eeec74305a833dd3efc2729",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Nafs Asp"
@@ -986,8 +968,8 @@
   "fork_main_commit": "9889dd28f90c484fde557fa25cf30beb2b45621d",
   "authorship_note": "All 43 original card-addition commits are authored by jschibel. This does not attribute all shared foundation/engine work to that author.",
   "generator_counts": {
-    "landed_and_generated": 19,
-    "landed_needing_adapters": 24,
+    "landed_and_generated": 22,
+    "landed_needing_adapters": 21,
     "unimplemented_but_generated": 1
   }
 }

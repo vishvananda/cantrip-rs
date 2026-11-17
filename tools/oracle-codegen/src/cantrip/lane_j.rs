@@ -4913,8 +4913,8 @@ impl Compiler {
                             unreachable!("checked above");
                         };
                         let index = self.arrival_counters(filter, &entry.counters)?;
-                        let kind = if planned::switched_on("explicit-redirection-destinations") { "ReplacementRule" } else { "Replacement" };
-                        write!(grants, "g.add_effect(item.object, o, EffectKind::{kind} {{ card: item.ability.card, index: {index} }}, Duration::EndOfTurn); ").unwrap();
+                        let kind = lane_n::object_replacement(index);
+                        write!(grants, "g.add_effect(item.object, o, {kind}, Duration::EndOfTurn); ").unwrap();
                     }
                     return Ok(format!(
                         "{{ for &o in &objects_{id} {{ {grants}}} let rows_{id}: Vec<(ObjectId, PlayerId, bool)> = objects_{id}.iter().map(|&o| (o, {controller}, false)).collect(); g.put_all_onto_battlefield_as(&rows_{id})? }}"
