@@ -24,3 +24,6 @@ script requires the explicit fixture path. Update the Git pin, fixture checkout
 and golden evidence together when adopting a producer change. Ignored native
 compile/runtime cases still require explicit `MTGISH_CANTRIP_DIR` and a separate
 native target; they do not silently use an arbitrary neighboring clone.
+
+Current producer pin: `f7915260e717502cd81e3933617df19d05f32b0d` (Grammar 0.3.4 / model 0.3.0 / schema 192).
+The CI fixture checkout and dependency pin move together.

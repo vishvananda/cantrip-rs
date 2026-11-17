@@ -5,7 +5,7 @@ use std::{collections::BTreeMap,path::PathBuf};
 fn early_set_choices_keep_ties_subjects_and_optional_replacement() {
     let fixtures=PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures");
     let out=PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join("early-choice-regressions.jsonl");
-    planned::tracked(&fixtures.join("early_choice_regressions.ronl"),&fixtures.join("early_choice_regressions.oracle.json"),&out).unwrap();
+    planned::without_features(&["optional-lasting-replacements"], || planned::tracked(&fixtures.join("early_choice_regressions.ronl"),&fixtures.join("early_choice_regressions.oracle.json"),&out)).unwrap();
     let rows: BTreeMap<String,serde_json::Value>=std::fs::read_to_string(out).unwrap().lines().map(|s| {let v:serde_json::Value=serde_json::from_str(s).unwrap();(v["name"].as_str().unwrap().into(),v)}).collect();
     for name in ["Call to Arms","Cleansing"] {assert!(rows[name]["faces"][0]["gaps"].as_array().unwrap().is_empty(),"{name}: {}",rows[name]);}
     let call=rows["Call to Arms"]["faces"][0]["rust"].as_str().unwrap();

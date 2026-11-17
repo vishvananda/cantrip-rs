@@ -3023,6 +3023,14 @@ impl Compiler {
             }
             // What put it there is what was resolving as it entered, or the Aura it
             // came with (CR 303.4f); the history reads the same of a token.
+            ObjectFilter::CreatedWith(ObjectRef::Source) if self.linked_token_creator.is_some() => {
+                if !planned::switched_on("linked-token-creations") { return Err(gap("linked token-creation receipts")); }
+                let creator = self.linked_token_creator.unwrap();
+                let linked = if layer { "q.linked_to(asker.source)" }
+                    else if self.reader == Reader::Resolution && self.stack_item && !self.tabled { "q.linked(item)" }
+                    else { "q.linked_to(asker)" };
+                format!("{{ let by = {linked}; q.history().tokens_created_by(by, AbilityRef {{ card: by.text, index: {creator} }}).any(|token| token == {id}) }}")
+            }
             ObjectFilter::MadeBy(object) if !layer => format!(
                 "{}.is_some_and(|m: ObjectId| q.state().obj({id}).entered_with == Some(m) || q.history().all().iter().any(|r| matches!(r.event, Event::Entered {{ permanent, .. }} if permanent == {id}) && (r.cause == Cause::Spell(m) || matches!(r.cause, Cause::Ability {{ source, .. }} if source == m))))",
                 self.object(object)?
@@ -5616,4 +5624,27 @@ impl Compiler {
             }
         })
     }
+}
+
+/// Creation in this printed resolving ability establishes this link.
+/// Abilities granted to tokens and independently delayed bodies are different.
+pub(super) fn creates_tokens(ability: &Ability) -> bool {
+    use oracle_ir::visit::{Visitor, Walk};
+    struct Find(bool);
+    impl Visitor for Find {
+        fn ability(&mut self, _: &Ability) -> bool { false }
+        fn operation(&mut self, operation: &Operation) -> bool {
+            match operation {
+                Operation::CreateTokens { .. } => { self.0 = true; false }
+                Operation::CreateDelayedTrigger { .. } | Operation::CreateReplacement { .. }
+                | Operation::CreateContinuousEffect { .. } | Operation::CreateEmblem { .. } => false,
+                _ => true,
+            }
+        }
+    }
+    let body = match ability {
+        Ability::Activated { body, .. } | Ability::Triggered { body, .. } => body,
+        _ => return false,
+    };
+    let mut found = Find(false); body.walk(&mut found); found.0
 }

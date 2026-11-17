@@ -834,6 +834,30 @@ impl Compiler {
         ))
     }
 
+    fn arrival_filter(&self, filter: &ObjectFilter) -> Result<String> {
+        match filter {
+            ObjectFilter::InZone(ZoneScope::Shared(zone)) => Ok(format!("q.state().obj(id).zone.kind() == {}", zone_kind(zone)?)),
+            ObjectFilter::AllOf(filters) => Ok(format!("({})", filters.iter().map(|f| self.arrival_filter(f)).collect::<Result<Vec<_>>>()?.join(" && "))),
+            other => self.filter(other, &Candidate::of("id")),
+        }
+    }
+    fn entry_sacrifice_filter(&self, filter: &ObjectFilter) -> Result<String> {
+        Ok(match filter {
+            ObjectFilter::Any => "true".into(),
+            ObjectFilter::Subtype(subtype) => {
+                let word = name(subtype);
+                if !crate::cantrip_vocab::SUBTYPES.contains(&word.as_str()) { return Err(gap(format!("historical entry-sacrifice subtype {word}"))); }
+                format!("row.subtypes.has(q.words(asker.source).subtype(Subtype::{word}))")
+            }
+            ObjectFilter::AllOf(filters) if filters.is_empty() => "true".into(),
+            ObjectFilter::AnyOf(filters) if filters.is_empty() => "false".into(),
+            ObjectFilter::CardType(kind) => format!("row.types.has(CardType::{})", card_type(kind)?),
+            ObjectFilter::AllOf(filters) => format!("({})", filters.iter().map(|f| self.entry_sacrifice_filter(f)).collect::<Result<Vec<_>>>()?.join(" && ")),
+            ObjectFilter::AnyOf(filters) => format!("({})", filters.iter().map(|f| self.entry_sacrifice_filter(f)).collect::<Result<Vec<_>>>()?.join(" || ")),
+            ObjectFilter::Not(filter) => format!("!({})", self.entry_sacrifice_filter(filter)?),
+            _ => return Err(gap("historical entry-sacrifice predicate")),
+        })
+    }
     pub(super) fn objects(&self, objects: &ObjectSet) -> Result<String> {
         let carried = match self.outside_objects(objects) {
             Err(_) if self.targets_gone(objects).is_some() => None,
@@ -965,11 +989,7 @@ impl Compiler {
                     // A transition's original incarnations retain their arrival
                     // zone after a later move. Explicit InZone sets below still
                     // ask current membership and reject departed incarnations.
-                    (_, ObjectFilter::InZone(ZoneScope::Shared(zone)))
-                        if arrival_incarnations(objects) =>
-                    {
-                        format!("q.state().obj(id).zone.kind() == {}", zone_kind(zone)?)
-                    }
+                    (_, filter) if arrival_incarnations(objects) => self.arrival_filter(filter)?,
                     _ => self.filter(filter, &Candidate::of("id"))?,
                 };
                 format!(
@@ -1422,6 +1442,20 @@ impl Compiler {
             max: u32::MAX.into(),
             dynamic: true,
         };
+        if let Expr::CountObjects(objects) = n {
+            let (base, filter) = match objects.as_ref() {
+                ObjectSet::Matching { objects, filter } => (objects.as_ref(), filter),
+                base => (base, &ObjectFilter::Any),
+            };
+            if matches!(base, ObjectSet::SacrificedAsEntered(ObjectRef::Source)) {
+                if !planned::switched_on("entry-sacrifice-history") { return Err(gap("historical entry-sacrifice receipts")); }
+                let linked = if self.reader == Reader::Layer { "q.linked_to(asker.source)" }
+                    else if self.reader == Reader::Resolution && self.stack_item && !self.tabled { "q.linked(item)" }
+                    else { "q.linked_to(asker)" };
+                let test = self.entry_sacrifice_filter(filter)?;
+                return Ok(count(format!("q.history().sacrificed_as_entered(q.state(), {linked}).filter(|row| {test}).count() as i64")));
+            }
+        }
         if let Expr::CountObjects(objects)
         | Expr::Aggregate { objects, .. }
         | Expr::CountDistinct { objects, .. } = n

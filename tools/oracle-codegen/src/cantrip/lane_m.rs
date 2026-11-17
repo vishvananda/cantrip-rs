@@ -903,7 +903,10 @@ impl Compiler {
         let Instruction::Effect { result, operation } = instruction else {
             return None;
         };
-        if !self.bound_players.is_empty() {
+        // PlayersDo establishes its own acting-player scope. Looking through
+        // its body would turn choosing one player into a loop over all players.
+        if !self.bound_players.is_empty() || self.notes.acting.is_some()
+            || matches!(operation, Operation::PlayersDo { .. }) {
             return None;
         }
         let words = format!("{operation:?}");
@@ -1191,6 +1194,7 @@ impl Compiler {
             PlayerRef::Performer(result) if self.notes.performers.contains_key(&result.0) => {
                 self.notes.performers[&result.0].clone()
             }
+            PlayerRef::Acting if self.notes.acting.is_some() => self.notes.acting.clone().unwrap(),
             PlayerRef::Acting | PlayerRef::Prior(PriorPlayer::That) => match self.row_player() {
                 Ok(row) => row,
                 Err(_) if matches!(player, PlayerRef::Acting) => {

@@ -33,7 +33,7 @@ fn generated_target() -> PathBuf {
 }
 fn verify_cantrip_snapshot(checkout: &std::path::Path) {
     let result = Command::new("python3")
-        .arg(PathBuf::from(concat!(env!("MTGISH_SOURCE_ROOT"),"/rust_syntax/normalize")).join("tools/update_cantrip_vocabulary.py"))
+        .arg(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../update_cantrip_vocabulary.py"))
         .arg(checkout)
         .arg("--check")
         .output()
@@ -201,11 +201,11 @@ fn unsupported_limits_are_not_omitted_and_one_group_is_one_sentence() {
 /// Actual Cantrip core execution is an explicit integration check, so ordinary
 /// lowerer edits do not repeatedly compile the sibling workspace.
 #[test]
-#[ignore = "run with --ignored to compile and execute generated callbacks against ../cantrip"]
+#[ignore = "explicit native runtime check; needs MTGISH_CANTRIP_DIR"]
 fn generated_modules_execute_in_cantrip() {
     let cantrip_root = std::env::var_os("MTGISH_CANTRIP_DIR")
         .map(PathBuf::from)
-        .unwrap_or_else(|| PathBuf::from(concat!(env!("MTGISH_SOURCE_ROOT"),"/rust_syntax/normalize")).join("../../../cantrip"));
+        .expect("Set MTGISH_CANTRIP_DIR to the native checkout being validated");
     let cantrip_root = cantrip_root
         .canonicalize()
         .expect("Cantrip checkout (or MTGISH_CANTRIP_DIR)");

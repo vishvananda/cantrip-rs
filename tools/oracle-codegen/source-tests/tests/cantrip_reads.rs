@@ -21,7 +21,7 @@ const CARDS: &[(&str, &str)] = &[
     // A creature card in hand is no creature: it may still cycle.
     ("Damping Matrix", "q.is_on_battlefield(id)"),
     // Tokens have no event of their own: what was resolving as they entered.
-    ("Arcane Artisan", "Event::Entered"),
+    ("Arcane Artisan", "tokens_created_by("),
     // Suspended as the upkeep reads it.
     ("Time Beetle", "fn time_travel_for"),
     // A replacement's `then` has no stack item to be linked by.

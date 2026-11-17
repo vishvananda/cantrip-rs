@@ -1104,6 +1104,11 @@ impl Compiler {
                 &feature,
                 &format!("q.not_chosen({})", self.selected(result)?),
             ),
+            ObjectSet::FromHistoryDestinations { event, window } => {
+                if !planned::switched_on("history-destination-objects") { return Err(gap("first-destination history objects")); }
+                let departures = self.objects(&ObjectSet::FromHistory { event: event.clone(), window: window.clone() })?;
+                format!("({departures}).into_iter().flat_map(|old| q.found_all_after_move(old)).filter(|&id| q.state().obj(id).became.is_none()).collect::<Vec<ObjectId>>()")
+            }
             ObjectSet::FromHistory { event, window } => {
                 let scope = match window {
                     HistoryWindow::ThisTurn => "q.history().this_turn().iter()".to_string(),

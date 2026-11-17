@@ -31,12 +31,10 @@ fn stardew_controller_chooses_the_player_who_may_accept_control() {
         let choose = code
             .find("choose::player(g, asker.controller, asker.source, among_")
             .unwrap();
-        let frame = code[choose..]
-            .find("Asker::new(asker.source, doer_")
-            .unwrap()
-            + choose;
-        let accept = code[frame..].find("ask_may(g, decider_").unwrap() + frame;
-        assert!(choose < frame && frame < accept);
+        let accept = code[choose..].find("ask_may(g, decider_").unwrap() + choose;
+        assert!(choose < accept);
+        assert!(code.contains("Some(doer_"));
+        assert!(!code.contains("Asker::new(asker.source, doer_"), "the ability controller remains you");
         assert!(!code.contains("planned!"));
     });
 }

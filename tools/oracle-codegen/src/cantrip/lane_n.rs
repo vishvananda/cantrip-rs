@@ -1321,6 +1321,10 @@ impl Compiler {
                     } else if *effect_only {
                         tests.push("matches!(z.discard_cause, Some(DiscardCause::Effect { .. }))".into());
                     }
+                } else if causes.is_none() && *effect_only && planned::switched_on("effect-cause-controller") {
+                    // This is the pending discard's live replacement check.
+                    // A delayed trigger still needs its own frozen cause carrier.
+                    tests.push("q.effect_controller().is_some()".into());
                 } else {
                     if let Some(cause) = causes {
                         let test = self.matching(frame, |c| c.filter(cause, &Candidate::of("cause")))?;

@@ -1,6 +1,6 @@
 // Cantrip vocabulary snapshot; regenerate with tools/update_cantrip_vocabulary.py.
 // These names are inert metadata, never behavior.
-pub const API_FINGERPRINT: &str = "1da38802b96d02dbce9151b4ddf58f25389b7016d7c7dc10382a88d88da5797f";
+pub const API_FINGERPRINT: &str = "235fbb1780747dbaa038447d8463320b09a1ba299857305ab5d5ca9e03af3952";
 pub const SUBTYPES: &[&str] = &[
     "Adventure",
     "Advisor",
@@ -577,6 +577,30 @@ pub const KEYWORDS: &[&str] = &[
     "SnowForestwalk",
     "SnowLandwalk",
     "Desertwalk",
+    "SnowCavewalk",
+    "SnowDesertwalk",
+    "SnowGatewalk",
+    "SnowLairwalk",
+    "SnowLocuswalk",
+    "SnowMinewalk",
+    "SnowPlanetwalk",
+    "SnowPowerPlantwalk",
+    "SnowSpherewalk",
+    "SnowTowerwalk",
+    "SnowTownwalk",
+    "SnowUrzaswalk",
+    "Cavewalk",
+    "Gatewalk",
+    "Lairwalk",
+    "Locuswalk",
+    "Minewalk",
+    "Planetwalk",
+    "PowerPlantwalk",
+    "Spherewalk",
+    "Towerwalk",
+    "Townwalk",
+    "Urzaswalk",
+    "CantAttack",
 ];
 pub const COUNTERS: &[&str] = &[
     "PlusOne",
@@ -671,18 +695,32 @@ pub const COUNTERS: &[&str] = &[
     "Tide",
     "Music",
     "Vow",
-    "Cube",
     "Doom",
-    "Glyph",
-    "Pin",
+    "Intervention",
+    "Hunger",
+    "Revival",
+    "Stash",
+    "Divinity",
     "Sleight",
+    "Cube",
+    "Glyph",
+    "Possession",
+    "Pin",
+    "Nest",
 ];
 pub const LASTING_RULE_KINDS: &[&str] = &[
     "CantAttack",
     "CantBlock",
     "MustAttack",
     "MustAttackPlayerOtherThanYou",
+    "MustBeBlocked",
     "DoesntUntap",
     "CantAttackYou",
+    "CantBePlayed",
+    "RevealedInHand",
+    "AttackingDoesntCauseTap",
+    "CantBeRegenerated",
+    "DamageCantBePrevented",
+    "DamageCantBeRedirected",
 ];
-pub const FEATURES: &[&str] = &["source-control-intervals", "producible-mana-types", "lasting-rules", "rampage", "combat-removal", "blocked-status", "pt-counters", "regeneration-bans", "mana-counter-costs", "next-turn-delayed", "blocking-status", "damage-poison", "combat-lki", "entry-actor", "resolving-counter-costs", "aura-graveyard-identity", "delayed-subject-members", "counter-placement-ceiling", "divide-reads-context", "typed-prevention-amount", "32-bit-effect-quantities", "snow-mana", "non-target-attachment-hosts", "simultaneous-replacement-damage", "target-original-context", "delayed-watched-source", "multiple-blocks", "cost-object-receipts", "game-draw-legality", "left-battlefield-receipts", "delayed-watched-subject", "core-riot", "exile-cast-fields", "permanent-cost-exclusions", "spell-alternative-kinds", "multi-zone-search", "job-select-token", "resolved-land-types", "untap-events", "counter-removal-events", "control-change-events", "event-delayed-object-lists", "exile-on-leave", "life-exchange", "compound-cumulative-upkeep", "no-other-auras", "resolution-x-payment", "landwalk-blocking-exceptions", "independent-pt-settings", "no-combat-damage-assignment", "world-rule", "other-activators", "step-deadlines", "counted-untap-steps", "explicit-mana-loss", "random-discard-costs", "attack-as-though-haste", "nonmana-mana-tap-triggers", "keyword-family-metadata", "combat-event-delays", "other-player-targets", "blocking-reassignment", "noted-values", "nonmana-combat-costs", "combat-group-constraints", "revealed-hands", "computed-x", "bands-with-other", "rechosen-values", "hand-size-rules", "skip-steps", "untap-limits"];
+pub const FEATURES: &[&str] = &["entry-sacrifice-history", "game-draw-effect", "linked-token-creations", "history-destination-objects", "battlefield-source-enchantment", "optional-lasting-replacements", "source-control-intervals", "producible-mana-types", "opponents-land-colors", "variable-sacrifice-activations", "lasting-rules", "rampage", "combat-removal", "blocked-status", "pt-counters", "regeneration-bans", "mana-counter-costs", "next-turn-delayed", "blocking-status", "damage-poison", "combat-lki", "entry-actor", "resolving-counter-costs", "aura-graveyard-identity", "delayed-subject-members", "group-departure-delays", "counter-placement-ceiling", "divide-reads-context", "typed-prevention-amount", "32-bit-effect-quantities", "snow-mana", "non-target-attachment-hosts", "simultaneous-replacement-damage", "target-original-context", "delayed-watched-source", "multiple-blocks", "cost-object-receipts", "game-draw-legality", "draw-result-receipts", "left-battlefield-receipts", "delayed-watched-subject", "core-riot", "exile-cast-fields", "permanent-cost-exclusions", "spell-alternative-kinds", "multi-zone-search", "job-select-token", "resolved-land-types", "untap-events", "counter-removal-events", "control-change-events", "event-delayed-object-lists", "exile-on-leave", "life-exchange", "compound-cumulative-upkeep", "cumulative-upkeep-mana", "mana-bundle-choices", "effect-cause-controller", "no-other-auras", "resolution-x-payment", "landwalk-blocking-exceptions", "independent-pt-settings", "no-combat-damage-assignment", "world-rule", "other-activators", "step-deadlines", "counted-untap-steps", "explicit-mana-loss", "random-discard-costs", "attack-as-though-haste", "nonmana-mana-tap-triggers", "keyword-family-metadata", "combat-event-delays", "blocking-reassignment", "nonmana-combat-costs", "combat-group-constraints", "revealed-hands", "computed-x", "bands-with-other", "rechosen-values", "skip-steps", "untap-limits"];

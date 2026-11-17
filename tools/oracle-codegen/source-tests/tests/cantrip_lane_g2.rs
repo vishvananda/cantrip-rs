@@ -53,7 +53,7 @@ const CARDS: &[(&str, &str, bool)] = &[
     ("Leori, Sparktouched Hunter", "a-resolution-s-choice-read-by-the-trigger-it-creates", false),
     ("Zombie Boa", "a-resolution-s-choice-read-by-the-trigger-it-creates", false),
     ("Phyrexian Splicer", "a-value-chosen-as-an-activation-cost-read-by-its-targets", false),
-    ("Infernal Denizen", "operation-players-do", false),
+    ("Infernal Denizen", "choose::player(g, asker.controller, asker.source, among_", true),
 ];
 
 #[test]

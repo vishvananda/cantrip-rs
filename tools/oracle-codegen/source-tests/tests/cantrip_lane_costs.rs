@@ -44,7 +44,7 @@ const CARDS: &[(&str, &str)] = &[
     // Who a resolving effect may not make discard or sacrifice.
     ("Sigarda, Host of Herons", "cause_rules: &["),
     // "An opponent does this": the doer is "you" in what they do.
-    ("Ingenious Mastery", "&Asker::new(asker.source, doer_"),
+    ("Ingenious Mastery", "Some(doer_"),
     // What a copy keeps of the object that copied.
     ("Vesuvan Doppelganger", "own.colors.unwrap_or("),
     ("Hulking Metamorph", "own.power.unwrap_or(0)"),

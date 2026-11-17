@@ -9,8 +9,8 @@ description = "Owned Oracle IR to Cantrip Rust; standalone tooling, outside engi
 [workspace]
 
 [dependencies]
-oracle-ir = { version = "=0.2.0", default-features = false }
-oracle-ir-contract = { version = "=0.2.1", default-features = false }
+oracle-ir = { version = "=0.3.0", default-features = false }
+oracle-ir-contract = { version = "=0.3.0", default-features = false }
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["unbounded_depth"] }
 ron = "0.8.1"

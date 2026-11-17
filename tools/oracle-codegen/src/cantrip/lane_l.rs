@@ -56,15 +56,6 @@ fn total_mana_value_at_least(constraints: &[SelectionConstraint]) -> Option<i64>
     }
 }
 
-/// A body where "you" is only who gains control: then "you" is the doer. One that
-/// also says "a creature you control" (Infernal Denizen) can't tell the doer from
-/// the ability's controller.
-fn you_only_gains_control(body: &[Operand]) -> bool {
-    let text = format!("{body:?}");
-    let gains = text.matches("SetController(AbilityController)").count();
-    gains > 0 && text.matches("AbilityController").count() == gains
-}
-
 /// What "do this only once each turn" offers, under a "may" that already asks it.
 pub(super) fn once_offered(body: &Program) -> Option<&Program> {
     match body.instructions.as_slice() {
@@ -2225,11 +2216,13 @@ impl Compiler {
                 otherwise,
             } if otherwise.is_empty()
                 && body.iter().all(|step| matches!(step, Operand::Program(_)))
-                && (!*optional || you_only_gains_control(body)) =>
+ =>
             {
                 let optional = *optional;
                 let among = self.fetch(self.players(players)?);
-                writeln!(out, "let among_{id}: Vec<PlayerId> = {among}; let Some(doer_{id}) = (if among_{id}.len() > 1 {{ {M}::choose::player(g, asker.controller, asker.source, among_{id}, \"Choose\", 0)? }} else {{ among_{id}.first().copied() }}) else {{ return Ok(()); }}; {{ let asker = &Asker::new(asker.source, doer_{id});").unwrap();
+                writeln!(out, "let among_{id}: Vec<PlayerId> = {among}; let Some(doer_{id}) = (if among_{id}.len() > 1 {{ {M}::choose::player(g, asker.controller, asker.source, among_{id}, \"Choose\", 0)? }} else {{ among_{id}.first().copied() }}) else {{ return Ok(()); }}; {{").unwrap();
+                let previous_actor = self.notes.acting.replace(format!("Some(doer_{id})"));
+                let done: Result<()> = (|| {
                 for step in body {
                     let Operand::Program(program) = step else {
                         unreachable!("just matched");
@@ -2237,7 +2230,7 @@ impl Compiler {
                     if optional {
                         let mut offered = program.clone();
                         offered.instructions = vec![Instruction::Optional {
-                            decider: PlayerRef::AbilityController,
+                            decider: PlayerRef::Acting,
                             body: program.clone(),
                         }];
                         self.block(&offered, out, true)?;
@@ -2245,6 +2238,10 @@ impl Compiler {
                         self.block(program, out, true)?;
                     }
                 }
+                Ok(())
+                })();
+                self.notes.acting = previous_actor;
+                done?;
                 writeln!(out, "}}").unwrap();
             }
             // "Repeat the following process for each opponent in turn order ...
@@ -2267,6 +2264,26 @@ impl Compiler {
                     };
                     self.block(program, out, true)?;
                 }
+            }
+            Operation::PlayersDo {
+                players, any_one: false, optional: false, once_each_turn: false,
+                body, otherwise,
+            } if otherwise.is_empty() && body.iter().all(|step| matches!(step, Operand::Program(_))) => {
+                // A separate process for each player keeps "you" on the
+                // original ability controller and binds only Acting.
+                let players = self.fetch(self.players(players)?);
+                writeln!(out, "let actors_{id}: Vec<PlayerId> = {players}; for doer_{id} in actors_{id} {{").unwrap();
+                let previous_actor = self.notes.acting.replace(format!("Some(doer_{id})"));
+                let done = (|| {
+                    for step in body {
+                        let Operand::Program(program) = step else { unreachable!() };
+                        self.block(program, out, true)?;
+                    }
+                    Ok(())
+                })();
+                self.notes.acting = previous_actor;
+                done?;
+                writeln!(out, "}}").unwrap();
             }
             Operation::PlayersDo {
                 players,

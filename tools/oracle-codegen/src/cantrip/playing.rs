@@ -187,6 +187,7 @@ impl Compiler {
                         return Err(gap("play count PerPlayer"));
                     }
                 }
+                ObjectSet::Recorded(_) => {}
                 ObjectSet::Matching { objects, .. } if matches!(**objects, ObjectSet::Recorded(_)) => {}
                 _ => return Err(gap("play count PerPlayer")),
             }

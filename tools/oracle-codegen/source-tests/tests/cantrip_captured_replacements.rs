@@ -9,7 +9,7 @@ fn card(name: &str) -> Card {
 
 #[test]
 fn old_targets_retain_the_makers_x_gap() {
-    cantrip::planned::with_additional_features(&[], || {
+    cantrip::planned::without_features(&["captured-replacement-values"], || {
         let gaps = cantrip::gaps(&card("Aladdin's Lamp"));
         assert!(gaps.iter().any(|g| g.feature == "the X of the ability that made a replacement effect"), "{gaps:?}");
     });

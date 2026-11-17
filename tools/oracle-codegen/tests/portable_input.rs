@@ -39,3 +39,107 @@ fn cli_rejects_versions_and_trailing_or_missing_records() {
     }
     let _:Record=serde_json::from_str(&good).unwrap();
 }
+
+#[test]
+fn printed_basic_land_mana_does_not_add_a_second_intrinsic_activation() {
+    use cantrip_oracle_codegen::{ir::*, mtg_types::{CardType, SubType}};
+    let mut face=corpus::read_cards(&fixture()).unwrap().remove(0).card.faces.remove(0);
+    face.name="Forest".into();
+    face.characteristics.card_types=vec![CardType::Land];
+    face.characteristics.subtypes=vec![SubType::Forest];
+    face.characteristics.mana_cost=None;
+    face.characteristics.power_toughness=None;
+    face.abilities.clear();
+    let unprinted=cantrip::module(&face).unwrap();
+    let printed=serde_json::json!({"kind":"Activated","args":{
+        "origin":"Ordinary","cost":{"parts":["TapSymbol"]},
+        "limits":{"once":false,"once_each_turn":false,"sorcery":false,"condition":null,"activators":null,"keyword":null,"modifiers":[]},
+        "announcement":{"targets":[],"modes":null},
+        "body":{"instructions":[{"kind":"Effect","args":{"result":0,"operation":{"kind":"AddMana","args":{
+            "players":{"kind":"One","args":{"kind":"AbilityController"}},
+            "mana":{"Amount":{"color":"Green","amount":{"kind":"Constant","args":1}}},"restriction":null
+        }}}}]}
+    }});
+    // Use the published tagged form of ManaProduction, including its concrete color.
+    let mut printed=printed;
+    printed["args"]["body"]["instructions"][0]["args"]["operation"]["args"]["mana"]=
+        serde_json::to_value(ManaProduction::Amount{color:ManaColor::Green,amount:Expr::Constant(1)}).unwrap();
+    face.abilities.push(serde_json::from_value(printed).unwrap());
+    assert_eq!(cantrip::module(&face).unwrap(),unprinted);
+    if let Ability::Activated{body,..}=&mut face.abilities[0] {
+        if let Instruction::Effect{operation:Operation::AddMana{restriction,..},..}=&mut body.instructions[0] {
+            *restriction=Some(ManaUse::Purpose(ManaPurpose::CumulativeUpkeep));
+        }
+    }
+    assert_ne!(cantrip::module(&face).unwrap(),unprinted,"restricted mana is a distinct printed ability");
+}
+
+#[test]
+fn live_discard_replacement_uses_effect_controller_only_on_capable_engines() {
+    use cantrip_oracle_codegen::ir::*;
+    let mut face=corpus::read_cards(&fixture()).unwrap().remove(0).card.faces.remove(0);
+    face.abilities=vec![Ability::Replacement{
+        active:ReplacementActive::Battlefield,
+        event:ReplacementEvent::Discard{players:PlayerSet::One(PlayerRef::AbilityController),causes:None,card:None,effect_only:true},
+        body:Program{instructions:vec![Instruction::Effect{result:ResultId(0),operation:Operation::ModifyEvent{change:EventChange::SetDestination(Destination::OwnersLibraryTop)}}]},
+    }];
+    let generated=cantrip::planned::with_features(&["effect-cause-controller"],||cantrip::module(&face)).unwrap();
+    assert!(generated.contains("q.effect_controller().is_some()"));
+    assert!(!generated.contains("proposal_cause"));
+    assert!(cantrip::planned::with_features(&[],||cantrip::module(&face)).is_err());
+}
+
+fn linked_history_face(name: &str) -> cantrip_oracle_codegen::ir::Card {
+    corpus::read_cards(&std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/linked_history_records.jsonl"))
+        .unwrap().into_iter().flat_map(|record|record.card.faces).find(|face|face.name==name).unwrap()
+}
+
+#[test]
+fn linked_tokens_use_the_creating_ability_and_acquisition_without_broad_cause_matching() {
+    let face=linked_history_face("Tetravus");
+    let generated=cantrip::module(&face).unwrap();
+    assert!(generated.contains("tokens_created_by("));
+    assert!(generated.contains("index: 0"));
+    assert!(!generated.contains("Event::Entered"));
+    assert!(cantrip::planned::without_features(&["linked-token-creations"],||cantrip::module(&face)).is_err());
+    let mut ambiguous=face;
+    ambiguous.abilities.push(ambiguous.abilities[2].clone());
+    assert!(cantrip::module(&ambiguous).is_err(),"two creating abilities require an explicit unambiguous link");
+}
+
+#[test]
+fn historical_deaths_project_only_the_first_surviving_destination() {
+    let face=linked_history_face("Krovikan Vampire");
+    let generated=cantrip::module(&face).unwrap();
+    assert!(generated.contains("q.found_all_after_move(old)"));
+    assert!(generated.contains("became.is_none()"));
+    assert!(cantrip::planned::without_features(&["history-destination-objects"],||cantrip::module(&face)).is_err());
+}
+
+#[test]
+fn counter_removal_reads_the_recorded_remover_and_resulting_total() {
+    let generated=cantrip::module(&linked_history_face("Divine Intervention")).unwrap();
+    assert!(generated.contains("Event::CountersRemoved { object, kind, amount, total, by, .. }"));
+    assert!(generated.contains("by.as_ref().is_some_and(|by|"));
+    assert!(generated.contains("*total == 0"));
+    assert!(generated.contains("g.draw_game()"));
+}
+
+#[test]
+fn a_chosen_actor_does_not_rebind_the_ability_controller_or_repeat_for_all_players() {
+    let generated=cantrip::module(&linked_history_face("Stardew Valley")).unwrap();
+    assert!(generated.contains("choose::player(g, asker.controller, asker.source, among_"));
+    assert!(generated.contains("Some(doer_"));
+    assert!(!generated.contains("Asker::new(asker.source, doer_"));
+    assert!(!generated.contains("bound_9000"));
+}
+
+#[test]
+fn entry_sacrifice_counts_read_the_linked_historical_rows() {
+    let face=linked_history_face("Wood Elemental");
+    let generated=cantrip::module(&face).unwrap();
+    assert!(generated.contains("sacrificed_as_entered(q.state(), q.linked_to(asker.source))"));
+    assert!(generated.contains("row.subtypes.has(q.words(asker.source).subtype(Subtype::Forest))"));
+    assert!(!generated.contains("q.chars(row.id)"));
+    assert!(cantrip::planned::without_features(&["entry-sacrifice-history"],||cantrip::module(&face)).is_err());
+}

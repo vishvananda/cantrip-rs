@@ -16,7 +16,10 @@ separate terminals. Client work also needs Cantrip's .NET, WebAssembly and brows
 The generator is a standalone crate under `tools/oracle-codegen`. It depends on
 published Oracle IR contracts, not the MTGish parser. Use a compatible native API;
 `examples/tested-profile.json` is a historical working pair, not a claim that the
-latest engine accepts every generated module. Revalidate when updating the base.
+latest engine accepts every generated module. Revalidate when updating the base. The 2026-11-17 refresh uses upstream
+`5441ecd742c2e40e908d0347f56afa520005a89b` and published model/contract 0.3.0
+(schema 192), on `tools/oracle-codegen-20261117`. See
+[the backlog audit](../../docs/ice-age-reassessment-20261117.md).
 
 ```sh
 T="$PWD/tools/card-lane"                        # from this Cantrip checkout

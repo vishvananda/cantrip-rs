@@ -13,7 +13,7 @@ fn foundation_callbacks_cite_the_rules_their_api_positions_implement() {
         ("Adventurers' Guildhouse", "granted_0_bands_0", "702.22b"),
         ("Cathedral of Serra", "granted_0_bands_0", "702.22b"),
         ("Clergy of the Holy Nimbus", "creature_cant_be_regenerated_only_activators", "602.2"),
-        ("Cursed Rack", "as_artifact_enters_choose_opponent_hand_size_0", "402.2"),
+        ("Cursed Rack", "as_artifact_enters_choose_opponent_enters", "614.1c"),
         ("Damping Field", "players_cant_untap_more_than_untaps_0", "502.3"),
         ("Damping Field", "players_cant_untap_more_than_untapping_0", "502.3"),
         // The same card's resolving effect must retain its resolution rule.
@@ -41,7 +41,7 @@ fn foundation_callbacks_cite_the_rules_their_api_positions_implement() {
         let function = file.items.iter().find_map(|item| match item {
             syn::Item::Fn(f) if f.sig.ident == function => Some(f),
             _ => None,
-        }).unwrap_or_else(|| panic!("{name}: missing {function}"));
+        }).unwrap_or_else(|| panic!("{name}: missing {function}; functions: {:?}", file.items.iter().filter_map(|i| if let syn::Item::Fn(f)=i {Some(f.sig.ident.to_string())} else {None}).collect::<Vec<_>>()));
         let docs: String = function.attrs.iter().filter_map(|attr| {
             let syn::Meta::NameValue(meta) = &attr.meta else { return None };
             if !meta.path.is_ident("doc") { return None; }

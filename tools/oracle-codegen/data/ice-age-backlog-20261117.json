@@ -1,0 +1,1116 @@
+{
+  "date": "2026-11-17",
+  "scope": "Original paused 57 early-set cards; excludes Shahrazad, ante and dexterity; includes flavor-banned cards. No reservation or implementation was started.",
+  "engine_commit": "5441ecd742c2e40e908d0347f56afa520005a89b",
+  "grammar_version": "0.3.4",
+  "model_version": "0.3.0",
+  "schema_version": 192,
+  "frozen_oracle_sha256": "2281f3d715e8ee6127825154b31202918ef83a9d9a3641a0d23b0163ebea3065",
+  "source_ron_sha256": "7c1f493906004497a6682071481ddabf1ce15e9efc63834a904554ffd35a14a7",
+  "backlog_records_sha256": "4baa58c98b4bff1e017a7c99ddacf1fd4a85dfed77467a05c9b8154a71735e91",
+  "tracked_rows_sha256": "0c011a57dc8cc16c17a78423940d9f3c05b49455a68de3b8501a7e04c69f75d3",
+  "native_api_sha256": "235fbb1780747dbaa038447d8463320b09a1ba299857305ab5d5ca9e03af3952",
+  "counts": {
+    "landed_upstream": 43,
+    "implementation_ready": 1,
+    "engine_gap": 13
+  },
+  "validation": {
+    "native_full_suite": "Engine baseline 5441ecd742: bash tools/test.sh passed; 27,853 Rust tests (15 ignored), managed tests and client build. Later fork-main host/client/test commits do not change the audited API.",
+    "generator": "77 Rust tests passed",
+    "pipeline_python": "437 tests passed",
+    "tooling_python": "52 tests passed",
+    "mtgish": "1,596 Rust tests passed; 33,529 exported records, zero lowering diagnostics",
+    "library_of_leng": "Generated module compiles as a standalone Rust library against the checked-profile current cantrip-api. Card registration and runtime scenarios are not implemented by this audit.",
+    "latest_refresh": "Upstream advanced during the audit: rebased from 90204df367 to 5441ecd742. New original-draw receipts, nest counters and unrelated cards do not change the 43/1/13 result.",
+    "source_integration": "607 tests passed (12 ignored) against MTGish f7915260; affected targets additionally checked after the final adapters.",
+    "native_api_check": "Seven generated cards type-check against actual cantrip-api and cantrip-mechanics in one isolated crate; full native execution/scenario coverage remains separate."
+  },
+  "cards": [
+    {
+      "name": "Ali from Cairo",
+      "module": "crates/cantrip-cards/src/cards/ali_from_cairo.rs",
+      "data": "content/mtg/cards/ali-from-cairo.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[0]",
+          "feature": "player rule DamageLifeFloor",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "fa44ff5f693a827e3521385b7d6099f75de8bef4",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Ali from Cairo"
+    },
+    {
+      "name": "Arcum's Weathervane",
+      "module": "crates/cantrip-cards/src/cards/arcums_weathervane.rs",
+      "data": "content/mtg/cards/arcums-weathervane.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "",
+          "feature": "engine: no effect changes supertypes",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "a5ba9f7ba84282675c2c55adc233a815fc3c1f24",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Arcum's Weathervane"
+    },
+    {
+      "name": "Barbarian Guides",
+      "module": "crates/cantrip-cards/src/cards/barbarian_guides.rs",
+      "data": "content/mtg/cards/barbarian-guides.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "",
+          "feature": "landwalk of AllOf",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "34bcecd533b2148c5c49af42908d6e067e0395fc",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Barbarian Guides"
+    },
+    {
+      "name": "Camouflage",
+      "module": "crates/cantrip-cards/src/cards/camouflage.rs",
+      "data": "content/mtg/cards/camouflage.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[1].instructions[0]",
+          "feature": "operation GameEffect",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "7ea6a1560d294e6f10d5497705853bd33a2fbac5",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Camouflage"
+    },
+    {
+      "name": "City in a Bottle",
+      "module": "crates/cantrip-cards/src/cards/city_in_a_bottle.rs",
+      "data": "content/mtg/cards/city-in-a-bottle.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[0]",
+          "feature": "trigger event ObjectBecomes",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "",
+          "feature": "object collection EventGroup",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "",
+          "feature": "trigger event ObjectBecomes",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "ce1e530c4fe2a9336d01187edc27c1553a119f52",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: City in a Bottle"
+    },
+    {
+      "name": "Dance of the Dead",
+      "module": "crates/cantrip-cards/src/cards/dance_of_the_dead.rs",
+      "data": "content/mtg/cards/dance-of-the-dead.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[0]",
+          "feature": "enchant graveyard card",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "abilities[1].instructions[3]",
+          "feature": "a triggered ability carrying separate groups of objects",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "a49561f5d7a1647913119b8846173b2d04d08f38",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Dance of the Dead"
+    },
+    {
+      "name": "Dark Sphere",
+      "module": "crates/cantrip-cards/src/cards/dark_sphere.rs",
+      "data": "content/mtg/cards/dark-sphere.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "",
+          "feature": "prevention of part of the damage made at resolution",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "e9fc547bffa073c24892d37dcbd683d5a6a424e9",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Dark Sphere"
+    },
+    {
+      "name": "Derelor",
+      "module": "crates/cantrip-cards/src/cards/derelor.rs",
+      "data": "content/mtg/cards/derelor.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "",
+          "feature": "a spell costing colored mana more",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "c6ed77742f67bd49b3e9ec1999f579461f72f1da",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Derelor"
+    },
+    {
+      "name": "Divine Intervention",
+      "module": "crates/cantrip-cards/src/cards/divine_intervention.rs",
+      "data": "content/mtg/cards/divine-intervention.json",
+      "status": "landed_upstream",
+      "generator_gaps": [],
+      "implementation_commit": "0bc651ffb92bdb84b472a69bbf16467fabd7d8f5",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Divine Intervention"
+    },
+    {
+      "name": "Drain Power",
+      "module": null,
+      "data": null,
+      "status": "engine_gap",
+      "generator_gaps": [
+        {
+          "path": "abilities[0].instructions[0]",
+          "feature": "keyword action ActivateManaAbility",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "abilities[0].instructions[1]",
+          "feature": "mana production LostThisWay",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "required_feature": "Force the target player to activate each land’s mana ability, then transfer the actual emptied mana receipt.",
+      "api_evidence": "crates/cantrip-api/src/game.rs"
+    },
+    {
+      "name": "Drought",
+      "module": "crates/cantrip-cards/src/cards/drought.rs",
+      "data": "content/mtg/cards/drought.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[2]",
+          "feature": "activation cost with another cost",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "",
+          "feature": "engine: no cost sized by the game",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "",
+          "feature": "numeric expression ActivationCostSymbols",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "",
+          "feature": "spell cost increase other than mana",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "876f09fdf575d338147aab9ec801f6e149764b3a",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Drought"
+    },
+    {
+      "name": "Equinox",
+      "module": null,
+      "data": null,
+      "status": "engine_gap",
+      "generator_gaps": [
+        {
+          "path": "",
+          "feature": "object filter WouldDestroy",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "required_feature": "Authoritative prediction that a spell would destroy a land; current target legality alone is insufficient.",
+      "api_evidence": "crates/cantrip-api/src/card.rs"
+    },
+    {
+      "name": "Errant Minion",
+      "module": "crates/cantrip-cards/src/cards/errant_minion.rs",
+      "data": "content/mtg/cards/errant-minion.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[1].instructions[1]",
+          "feature": "operation DealDamageWith",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "fb229e7956c26598aa867a86e81f47e776a303a6",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Errant Minion"
+    },
+    {
+      "name": "Fasting",
+      "module": "crates/cantrip-cards/src/cards/fasting.rs",
+      "data": "content/mtg/cards/fasting.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[1]",
+          "feature": "replacement of BeginDrawStep",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "a44fe93e5a1195a670c1ae3121948b3f3dfb5d32",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Fasting"
+    },
+    {
+      "name": "Field of Dreams",
+      "module": null,
+      "data": null,
+      "status": "engine_gap",
+      "generator_gaps": [
+        {
+          "path": "abilities[0]",
+          "feature": "a library's top card open to view",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "required_feature": "Reveal every player’s library top, including a player without a permanent; existing RevealLibraryTop applies to the source controller.",
+      "api_evidence": "crates/cantrip-api/src/card.rs"
+    },
+    {
+      "name": "Firestorm Phoenix",
+      "module": "crates/cantrip-cards/src/cards/firestorm_phoenix.rs",
+      "data": "content/mtg/cards/firestorm-phoenix.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[1].instructions[0]",
+          "feature": "player rule for a while Visibility",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "abilities[1]",
+          "feature": "player rule for a while Visibility",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "abilities[1]",
+          "feature": "player rule for a while Prohibit PlayCard",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "a480f9368d959dff3ea99b84cd0e5792efac4d7b",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Firestorm Phoenix"
+    },
+    {
+      "name": "Forcefield",
+      "module": "crates/cantrip-cards/src/cards/forcefield.rs",
+      "data": "content/mtg/cards/forcefield.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "",
+          "feature": "prevention of part of the damage made at resolution",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "9fa7981b1d381a2330f7032c16fa68e8cfebb37f",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Forcefield"
+    },
+    {
+      "name": "Freyalise's Winds",
+      "module": "crates/cantrip-cards/src/cards/freyalises_winds.rs",
+      "data": "content/mtg/cards/freyalises-winds.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[1]",
+          "feature": "replacement of UntapsInUntapStep",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "c09ca0a2949759b624724c03f024445fdf5d7325",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Freyalise's Winds"
+    },
+    {
+      "name": "Ghostly Flame",
+      "module": null,
+      "data": null,
+      "status": "engine_gap",
+      "generator_gaps": [
+        {
+          "path": "abilities[0]",
+          "feature": "static rule Unique",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "",
+          "feature": "static change ColorlessDamageSource",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "required_feature": "Treat damage sources as colorless only for damage; retain their colors for other purposes.",
+      "api_evidence": "crates/cantrip-api/src/card.rs"
+    },
+    {
+      "name": "Glyph of Reincarnation",
+      "module": "crates/cantrip-cards/src/cards/glyph_of_reincarnation.rs",
+      "data": "content/mtg/cards/glyph-of-reincarnation.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[1].instructions[1].instructions[0].instructions[0]",
+          "feature": "player reference AsOf",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "8ef0f9983e1aa55849957c0f10a7f4318cfb7b2c",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Glyph of Reincarnation"
+    },
+    {
+      "name": "Guardian Angel",
+      "module": "crates/cantrip-cards/src/cards/guardian_angel.rs",
+      "data": "content/mtg/cards/guardian-angel.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[0].instructions[1]",
+          "feature": "player rule for a while SpecialAction",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "abilities[0]",
+          "feature": "player rule for a while SpecialAction",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "c82d67bff7182cfa6a998f9ef133514fba72bdcd",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Guardian Angel"
+    },
+    {
+      "name": "Guardian Beast",
+      "module": null,
+      "data": null,
+      "status": "engine_gap",
+      "generator_gaps": [
+        {
+          "path": "abilities[0]",
+          "feature": "static rule Prohibit BeAttachedBy",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "abilities[0]",
+          "feature": "static rule Prohibit ChangeControl",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "required_feature": "Prevent new Aura enchantment and control changes while preserving already attached Auras; NoOtherAuras has different semantics.",
+      "api_evidence": "crates/cantrip-api/src/card.rs"
+    },
+    {
+      "name": "Hipparion",
+      "module": "crates/cantrip-cards/src/cards/hipparion.rs",
+      "data": "content/mtg/cards/hipparion.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[0]",
+          "feature": "static rule CombatCost Block",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "0da13b18d9209823bbd1a2218ebde0f601538381",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Hipparion"
+    },
+    {
+      "name": "Ice Cauldron",
+      "module": "crates/cantrip-cards/src/cards/ice_cauldron.rs",
+      "data": "content/mtg/cards/ice-cauldron.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[0].instructions[3]",
+          "feature": "operation Note",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "abilities[1].instructions[0]",
+          "feature": "mana production LastNoted",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "",
+          "feature": "mana spending predicate",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "b70847646b54437252691fd5f6f9f5245b0878df",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Ice Cauldron"
+    },
+    {
+      "name": "Illusionary Mask",
+      "module": null,
+      "data": null,
+      "status": "engine_gap",
+      "generator_gaps": [
+        {
+          "path": "abilities[0].instructions[1].instructions[0]",
+          "feature": "operation PlayWith",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "",
+          "feature": "duration WhileMatches",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "",
+          "feature": "object filter ManaCostPayableWith",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "",
+          "feature": "replacement of AssignsCombatDamage",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "",
+          "feature": "replacement of BecomesTapped",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "required_feature": "Preserve the actual X-payment mana and restrict face-down casting to payable creature costs; replace damage assignment, damage reception and becoming tapped with turning face up.",
+      "api_evidence": "crates/cantrip-api/src/game.rs"
+    },
+    {
+      "name": "Illusionary Presence",
+      "module": "crates/cantrip-cards/src/cards/illusionary_presence.rs",
+      "data": "content/mtg/cards/illusionary-presence.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[1].instructions[1]",
+          "feature": "landwalk of an unrestricted chosen land type",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "b2b88921a21133f9ba31791e02ce8628fe8014e7",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Illusionary Presence"
+    },
+    {
+      "name": "Jade Monolith",
+      "module": "crates/cantrip-cards/src/cards/jade_monolith.rs",
+      "data": "content/mtg/cards/jade-monolith.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[0].instructions[1]",
+          "feature": "target reference outside a resolving ability",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "",
+          "feature": "target reference outside a resolving ability",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "cfc685f6f525f663d032d26d1a045d3738adcd73",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Jade Monolith"
+    },
+    {
+      "name": "Johan",
+      "module": "crates/cantrip-cards/src/cards/johan.rs",
+      "data": "content/mtg/cards/johan.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[0].instructions[0].instructions[0]",
+          "feature": "granted Static",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "abilities[0].instructions[1].instructions[0]",
+          "feature": "player rule for a while AttackWithoutTapping",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "abilities[0].instructions[1]",
+          "feature": "player rule for a while AttackWithoutTapping",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "",
+          "feature": "granted Static",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "3cf97efee999eebb64aa405744d8afdf7ef2cb08",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Johan"
+    },
+    {
+      "name": "Land Equilibrium",
+      "module": "crates/cantrip-cards/src/cards/land_equilibrium.rs",
+      "data": "content/mtg/cards/land-equilibrium.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "",
+          "feature": "event change then",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "70dbc647d180a216d16b0d36ddc9750f87ec992d",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Land Equilibrium"
+    },
+    {
+      "name": "Lava Burst",
+      "module": "crates/cantrip-cards/src/cards/lava_burst.rs",
+      "data": "content/mtg/cards/lava-burst.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[0].instructions[0]",
+          "feature": "operation EffectOn",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "f87f31ce5f9563f14ba40a3c4a9dc42521933089",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Lava Burst"
+    },
+    {
+      "name": "Library of Leng",
+      "module": null,
+      "data": null,
+      "status": "implementation_ready",
+      "generator_gaps": [],
+      "required_feature": "Ready for card implementation and scenarios: live effect_controller identifies effect-caused discards; optional library-top replacement and maximum-hand-size APIs exist.",
+      "api_evidence": "crates/cantrip-api/src/game.rs"
+    },
+    {
+      "name": "Melee",
+      "module": "crates/cantrip-cards/src/cards/melee.rs",
+      "data": "content/mtg/cards/melee.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[1].instructions[0]",
+          "feature": "player rule for a while Decides",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "abilities[1]",
+          "feature": "player rule for a while Decides",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "a0e28ab2d9762b8fb3af60e13d14cd81ed5335fd",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Melee"
+    },
+    {
+      "name": "Merseine",
+      "module": "crates/cantrip-cards/src/cards/merseine.rs",
+      "data": "content/mtg/cards/merseine.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "",
+          "feature": "engine: no cost copies a mana cost",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "a9c676053e197f2409033d628fa01ad091013133",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Merseine"
+    },
+    {
+      "name": "Nafs Asp",
+      "module": "crates/cantrip-cards/src/cards/nafs_asp.rs",
+      "data": "content/mtg/cards/nafs-asp.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[0].instructions[0]",
+          "feature": "operation DelayedUnlessPaid",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "9222061f74ce01050eeec74305a833dd3efc2729",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Nafs Asp"
+    },
+    {
+      "name": "Night Soil",
+      "module": "crates/cantrip-cards/src/cards/night_soil.rs",
+      "data": "content/mtg/cards/night-soil.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "",
+          "feature": "engine: no set rule on what a cost chooses",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "",
+          "feature": "move cost Exile from Matching",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "2d2004c24a5bcd8fb5b53890a8b89109623e02fa",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Night Soil"
+    },
+    {
+      "name": "North Star",
+      "module": null,
+      "data": null,
+      "status": "engine_gap",
+      "generator_gaps": [
+        {
+          "path": "abilities[0].instructions[0]",
+          "feature": "player rule for a while SpecialAction",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "abilities[0].instructions[0]",
+          "feature": "operation PlayWith",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "abilities[0]",
+          "feature": "player rule for a while SpecialAction",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "required_feature": "One-use, this-turn permission to spend mana as any type for one spell’s mana cost only, leaving additional costs unchanged. Existing SpendAnyColorRule covers a whole payment and does not supply this permission.",
+      "api_evidence": "crates/cantrip-api/src/card.rs",
+      "reference_contract_gap": "https://github.com/vishvananda/oracle-grammar/issues/34",
+      "reference_contract_detail": "Current reference agrees with the adapter but uses a hand-only special casting action; no explicit mana-cost-only scope. Requires an owned permission refinement as well as native engine support."
+    },
+    {
+      "name": "Nova Pentacle",
+      "module": "crates/cantrip-cards/src/cards/nova_pentacle.rs",
+      "data": "content/mtg/cards/nova-pentacle.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[0].instructions[1]",
+          "feature": "target reference outside a resolving ability",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "",
+          "feature": "target reference outside a resolving ability",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "",
+          "feature": "targets chosen by another player",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "be4022b15ac165228864b0273965a363fced25d5",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Nova Pentacle"
+    },
+    {
+      "name": "Personal Incarnation",
+      "module": "crates/cantrip-cards/src/cards/personal_incarnation.rs",
+      "data": "content/mtg/cards/personal-incarnation.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[0].instructions[0]",
+          "feature": "replacement of damage to a named recipient",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "e375785c0071c2bff043d74f59596ed5962f4a7c",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Personal Incarnation"
+    },
+    {
+      "name": "Power Leak",
+      "module": "crates/cantrip-cards/src/cards/power_leak.rs",
+      "data": "content/mtg/cards/power-leak.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[1].instructions[1]",
+          "feature": "operation DealDamageWith",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "fc026611e70e27332218c7d3380a165ed4946539",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Power Leak"
+    },
+    {
+      "name": "Power Surge",
+      "module": null,
+      "data": null,
+      "status": "engine_gap",
+      "generator_gaps": [
+        {
+          "path": "",
+          "feature": "engine: no record of the board as the turn began",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "required_feature": "Authoritative untapped-land snapshot as the turn began, before untapping; TurnBegan records do not carry that board snapshot.",
+      "api_evidence": "crates/cantrip-api/src/event.rs"
+    },
+    {
+      "name": "Psychic Purge",
+      "module": null,
+      "data": null,
+      "status": "engine_gap",
+      "generator_gaps": [
+        {
+          "path": "",
+          "feature": "engine: no discard cause in events",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "required_feature": "Freeze the controller of the discard-causing effect in event/trigger data for later resolution; live effect_controller is insufficient.",
+      "api_evidence": "crates/cantrip-api/src/event.rs"
+    },
+    {
+      "name": "Raging River",
+      "module": "crates/cantrip-cards/src/cards/raging_river.rs",
+      "data": "content/mtg/cards/raging-river.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[0].instructions[0].instructions[0]",
+          "feature": "a pile's name kept on its objects for a lasting rule",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "abilities[0].instructions[1].instructions[0]",
+          "feature": "a pile's name kept on its objects for a lasting rule",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "abilities[0].instructions[1].instructions[1]",
+          "feature": "a lasting block rule reading what its ability chose",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "",
+          "feature": "player collection Scoped",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "07ae734d6339ae68d65fa6ec6dd09eb313bca45c",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Raging River"
+    },
+    {
+      "name": "Rasputin Dreamweaver",
+      "module": "crates/cantrip-cards/src/cards/rasputin_dreamweaver.rs",
+      "data": "content/mtg/cards/rasputin-dreamweaver.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[4]",
+          "feature": "static rule CounterLimit",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "",
+          "feature": "object state StartedTurnUntapped",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "20c210ad376c360da9e6fd7bf98c23047c0d299d",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Rasputin Dreamweaver"
+    },
+    {
+      "name": "Reflecting Mirror",
+      "module": "crates/cantrip-cards/src/cards/reflecting_mirror.rs",
+      "data": "content/mtg/cards/reflecting-mirror.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[0].instructions[0].instructions[0]",
+          "feature": "a spell's target changed to a player",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "6de7edf14f63fa6da754b5a4e0a9e15015e871fd",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Reflecting Mirror"
+    },
+    {
+      "name": "Rock Hydra",
+      "module": "crates/cantrip-cards/src/cards/rock_hydra.rs",
+      "data": "content/mtg/cards/rock-hydra.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[1]",
+          "feature": "engine: no static prevention with an effect besides",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "a3e2e8a464367ca7391970a237bf03e951353a28",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Rock Hydra"
+    },
+    {
+      "name": "Runesword",
+      "module": "crates/cantrip-cards/src/cards/runesword.rs",
+      "data": "content/mtg/cards/runesword.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[0].instructions[2]",
+          "feature": "engine: no resolving rule on an open set: Prohibit Regenerate",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "f4c6d0899518fb326e878ffc002b67b7ea1c5441",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Runesword"
+    },
+    {
+      "name": "Sacred Boon",
+      "module": "crates/cantrip-cards/src/cards/sacred_boon.rs",
+      "data": "content/mtg/cards/sacred-boon.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "",
+          "feature": "damage prevented by an effect of this ability",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "",
+          "feature": "target reference",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "9583651f7a5700c1ba7d575b4e2edbcf53cf7b92",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Sacred Boon"
+    },
+    {
+      "name": "Season of the Witch",
+      "module": null,
+      "data": null,
+      "status": "engine_gap",
+      "generator_gaps": [
+        {
+          "path": "",
+          "feature": "object state CouldntAttack",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "required_feature": "Historical attack eligibility/opportunities for creatures that did not attack; current legality or attacked_this_turn does not answer “couldn’t attack.”",
+      "api_evidence": "crates/cantrip-api/src/history.rs"
+    },
+    {
+      "name": "Silhouette",
+      "module": "crates/cantrip-cards/src/cards/silhouette.rs",
+      "data": "content/mtg/cards/silhouette.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "",
+          "feature": "replacement event Caused",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "5f0b2796966d2f80b4f2a1d4bc6605ece33fb6c7",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Silhouette"
+    },
+    {
+      "name": "Soul Burn",
+      "module": "crates/cantrip-cards/src/cards/soul_burn.rs",
+      "data": "content/mtg/cards/soul-burn.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[0]",
+          "feature": "engine: no rule on the mana spent on a spell",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "",
+          "feature": "numeric expression ManaOf",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "bbd04b83e9939392377745dc23d8013c8388b714",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Soul Burn"
+    },
+    {
+      "name": "Sunglasses of Urza",
+      "module": null,
+      "data": null,
+      "status": "engine_gap",
+      "generator_gaps": [
+        {
+          "path": "abilities[0]",
+          "feature": "player rule SpendColorAs",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "required_feature": "Directed white-as-red mana spending substitution; the unrestricted spend-any-color callback is insufficient.",
+      "api_evidence": "crates/cantrip-api/src/card.rs"
+    },
+    {
+      "name": "Takklemaggot",
+      "module": "crates/cantrip-cards/src/cards/takklemaggot.rs",
+      "data": "content/mtg/cards/takklemaggot.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "",
+          "feature": "move arrival state",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "",
+          "feature": "object reference Scoped",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "78f6c45db90b9ba594570d80d179877a3f71a664",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Takklemaggot"
+    },
+    {
+      "name": "Tawnos's Coffin",
+      "module": "crates/cantrip-cards/src/cards/tawnoss_coffin.rs",
+      "data": "content/mtg/cards/tawnoss-coffin.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "abilities[1].instructions[1]",
+          "feature": "operation Note",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "abilities[1].instructions[2]",
+          "feature": "a triggered ability carrying separate groups of objects",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "",
+          "feature": "move arrival state",
+          "message": "Cantrip code generation has not implemented this capability"
+        },
+        {
+          "path": "",
+          "feature": "several objects arriving attached",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "1b1343cf35beb622123d74898cd9765be407bb4b",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Tawnos's Coffin"
+    },
+    {
+      "name": "Wall of Shadows",
+      "module": null,
+      "data": null,
+      "status": "engine_gap",
+      "generator_gaps": [
+        {
+          "path": "",
+          "feature": "object filter CanTargetOnly",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "required_feature": "Determine whether a spell/ability can target only Walls, across its target slots/modes; current selected-target legality is insufficient.",
+      "api_evidence": "crates/cantrip-api/src/card.rs"
+    },
+    {
+      "name": "Whippoorwill",
+      "module": "crates/cantrip-cards/src/cards/whippoorwill.rs",
+      "data": "content/mtg/cards/whippoorwill.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "",
+          "feature": "continuous rule Unique",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "0d7e8ef853ed0485d3e531793a8e98017c67dbcb",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Whippoorwill"
+    },
+    {
+      "name": "Word of Command",
+      "module": null,
+      "data": null,
+      "status": "engine_gap",
+      "generator_gaps": [
+        {
+          "path": "abilities[0].instructions[0]",
+          "feature": "operation PickFromHand",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "required_feature": "Control a player during this resolution/selected spell resolution, force the selected play, and restrict which mana abilities/resources can pay; next-turn control is insufficient.",
+      "api_evidence": "crates/cantrip-api/src/game.rs"
+    },
+    {
+      "name": "Worms of the Earth",
+      "module": "crates/cantrip-cards/src/cards/worms_of_the_earth.rs",
+      "data": "content/mtg/cards/worms-of-the-earth.json",
+      "status": "landed_upstream",
+      "generator_gaps": [
+        {
+          "path": "",
+          "feature": "cost part PlayerAction",
+          "message": "Cantrip code generation has not implemented this capability"
+        }
+      ],
+      "implementation_commit": "1b6afae4404e8334f16e1ecb5d109983569129be",
+      "implementation_author": "jschibel",
+      "implementation_subject": "Card: Worms of the Earth"
+    }
+  ],
+  "fork_main_commit": "9889dd28f90c484fde557fa25cf30beb2b45621d",
+  "authorship_note": "All 43 original card-addition commits are authored by jschibel. This does not attribute all shared foundation/engine work to that author.",
+  "generator_counts": {
+    "landed_and_generated": 1,
+    "landed_needing_adapters": 42,
+    "unimplemented_but_generated": 1
+  }
+}

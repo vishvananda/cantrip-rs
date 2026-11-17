@@ -2413,7 +2413,7 @@ impl Compiler {
         // that follows is `put_onto_battlefield_with_aura` (CR 303.4f).
         let made_by_source = matches!(filter,
             ObjectFilter::AllOf(filters) if matches!(filters.as_slice(),
-                [ObjectFilter::CardType(crate::mtg_types::CardType::Creature), ObjectFilter::MadeBy(ObjectRef::Source), ..]));
+                [ObjectFilter::CardType(crate::mtg_types::CardType::Creature), ObjectFilter::MadeBy(ObjectRef::Source) | ObjectFilter::CreatedWith(ObjectRef::Source), ..]));
         // Retain the explicit gap for another MadeBy relationship. The supported
         // structural case needs no Debug formatting or variant-name string match.
         if made_by_source {

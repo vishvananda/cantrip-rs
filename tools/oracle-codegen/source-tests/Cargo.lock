@@ -438,7 +438,7 @@ checksum = "f8ca58f447f06ed17d5fc4043ce1b10dd205e060fb3ce5b979b8ed8e59ff3f79"
 [[package]]
 name = "mtgish-ast"
 version = "0.1.0"
-source = "git+https://github.com/vishvananda/mtgish.git?rev=a4ca676381065d25b35e865b1d18aecbae0e78d8#a4ca676381065d25b35e865b1d18aecbae0e78d8"
+source = "git+https://github.com/vishvananda/mtgish.git?rev=f7915260e717502cd81e3933617df19d05f32b0d#f7915260e717502cd81e3933617df19d05f32b0d"
 dependencies = [
  "bincode",
  "mtgish-ir",
@@ -456,7 +456,7 @@ dependencies = [
 [[package]]
 name = "mtgish-ir"
 version = "0.1.0"
-source = "git+https://github.com/vishvananda/mtgish.git?rev=a4ca676381065d25b35e865b1d18aecbae0e78d8#a4ca676381065d25b35e865b1d18aecbae0e78d8"
+source = "git+https://github.com/vishvananda/mtgish.git?rev=f7915260e717502cd81e3933617df19d05f32b0d#f7915260e717502cd81e3933617df19d05f32b0d"
 dependencies = [
  "oracle-ir",
 ]
@@ -478,9 +478,9 @@ dependencies = [
 
 [[package]]
 name = "oracle-ir"
-version = "0.2.0"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4ae0762de9308614cefb952e56583e7830534def65116339e20c036f927b92e1"
+checksum = "0daffe77112ed4891e6862b258458fa15b939aa451950020ede85b0615cac535"
 dependencies = [
  "bincode",
  "proc-macro2",
@@ -492,9 +492,9 @@ dependencies = [
 
 [[package]]
 name = "oracle-ir-contract"
-version = "0.2.1"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c2d533358259d64be81ef91108f8adf572c9bc40ed996b432be09faf2913d4f3"
+checksum = "2bcd90aa8df09794c311e214cea82eb2aba779ba65b280a347593b952f6f5b37"
 dependencies = [
  "bincode",
  "oracle-ir",
@@ -596,7 +596,7 @@ dependencies = [
 [[package]]
 name = "rust_syntax"
 version = "0.0.1"
-source = "git+https://github.com/vishvananda/mtgish.git?rev=a4ca676381065d25b35e865b1d18aecbae0e78d8#a4ca676381065d25b35e865b1d18aecbae0e78d8"
+source = "git+https://github.com/vishvananda/mtgish.git?rev=f7915260e717502cd81e3933617df19d05f32b0d#f7915260e717502cd81e3933617df19d05f32b0d"
 dependencies = [
  "bincode",
  "oracle-ir",

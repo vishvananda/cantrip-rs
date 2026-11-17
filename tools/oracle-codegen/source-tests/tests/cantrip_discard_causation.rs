@@ -20,7 +20,7 @@ fn with_cause(test: impl FnOnce()) {
 
 #[test]
 fn old_targets_keep_the_discard_authority_gaps() {
-    cantrip::planned::with_additional_features(&[], || {
+    cantrip::planned::without_features(&["discard-causation", "effect-cause-controller"], || {
         assert!(cantrip::gaps(&card("Library of Leng")).iter()
             .any(|g| g.feature == "replacement event Discard"));
         assert!(cantrip::gaps(&card("Psychic Purge")).iter()

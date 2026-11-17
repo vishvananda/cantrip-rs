@@ -1,7 +1,7 @@
 # Oracle IR to Cantrip
 
-Standalone tooling over published `oracle-ir` 0.2.0 and `oracle-ir-contract` 0.2.1,
-schema 191. This crate is excluded from the engine workspace. Normal builds do
+Standalone tooling over published `oracle-ir` 0.3.0 and `oracle-ir-contract` 0.3.0,
+schema 192. This crate is excluded from the engine workspace. Normal builds do
 not depend on MTGish, its grammar, or the block editor.
 
 ```sh
@@ -29,7 +29,7 @@ JSONL records use this envelope (every field required):
 ```json
 {
   "format_version": 1,
-  "card": {"schema_version": 191, "layout": "Card", "data": [], "faces": []},
+  "card": {"schema_version": 192, "layout": "Card", "data": [], "faces": []},
   "context": {"primary_face": "Card name", "hand_modifier": 0, "life_modifier": 0},
   "identity": {"layout": "Card", "names": ["Card name"], "source_sha256": "producer hash"},
   "diagnostics": []
@@ -74,3 +74,26 @@ Refresh it explicitly with the producer snapshot rather than reading another che
 
 The original generator is MIT licensed; see the retained LICENSE. Python tools
 and lane docs moved without campaign databases, credentials or build caches.
+
+Current engine API refresh (2026-11-17): the tool branch is based on upstream
+`5441ecd742c2e40e908d0347f56afa520005a89b`, and consumes schema 192 from
+Grammar 0.3.4 through its published model/contract. Printed basic-land mana
+activations are classified by the owned contract so Cantrip does not add a second
+intrinsic activation. An effect-only pending discard can use the live
+`Query::effect_controller`; this does not imply frozen discard attribution is
+available to delayed triggers. See [the old-set reassessment](../../docs/ice-age-reassessment-20261117.md).
+
+For an actual native API check, after building the CLI:
+
+```sh
+python3 tools/oracle-codegen/check_native.py --cantrip .
+```
+
+This type-checks seven producer-neutral schema-192 examples against the native
+API and mechanics in a temporary crate, with a reusable dependency cache. It
+does not build the engine, card registry or clients. CI runs this check alongside
+the 77 standalone generator tests and the separate pinned Source integration.
+Linked token references use the creating ability and its acquisition; historical
+deaths project only their first surviving destinations. Entry-sacrifice counts
+read historical rows. Explicit acting-player scopes preserve the original
+ability controller instead of rebinding every occurrence of “you.”

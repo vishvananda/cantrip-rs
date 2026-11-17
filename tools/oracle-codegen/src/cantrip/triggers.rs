@@ -1182,11 +1182,8 @@ impl Compiler {
     ) -> Result<Matched> {
         let removed = *change != CounterChange::Put;
         let native_removed = removed && planned::switched_on("counter-removal-events");
-        // Native removal events carry the resulting total, but no remover:
-        // the cause belongs to the history record. Do not invent a `by` field.
-        if native_removed && by.is_some() {
-            return Err(gap("counter removal with a named removing player"));
-        }
+        // Current native removal events freeze both the resulting total and
+        // the removing player, independently of who controls the source now.
         let frame = Frame {
             object: Some(Carried::Subject),
             amount: Some(Carried::Data(0)),
@@ -1213,7 +1210,8 @@ impl Compiler {
             tests.push(format!("*kind == {}", read::counter_kind(kind)?));
         }
         if let Some(by) = by {
-            tests.push(self.matching(frame, |c| c.player_in(by, "*by"))?);
+            let test = self.matching(frame, |c| c.player_in(by, "*by"))?;
+            tests.push(if native_removed { format!("by.as_ref().is_some_and(|by| {test})") } else { test });
         }
         if *change == CounterChange::LastRemoved {
             tests.push(if native_removed {
@@ -1226,7 +1224,7 @@ impl Compiler {
             if removed && !native_removed { "COUNTERS_REMOVED" } else { "COUNTERS" },
             Arm {
                 pattern: match removed {
-                    true if native_removed => "Event::CountersRemoved { object, kind, amount, total }".into(),
+                    true if native_removed => "Event::CountersRemoved { object, kind, amount, total, by, .. }".into(),
                     true => "Event::CountersRemoved { object, kind, amount, by, .. }".into(),
                     false if as_put.is_some() => {
                         "Event::CountersPut { object, kind, amount, by, types, .. }".into()
@@ -1879,7 +1877,11 @@ impl Compiler {
                 let mut matched =
                     self.counters_batch(change, kind.as_ref(), objects, by.as_ref(), &per)?;
                 matched.batch = None;
-                self.plan_event(&mut matched, "engine: no event for each counter put", false)?;
+                // LastRemoved is one transition to zero, irrespective of the
+                // number removed. It is not one trigger for each counter.
+                if *change != CounterChange::LastRemoved {
+                    self.plan_event(&mut matched, "engine: no event for each counter put", false)?;
+                }
                 Ok(matched)
             }
             EventSpec::Activated { players, abilities } => self.activated_event(players, abilities),

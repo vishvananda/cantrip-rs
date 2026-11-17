@@ -39,6 +39,10 @@ const LANDED: &[&str] = &[
 /// holes. `tools/update_cantrip_vocabulary.py` reads this table to write
 /// `FEATURES`: keep each entry on one line, its name a literal.
 const SWITCHED: &[(&str, &str, &[&str])] = &[
+    ("entry-sacrifice-history", "pub fn sacrificed_as_entered(self, state:", &[]),
+    ("game-draw-effect", "fn draw_game(&mut self)", &["engine-no-effect-draws-the-game"]),
+    ("linked-token-creations", "pub fn tokens_created_by(&self, by: Linked, ability: AbilityRef)", &[]),
+    ("history-destination-objects", "fn found_all_after_move(&self, left: ObjectId) -> Vec<ObjectId>", &[]),
     // `CardDef::lasting_rules` with `Game::add_lasting_rule` (a rule on an open
     // set, CR 611.2c), `EffectKind::DoesntUntap`, and the durations
     // `DuringItsControllersNextUntapStep` and `DuringNextUntapStepOf`: Cantrip
@@ -95,7 +99,7 @@ const SWITCHED: &[(&str, &str, &[&str])] = &[
     ("job-select-token", "pub static HERO_1_1_COLORLESS:", &[]),
     ("resolved-land-types", "SetLandType(Subtype),", &["engine-no-resolving-effect-sets-land-types"]),
     ("untap-events", "Untapped { permanent: ObjectId },", &["engine-no-untap-event"]),
-    ("counter-removal-events", "CountersRemoved { object: ObjectId, kind: CounterKind, amount: i32, total: i32 },", &["engine-no-event-for-a-counter-being-removed"]),
+    ("counter-removal-events", "CountersRemoved { object: ObjectId, kind: CounterKind, amount: i32, total: i32, by: Option<PlayerId> },", &["engine-no-event-for-a-counter-being-removed"]),
     ("control-change-events", "ControlChanged { permanent: ObjectId, from: PlayerId, controller: PlayerId },", &["trigger-event-player-loses-control"]),
     ("event-delayed-object-lists", "fn delayed_trigger_about(", &["engine-a-delayed-ability-on-an-event-keeps-no-list"]),
     ("exile-on-leave", "fn exile_on_leave(&mut self, permanent: ObjectId);", &[]),
@@ -105,6 +109,7 @@ const SWITCHED: &[(&str, &str, &[&str])] = &[
     ("mana-bundle-choices", "pub const fn add_one_bundle_of(", &[]),
     ("captured-replacement-values", "pub const fn show_captured_value(self) -> GrantedReplacementDef", &[]),
     ("discard-causation", "fn discard_cost(", &[]),
+    ("effect-cause-controller", "fn effect_controller(&self) -> Option<PlayerId>", &[]),
     ("no-other-auras", "pub const ENCHANTED_NO_OTHER_AURAS:", &[]),
     ("resolution-x-payment", "fn may_pay_x(&mut self, payer: PlayerId,", &[]),
     ("landwalk-blocking-exceptions", "pub landwalk_exceptions: &'static [LandwalkException],", &[]),

@@ -1016,6 +1016,8 @@ struct Compiler {
     repeating: Option<usize>,
     /// The name of the card being compiled, for what is named after it.
     card_name: String,
+    /// Native slot of the sole token-creating printed ability, if proved.
+    linked_token_creator: Option<usize>,
     /// What follows the instruction being compiled in this ability, nearest
     /// first: its own program, then the rest of those around it.
     after: Vec<Instruction>,
@@ -1409,6 +1411,7 @@ impl Compiler {
             failed: BTreeSet::new(),
             repeating: None,
             card_name: String::new(),
+            linked_token_creator: None,
             after: Vec::new(),
             searched: BTreeMap::new(),
             cipher: false,
@@ -2719,6 +2722,16 @@ fn emit_face(
         feature: "invalid AST".into(),
         message: e,
     })?;
+    // A printed basic-land mana line denotes the intrinsic ability already
+    // derived by Cantrip's layers; it must not become a second activation.
+    let nonintrinsic = card.abilities.iter().any(|ability|
+        oracle_ir_contract::intrinsic::printed_basic_land_mana(&card.characteristics, ability).is_some()
+    ).then(|| {
+        let mut face = card.clone();
+        face.abilities = oracle_ir_contract::intrinsic::nonintrinsic_printed_abilities(card).cloned().collect();
+        face
+    });
+    let card = nonintrinsic.as_ref().unwrap_or(card);
     let combined = recipes::combine_attack_block(card);
     let card = combined.as_ref().unwrap_or(card);
     let joined = lane_m::spells_joined(card);
@@ -2796,7 +2809,12 @@ fn emit_face(
         }
         _ => Err(gap("two mechanics that need the first delayed ability")),
     });
+    let token_creators = card.abilities.iter().enumerate()
+        .filter(|(_, ability)| lane_j::creates_tokens(ability)).map(|(i, _)| i).collect::<Vec<_>>();
     for (i, a) in card.abilities.iter().enumerate() {
+        if token_creators.as_slice() == [i] && parts.abilities.len() <= usize::from(u8::MAX) {
+            c.linked_token_creator = Some(parts.abilities.len());
+        }
         // A list of what each player chose is a local of the ability that asked (Null Chamber's names).
         let earlier: Vec<ValueKind> = std::mem::take(&mut c.chosen_lists)
             .into_iter()

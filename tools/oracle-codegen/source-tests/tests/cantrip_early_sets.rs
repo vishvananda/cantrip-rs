@@ -64,7 +64,7 @@ fn last_removed_uses_the_events_total_and_shared_counter_mask() {
     *by = None;
     let whole = cantrip::whole(&source, &lowered.card).unwrap();
     let code = &whole.faces[0].rust;
-    assert!(code.contains("Event::CountersRemoved { object, kind, amount, total }"), "{code}");
+    assert!(code.contains("Event::CountersRemoved { object, kind, amount, total, by, .. }"), "{code}");
     assert!(code.contains("*total == 0"), "{code}");
     assert!(!code.contains("COUNTERS_REMOVED"), "{code}");
     assert!(!code.contains("no event for a counter being removed"), "{code}");
