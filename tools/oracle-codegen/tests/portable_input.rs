@@ -776,3 +776,29 @@ fn returned_card_rules_follow_only_the_first_hand_identity_and_bind_its_owner() 
     *affected = EffectSubjects::Players(PlayerSet::One(PlayerRef::AbilityController));
     assert!(cantrip::module(&face).is_err(), "another player's visibility/play permission is not silently rebound to the owner");
 }
+
+
+#[test]
+fn printed_prevention_followups_use_proposals_and_keep_event_amount_separate_from_prevented_amount() {
+    use cantrip_oracle_codegen::ir::*;
+    let face = native_face("Phantom Centaur");
+    let generated = cantrip::module(&face).unwrap();
+    let callback = generated.lines().find(|line|line.contains("fn ability_2_then(")).unwrap();
+    assert!(callback.contains("before: &Proposal, after: &Proposal"));
+    assert!(callback.contains("let (Proposal::Damage(e), Proposal::Damage(after)) = (before, after)"));
+    assert!(!callback.contains("parts: &[Prevented]"));
+    assert!(!callback.contains("if prevented"), "counter removal still happens when prevention is prohibited");
+    assert!(generated.contains("g.remove_counters("));
+    let mut face = native_face("Gloom Surgeon");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("e.amount.saturating_sub(after.amount)"));
+    assert!(generated.contains("i64::from(data[0])"), "that many is the proposed damage amount");
+    let Ability::Replacement { body, .. } = &mut face.abilities[0] else { panic!() };
+    let Instruction::Effect { operation: Operation::Move { objects: ObjectSet::Take { count, .. }, .. }, .. } = &mut body.instructions[1] else { panic!() };
+    *count = Expr::Performed(ResultId(0));
+    let generated = cantrip::module(&face).unwrap();
+    let lookup = generated.lines().find(|line|line.contains("let objects_0 =")).unwrap();
+    assert!(lookup.contains("done_prevented") && !lookup.contains("data[0]"), "an explicit prevention receipt uses actual prevented damage");
+    let granted = cantrip::module(&native_face("Reverse Damage")).unwrap();
+    assert!(granted.contains(".gain_prevented()") || granted.contains("gain_prevented: true"));
+}

@@ -1,8 +1,8 @@
 # Intended gaps versus the interfaces that landed
 
 Current checkpoint: **36/43 landed cards generate without diagnostics**;7 generator
-holds and2 separately recorded reference holds remain. **116 generator tests**
-and **47 real native interface examples** pass. The dated batches below record
+holds and2 separately recorded reference holds remain. **117 generator tests**
+and **50 real native interface examples** pass. The dated batches below record
 how this total changed; their earlier counts are historical.
 
 The original 57-card pause list is the input, not all unsupported cards in the
@@ -298,3 +298,15 @@ Remaining generator holds: Dance of the Dead, Ice Cauldron, Raging River,
 Sacred Boon, Takklemaggot, Tawnos's Coffin and Worms of the Earth. These require
 further adapters/reference work; they do not add to the13 engine gaps.
 Family-ten focused Source checks passed **37 tests** (one ignored).
+
+
+## Whole-corpus verification follow-up
+
+The [full-corpus comparison](generator-corpus-coverage-20261117.md) measures shared
+adapters beyond this early-set backlog: 63 new diagnostic-free cards in the latest
+pass, 62 of them compiling natively;112 native-compiling gains across the full
+series. It also exposed and fixed the printed/granted prevention callback ABI
+distinction. This leaves the36/43 early-set classification unchanged. Current
+checks pass 117 generator tests, 50 native smoke examples, 112 additional corpus
+modules and 15 affected Source tests. Nine Lives needs a counter vocabulary
+prerequisite; no engine/card registration was added by this work.

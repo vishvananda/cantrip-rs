@@ -4,7 +4,7 @@ Engine/API audited 2026-11-17 against Cantrip `5441ecd742c2e40e908d0347f56afa520
 
 Current generator checkpoint: **36/43** landed cards have no generation diagnostics;
 **7 generator holds** and **2 separately tracked reference holds** remain.
-**116 generator tests** and **47 native interface examples** pass. The adoption
+**117 generator tests** and **50 native interface examples** pass. The adoption
 checkpoints below are historical.
 
 Of the original paused **57 cards**, **43 now have landed implementations and metadata**, **Library of Leng is newly implementation-ready**, and **13 still require engine authority or event information**. The original exclusions remain: Shahrazad, ante and dexterity cards. Flavor-banned cards remain in scope.

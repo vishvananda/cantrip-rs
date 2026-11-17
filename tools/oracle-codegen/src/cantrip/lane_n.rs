@@ -789,6 +789,13 @@ impl Compiler {
             ("", "")
         };
         writeln!(self.functions, "#[allow(unused_variables, unused_mut)] fn {then}_steps(g: &mut dyn Game, asker: &Asker, {about}subject: Target, data: [u32; 2], done_prevented: {prevention_ty}{quantity_param}) -> Result<(), Suspend> {{ {out} Ok(()) }}", prevention_ty = Quantity::Prevention.kind()).unwrap();
+        if about.is_empty() && planned::switched_on("static-prevention-side-effects") {
+            // Printed prevention runs per proposal, even when damage cannot be
+            // prevented (CR 615.12). EventAmount is the original proposed amount;
+            // Performed independently reports the amount actually prevented.
+            writeln!(self.functions, "#[allow(unused_variables, dead_code)] fn {then}(g: &mut dyn Game, asker: &Asker, before: &Proposal, after: &Proposal) {{ let (Proposal::Damage(e), Proposal::Damage(after)) = (before, after) else {{ return }}; let prevented = e.amount.saturating_sub(after.amount); let q: &dyn Query = g; {locals} let _ = {then}_steps(g, asker, subject, data, prevented{quantity_arg}); }}").unwrap();
+            return Ok(Some(then));
+        }
         // Words that read "that source" or "that creature" where the parts have
         // several are about each one (Comeuppance: each creature is dealt the
         // damage prevented from it): the rest runs once for each, with its total.

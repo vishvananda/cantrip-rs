@@ -8,7 +8,7 @@
   "frozen_oracle_sha256": "2281f3d715e8ee6127825154b31202918ef83a9d9a3641a0d23b0163ebea3065",
   "source_ron_sha256": "7c1f493906004497a6682071481ddabf1ce15e9efc63834a904554ffd35a14a7",
   "backlog_records_sha256": "4baa58c98b4bff1e017a7c99ddacf1fd4a85dfed77467a05c9b8154a71735e91",
-  "tracked_rows_sha256": "e41d01a0abf487a51921d3f182c9e546f6c34daa2e133ba33e6c4ddde6f276e6",
+  "tracked_rows_sha256": "d9747563d90729d6aa318bd61524dca1a0da2155f2c86af8f4d1643e0b73d0e4",
   "native_api_sha256": "235fbb1780747dbaa038447d8463320b09a1ba299857305ab5d5ca9e03af3952",
   "counts": {
     "landed_upstream": 43,
@@ -17,14 +17,14 @@
   },
   "validation": {
     "native_full_suite": "Engine baseline 5441ecd742: bash tools/test.sh passed; 27,853 Rust tests (15 ignored), managed tests and client build. Later fork-main host/client/test commits do not change the audited API.",
-    "generator": "116 Rust tests pass; every smoke fixture must generate a real complete module.",
+    "generator": "117 Rust tests pass; every smoke fixture must generate a real complete module.",
     "pipeline_python": "437 tests passed",
     "tooling_python": "52 tests passed",
     "mtgish": "1,596 Rust tests passed; 33,529 exported records, zero lowering diagnostics",
     "library_of_leng": "Generated module compiles as a standalone Rust library against the checked-profile current cantrip-api. Card registration and runtime scenarios are not implemented by this audit.",
     "latest_refresh": "Upstream advanced during the audit: rebased from 90204df367 to 5441ecd742. New original-draw receipts, nest counters and unrelated cards do not change the 43/1/13 result.",
-    "source_integration": "Family-eight full CI passed607 tests,12 ignored. Family-nine focused39 passed,2 ignored; family-ten focused37 passed,1 ignored. Latest full CI runs after push; superseded branch runs are canceled.",
-    "native_api_check": "47 actual generated modules compile against native API/mechanics. Drought adds repeated sacrifices during actual cost payment; Firestorm Phoenix follows only its returned-hand identity and binds the owner\u2019s next turn. Glyph reference correctness remains a separate hold (#36)."
+    "source_integration": "Family-ten full CI passed607 tests,12 ignored. Printed-prevention correction passes15 focused Source tests; latest full CI follows push.",
+    "native_api_check": "The 50 native smoke examples and the separate 112-card corpus gain set type-check against native API/mechanics. Printed prevention follow-ups use the proposal ABI; granted prevention retains its prevented-parts ABI. Nine Lives additionally needs the Incarnation counter registered."
   },
   "cards": [
     {
@@ -824,10 +824,11 @@
   "generator_adoption": {
     "landed_cards_clean": 36,
     "landed_cards_held": 7,
-    "native_smoke_examples": 47,
+    "native_smoke_examples": 50,
     "reference_holds": [
       "Sacred Boon (oracle-grammar#35)",
       "Glyph of Reincarnation (oracle-grammar#36; historical controller adapter compiles)"
     ]
-  }
+  },
+  "corpus_coverage_report": "corpus-coverage-20261117.json"
 }
