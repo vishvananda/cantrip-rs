@@ -8,7 +8,7 @@
   "frozen_oracle_sha256": "2281f3d715e8ee6127825154b31202918ef83a9d9a3641a0d23b0163ebea3065",
   "source_ron_sha256": "7c1f493906004497a6682071481ddabf1ce15e9efc63834a904554ffd35a14a7",
   "backlog_records_sha256": "4baa58c98b4bff1e017a7c99ddacf1fd4a85dfed77467a05c9b8154a71735e91",
-  "tracked_rows_sha256": "c13245346118b4938cf7ad68ec3abff52c0a8ab6e01fa7f1f2212fda89a841cf",
+  "tracked_rows_sha256": "e3839f6cb8f8de5857fd55a9540024738c81193aea87312abfcf2b44899c8f8f",
   "native_api_sha256": "235fbb1780747dbaa038447d8463320b09a1ba299857305ab5d5ca9e03af3952",
   "counts": {
     "landed_upstream": 43,
@@ -17,14 +17,14 @@
   },
   "validation": {
     "native_full_suite": "Engine baseline 5441ecd742: bash tools/test.sh passed; 27,853 Rust tests (15 ignored), managed tests and client build. Later fork-main host/client/test commits do not change the audited API.",
-    "generator": "84 Rust tests pass, including pending damage portions and prevention life-results scope.",
+    "generator": "90 Rust tests pass, including replacement blocker declarations, turn-start orientation, counter ceilings, colored cost increases and one-graveyard exile costs.",
     "pipeline_python": "437 tests passed",
     "tooling_python": "52 tests passed",
     "mtgish": "1,596 Rust tests passed; 33,529 exported records, zero lowering diagnostics",
     "library_of_leng": "Generated module compiles as a standalone Rust library against the checked-profile current cantrip-api. Card registration and runtime scenarios are not implemented by this audit.",
     "latest_refresh": "Upstream advanced during the audit: rebased from 90204df367 to 5441ecd742. New original-draw receipts, nest counters and unrelated cards do not change the 43/1/13 result.",
-    "source_integration": "607 tests passed (12 ignored) at the adoption checkpoint. After prevention adapters, 29 tests passed (1 ignored) across five affected Source targets, including the corrected preserved-program expansion count.",
-    "native_api_check": "16 generated examples type-check against native API/mechanics, including Dark Sphere, Forcefield, Reverse Damage, Hallow and Deflecting Palm."
+    "source_integration": "607 tests passed (12 ignored) at the adoption checkpoint; subsequent focused targets pass. A complete no-fail-fast sweep is running for this batch; prior CI Tangle snapshot updated only for the required new prevention defaults/import.",
+    "native_api_check": "20 generated examples type-check against the actual native API/mechanics, including Camouflage, Rasputin Dreamweaver, Derelor and Night Soil."
   },
   "cards": [
     {
@@ -62,13 +62,7 @@
       "module": "crates/cantrip-cards/src/cards/camouflage.rs",
       "data": "content/mtg/cards/camouflage.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "abilities[1].instructions[0]",
-          "feature": "operation GameEffect",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "7ea6a1560d294e6f10d5497705853bd33a2fbac5",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Camouflage"
@@ -135,13 +129,7 @@
       "module": "crates/cantrip-cards/src/cards/derelor.rs",
       "data": "content/mtg/cards/derelor.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "",
-          "feature": "a spell costing colored mana more",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "c6ed77742f67bd49b3e9ec1999f579461f72f1da",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Derelor"
@@ -636,18 +624,7 @@
       "module": "crates/cantrip-cards/src/cards/night_soil.rs",
       "data": "content/mtg/cards/night-soil.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "",
-          "feature": "engine: no set rule on what a cost chooses",
-          "message": "Cantrip code generation has not implemented this capability"
-        },
-        {
-          "path": "",
-          "feature": "move cost Exile from Matching",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "2d2004c24a5bcd8fb5b53890a8b89109623e02fa",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Night Soil"
@@ -803,18 +780,7 @@
       "module": "crates/cantrip-cards/src/cards/rasputin_dreamweaver.rs",
       "data": "content/mtg/cards/rasputin-dreamweaver.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "abilities[4]",
-          "feature": "static rule CounterLimit",
-          "message": "Cantrip code generation has not implemented this capability"
-        },
-        {
-          "path": "",
-          "feature": "object state StartedTurnUntapped",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "20c210ad376c360da9e6fd7bf98c23047c0d299d",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Rasputin Dreamweaver"
@@ -1073,8 +1039,8 @@
   "fork_main_commit": "9889dd28f90c484fde557fa25cf30beb2b45621d",
   "authorship_note": "All 43 original card-addition commits are authored by jschibel. This does not attribute all shared foundation/engine work to that author.",
   "generator_counts": {
-    "landed_and_generated": 7,
-    "landed_needing_adapters": 36,
+    "landed_and_generated": 11,
+    "landed_needing_adapters": 32,
     "unimplemented_but_generated": 1
   }
 }

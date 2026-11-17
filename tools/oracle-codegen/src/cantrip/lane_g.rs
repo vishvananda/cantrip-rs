@@ -469,6 +469,21 @@ fn cost_zone(objects: &ObjectSet) -> Option<(String, ObjectFilter)> {
     })
 }
 
+/// One owner among all graveyards is one graveyard (CR 400.3). Preserve every
+/// nested filter; a same-controller rule would not prove the same property.
+fn single_graveyard_filter(objects: &ObjectSet) -> Option<ObjectFilter> {
+    match objects {
+        ObjectSet::Zone {
+            scope: ZoneScope::Players { zone: EventZone::Graveyard, players: PlayerSet::All },
+            kind: ObjectKind::Card, filter,
+        } => Some(filter.clone()),
+        ObjectSet::Matching { objects, filter } => Some(ObjectFilter::AllOf(vec![
+            single_graveyard_filter(objects)?, filter.clone(),
+        ])),
+        _ => None,
+    }
+}
+
 /// What paid a part of an activation's or a spell's cost, where the engine
 /// keeps no list of it: discarded and exiled cards, and revealed ones.
 pub(super) fn paid_objects(component: &[u32]) -> String {
@@ -2173,6 +2188,23 @@ impl Compiler {
                 }
             }
             CostPart::Constrained { part, constraints } => {
+                if planned::switched_on("single-graveyard-exile-costs")
+                    && matches!(constraints.as_slice(), [SelectionConstraint::CommonProperty(DistinctProperty::Owners)])
+                    && self.activation_cost.is_some() && label != PAID
+                {
+                    if let CostPart::Move { selections, destination: MovementDestination::Exile { visibility: ExileVisibility::FaceUp, arrival } } = &**part {
+                        if let [CostObjectSelection { objects, choose: Some(Count::Exactly(Expr::Constant(n))) }] = selections.as_slice() {
+                            if let Some(filter) = single_graveyard_filter(objects) {
+                                if self.activation_in_graveyard { return Err(gap("single-graveyard cost that can exile its own ability source")); }
+                                if !arrival.counters.is_empty() || !arrival.states.is_empty() { return Err(gap("arrival changes on a single-graveyard cost")); }
+                                let n = u8::try_from(*n).ok().filter(|n| *n > 0)
+                                    .ok_or_else(|| gap("single-graveyard exile count outside 1..=255"))?;
+                                let filter = self.cost_filter(&filter, label)?;
+                                return Ok(format!("exile_from_a_graveyard_of({n}, {filter})"));
+                            }
+                        }
+                    }
+                }
                 if let (
                     CostPart::ChangeTapState {
                         selections,

@@ -217,6 +217,9 @@ impl Compiler {
                 "DevouredACreature",
                 format!("q.state().obj({id}).marks.devoured > 0"),
             ),
+            S::StartedTurnUntapped if planned::switched_on("untap-events") && self.history.is_none() => format!(
+                "{{ let permanent = {id}; let history = q.history(); matches!(q.state().obj(permanent).zone.kind(), ZoneKind::Battlefield | ZoneKind::PhasedOut) && !history.entered_this_turn(permanent) && {{ let taps = EventQuery::kind(EventMask(EventMask::TAPPED.0 | EventMask::UNTAPPED.0)).object(permanent).this_turn(); match history.select(taps).next().map(|record| record.event) {{ Some(Event::Untapped {{ .. }}) => false, Some(_) => true, None => !q.state().obj(permanent).tapped }} }} }}"
+            ),
             S::StartedTurnUntapped => unrecorded(
                 "StartedTurnUntapped",
                 format!("q.state().obj({id}).marks.untapped_as_turn_began"),

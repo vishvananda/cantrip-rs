@@ -815,6 +815,9 @@ struct Compiler {
     links_exile: bool,
     /// Some ability of the card takes cards from one player's graveyard.
     one_graveyard: bool,
+    /// A graveyard activation may pay with its own source card. The native
+    /// single-graveyard cost excludes that card, so needs a narrower contract.
+    activation_in_graveyard: bool,
     /// A face other than the definition an object's `card` names: `lane_f`.
     own_face: bool,
     /// Which door of its Room this face is.
@@ -1316,6 +1319,7 @@ impl Compiler {
             known_one: BTreeSet::new(),
             links_exile: false,
             one_graveyard: false,
+            activation_in_graveyard: false,
             own_face: false,
             door: None,
             choosing: None,

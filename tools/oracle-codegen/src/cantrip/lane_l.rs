@@ -2100,6 +2100,42 @@ impl Compiler {
                 }] };
                 self.create_replacement(&event, &ReplacementLimit::UntilExpired, until, &body, out)?;
             }
+            Operation::GameEffect { until: Duration::EndOfTurn, effect }
+                if matches!(effect.as_ref(), Operand::Term { family, form, operands }
+                    if family == "GameEffect" && form == "DefendingPlayersChooseCreaturesToDefendAttackersAtRandom"
+                        && operands.is_empty()) && planned::switched_on("replacement-block-declarations") =>
+            {
+                if !self.stack_item { return Err(gap("a replacement blocker declaration outside a stack resolution")); }
+                let index = self.late_tables.iter().filter(|(table, _)| *table == "blockers_instead").count();
+                let index = u8::try_from(index).map_err(|_| gap("more than 256 replacement blocker declarations"))?;
+                let label = format!("blocker_piles_{}", self.fresh());
+                // The core offers each defender's creatures and enforces block
+                // legality after the pile procedure returns its assignments.
+                writeln!(self.functions, "fn {label}_any(_: &dyn Query, choice: &Choice, _: u32) -> Verdict {{ Verdict::any(choice) }}").unwrap();
+                writeln!(self.functions, r#"fn {label}(g: &mut dyn Game, asker: &Asker, over: &DefendingCreatures) -> Result<Vec<(ObjectId, ObjectId)>, Suspend> {{
+                    use cantrip_mechanics::{{choose, select}};
+                    let mut piles: Vec<Vec<ObjectId>> = Vec::with_capacity(over.attackers.len());
+                    for _ in &over.attackers {{
+                        let room: Vec<ObjectId> = over.creatures.iter()
+                            .filter(|&&(creature, most)| count_u32(piles.iter().filter(|pile| pile.contains(&creature)).count()) < most)
+                            .map(|creature| creature.0).collect();
+                        let rule = select::cards(select::ANY_NUMBER)
+                            .with(select::part(&({label}_any as SelectFn), 0, "you control to put in the next pile"))
+                            .called("creature");
+                        piles.push(choose::select(g, over.defender, asker.source, Purpose::Choose, room, rule)?);
+                    }}
+                    let mut unassigned = over.attackers.clone();
+                    let mut blocks = Vec::new();
+                    for pile in piles {{
+                        let attacker = unassigned.remove(g.choose_at_random(unassigned.len()));
+                        blocks.extend(pile.into_iter().map(|creature| (creature, attacker)));
+                    }}
+                    Ok(blocks)
+                }}"#).unwrap();
+                self.late_tables.push(("blockers_instead", format!("BlockersInstead {{ text: {}, blocks: {label} }}",
+                    quoted("This turn, each defending player divides creatures into piles, one per attacker, and assigns the piles to attackers at random instead of declaring blockers."))));
+                writeln!(out, "g.blockers_instead_this_turn(item, {index});").unwrap();
+            }
             // The rule is data; the objects and players it names as it resolves
             // are the call's, as `effect_on_objects` takes them.
             Operation::GameEffect { until, effect } => {

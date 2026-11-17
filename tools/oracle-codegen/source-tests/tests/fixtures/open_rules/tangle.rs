@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::prevention;
 use cantrip_oracle as oracle;
 
 /// "Prevent all combat damage that would be dealt this turn. Each attacking creature doesn't untap during its controller's next untap step." (CR 615.1).
@@ -83,6 +84,7 @@ pub static CARD: CardDef = CardDef {
             applies: made_1_applies,
             then: None,
             text: "Prevent all combat damage that would be dealt this turn.",
+            ..prevention::ANY_DAMAGE
         },
     ],
     ..oracle::TANGLE

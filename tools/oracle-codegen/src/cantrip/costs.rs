@@ -1435,6 +1435,8 @@ impl Compiler {
                 };
                 let before = self.clone();
                 self.activation_cost = Some(cost.clone());
+                let old_graveyard = self.activation_in_graveyard;
+                self.activation_in_graveyard = scope.is_some_and(|scope| scope.zones.contains(&EventZone::Graveyard));
                 let index = parts.abilities.len();
                 let def = self.activated(
                     label,
@@ -1447,6 +1449,7 @@ impl Compiler {
                     scope,
                 );
                 self.activation_cost = None;
+                self.activation_in_graveyard = old_graveyard;
                 if matches!(limits.keyword, Some(ActivatedKeyword::Forecast)) {
                     self.plan_entry("activated keyword Forecast", "abilities", &def?, parts);
                 } else {

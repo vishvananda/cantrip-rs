@@ -120,3 +120,24 @@ contains **16 natively type-checked examples**; **84 generator tests** and **29
 affected Source tests** pass (one ignored). The Source preserved-program count
 was updated from 7 clean / 4 gaps to 8 clean / 3 gaps, reflecting the newly
 supported native interface.
+
+## Declaration, history and cost adapters
+
+Camouflage uses the native blocker-declaration replacement, leaving block
+legality to the core. Its pile procedure respects each creature’s block capacity,
+permits empty piles and assigns each pile to a distinct attacker at random.
+Rasputin uses the first tap/untap transition this turn, rejects a newly entered
+object and preserves phased-out identity. Its counter ceiling is a state-based
+action table, not a cap on placement. This self-orientation query does not supply
+Power Surge’s historical board snapshot.
+
+Derelor uses the native colored mana cost increase, keeping color-word changes
+separate from the printed mana symbol. Night Soil chooses a single graveyard
+while paying the cost. Unsupported set constraints, counts and self-exile from a
+graveyard activation remain gaps.
+
+The original 43 now have **11 cleanly generated / 32 awaiting adapters**, plus
+Library of Leng. **90 generator tests** and **20 native interface examples** pass.
+Focused Source cost/early-set tests pass; the full Source sweep is in progress.
+The old Tangle snapshot now includes the prevention defaults required by the
+expanded native struct; those were the only differences in its CI failure.

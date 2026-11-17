@@ -623,6 +623,19 @@ impl Compiler {
                 return self.player_static(label, players, changes, parts)
             }
         };
+        // CR 704.5r: excess counters come off as a state-based action. Do not
+        // cap the placement: events must still see all the counters being put.
+        if matches!(kind, StaticKind::Ordinary) && self.static_guard.is_none()
+            && matches!(affected, ObjectSet::One(ObjectRef::Source))
+            && planned::switched_on("counter-ceilings")
+        {
+            if let [Change::Rule(RuleChange::CounterLimit { kind, max: Expr::Constant(max) })] = changes {
+                let max = i32::try_from(*max).ok().filter(|n| *n >= 0)
+                    .ok_or_else(|| gap("counter ceiling outside nonnegative i32"))?;
+                parts.table("counter_ceilings", format!("({}, {max})", counter_kind(kind)?));
+                return Ok(());
+            }
+        }
         if matches!(kind, StaticKind::Ordinary) && self.static_guard.is_none()
             && recipes::creature_anthem(affected, changes)
         {

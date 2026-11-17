@@ -245,3 +245,96 @@ fn the_controller_only_gain_flag_does_not_claim_other_players_gains() {
     *players=PlayerSet::All;
     assert!(cantrip::gaps(&face).iter().any(|gap|gap.feature=="conditional or modified life gain from prevention in the damage event"));
 }
+
+#[test]
+fn blocker_piles_use_the_declaration_hook_and_preserve_additional_block_capacity() {
+    use cantrip_oracle_codegen::ir::*;
+    let mut face = native_face("Camouflage");
+    face.name = "An unrelated name".into();
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("g.blockers_instead_this_turn(item, 0)"));
+    assert!(generated.contains("over.defender"));
+    assert!(generated.contains("over.creatures"));
+    assert!(generated.contains("most"));
+    assert!(generated.contains("g.choose_at_random(unassigned.len())"));
+    assert!(generated.contains("cast_only_if: Some("));
+    assert!(cantrip::planned::without_features(&["replacement-block-declarations"], || cantrip::module(&face)).is_err());
+    let Ability::Spell { body, .. } = &mut face.abilities[1] else { panic!() };
+    let mut again = body.instructions[0].clone();
+    let Instruction::Effect { result, .. } = &mut again else { panic!() };
+    *result = ResultId(1);
+    body.instructions.push(again);
+    let twice = cantrip::module(&face).unwrap();
+    assert!(twice.contains("g.blockers_instead_this_turn(item, 1)"));
+    let Ability::Spell { body, .. } = &mut face.abilities[1] else { panic!() };
+    let Instruction::Effect { operation: Operation::GameEffect { until, .. }, .. } = &mut body.instructions[0] else { panic!() };
+    *until = Duration::EndOfCombat;
+    assert!(cantrip::module(&face).is_err(), "the native hook only lasts this turn");
+}
+
+#[test]
+fn turn_start_orientation_uses_the_first_tap_transition_and_rejects_new_objects() {
+    let face = native_face("Rasputin Dreamweaver");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("history.entered_this_turn(permanent)"));
+    assert!(generated.contains("history.select(taps).next()"));
+    assert!(generated.contains("Some(Event::Untapped"));
+    assert!(generated.contains("ZoneKind::PhasedOut"));
+    assert!(!generated.contains("marks.untapped_as_turn_began"));
+    assert!(cantrip::planned::without_features(&["untap-events"], || cantrip::module(&face)).is_err());
+}
+
+#[test]
+fn counter_ceilings_are_state_based_and_not_placement_limits() {
+    use cantrip_oracle_codegen::ir::*;
+    let mut face = native_face("Rasputin Dreamweaver");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("counter_ceilings: &[(CounterKind::Dream, 7)]"));
+    assert!(!generated.contains("add_counters_with_limit"));
+    assert!(cantrip::planned::without_features(&["counter-ceilings"], || cantrip::module(&face)).is_err());
+    let Ability::Static { changes, .. } = face.abilities.last_mut().unwrap() else { panic!() };
+    let Change::Rule(RuleChange::CounterLimit { max, .. }) = &mut changes[0] else { panic!() };
+    *max = Expr::Constant(-1);
+    assert!(cantrip::module(&face).is_err());
+    let Ability::Static { changes, .. } = face.abilities.last_mut().unwrap() else { panic!() };
+    let Change::Rule(RuleChange::CounterLimit { max, .. }) = &mut changes[0] else { panic!() };
+    *max = Expr::AnnouncedX;
+    assert!(cantrip::module(&face).is_err(), "the native table has constant ceilings");
+}
+
+#[test]
+fn colored_cost_increases_keep_the_spell_filter_separate_from_the_mana_symbols() {
+    let face = native_face("Derelor");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("CostDelta::more_mana("), "{generated}");
+    assert!(generated.contains("CostDelta::more_mana(ManaCost { generic: 0, x: 0, symbols: [0, 0, 1, 0, 0, 0]"), "{generated}");
+    assert!(generated.contains(".color(Color::Black)"));
+    assert!(cantrip::planned::without_features(&["colored-spell-cost-increases"], || cantrip::module(&face)).is_err());
+}
+
+#[test]
+fn one_graveyard_is_chosen_as_a_cost_not_as_a_target_or_resolving_effect() {
+    let face = native_face("Night Soil");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("exile_from_a_graveyard_of(2,"));
+    assert!(generated.contains(".is(CardType::Creature)"));
+    assert!(!generated.contains("g.exile("));
+    assert!(!generated.contains("targets: &[TargetSlot"));
+    assert!(cantrip::planned::without_features(&["single-graveyard-exile-costs"], || cantrip::module(&face)).is_err());
+}
+
+#[test]
+fn the_native_graveyard_cost_does_not_claim_self_exile_or_other_set_constraints() {
+    use cantrip_oracle_codegen::ir::*;
+    let mut face = native_face("Night Soil");
+    face.abilities[0] = Ability::Scoped {
+        zones: vec![EventZone::Graveyard], condition: None,
+        ability: Box::new(face.abilities[0].clone()),
+    };
+    assert!(cantrip::gaps(&face).iter().any(|gap|gap.feature=="single-graveyard cost that can exile its own ability source"));
+    let mut face = native_face("Night Soil");
+    let Ability::Activated { cost, .. } = &mut face.abilities[0] else { panic!() };
+    let CostPart::Constrained { constraints, .. } = &mut cost.parts[1] else { panic!() };
+    *constraints = vec![SelectionConstraint::DifferentNames];
+    assert!(cantrip::module(&face).is_err());
+}
