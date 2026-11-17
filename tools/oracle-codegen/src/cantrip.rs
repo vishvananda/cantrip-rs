@@ -818,6 +818,9 @@ struct Compiler {
     /// A graveyard activation may pay with its own source card. The native
     /// single-graveyard cost excludes that card, so needs a narrower contract.
     activation_in_graveyard: bool,
+    /// A whole spell body is being compiled, rather than an activation or
+    /// trigger that can share its source identity with earlier payments.
+    resolving_spell: bool,
     /// A face other than the definition an object's `card` names: `lane_f`.
     own_face: bool,
     /// Which door of its Room this face is.
@@ -1320,6 +1323,7 @@ impl Compiler {
             links_exile: false,
             one_graveyard: false,
             activation_in_graveyard: false,
+            resolving_spell: false,
             own_face: false,
             door: None,
             choosing: None,

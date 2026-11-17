@@ -653,6 +653,21 @@ impl Compiler {
                         },
                     ..
                 } if kind == "Damage" => self.replacing.edits.push_str("e.heal_marked = true;"),
+                Instruction::Effect { operation: Operation::RemoveCounters { removals }, result }
+                    if kind == "Untap" && cancels && planned::switched_on("untap-replacement-proposals") =>
+                {
+                    if let [CounterRemoval {
+                        player: PlayerRef::AbilityController,
+                        recipients: Recipients::Objects(ObjectSet::One(ObjectRef::EventSubject)),
+                        kind: Some(counter), amount: CounterAmount::All, selection: None,
+                    }] = removals.as_slice() {
+                        if let Ok(counter) = counter_kind(counter) {
+                            write!(self.replacing.edits, "u.remove[{counter} as usize] = q.state().obj(u.permanent).counters({counter});").unwrap();
+                            continue;
+                        }
+                    }
+                    rest.push(Instruction::Effect { operation: Operation::RemoveCounters { removals }, result });
+                }
                 other => rest.push(other),
             }
         }
@@ -923,6 +938,7 @@ impl Compiler {
         use EventChange as C;
         let owner = "q.state().obj(z.object).owner";
         Ok(match (kind, change) {
+            ("Untap", C::Cancel) if planned::switched_on("untap-replacement-proposals") => "u.untaps = false;".into(),
             ("ZoneChange", C::Cancel) => "z.replaced = true;".into(),
             ("ZoneChange", C::SetDestination(Destination::Exile)) if self.links_exile => {
                 format!("z.to = Zone::exile({owner}); z.exiled_with = Some(q.linked_to(asker));")
@@ -1186,6 +1202,16 @@ impl Compiler {
         };
         let one = |watched: Watched, frame: Frame| Ok(Some((vec![watched], frame)));
         match event {
+            ReplacementEvent::Object { event: ReplacedObjectEvent::UntapsInUntapStep, objects }
+                if planned::switched_on("untap-replacement-proposals") =>
+            {
+                let test = self.matching(object_frame, |c| c.filter(objects, &Candidate::of("id")))?;
+                one(Watched {
+                    kind: "Untap", variant: "Untap", binding: "u",
+                    locals: "let id = u.permanent; let subject = Target::Object(id); let data = [u32::MAX; 2];".into(),
+                    tests: vec!["u.untaps && u.untap_step == Some(u.controller)".into(), test],
+                }, object_frame)
+            }
             ReplacementEvent::Object {
                 event: ReplacedObjectEvent::LeavesBattlefield,
                 objects,

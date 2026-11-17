@@ -2534,6 +2534,16 @@ impl Compiler {
                 self.spell_cost = was;
                 paid?;
             }
+            (CastingRule::RestrictMana { portion: ManaCostPortion::X, filter: ManaPaymentFilter::Colors(colors) }, None)
+                if planned::switched_on("x-mana-types") =>
+            {
+                let mask = color_mask(colors)?;
+                let value = match parts.fields.get("x_mana") {
+                    Some(previous) => format!("XMana {{ types: ({previous}).types & {mask}, one_each: ({previous}).one_each }}"),
+                    None => format!("XMana {{ types: {mask}, one_each: false }}"),
+                };
+                parts.field("x_mana", value);
+            }
             (CastingRule::RestrictMana { portion, filter }, None) => {
                 let rule = match filter {
                     ManaPaymentFilter::None => "ManaSpendRule::Nothing".to_string(),

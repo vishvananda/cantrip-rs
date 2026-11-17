@@ -39,6 +39,11 @@ const LANDED: &[&str] = &[
 /// holes. `tools/update_cantrip_vocabulary.py` reads this table to write
 /// `FEATURES`: keep each entry on one line, its name a literal.
 const SWITCHED: &[(&str, &str, &[&str])] = &[
+    ("untap-replacement-proposals", "pub untap_step: Option<PlayerId>", &[]),
+    ("mana-block-costs", "pub block_costs: &'static [BlockCostRule]", &[]),
+    ("restricted-retargeting", "fn change_target_where(", &[]),
+    ("x-mana-types", "pub x_mana: XMana", &[]),
+    ("spent-on-x-events", "SpentOnX { player: PlayerId", &[]),
     ("single-graveyard-exile-costs", "pub const fn exile_from_a_graveyard_of(", &[]),
     ("replacement-block-declarations", "fn blockers_instead_this_turn(", &[]),
     ("counter-ceilings", "pub counter_ceilings: &'static [(CounterKind, i32)]", &[]),

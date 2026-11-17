@@ -791,6 +791,9 @@ impl Compiler {
             _ => body,
         };
         let (changes, rest) = self.split_program(program, frame);
+        if self.replacing.kind == "Untap" && !rest.is_empty() {
+            return Err(gap("untap replacement with instructions outside the native proposal"));
+        }
         Ok((extra, changes, rest))
     }
     /// Damage an effect adds while replacing damage belongs to that same event

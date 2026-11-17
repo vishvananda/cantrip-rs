@@ -4279,6 +4279,23 @@ impl Compiler {
                 }
             }
             R::CombatCost {
+                action: action @ (ObjectAction::Block(filter) | ObjectAction::BeBlocked(filter)),
+                payer: PlayerRef::DeclaringPlayer,
+                cost,
+            } if super::planned::switched_on("mana-block-costs") => {
+                let (subject, other) = if matches!(action, ObjectAction::Block(_)) {
+                    ("blocker", "attacker")
+                } else { ("attacker", "blocker") };
+                self.affected_object = Some(subject);
+                let read = self.attack_mana(cost);
+                self.affected_object = None;
+                let Some(mana) = read? else { return Err(gap("nonmana cost to block")); };
+                let (guard, test) = (self.guard()?, self.rule_subject(affected, subject)?);
+                let other = self.filter(filter, &Candidate::of(other))?;
+                writeln!(self.functions, "#[allow(unused_variables)] fn {function}(q: &dyn Query, asker: &Asker, blocker: ObjectId, attacker: ObjectId) -> Option<ManaCost> {{ ({guard}{test} && {other}).then(|| {mana}) }}").unwrap();
+                parts.table("block_costs", function.to_string());
+            }
+            R::CombatCost {
                 action: ObjectAction::Block(_) | ObjectAction::BeBlocked(_),
                 ..
             } => self.object_plan(

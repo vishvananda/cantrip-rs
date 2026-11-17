@@ -8,7 +8,7 @@
   "frozen_oracle_sha256": "2281f3d715e8ee6127825154b31202918ef83a9d9a3641a0d23b0163ebea3065",
   "source_ron_sha256": "7c1f493906004497a6682071481ddabf1ce15e9efc63834a904554ffd35a14a7",
   "backlog_records_sha256": "4baa58c98b4bff1e017a7c99ddacf1fd4a85dfed77467a05c9b8154a71735e91",
-  "tracked_rows_sha256": "e3839f6cb8f8de5857fd55a9540024738c81193aea87312abfcf2b44899c8f8f",
+  "tracked_rows_sha256": "b49bea80093b0fb89ef611a5a02c5180561e63185a7086b01e50d11d52ff45c7",
   "native_api_sha256": "235fbb1780747dbaa038447d8463320b09a1ba299857305ab5d5ca9e03af3952",
   "counts": {
     "landed_upstream": 43,
@@ -17,14 +17,14 @@
   },
   "validation": {
     "native_full_suite": "Engine baseline 5441ecd742: bash tools/test.sh passed; 27,853 Rust tests (15 ignored), managed tests and client build. Later fork-main host/client/test commits do not change the audited API.",
-    "generator": "90 Rust tests pass, including replacement blocker declarations, turn-start orientation, counter ceilings, colored cost increases and one-graveyard exile costs.",
+    "generator": "95 Rust tests pass, including block taxes, restricted retargeting, actual spell-X receipts, and simultaneous untap replacements. Unsupported activation/delayed/snow receipt layouts stay explicit gaps.",
     "pipeline_python": "437 tests passed",
     "tooling_python": "52 tests passed",
     "mtgish": "1,596 Rust tests passed; 33,529 exported records, zero lowering diagnostics",
     "library_of_leng": "Generated module compiles as a standalone Rust library against the checked-profile current cantrip-api. Card registration and runtime scenarios are not implemented by this audit.",
     "latest_refresh": "Upstream advanced during the audit: rebased from 90204df367 to 5441ecd742. New original-draw receipts, nest counters and unrelated cards do not change the 43/1/13 result.",
-    "source_integration": "607 tests passed (12 ignored) at the adoption checkpoint; subsequent focused targets pass. A complete no-fail-fast sweep is running for this batch; prior CI Tangle snapshot updated only for the required new prevention defaults/import.",
-    "native_api_check": "20 generated examples type-check against the actual native API/mechanics, including Camouflage, Rasputin Dreamweaver, Derelor and Night Soil."
+    "source_integration": "Full preceding-batch no-fail-fast sweep: 606 passed, 12 ignored, one stale Alabaster Leech gap expectation failed. Corrected that expectation; all 46 tests in five affected Source targets now pass (1 ignored), including Tangle\u2019s exact generated-file snapshot.",
+    "native_api_check": "24 generated examples type-check against the native API/mechanics. Latest additions: Hipparion, Reflecting Mirror, Soul Burn and Freyalise\u2019s Winds."
   },
   "cards": [
     {
@@ -298,13 +298,7 @@
       "module": "crates/cantrip-cards/src/cards/freyalises_winds.rs",
       "data": "content/mtg/cards/freyalises-winds.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "abilities[1]",
-          "feature": "replacement of UntapsInUntapStep",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "c09ca0a2949759b624724c03f024445fdf5d7325",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Freyalise's Winds"
@@ -391,13 +385,7 @@
       "module": "crates/cantrip-cards/src/cards/hipparion.rs",
       "data": "content/mtg/cards/hipparion.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "abilities[0]",
-          "feature": "static rule CombatCost Block",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "0da13b18d9209823bbd1a2218ebde0f601538381",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Hipparion"
@@ -790,13 +778,7 @@
       "module": "crates/cantrip-cards/src/cards/reflecting_mirror.rs",
       "data": "content/mtg/cards/reflecting-mirror.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "abilities[0].instructions[0].instructions[0]",
-          "feature": "a spell's target changed to a player",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "6de7edf14f63fa6da754b5a4e0a9e15015e871fd",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Reflecting Mirror"
@@ -890,18 +872,7 @@
       "module": "crates/cantrip-cards/src/cards/soul_burn.rs",
       "data": "content/mtg/cards/soul-burn.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "abilities[0]",
-          "feature": "engine: no rule on the mana spent on a spell",
-          "message": "Cantrip code generation has not implemented this capability"
-        },
-        {
-          "path": "",
-          "feature": "numeric expression ManaOf",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "bbd04b83e9939392377745dc23d8013c8388b714",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Soul Burn"
@@ -1039,8 +1010,8 @@
   "fork_main_commit": "9889dd28f90c484fde557fa25cf30beb2b45621d",
   "authorship_note": "All 43 original card-addition commits are authored by jschibel. This does not attribute all shared foundation/engine work to that author.",
   "generator_counts": {
-    "landed_and_generated": 11,
-    "landed_needing_adapters": 32,
+    "landed_and_generated": 15,
+    "landed_needing_adapters": 28,
     "unimplemented_but_generated": 1
   }
 }

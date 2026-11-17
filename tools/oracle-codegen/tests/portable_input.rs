@@ -338,3 +338,101 @@ fn the_native_graveyard_cost_does_not_claim_self_exile_or_other_set_constraints(
     *constraints = vec![SelectionConstraint::DifferentNames];
     assert!(cantrip::module(&face).is_err());
 }
+
+#[test]
+fn block_taxes_test_both_combatants_and_charge_the_declaring_player() {
+    use cantrip_oracle_codegen::ir::*;
+    let mut face = native_face("Hipparion");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("block_costs: &["));
+    assert!(generated.contains("blocker == asker.source"));
+    assert!(generated.contains("q.chars(attacker).power"));
+    assert!(generated.contains("-> Option<ManaCost>"));
+    assert!(cantrip::planned::without_features(&["mana-block-costs"], || cantrip::module(&face)).is_err());
+    let Ability::Static { changes, .. } = &mut face.abilities[0] else { panic!() };
+    let Change::Rule(RuleChange::CombatCost { cost, .. }) = &mut changes[0] else { panic!() };
+    cost.parts = vec![CostPart::Life(Expr::Constant(1))];
+    assert!(cantrip::gaps(&face).iter().any(|gap|gap.feature=="nonmana cost to block"));
+}
+
+#[test]
+fn restricted_retargeting_keeps_the_original_condition_and_uses_native_legality() {
+    let face = native_face("Reflecting Mirror");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("g.change_target_where("));
+    assert!(generated.contains("matches!(target, Target::Player(_))"));
+    assert!(generated.contains("q.state().targets(i).iter().any("));
+    assert!(generated.contains("matches!(t, Target::Player(p) if"));
+    assert!(generated.contains(".x_is("));
+    assert!(cantrip::planned::without_features(&["restricted-retargeting"], || cantrip::module(&face)).is_err());
+}
+
+#[test]
+fn x_payment_reads_only_the_actual_mana_spent_on_this_spell_s_x() {
+    use cantrip_oracle_codegen::ir::*;
+    let mut face = native_face("Soul Burn");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("x_mana: XMana { types: 12, one_each: false }"));
+    assert!(generated.contains("Event::SpentOnX { on, cast: true, mana, n, .. }"));
+    assert!(generated.contains("on == item.object"));
+    assert!(generated.contains("4u8 & (1u8 << mana as u8)"));
+    assert!(!generated.contains("Event::ManaSpent"));
+    for feature in ["x-mana-types", "spent-on-x-events"] {
+        assert!(cantrip::planned::without_features(&[feature], || cantrip::module(&face)).is_err());
+    }
+    let Ability::Casting(CastingRule::RestrictMana { portion, .. }) = &mut face.abilities[0] else { panic!() };
+    *portion = ManaCostPortion::All;
+    assert!(cantrip::module(&face).is_err(), "the X interface does not restrict the rest of a cost");
+}
+
+#[test]
+fn untap_replacement_counter_removal_belongs_to_the_same_simultaneous_event() {
+    use cantrip_oracle_codegen::ir::*;
+    let face = native_face("Freyalise's Winds");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("ReplacementKind::Untap"));
+    assert!(generated.contains("u.untap_step == Some(u.controller)"));
+    assert!(generated.contains("u.untaps = false"));
+    assert!(generated.contains("u.remove[CounterKind::Wind as usize]"));
+    assert!(!generated.contains("g.remove_counters"));
+    assert!(cantrip::planned::without_features(&["untap-replacement-proposals"], || cantrip::module(&face)).is_err());
+    let mut unsupported = face;
+    let Ability::Replacement { body, .. } = &mut unsupported.abilities[1] else { panic!() };
+    let Instruction::Effect { operation: Operation::RemoveCounters { removals }, .. } = &mut body.instructions[1] else { panic!() };
+    removals[0].amount = CounterAmount::Count(Count::Exactly(Expr::Constant(1)));
+    assert!(cantrip::gaps(&unsupported).iter().any(|gap|gap.feature=="untap replacement with instructions outside the native proposal"));
+}
+
+#[test]
+fn spell_x_receipts_do_not_claim_snow_provenance_or_repeatable_activation_identity() {
+    use cantrip_oracle_codegen::ir::*;
+    let mut snow = native_face("Soul Burn");
+    let Ability::Spell { body, .. } = &mut snow.abilities[1] else { panic!() };
+    let Instruction::Effect { operation: Operation::GainLife { amount: Expr::Minimum(_, amount), .. }, .. } = &mut body.instructions[1] else { panic!() };
+    let Expr::ManaOf { filter, .. } = &mut **amount else { panic!() };
+    filter.snow = true;
+    assert!(cantrip::gaps(&snow).iter().any(|gap|gap.feature=="numeric expression ManaOf"));
+    let mut spell = native_face("Soul Burn");
+    let Ability::Spell { announcement, body } = spell.abilities.remove(1) else { panic!() };
+    let mut activation = native_face("Reflecting Mirror");
+    let Ability::Activated { limits, .. } = &activation.abilities[0] else { panic!() };
+    let mut limits = limits.clone();
+    limits.modifiers.clear();
+    activation.abilities = vec![Ability::Activated {
+        origin: ActivationOrigin::Ordinary,
+        cost: Cost { parts: vec![CostPart::Mana(vec![ManaSymbol::X])] },
+        limits, announcement, body,
+    }];
+    assert!(cantrip::gaps(&activation).iter().any(|gap|gap.feature=="numeric expression ManaOf"));
+    let mut delayed = native_face("Soul Burn");
+    let Ability::Spell { body, .. } = &mut delayed.abilities[1] else { panic!() };
+    body.instructions = vec![Instruction::Effect { result: ResultId(0), operation: Operation::CreateDelayedTrigger {
+        event: Box::new(EventSpec::Turn { point: TurnPoint::EndStepBegins, players: PlayerSet::One(PlayerRef::AbilityController) }),
+        start: DelayedStart::Immediately, expires: None, intervening_if: None,
+        body: Program { instructions: vec![Instruction::Effect { result: ResultId(0), operation: Operation::GainLife {
+            players: PlayerSet::One(PlayerRef::AbilityController),
+            amount: Expr::ManaOf { mana: ManaOccurrence::SpentOnX, filter: SpentManaFilter { colors: None, snow: false } },
+        } }] },
+    } }];
+    assert!(cantrip::gaps(&delayed).iter().any(|gap|gap.feature=="numeric expression ManaOf"));
+}

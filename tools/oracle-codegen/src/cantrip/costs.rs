@@ -1238,6 +1238,19 @@ impl Compiler {
         parts: &mut Parts,
         scope: Option<Scope>,
     ) -> Result<()> {
+        let previous = self.resolving_spell;
+        self.resolving_spell = matches!(ability, Ability::Spell { .. });
+        let result = self.ability_inner(ability, label, parts, scope);
+        self.resolving_spell = previous;
+        result
+    }
+    fn ability_inner(
+        &mut self,
+        ability: &Ability,
+        label: &str,
+        parts: &mut Parts,
+        scope: Option<Scope>,
+    ) -> Result<()> {
         match ability {
             Ability::Keyword(k) => match k {
                 // "Snow swampwalk", "desertwalk": no word of Cantrip's says it, and it

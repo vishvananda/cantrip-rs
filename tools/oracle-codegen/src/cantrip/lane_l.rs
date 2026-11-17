@@ -1592,6 +1592,15 @@ impl Compiler {
                 self.plan_code(&feature, &format!("if let Some(spell) = {object} {{ g.change_controller(spell, {player}); {M}::copy::retarget(g, {player}, spell, {targets}, &{among})?; }}"), out);
             }
             Operation::Retarget {
+                actor, object, targets: NewTargets::ToPlayers(PlayerSet::All),
+            } if planned::switched_on("restricted-retargeting") => {
+                let player = self.one_actor(actor, &feature)?;
+                let object = self.fetch(self.object(object)?);
+                let filter = format!("new_player_target_{}", self.fresh());
+                writeln!(self.functions, "fn {filter}(_: &dyn Query, target: Target) -> bool {{ matches!(target, Target::Player(_)) }}").unwrap();
+                writeln!(out, "if let Some(spell) = {object} {{ g.change_target_where(Target::Object(spell), {player}, {filter})?; }}").unwrap();
+            }
+            Operation::Retarget {
                 actor,
                 object,
                 targets,

@@ -1255,6 +1255,17 @@ impl Compiler {
                 "{}.map_or(0i64, |o: ObjectId| q.history().this_turn().iter().map(|r| match r.event {{ Event::Damage {{ source, amount, .. }} if source == o => i64::from(amount), _ => 0 }}).sum::<i64>())",
                 self.object(object)?
             )),
+            Expr::ManaOf { mana: ManaOccurrence::SpentOnX, filter }
+                if planned::switched_on("spent-on-x-events") && self.resolving_spell
+                    && self.reader == Reader::Resolution && self.stack_item
+                    && self.history.is_none() && self.outer.is_none() && !filter.snow =>
+            {
+                let types = match &filter.colors {
+                    Some(colors) => format!("({}u8 & (1u8 << mana as u8)) != 0", color_mask(colors)?),
+                    None => "true".into(),
+                };
+                counted(format!("q.history().this_turn().iter().filter_map(|record| match record.event {{ Event::SpentOnX {{ on, cast: true, mana, n, .. }} if on == item.object && {types} => Some(i64::from(n)), _ => None }}).fold(0i64, i64::saturating_add)"))
+            }
             Expr::ManaOf { mana, filter } => {
                 let colors = match &filter.colors {
                     Some(colors) => format!("Some(&[{}])", colors_code(colors)?),

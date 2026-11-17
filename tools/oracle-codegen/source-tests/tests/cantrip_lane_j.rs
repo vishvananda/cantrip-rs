@@ -32,8 +32,8 @@ const CARDS: &[(&str, &str)] = &[
     ("Endless Atlas", "cantrip_mechanics::same_name(q, a, b)"),
     ("Bogardan Hellkite", "damage_divided(g, item)"),
     ("Patrician Geist", "zone_cast_from(q, spell)"),
+    ("Alabaster Leech", "CostDelta::more_mana("),
     // What Cantrip doesn't have yet is named as a requirement.
-    ("Alabaster Leech", "a spell costing colored mana more"),
     ("Disa the Restless", "a token that is a named card"),
     (
         "Mantle of the Ancients",

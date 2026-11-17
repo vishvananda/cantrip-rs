@@ -141,3 +141,20 @@ Library of Leng. **90 generator tests** and **20 native interface examples** pas
 Focused Source cost/early-set tests pass; the full Source sweep is in progress.
 The old Tangle snapshot now includes the prevention defaults required by the
 expanded native struct; those were the only differences in its CI failure.
+
+## Block costs, retargeting and pending-event adapters
+
+Hipparion uses the native mana block-tax callback. Reflecting Mirror keeps its
+single-target and targets-you conditions while delegating the restricted change
+to native target legality. Soul Burn restricts only X and counts actual black mana
+from `SpentOnX`, not the whole payment or as-though colors. Repeatable activation
+identity, delayed bodies and snow provenance are deliberately not inferred from
+that spell receipt. Freyalise’s Winds records counter removal on the same native
+untap proposal, restricted to the permanent controller’s untap step; unmatched
+proposal-side instructions remain explicit gaps.
+
+The original 43 are now **15 cleanly generated / 28 awaiting adapters**, plus
+Library of Leng. **95 generator tests** and **24 native interface examples** pass.
+The preceding full Source sweep had 606 passes, 12 ignored and one stale Alabaster
+Leech expectation; that is fixed and all 46 tests in the five affected targets
+pass (one ignored). Tangle’s exact snapshot also passes with the new defaults.
