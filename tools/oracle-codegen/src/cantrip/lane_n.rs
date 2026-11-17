@@ -33,7 +33,7 @@ pub(super) struct Replacing {
     /// The name of the question for "you may".
     pub may: Option<String>,
     /// The result that says how much a prevention prevented.
-    prevented: Option<u32>,
+    pub(super) prevented: Option<u32>,
     /// The feature an event's callbacks wait on, when Cantrip has no such event.
     pub planned: Option<String>,
     /// Those callbacks, kept from the file's compiled functions.
@@ -109,42 +109,53 @@ pub(super) fn prevents(changes: &[EventChange]) -> bool {
     )
 }
 
-/// The definition of a prevention an effect made, with what Cantrip's has no
-/// field for yet.
+/// A pending-damage portion is separate from the shield's total allowance.
+/// Optional prevention remains an independent capability, not implied by it.
+pub(super) struct GrantedPreventionSpec<'a> {
+    pub then: Option<&'a str>,
+    pub amount: Option<&'a str>,
+    pub words: &'a str,
+    pub may: Option<&'a str>,
+    pub gain_prevented: bool,
+}
+
 pub(super) fn granted_prevention(
     hint: &str,
     applies: &str,
     text: &str,
-    then: Option<&str>,
-    of: Option<&str>,
-    may: Option<&str>,
+    spec: GrantedPreventionSpec<'_>,
 ) -> String {
+    let GrantedPreventionSpec { then, amount: of, words: portion_words, may, gain_prevented } = spec;
     let then = then.map_or("None".to_string(), |then| format!("Some({then})"));
-    let base = format!(
-        "GrantedPreventionDef {{ hint: {hint}, damage: \"damage\", of_it: None, applies: {applies}, then: {then}, text: {text} }}"
-    );
-    let mut more = format!(" then: {then},");
-    if let Some(of) = of {
-        write!(more, " amount: Some({of}),").unwrap();
-    }
-    if let Some(may) = may {
-        write!(more, " optional: Some(&{may}),").unwrap();
-    }
-    if of.is_none() && may.is_none() {
-        return base;
-    }
-    let feature = if of.is_some() {
-        "prevention of part of the damage made at resolution"
-    } else {
-        "prevention a player may decline"
+    let fields = format!("hint: {hint}, damage: \"damage\", of_it: None, applies: {applies}, then: {then}, text: {text}");
+    let fields = if gain_prevented { format!("{fields}, gain_prevented: true") } else { fields };
+    let defaults = "cantrip_mechanics::prevention::ANY_DAMAGE";
+    let base = format!("GrantedPreventionDef {{ {fields}, ..{defaults} }}");
+    let portion = match of {
+        None => base,
+        Some(amount) if planned::switched_on("granted-prevention-portions") => format!(
+            "GrantedPreventionDef {{ {fields}, portion: Some(PreventionPortion {{ amount: {amount}, words: {} }}), ..{defaults} }}", quoted(portion_words)),
+        Some(amount) => planned::planned_value(
+            "prevention of part of the damage made at resolution", &base,
+            &format!("GrantedPreventionDef {{ {fields}, amount: Some({amount}), ..{defaults} }}")),
     };
-    planned::planned_value(
-        feature,
-        &base,
-        &format!(
-            "GrantedPreventionDef {{ hint: {hint}, damage: \"damage\", of_it: None, applies: {applies},{more} text: {text} }}"
-        ),
-    )
+    match may {
+        None => portion,
+        Some(question) => planned::planned_value(
+            "prevention a player may decline", &portion,
+            &format!("GrantedPreventionDef {{ optional: Some(&{question}), ..{portion} }}")),
+    }
+}
+
+pub(super) fn prevention_portion_words(changes: &[EventChange]) -> String {
+    match changes {
+        [EventChange::PreventSomeDamage(Expr::Divide { numerator, denominator, rounding })]
+            if matches!(**numerator, Expr::EventAmount) && matches!(**denominator, Expr::Constant(2)) =>
+                format!("half, rounded {}, of", if matches!(rounding, Rounding::Down) { "down" } else { "up" }),
+        [EventChange::PreventAllButDamage(Expr::Constant(n))] => format!("all but {n} of"),
+        [EventChange::PreventSomeDamage(Expr::Constant(n))] => format!("{n} of"),
+        _ => "part of".into(),
+    }
 }
 
 /// What a made effect is shown as: the line's words where its body has none.
@@ -805,6 +816,10 @@ impl Compiler {
         frame: Frame,
         changes: &[EventChange],
     ) -> Result<Option<String>> {
+        if planned::switched_on("granted-prevention-portions") && matches!(changes,
+            [EventChange::PreventSomeDamage(n)] if !quantity::relative_to_event(n)) {
+            return Err(gap("a fixed per-event allowance on a granted prevention"));
+        }
         let code = match changes {
             [EventChange::PreventSomeDamage(n)] => self
                 .matching(frame, |c| c.number(n))?
@@ -818,7 +833,13 @@ impl Compiler {
             _ => return Ok(None),
         };
         let function = format!("{label}_amount");
-        writeln!(self.functions, "#[allow(unused_variables, dead_code)] fn {function}(q: &dyn Query, asker: &Asker, affected: ObjectId, e: &cantrip_api::DamageEvent) -> {prevention_ty} {{ {} {code} }}", arms[0].locals, prevention_ty = Quantity::Prevention.kind()).unwrap();
+        let affected = if planned::switched_on("granted-prevention-portions") {
+            // The current amount callback gets the pending event, not the
+            // shield's stored affected object. Never leave that as a free name.
+            if reads_affected(&code) { return Err(gap("a prevention portion reading its stored affected object")); }
+            ""
+        } else { "affected: ObjectId, " };
+        writeln!(self.functions, "#[allow(unused_variables, dead_code)] fn {function}(q: &dyn Query, asker: &Asker, {affected}e: &cantrip_api::DamageEvent) -> {prevention_ty} {{ {} {code} }}", arms[0].locals, prevention_ty = Quantity::Prevention.kind()).unwrap();
         Ok(Some(function))
     }
     /// The size of a shield a made effect is used up by, as code of the resolution.
@@ -2730,4 +2751,52 @@ fn first_literal(code: &str) -> Option<&str> {
         }
     }
     None
+}
+
+fn reads_affected(code: &str) -> bool {
+    use syn::visit::Visit;
+    struct Read(bool);
+    impl<'ast> Visit<'ast> for Read {
+        fn visit_expr_path(&mut self, path: &'ast syn::ExprPath) {
+            self.0 |= path.qself.is_none() && path.path.is_ident("affected");
+            syn::visit::visit_expr_path(self, path);
+        }
+    }
+    if !code.contains("affected") { return false; }
+    let Ok(expression) = syn::parse_str::<syn::Expr>(code) else { return true; };
+    let mut read = Read(false); read.visit_expr(&expression); read.0
+}
+
+/// Life equal to the prevention is one life result of the same damage event,
+/// not a later callback (Native GrantedPreventionDef::gain_prevented).
+pub(super) fn gains_prevented(rest: &[Instruction], prevented: Option<u32>) -> Result<bool> {
+    let Some(prevented) = prevented else { return Ok(false) };
+    if matches!(rest, [Instruction::Effect { operation: Operation::GainLife {
+        players: PlayerSet::One(PlayerRef::AbilityController), amount: Expr::Performed(result),
+    }, .. }] if result.0 == prevented) {
+        if !planned::switched_on("prevention-life-results") { return Err(gap("prevention life gain in the damage event")); }
+        return Ok(true);
+    }
+    use crate::visit::{Visitor, Walk};
+    struct Gain { prevented: u32, found: bool }
+    impl Visitor for Gain {
+        fn ability(&mut self, _: &Ability) -> bool { false }
+        fn operation(&mut self, operation: &Operation) -> bool {
+            if let Operation::GainLife { amount, .. } = operation {
+                struct Read(u32, bool);
+                impl Visitor for Read {
+                    fn expr(&mut self, expression: &Expr) -> bool {
+                        self.1 |= matches!(expression, Expr::Performed(result) if result.0 == self.0); true
+                    }
+                }
+                let mut read = Read(self.prevented, false); amount.walk(&mut read);
+                self.found |= read.1;
+            }
+            true
+        }
+    }
+    let mut gain = Gain { prevented, found: false };
+    for step in rest { step.walk(&mut gain); }
+    if gain.found { return Err(gap("conditional or modified life gain from prevention in the damage event")); }
+    Ok(false)
 }

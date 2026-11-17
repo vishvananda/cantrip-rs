@@ -1267,8 +1267,10 @@ impl Compiler {
                 return Err(gap("captured value in a granted prevention callback"));
             }
             let alone = lane_n::parts_alone(event, to);
+            let gain_prevented = lane_n::gains_prevented(&rest, self.replacing.prevented)?;
+            let after = if gain_prevented { &[][..] } else { rest.as_slice() };
             let then =
-                self.prevention_then(label, &arms, frame, &rest, "affected: ObjectId, ", alone)?;
+                self.prevention_then(label, &arms, frame, after, "affected: ObjectId, ", alone)?;
             let of = self.made_prevention_amount(label, &arms, frame, &changes)?;
             let applies = format!("{label}_applies");
             self.watch_function(
@@ -1285,9 +1287,11 @@ impl Compiler {
                 &hint,
                 &applies,
                 &text,
-                then.as_deref(),
-                of.as_deref(),
-                may.as_deref(),
+                lane_n::GrantedPreventionSpec {
+                    then: then.as_deref(), amount: of.as_deref(),
+                    words: &lane_n::prevention_portion_words(&changes),
+                    may: may.as_deref(), gain_prevented,
+                },
             ));
             let index = self.made_preventions.len() - 1;
             let next_time = matches!(limit, ReplacementLimit::NextOccurrence);

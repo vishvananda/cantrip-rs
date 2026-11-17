@@ -175,3 +175,73 @@ fn chosen_landwalks_keep_the_snow_qualification_and_include_nonbasic_subtypes() 
         assert!(cantrip::planned::without_features(&[feature],||cantrip::module(&face)).is_err());
     }
 }
+
+fn prevention_body(face: &mut cantrip_oracle_codegen::ir::Card) -> &mut cantrip_oracle_codegen::ir::Program {
+    use cantrip_oracle_codegen::ir::*;
+    for ability in &mut face.abilities {
+        let body = match ability { Ability::Activated { body,.. } | Ability::Spell { body,.. } => body, _ => continue };
+        for step in &mut body.instructions {
+            if let Instruction::Effect { operation: Operation::CreateReplacement { body,.. },.. } = step { return body; }
+        }
+    }
+    panic!("expected a generated prevention")
+}
+
+#[test]
+fn granted_portions_read_the_pending_damage_without_a_creation_time_snapshot() {
+    for (name, words) in [("Dark Sphere","half, rounded down, of"),("Forcefield","all but 1 of")] {
+        let face=native_face(name);
+        let generated=cantrip::module(&face).unwrap();
+        assert!(generated.contains("portion: Some(PreventionPortion"));
+        assert!(generated.contains(words));
+        let syntax=syn::parse_file(&generated).unwrap();
+        let amount=syntax.items.iter().find_map(|item| match item {
+            syn::Item::Fn(function) if function.sig.ident.to_string().ends_with("_amount") => Some(function), _=>None,
+        }).unwrap();
+        assert_eq!(amount.sig.inputs.len(),3,"the actual native amount interface");
+        use quote::ToTokens;
+        let body=amount.block.to_token_stream().to_string();
+        assert!(body.contains("e . amount"));
+        assert!(!body.contains("item"),"the future event supplies the amount");
+        assert!(cantrip::planned::without_features(&["granted-prevention-portions"],||cantrip::module(&face)).is_err());
+    }
+}
+
+#[test]
+fn prevention_life_gain_is_part_of_the_same_damage_event() {
+    for name in ["Reverse Damage","Hallow"] {
+        let face=native_face(name);
+        let generated=cantrip::module(&face).unwrap();
+        assert!(generated.contains("gain_prevented: true"));
+        assert!(!generated.contains("g.gain_life("));
+        assert!(!generated.contains("then: Some("));
+        assert!(cantrip::planned::without_features(&["prevention-life-results"],||cantrip::module(&face)).is_err());
+    }
+    let palm=cantrip::module(&native_face("Deflecting Palm")).unwrap();
+    assert!(palm.contains("then: Some("));
+    assert!(!palm.contains("gain_prevented: true"));
+}
+
+#[test]
+fn portions_do_not_imply_optional_prevention_or_a_fixed_event_allowance() {
+    use cantrip_oracle_codegen::ir::*;
+    let mut face=native_face("Dark Sphere");
+    let body=prevention_body(&mut face);
+    body.instructions=vec![Instruction::Optional {decider: PlayerRef::AbilityController,body:body.clone()}];
+    assert!(cantrip::gaps(&face).iter().any(|gap|gap.feature=="prevention a player may decline"));
+    let mut face=native_face("Dark Sphere");
+    let body=prevention_body(&mut face);
+    let Instruction::Effect{operation:Operation::ModifyEvent{change},..}=&mut body.instructions[0] else {panic!()};
+    *change=EventChange::PreventSomeDamage(Expr::Constant(2));
+    assert!(cantrip::gaps(&face).iter().any(|gap|gap.feature=="a fixed per-event allowance on a granted prevention"));
+}
+
+#[test]
+fn the_controller_only_gain_flag_does_not_claim_other_players_gains() {
+    use cantrip_oracle_codegen::ir::*;
+    let mut face=native_face("Reverse Damage");
+    let body=prevention_body(&mut face);
+    let Instruction::Effect {operation:Operation::GainLife{players,..},..}=&mut body.instructions[1] else {panic!()};
+    *players=PlayerSet::All;
+    assert!(cantrip::gaps(&face).iter().any(|gap|gap.feature=="conditional or modified life gain from prevention in the damage event"));
+}

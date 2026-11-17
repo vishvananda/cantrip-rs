@@ -228,5 +228,6 @@ fn every_supported_replacement_record_still_generates_a_complete_rust_module() {
             }
         }
     }
-    assert_eq!((modules, held), (7, 4));
+    // Native layer-4 supertype changes enable one more preserved program.
+    assert_eq!((modules, held), (8, 3));
 }

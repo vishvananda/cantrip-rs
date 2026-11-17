@@ -8,7 +8,7 @@
   "frozen_oracle_sha256": "2281f3d715e8ee6127825154b31202918ef83a9d9a3641a0d23b0163ebea3065",
   "source_ron_sha256": "7c1f493906004497a6682071481ddabf1ce15e9efc63834a904554ffd35a14a7",
   "backlog_records_sha256": "4baa58c98b4bff1e017a7c99ddacf1fd4a85dfed77467a05c9b8154a71735e91",
-  "tracked_rows_sha256": "5b7430151ce755a2176d4e7a65f2690c1321aa5ed5476d3b4e04b27c82516edc",
+  "tracked_rows_sha256": "c13245346118b4938cf7ad68ec3abff52c0a8ab6e01fa7f1f2212fda89a841cf",
   "native_api_sha256": "235fbb1780747dbaa038447d8463320b09a1ba299857305ab5d5ca9e03af3952",
   "counts": {
     "landed_upstream": 43,
@@ -17,14 +17,14 @@
   },
   "validation": {
     "native_full_suite": "Engine baseline 5441ecd742: bash tools/test.sh passed; 27,853 Rust tests (15 ignored), managed tests and client build. Later fork-main host/client/test commits do not change the audited API.",
-    "generator": "80 Rust tests pass; 13 targeted tests repeated after the native-interface fix.",
+    "generator": "84 Rust tests pass, including pending damage portions and prevention life-results scope.",
     "pipeline_python": "437 tests passed",
     "tooling_python": "52 tests passed",
     "mtgish": "1,596 Rust tests passed; 33,529 exported records, zero lowering diagnostics",
     "library_of_leng": "Generated module compiles as a standalone Rust library against the checked-profile current cantrip-api. Card registration and runtime scenarios are not implemented by this audit.",
     "latest_refresh": "Upstream advanced during the audit: rebased from 90204df367 to 5441ecd742. New original-draw receipts, nest counters and unrelated cards do not change the 43/1/13 result.",
-    "source_integration": "607 tests passed (12 ignored) against MTGish f7915260; affected targets additionally checked after the final adapters.",
-    "native_api_check": "11 generated examples type-check against native API/mechanics, including independent supertype flags, broad chosen landwalk and joint damage life-results floors."
+    "source_integration": "607 tests passed (12 ignored) at the adoption checkpoint. After prevention adapters, 29 tests passed (1 ignored) across five affected Source targets, including the corrected preserved-program expansion count.",
+    "native_api_check": "16 generated examples type-check against native API/mechanics, including Dark Sphere, Forcefield, Reverse Damage, Hallow and Deflecting Palm."
   },
   "cards": [
     {
@@ -125,13 +125,7 @@
       "module": "crates/cantrip-cards/src/cards/dark_sphere.rs",
       "data": "content/mtg/cards/dark-sphere.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "",
-          "feature": "prevention of part of the damage made at resolution",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "e9fc547bffa073c24892d37dcbd683d5a6a424e9",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Dark Sphere"
@@ -179,7 +173,7 @@
           "message": "Cantrip code generation has not implemented this capability"
         }
       ],
-      "required_feature": "Force the target player to activate each land’s mana ability, then transfer the actual emptied mana receipt.",
+      "required_feature": "Force the target player to activate each land\u2019s mana ability, then transfer the actual emptied mana receipt.",
       "api_evidence": "crates/cantrip-api/src/game.rs"
     },
     {
@@ -272,7 +266,7 @@
           "message": "Cantrip code generation has not implemented this capability"
         }
       ],
-      "required_feature": "Reveal every player’s library top, including a player without a permanent; existing RevealLibraryTop applies to the source controller.",
+      "required_feature": "Reveal every player\u2019s library top, including a player without a permanent; existing RevealLibraryTop applies to the source controller.",
       "api_evidence": "crates/cantrip-api/src/card.rs"
     },
     {
@@ -306,13 +300,7 @@
       "module": "crates/cantrip-cards/src/cards/forcefield.rs",
       "data": "content/mtg/cards/forcefield.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "",
-          "feature": "prevention of part of the damage made at resolution",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "9fa7981b1d381a2330f7032c16fa68e8cfebb37f",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Forcefield"
@@ -686,7 +674,7 @@
           "message": "Cantrip code generation has not implemented this capability"
         }
       ],
-      "required_feature": "One-use, this-turn permission to spend mana as any type for one spell’s mana cost only, leaving additional costs unchanged. Existing SpendAnyColorRule covers a whole payment and does not supply this permission.",
+      "required_feature": "One-use, this-turn permission to spend mana as any type for one spell\u2019s mana cost only, leaving additional costs unchanged. Existing SpendAnyColorRule covers a whole payment and does not supply this permission.",
       "api_evidence": "crates/cantrip-api/src/card.rs",
       "reference_contract_gap": "https://github.com/vishvananda/oracle-grammar/issues/34",
       "reference_contract_detail": "Current reference agrees with the adapter but uses a hand-only special casting action; no explicit mana-cost-only scope. Requires an owned permission refinement as well as native engine support."
@@ -912,7 +900,7 @@
           "message": "Cantrip code generation has not implemented this capability"
         }
       ],
-      "required_feature": "Historical attack eligibility/opportunities for creatures that did not attack; current legality or attacked_this_turn does not answer “couldn’t attack.”",
+      "required_feature": "Historical attack eligibility/opportunities for creatures that did not attack; current legality or attacked_this_turn does not answer \u201ccouldn\u2019t attack.\u201d",
       "api_evidence": "crates/cantrip-api/src/history.rs"
     },
     {
@@ -1085,8 +1073,8 @@
   "fork_main_commit": "9889dd28f90c484fde557fa25cf30beb2b45621d",
   "authorship_note": "All 43 original card-addition commits are authored by jschibel. This does not attribute all shared foundation/engine work to that author.",
   "generator_counts": {
-    "landed_and_generated": 5,
-    "landed_needing_adapters": 38,
+    "landed_and_generated": 7,
+    "landed_needing_adapters": 36,
     "unimplemented_but_generated": 1
   }
 }

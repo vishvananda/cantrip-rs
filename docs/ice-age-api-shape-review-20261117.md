@@ -64,3 +64,19 @@ fixture contains **11 examples**, and **80 generator tests** pass. Relevant
 Source regressions (8 tests) also pass. This brings the original43 to **5 cleanly
 generated / 38 awaiting adapters**, plus the newly ready Library of Leng.
 The earlier checkpoint figures above are historical.
+
+## Second interface-family batch
+
+Partial granted prevention now uses the native `PreventionPortion` callback,
+reading the pending damage amount when damage happens. Prevented-damage life
+gain uses `gain_prevented` in the same damage event; other follow-up effects retain
+the separate callback. Optional prevention, fixed per-event allowances and
+modified/redirected prevention life gain remain explicit gaps where the current
+interface has not been validated.
+
+Dark Sphere and Forcefield now generate without gaps. The original 43 are now
+**7 cleanly generated / 36 awaiting adapters**, plus Library of Leng. The fixture
+contains **16 natively type-checked examples**; **84 generator tests** and **29
+affected Source tests** pass (one ignored). The Source preserved-program count
+was updated from 7 clean / 4 gaps to 8 clean / 3 gaps, reflecting the newly
+supported native interface.
