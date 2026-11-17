@@ -225,3 +225,10 @@ hold even though its historical-controller query now compiles**; its published
 IR omits the actual-death restriction. That distinction is recorded in
 [Oracle Grammar #36](https://github.com/vishvananda/oracle-grammar/issues/36)
 and the machine-readable audit's `reference_hold` fields.
+
+
+Current adapter checkpoint: **34 of43** landed cards generate without diagnostics,
+**9** retain generator holds, and **45 native interface examples** compile.
+Reference holds on Sacred Boon and Glyph of Reincarnation remain visible; module
+compilation alone does not establish Oracle correctness. The13 actual engine
+gaps and Library of Leng's implementation-ready classification are unchanged.

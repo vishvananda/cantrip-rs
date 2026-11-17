@@ -1695,7 +1695,8 @@ impl Compiler {
                     .iter()
                     .map(|name| format!("{name:?}"))
                     .collect();
-                format!("matches!({chars}.name, {})", names.join(" | "))
+                let printed_name = c.name.clone().unwrap_or_else(|| format!("{chars}.name"));
+                format!("matches!({printed_name}, {})", names.join(" | "))
             }
             ObjectFilter::Noted(kind) => held(
                 &feature,

@@ -2431,6 +2431,14 @@ impl Compiler {
                 ),
                 Err(_) => String::new(),
             },
+            // Paying by having this permanent gain its own attack prohibition
+            // requires that same permanent still be on the battlefield.
+            Some(Instruction::Effect { operation: Operation::CreateContinuousEffect {
+                source: ObjectRef::Source,
+                affected: EffectSubjects::Objects(ObjectSet::One(ObjectRef::Source)), changes, ..
+            }, .. }) if matches!(changes.as_slice(), [Change::GrantAbility(ability)]
+                if self.grants_keyword(ability).as_deref() == Some("Keyword::CantAttack")) =>
+                "cantrip_mechanics::targets::permanent(g, asker.source) && ".into(),
             // "You may remove a counter from it": not asked of what has none to remove.
             Some(Instruction::Effect {
                 operation: Operation::RemoveCounters { removals },

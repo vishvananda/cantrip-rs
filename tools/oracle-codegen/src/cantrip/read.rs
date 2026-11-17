@@ -28,6 +28,8 @@ pub(super) struct Candidate {
     pub id: String,
     pub chars: String,
     pub controller: String,
+    /// The name of a face proposed for play, distinct from the live object's.
+    pub name: Option<String>,
     /// An event damage source, distinguished from an ordinary live candidate.
     pub damage_source: Option<bool>,
     /// Where the targets of a spell not on the stack yet are, if it has any
@@ -42,6 +44,7 @@ impl Candidate {
             id: id.into(),
             chars: format!("q.chars({id})"),
             controller: format!("q.controller({id})"),
+            name: None,
             announced: None,
             damage_source: None,
             entry_from: false,
@@ -52,6 +55,7 @@ impl Candidate {
             id: "affected".into(),
             chars: "(*so_far)".into(),
             controller: "q.controller(affected)".into(),
+            name: None,
             announced: None,
             damage_source: None,
             entry_from: false,

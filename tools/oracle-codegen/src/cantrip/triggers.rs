@@ -2047,6 +2047,57 @@ impl Compiler {
         {
             return Err(gap("modal or state trigger that works from a level"));
         }
+        if let EventSpec::ObjectBecomes(filter) = event {
+            if planned::switched_on("state-trigger-object-groups") {
+                if intervening_if.is_some() || gate.is_some() || conditional.is_some()
+                    || !announcement.targets.is_empty() || announcement.modes.is_some() {
+                    return Err(gap("object state trigger with an additional condition or announcement"));
+                }
+                // The native membership callback has no source argument. An
+                // explicit exclusion of the source is applied to the captured
+                // identities at resolution; all other source-dependent filters
+                // must stay gaps, never become fresh battlefield queries there.
+                fn without_self(filter: &ObjectFilter, excluded: &mut bool) -> ObjectFilter {
+                    match filter {
+                        ObjectFilter::Not(inner) if matches!(&**inner, ObjectFilter::SameObject(ObjectRef::Source)) => {
+                            *excluded = true; ObjectFilter::Any
+                        }
+                        ObjectFilter::AllOf(filters) => ObjectFilter::AllOf(filters.iter().map(|f|without_self(f, excluded)).collect()),
+                        other => other.clone(),
+                    }
+                }
+                let mut excluded = false;
+                let members_filter = without_self(filter, &mut excluded);
+                let mut query = self.clone();
+                query.reader = Reader::Query;
+                query.event_at = EventAt::Nowhere;
+                query.stack_item = false;
+                let state = query.filter(filter, &Candidate::of("id"))?;
+                let members = query.filter(&members_filter, &Candidate::of("id"))?;
+                if members.contains("asker") { return Err(gap("object state members depending on their source")); }
+                let [Instruction::Effect { result, operation: Operation::Sacrifice {
+                    players: PlayerSet::All, objects: ObjectSet::EventGroup, choose: None,
+                } }] = body.instructions.as_slice() else { return Err(gap("object state trigger with an unsupported group instruction")) };
+                let objects = if excluded { ObjectSet::Matching { objects: Box::new(ObjectSet::EventGroup),
+                    filter: ObjectFilter::Not(Box::new(ObjectFilter::SameObject(ObjectRef::Source))) } }
+                    else { ObjectSet::EventGroup };
+                let body = Program { instructions: vec![Instruction::Effect { result: result.clone(),
+                    operation: Operation::Sacrifice { players: PlayerSet::All, objects, choose: None } }] };
+                let state_fn = format!("{label}_state");
+                let members_fn = format!("{label}_members");
+                writeln!(self.functions, "fn {state_fn}(q: &dyn Query, asker: &Asker) -> bool {{ q.state().battlefield().iter().copied().any(|id| {state}) }}").unwrap();
+                writeln!(self.functions, "fn {members_fn}(q: &dyn Query, _: Target) -> Vec<ObjectId> {{ q.state().battlefield().iter().copied().filter(|&id| {members}).collect() }}").unwrap();
+                self.targets_for(announcement, label, Frame::default())?;
+                let grouped = std::mem::replace(&mut self.grouped, true);
+                let effect = self.effect(&body, label);
+                self.grouped = grouped;
+                let effect = effect?;
+                let text = self.said(lane_k::Said::Triggered, "Whenever the specified objects are on the battlefield".into());
+                let mut def = format!("state_triggered({state_fn}, {effect}, {}).members_of({members_fn})", quoted(&text));
+                if let Some(per_turn) = limits.per_turn { def.push_str(&format!(".triggers_each_turn({per_turn})")); }
+                return Ok(def);
+            }
+        }
         if let EventSpec::StateWithPlayer { condition, player } = event {
             if intervening_if.is_some() {
                 return Err(gap("captured state trigger with intervening condition"));

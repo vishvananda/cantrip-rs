@@ -548,6 +548,29 @@ impl Compiler {
                     continue;
                 }
             }
+            if planned::switched_on("lasting-attack-no-tap") && planned::switched_on(planned::LASTING_RULES)
+                && self.stack_item && self.pending == Pending::Nothing
+                && matches!(source, ObjectRef::Source)
+                && matches!(players, PlayerSet::One(PlayerRef::AbilityController)) {
+                if let PlayerRule::AttackWithoutTapping { attackers,
+                    condition: Condition::ObjectMatches { object: ObjectRef::Source, filter: ObjectFilter::Not(negated) } } = rule {
+                    if matches!(&**negated, ObjectFilter::Tapped) {
+                        let mut query = self.clone();
+                        query.reader = Reader::Query;
+                        query.event_at = EventAt::Nowhere;
+                        query.stack_item = false;
+                        query.reset_results();
+                        let test = query.filter(attackers, &Candidate::of("object"))?;
+                        let index = self.made_lasting_rules.len();
+                        let function = format!("untapped_source_no_tap_{index}");
+                        writeln!(self.functions, "#[allow(unused_variables)] fn {function}(q: &dyn Query, asker: &Asker, _: Target, object: ObjectId) -> bool {{ is_live(q, asker.source) && q.obj(asker.source).zone.is(ZoneKind::Battlefield) && !q.obj(asker.source).tapped && q.controller(object) == asker.controller && ({test}) }}").unwrap();
+                        self.made_lasting_rules.push(("attacking does not tap".into(), format!("LastingRule {{ text: \"Attacking does not cause these creatures to tap while the source is untapped.\", rule: LastingRuleKind::AttackingDoesntCauseTap, applies: {function} }}"), false));
+                        let duration = self.duration(duration)?;
+                        writeln!(out, "g.add_lasting_rule(item, {index}, Target::None, {duration});").unwrap();
+                        continue;
+                    }
+                }
+            }
             if planned::switched_on("combat-block-chooser")
                 && matches!(rule, PlayerRule::Decides(GameDecision::WhichCreaturesBlock)) {
                 let players = self.fetch(self.players(players)?);
@@ -756,7 +779,7 @@ impl Compiler {
                 ));
             }
             PlayerAction::PlayLand { from: None, filter } => {
-                let test = self.filter(filter, &Candidate { controller: "player".into(), ..Candidate::of("land") })?;
+                let test = self.filter(filter, &Candidate { controller: "player".into(), name: Some("q.card(face).name".into()), ..Candidate::of("land") })?;
                 self.table_entry(parts, "land_play_rules", function, format!(
                     "fn {function}(q: &dyn Query, asker: &Asker, player: PlayerId, land: ObjectId, face: CardId) -> bool {{ !({banned} && {test}) }}"
                 ));
@@ -765,7 +788,7 @@ impl Compiler {
                 from: Some(scope),
                 filter,
             } => {
-                let test = self.filter(filter, &Candidate { controller: "player".into(), ..Candidate::of("land") })?;
+                let test = self.filter(filter, &Candidate { controller: "player".into(), name: Some("q.card(face).name".into()), ..Candidate::of("land") })?;
                 let from = self.in_scope(scope, "land")?;
                 self.table_entry(parts, "land_play_rules", function, format!(
                     "fn {function}(q: &dyn Query, asker: &Asker, player: PlayerId, land: ObjectId, face: CardId) -> bool {{ !({banned} && {from} && {test}) }}"

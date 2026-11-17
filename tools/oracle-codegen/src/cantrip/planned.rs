@@ -39,6 +39,8 @@ const LANDED: &[&str] = &[
 /// holes. `tools/update_cantrip_vocabulary.py` reads this table to write
 /// `FEATURES`: keep each entry on one line, its name a literal.
 const SWITCHED: &[(&str, &str, &[&str])] = &[
+    ("state-trigger-object-groups", "pub const fn members_of(self, f: TriggerMembers)", &[]),
+    ("lasting-attack-no-tap", "AttackingDoesntCauseTap,", &[]),
     ("combat-block-chooser", "ChoosesBlocks,", &[]),
     ("copied-mana-activation-costs", "pub const fn cost_change(self, change: AbilityCostChange)", &[]),
     ("last-block-controller", "ControlChanged { permanent: ObjectId, from: PlayerId, controller: PlayerId }", &[]),

@@ -2788,6 +2788,12 @@ impl Compiler {
     }
     /// The keyword a granted mechanic is, where it is only a keyword.
     pub(super) fn grants_keyword(&self, ability: &Ability) -> Option<String> {
+        if planned::switched_on("lasting-attack-no-tap") && matches!(ability,
+            Ability::Static { kind: StaticKind::Ordinary,
+                affected: EffectSubjects::Objects(ObjectSet::One(ObjectRef::Source)), changes }
+            if matches!(changes.as_slice(), [Change::Rule(RuleChange::Prohibit(ObjectAction::Attack(AttackDefenders::Any)))])) {
+            return Some("Keyword::CantAttack".into());
+        }
         let Ability::Mechanic {
             mechanic,
             cost: None,

@@ -239,3 +239,28 @@ outputs must not be read as 32 newly audited Oracle-correct implementations.
 **112 generator tests** and **43 real native modules** pass. The preceding full
 Source regression sweep passed **607 tests** (12 ignored).
 Family-eight focused Source checks additionally passed **37 tests** (one ignored).
+
+
+## Captured object-state groups and open combat rules
+
+City in a Bottle now uses the native state trigger and captures its object group
+when it triggers. Resolution reads those saved identities and excludes the
+original source, without re-querying the battlefield or admitting later arrivals.
+Source-dependent membership predicates that cannot be represented by the native
+callback remain explicit gaps. The land-play name predicate uses the **proposed
+face**, not the current/front face of the card.
+
+Johan grants a removable self-only attack ban through the native keyword layer,
+then creates an independent lasting rule on an open set of its controller's
+creatures. That second rule requires the original source to remain a live,
+untapped battlefield permanent. The optional cost is not offered after that
+permanent has left; losing the granted ability does not erase the separate
+lasting combat rule. Unsupported source, condition and group layouts stay gaps.
+
+The original43 now have **34 without generator diagnostics**, **9 with generator
+holds**, plus Library of Leng. The two reference holds remain separate (Sacred
+Boon and Glyph of Reincarnation). **114 generator tests** and **45 actual native
+interface modules** pass; no engine code or registrations were changed. Cantrip
+upstream is still `9889dd28f90c484fde557fa25cf30beb2b45621d`; Grammar0.3.4 remains
+the newest published grammar/face release. The audited API fingerprint is unchanged.
+Family-nine focused Source checks passed **39 tests** (two ignored).

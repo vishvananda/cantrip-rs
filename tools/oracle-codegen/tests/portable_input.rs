@@ -697,3 +697,36 @@ fn block_chooser_rules_remain_combat_scoped_and_keep_delayed_unblocked_triggers(
     assert!(generated.contains("Event::Unblocked"));
     assert!(cantrip::planned::without_features(&["combat-block-chooser"], || cantrip::module(&face)).is_err());
 }
+
+
+#[test]
+fn object_state_triggers_snapshot_their_group_and_exclude_the_original_source() {
+    use cantrip_oracle_codegen::ir::*;
+    let mut face = native_face("City in a Bottle");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("state_triggered(ability_0_state, ability_0,"));
+    assert!(generated.contains(".members_of(ability_0_members)"));
+    assert!(generated.contains("q.event_objects(item).to_vec()"));
+    let effect = generated.lines().find(|line|line.contains("let objects_0 =")).unwrap();
+    assert!(effect.contains("!(Some(asker.source) == Some(id))"));
+    assert!(!effect.contains("battlefield()"), "new arrivals must not join an already stacked state trigger");
+    let land = generated.lines().find(|line|line.contains("fn ability_1_1_rule")).unwrap();
+    assert!(land.contains("q.card(face).name"), "judge the face proposed for play rather than the current/front face");
+    assert!(cantrip::planned::without_features(&["state-trigger-object-groups"], || cantrip::module(&face)).is_err());
+    let Ability::Triggered { event: EventSpec::ObjectBecomes(filter), .. } = &mut face.abilities[0] else { panic!() };
+    *filter = ObjectFilter::ControlledBy(PlayerSet::One(PlayerRef::AbilityController));
+    assert!(cantrip::gaps(&face).iter().any(|gap|gap.feature=="object state members depending on their source"));
+}
+
+#[test]
+fn a_granted_attack_ban_is_removable_but_the_open_combat_rule_outlives_the_grant() {
+    let face = native_face("Johan");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("EffectKind::AddKeywords(Keywords::of(&[Keyword::CantAttack]))"));
+    assert!(generated.contains("cantrip_mechanics::targets::permanent(g, asker.source) && cantrip_mechanics::effects::ask_may"));
+    assert!(generated.contains("LastingRuleKind::AttackingDoesntCauseTap"));
+    assert!(generated.contains("is_live(q, asker.source) && q.obj(asker.source).zone.is(ZoneKind::Battlefield) && !q.obj(asker.source).tapped"));
+    assert!(generated.contains("q.controller(object) == asker.controller"));
+    assert!(generated.contains("g.add_lasting_rule(item, 0, Target::None, Duration::EndOfCombat)"));
+    assert!(cantrip::planned::without_features(&["lasting-attack-no-tap"], || cantrip::module(&face)).is_err());
+}
