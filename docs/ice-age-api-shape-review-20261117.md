@@ -203,3 +203,39 @@ amount. The same defect occurs in Scars of the Veteran. This is reported as
 with exact published-bundle provenance. MTGish already fixed the Source grammar
 in closed #144; no duplicate Source report or upstream pull is needed. The
 native Cantrip card already implements the correct cumulative-history behavior.
+
+
+## Copied mana, historical controllers and special actions
+
+Merseine copies the enchanted object's **full mana cost**, retaining colored,
+hybrid and Phyrexian symbols and setting X to zero before reductions. Missing
+mana costs remain unpayable, including face-down objects and locked Rooms;
+they are not treated as payable zero. The ability keeps its noncontroller
+activation permission. Combinations with unsupported cost changes/conditions
+stay explicit gaps rather than overwriting an existing callback.
+
+A controller-at-last-block query walks this turn's matching block and control
+change records backwards and stops at the last block by the specified Wall.
+No matching block yields no player, never the current controller as a fallback.
+This removes Glyph of Reincarnation's backend query gap, but the face has a
+**separate reference hold**: published IR lacks the died-this-way restriction
+on the destruction outcomes. [Oracle Grammar #36](https://github.com/vishvananda/oracle-grammar/issues/36)
+includes provenance, a counterexample with exile replacing death, and a request
+to check simultaneous return timing. The Source parser already distinguishes
+“died this way”; this is a semantic lowering/reference issue, not a new MTGish
+source-grammar bug. An existing backend Oracle-text heuristic must not substitute
+for the missing typed distinction.
+
+Guardian Angel creates one target-bound native player special action; each
+payment creates a separate prevention shield on the stored recipient. This does
+not retarget the object or consume the action after one use. Other timing,
+cost and capture layouts remain gaps. Melee uses the native block chooser rule
+through end of combat, retaining its separate combat-long unblocked trigger.
+
+The original43 now have **32 without generator diagnostics**, **11 with generator
+holds**, plus Library of Leng. Two face/reference corrections are tracked
+separately: Sacred Boon and Glyph of Reincarnation. Thus 32 compiling generator
+outputs must not be read as 32 newly audited Oracle-correct implementations.
+**112 generator tests** and **43 real native modules** pass. The preceding full
+Source regression sweep passed **607 tests** (12 ignored).
+Family-eight focused Source checks additionally passed **37 tests** (one ignored).

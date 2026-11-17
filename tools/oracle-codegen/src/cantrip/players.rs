@@ -471,6 +471,46 @@ impl Compiler {
         }
         Ok(())
     }
+    /// A repeatable priority special action keeps one chosen recipient, not
+    /// the spell's whole lexical frame. Other costs/captures remain explicit gaps.
+    fn targeted_special_action(&mut self, id: usize, i: usize, source: &ObjectRef,
+        players: &PlayerSet, rule: &PlayerRule, duration: &crate::ir::Duration,
+        out: &mut String) -> Result<bool>
+    {
+        if !planned::switched_on("targeted-player-special-actions") || !self.stack_item
+            || !matches!(source, ObjectRef::Source)
+            || !matches!(players, PlayerSet::One(PlayerRef::AbilityController))
+            || !matches!(duration, crate::ir::Duration::EndOfTurn) { return Ok(false); }
+        let PlayerRule::SpecialAction { body, cost: Some(cost), limit: None,
+            during: None, instant_speed: true } = rule else { return Ok(false) };
+        let Operand::List(body) = &**body else { return Ok(false) };
+        let [Operand::Program(program)] = body.as_slice() else { return Ok(false) };
+        let [Instruction::Effect { operation: Operation::CreateReplacement {
+            event: ReplacementEvent::Damage(damage), limit: ReplacementLimit::TotalDamage(Expr::Constant(n)),
+            duration: crate::ir::Duration::EndOfTurn, body }, .. }] = program.instructions.as_slice()
+        else { return Ok(false) };
+        if damage.source_kind != ObjectKind::Any || !matches!(damage.sources, ObjectFilter::Any)
+            || !matches!(damage.kind, DamageKind::Any)
+            || !matches!(damage.grouping, DamageGrouping::SourceRecipient)
+            || !matches!(body.instructions.as_slice(), [Instruction::Effect {
+                operation: Operation::ModifyEvent { change: EventChange::PreventDamage }, .. }]) { return Ok(false); }
+        let DamageRecipients::Target { slot, index: 0 } = &damage.recipients else { return Ok(false) };
+        let n = u32::try_from(*n).map_err(|_|gap("special-action shield outside native range"))?;
+        let Operand::List(symbols) = &**cost else { return Ok(false) };
+        let [Operand::Term { family, form, operands }] = symbols.as_slice() else { return Ok(false) };
+        if family != "ManaSymbol" || form != "ManaCostGeneric" { return Ok(false); }
+        let [Operand::Integer(price)] = operands.as_slice() else { return Ok(false) };
+        let price = u32::try_from(*price).map_err(|_|gap("special-action cost outside native range"))?;
+        let recipient = self.recipients(&Recipients::Target { slot: slot.clone(), index: 0 })?;
+        let prevention = self.made_preventions.len();
+        self.made_preventions.push("cantrip_mechanics::prevention::ANY_DAMAGE".into());
+        let action = self.delayed.len();
+        let function = format!("special_{id}_{i}");
+        writeln!(self.functions, "fn {function}(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {{ let to = g.state().target(item, 0); cantrip_mechanics::prevention::this_turn(g, item, to, {prevention}, Shield::Next({n})); Ok(()) }}").unwrap();
+        self.delayed.push(format!("ability(Cost::mana({}), {function}, \"Pay to create a damage prevention shield.\").special_action()", mana(&[ManaSymbol::Generic(price)])?));
+        writeln!(out, "if let Some(about) = {} {{ g.add_effect(item.object, item.object, EffectKind::PlayerSpecialAction {{ ability: AbilityRef::delayed(item.ability.card, {action}), about }}, Duration::EndOfTurn); }}", self.fetch(format!("({recipient}).first().copied()"))).unwrap();
+        Ok(true)
+    }
     fn continuous_on_players_apart(
         &mut self,
         id: usize,
@@ -508,7 +548,16 @@ impl Compiler {
                     continue;
                 }
             }
-            if self.play_for_a_while(id, i, players, rule, duration, out)?
+            if planned::switched_on("combat-block-chooser")
+                && matches!(rule, PlayerRule::Decides(GameDecision::WhichCreaturesBlock)) {
+                let players = self.fetch(self.players(players)?);
+                let source = self.fetch(self.object(source)?);
+                let duration = self.duration(duration)?;
+                writeln!(out, "let deciders_{id}_{i} = {players}; let source_{id}_{i} = {source}; if let Some(source) = source_{id}_{i} {{ for player in deciders_{id}_{i} {{ g.add_player_effect(player, source, EffectKind::ChoosesBlocks, {duration}); }} }}").unwrap();
+                continue;
+            }
+            if self.targeted_special_action(id, i, source, players, rule, duration, out)?
+                || self.play_for_a_while(id, i, players, rule, duration, out)?
                 || self.prohibit_for_a_while(id, i, source, players, rule, duration, out)?
                 || self.look_for_a_while(id, i, players, rule, duration, out)?
                 || self.keyword_for_a_while(id, i, source, players, rule, duration, out)?

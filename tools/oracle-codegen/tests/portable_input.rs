@@ -636,3 +636,64 @@ fn one_point_redirection_remains_in_the_same_damage_event_and_larger_budgets_sta
     *limit = ReplacementLimit::TotalDamage(Expr::Constant(2));
     assert!(cantrip::gaps(&face).iter().any(|gap|gap.feature=="cumulative redirection budget"));
 }
+
+
+#[test]
+fn copied_activation_mana_cost_keeps_symbols_zeroes_x_and_refuses_missing_costs() {
+    use cantrip_oracle_codegen::ir::*;
+    let mut face = native_face("Merseine");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("ManaCost { x: 0, ..q.mana_cost(object) }"));
+    assert!(generated.contains("chars.no_cost || !def.has_cost"));
+    assert!(generated.contains("def.is_room() && q.obj(object).marks.doors == 0"));
+    assert!(generated.contains(".cost_change(ability_3_copied_cost_change).condition(ability_3_copied_cost_payable)"));
+    assert!(generated.contains(".activated_by(ability_3_activators)"));
+    assert!(!generated.contains("q.mana_value("));
+    assert!(cantrip::planned::without_features(&["copied-mana-activation-costs"], || cantrip::module(&face)).is_err());
+    let Ability::Activated { limits, .. } = &mut face.abilities[3] else { panic!() };
+    limits.condition = Some(Condition::PlayerIsActive(PlayerRef::AbilityController));
+    assert!(cantrip::gaps(&face).iter().any(|gap|gap.feature=="copied mana activation cost combined with another cost condition or change"));
+}
+
+#[test]
+fn historical_controller_queries_unwind_changes_only_until_the_last_matching_block() {
+    let face = native_face("Glyph of Reincarnation");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("EventMask::BLOCKS.0 | EventMask::CONTROL_CHANGED.0"));
+    assert!(generated.contains("q.history().select(about).rev()"));
+    assert!(generated.contains("permanent == creature => controller = from"));
+    assert!(generated.contains("blocker == wall && attacker == creature => return Some(controller)"));
+    assert!(generated.contains("None }))"), "a missing block must not fall back to today's controller");
+    assert!(cantrip::planned::without_features(&["last-block-controller"], || cantrip::module(&face)).is_err());
+    // This verifies the typed historical query, not the published face's
+    // separate missing died-this-way filter (documented as a reference hold).
+}
+
+#[test]
+fn repeatable_special_actions_keep_the_recipient_and_create_independent_shields() {
+    use cantrip_oracle_codegen::ir::*;
+    let mut face = native_face("Guardian Angel");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("EffectKind::PlayerSpecialAction"));
+    assert!(generated.contains("AbilityRef::delayed(item.ability.card, 0), about"));
+    assert!(generated.contains("let to = g.state().target(item, 0)"));
+    assert!(generated.contains("this_turn(g, item, to, 1, Shield::Next(1))"));
+    assert!(generated.contains(".special_action()"));
+    assert!(!generated.contains(".once()"));
+    assert!(cantrip::planned::without_features(&["targeted-player-special-actions"], || cantrip::module(&face)).is_err());
+    let Ability::Spell { body, .. } = &mut face.abilities[0] else { panic!() };
+    let Instruction::Effect { operation: Operation::CreateContinuousEffect { changes, .. }, .. } = &mut body.instructions[1] else { panic!() };
+    let Change::PlayerRule(PlayerRule::SpecialAction { instant_speed, .. }) = &mut changes[0] else { panic!() };
+    *instant_speed = false;
+    assert!(cantrip::module(&face).is_err(), "other timing rules are not silently made priority actions");
+}
+
+#[test]
+fn block_chooser_rules_remain_combat_scoped_and_keep_delayed_unblocked_triggers() {
+    let face = native_face("Melee");
+    let generated = cantrip::module(&face).unwrap();
+    assert!(generated.contains("g.add_player_effect(player, source, EffectKind::ChoosesBlocks, Duration::EndOfCombat)"));
+    assert!(generated.contains("DelayedWhen::ThisCombat"));
+    assert!(generated.contains("Event::Unblocked"));
+    assert!(cantrip::planned::without_features(&["combat-block-chooser"], || cantrip::module(&face)).is_err());
+}

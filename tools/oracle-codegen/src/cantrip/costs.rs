@@ -904,6 +904,32 @@ impl Compiler {
         body: &Program,
         scope: Option<Scope>,
     ) -> Result<String> {
+        // A copied mana cost is determined before reductions, preserving every
+        // printed symbol and its lack of a payable cost. It is not mana value.
+        if planned::switched_on("copied-mana-activation-costs") {
+            if let [CostPart::ManaCostOf(object)] = price.parts.as_slice() {
+                if !matches!(origin, ActivationOrigin::Ordinary) || limits.condition.is_some()
+                    || scope.is_some_and(|s| s.condition.is_some()) || limits.keyword.is_some()
+                    || limits.modifiers.iter().any(|m| !matches!(m,
+                        Change::ActivationRule(ActivationRule::OnlyBy(_)))) {
+                    return Err(gap("copied mana activation cost combined with another cost condition or change"));
+                }
+                if !matches!(object, ObjectRef::Source) && !matches!(object,
+                    ObjectRef::AttachedTo(host) if matches!(&**host, ObjectRef::Source)) {
+                    return Err(gap("copied activation mana cost of an unstored object"));
+                }
+                let mut query = self.clone();
+                query.reader = Reader::Query;
+                query.stack_item = false;
+                let object = query.object(object)?;
+                let copied = format!("{label}_copied_cost");
+                writeln!(self.functions, "#[allow(unused_variables)] fn {copied}(q: &dyn Query, asker: &Asker) -> Option<ManaCost> {{ let object = ({object})?; let chars = q.chars(object); let def = q.card(chars.card); if chars.no_cost || !def.has_cost || (def.is_room() && q.obj(object).marks.doors == 0) {{ return None; }} Some(ManaCost {{ x: 0, ..q.mana_cost(object) }}) }}").unwrap();
+                writeln!(self.functions, "fn {copied}_change(q: &dyn Query, asker: &Asker, _: Costed, _: &[Target]) -> CostDelta {{ {copied}(q, asker).map_or(CostDelta::NONE, CostDelta::more_mana) }}").unwrap();
+                writeln!(self.functions, "fn {copied}_payable(q: &dyn Query, asker: &Asker) -> bool {{ {copied}(q, asker).is_some() }}").unwrap();
+                let def = self.activated(label, index, origin, &Cost { parts: vec![] }, limits, announcement, body, scope)?;
+                return Ok(format!("{def}.cost_change({copied}_change).condition({copied}_payable)"));
+            }
+        }
         if planned::switched_on(x_rules::FEATURE) && x_rules::unresolved_effect_x(limits, body) {
             return Err(gap("dynamic text-defined X in an activated effect"));
         }

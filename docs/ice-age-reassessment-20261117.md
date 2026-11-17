@@ -216,3 +216,12 @@ the thirteen engine gaps above. Sacred Boon's hold is confirmed reference
 modeling, reported in [Oracle Grammar #35](https://github.com/vishvananda/oracle-grammar/issues/35).
 See the [interface adoption review](ice-age-api-shape-review-20261117.md) for
 semantic boundaries and validation of each batch.
+
+
+The following adapter batch raises diagnostic-free generation to **32 of43**
+landed cards and the native fixture to **43 real modules**. Eleven landed cards
+still have generator holds. **Glyph of Reincarnation is additionally a reference
+hold even though its historical-controller query now compiles**; its published
+IR omits the actual-death restriction. That distinction is recorded in
+[Oracle Grammar #36](https://github.com/vishvananda/oracle-grammar/issues/36)
+and the machine-readable audit's `reference_hold` fields.

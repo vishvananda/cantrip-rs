@@ -1182,6 +1182,21 @@ impl Compiler {
     /// The rest of `player`.
     pub(super) fn player_more(&self, player: &PlayerRef) -> Result<String> {
         let feature = format!("player reference {}", form(player));
+        if planned::switched_on("last-block-controller") && self.history.is_none() {
+            if let PlayerRef::AsOf { moment, player } = player {
+              if let Moment::LastEvent { event, window: HistoryWindow::ThisTurn } = &**moment {
+                if let (EventSpec::Pair { event: PairEvent::BecomesBlockedBy,
+                    objects: ObjectFilter::SameObject(creature), others: ObjectFilter::SameObject(wall) },
+                    PlayerRef::ControllerOf(controlled)) = (&**event, &**player) {
+                    if format!("{creature:?}") == format!("{controlled:?}") {
+                        let creature = self.object(creature)?;
+                        let wall = self.object(wall)?;
+                        return Ok(format!("({creature}).and_then(|creature| ({wall}).and_then(|wall| {{ let mut controller = q.obj(creature).controller; let about = EventQuery::kind(EventMask(EventMask::BLOCKS.0 | EventMask::CONTROL_CHANGED.0)).object(creature).this_turn(); for record in q.history().select(about).rev() {{ match record.event {{ Event::ControlChanged {{ permanent, from, .. }} if permanent == creature => controller = from, Event::Blocks {{ blocker, attacker, .. }} if blocker == wall && attacker == creature => return Some(controller), _ => {{}} }} }} None }}))"));
+                    }
+                }
+              }
+            }
+        }
         Ok(match player {
             // "That player" of an event that binds one, outside any row of players.
             PlayerRef::Prior(PriorPlayer::That)

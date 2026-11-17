@@ -8,7 +8,7 @@
   "frozen_oracle_sha256": "2281f3d715e8ee6127825154b31202918ef83a9d9a3641a0d23b0163ebea3065",
   "source_ron_sha256": "7c1f493906004497a6682071481ddabf1ce15e9efc63834a904554ffd35a14a7",
   "backlog_records_sha256": "4baa58c98b4bff1e017a7c99ddacf1fd4a85dfed77467a05c9b8154a71735e91",
-  "tracked_rows_sha256": "f113d3592b68a905c56f9001e7fdd7da824e5ae9d5d95c749c7dc08c24269632",
+  "tracked_rows_sha256": "80dc71096e9e05669e13f0d28c0bc80a6c750dee51e07e6559755e3b26d2d9f2",
   "native_api_sha256": "235fbb1780747dbaa038447d8463320b09a1ba299857305ab5d5ca9e03af3952",
   "counts": {
     "landed_upstream": 43,
@@ -17,14 +17,14 @@
   },
   "validation": {
     "native_full_suite": "Engine baseline 5441ecd742: bash tools/test.sh passed; 27,853 Rust tests (15 ignored), managed tests and client build. Later fork-main host/client/test commits do not change the audited API.",
-    "generator": "108 Rust tests pass; every smoke fixture must generate a real complete module.",
+    "generator": "112 Rust tests pass; every smoke fixture must generate a real complete module.",
     "pipeline_python": "437 tests passed",
     "tooling_python": "52 tests passed",
     "mtgish": "1,596 Rust tests passed; 33,529 exported records, zero lowering diagnostics",
     "library_of_leng": "Generated module compiles as a standalone Rust library against the checked-profile current cantrip-api. Card registration and runtime scenarios are not implemented by this audit.",
     "latest_refresh": "Upstream advanced during the audit: rebased from 90204df367 to 5441ecd742. New original-draw receipts, nest counters and unrelated cards do not change the 43/1/13 result.",
-    "source_integration": "Family-six full CI green:607 tests passed,12 ignored. Family-seven full Source sweep in progress; current CI runs after push.",
-    "native_api_check": "39 actual generated modules compile against native API/mechanics. Six more original backlog cards plus Dawn Elemental exercise prevention follow-ups, instructing damage causation, spell damage rules, named redirection and one-point partial redirection."
+    "source_integration": "Family-seven full sweep passed607 tests,12 ignored. Family-eight focused foundation/lane-n/cost checks passed37 tests,1 ignored; full CI follows push.",
+    "native_api_check": "43 actual generated modules compile against native API/mechanics. New fixtures cover copied full mana costs/no-cost guards, historical controller rollback, target-bound repeatable special actions, and combat-scoped block chooser rules. Glyph reference correctness is a separate hold (#36)."
   },
   "cards": [
     {
@@ -316,34 +316,21 @@
       "module": "crates/cantrip-cards/src/cards/glyph_of_reincarnation.rs",
       "data": "content/mtg/cards/glyph-of-reincarnation.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "abilities[1].instructions[1].instructions[0].instructions[0]",
-          "feature": "player reference AsOf",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "8ef0f9983e1aa55849957c0f10a7f4318cfb7b2c",
       "implementation_author": "jschibel",
-      "implementation_subject": "Card: Glyph of Reincarnation"
+      "implementation_subject": "Card: Glyph of Reincarnation",
+      "reference_hold": {
+        "issue": "https://github.com/vishvananda/oracle-grammar/issues/36",
+        "reason": "Historical controller query compiles, but published IR omits the actual died-this-way filter and needs simultaneous-return timing review. A compiling module does not validate this reference against Oracle text."
+      }
     },
     {
       "name": "Guardian Angel",
       "module": "crates/cantrip-cards/src/cards/guardian_angel.rs",
       "data": "content/mtg/cards/guardian-angel.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "abilities[0].instructions[1]",
-          "feature": "player rule for a while SpecialAction",
-          "message": "Cantrip code generation has not implemented this capability"
-        },
-        {
-          "path": "abilities[0]",
-          "feature": "player rule for a while SpecialAction",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "c82d67bff7182cfa6a998f9ef133514fba72bdcd",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Guardian Angel"
@@ -524,18 +511,7 @@
       "module": "crates/cantrip-cards/src/cards/melee.rs",
       "data": "content/mtg/cards/melee.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "abilities[1].instructions[0]",
-          "feature": "player rule for a while Decides",
-          "message": "Cantrip code generation has not implemented this capability"
-        },
-        {
-          "path": "abilities[1]",
-          "feature": "player rule for a while Decides",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "a0e28ab2d9762b8fb3af60e13d14cd81ed5335fd",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Melee"
@@ -545,13 +521,7 @@
       "module": "crates/cantrip-cards/src/cards/merseine.rs",
       "data": "content/mtg/cards/merseine.json",
       "status": "landed_upstream",
-      "generator_gaps": [
-        {
-          "path": "",
-          "feature": "engine: no cost copies a mana cost",
-          "message": "Cantrip code generation has not implemented this capability"
-        }
-      ],
+      "generator_gaps": [],
       "implementation_commit": "a9c676053e197f2409033d628fa01ad091013133",
       "implementation_author": "jschibel",
       "implementation_subject": "Card: Merseine"
@@ -926,11 +896,12 @@
     "unimplemented_but_generated": 1
   },
   "generator_adoption": {
-    "landed_cards_clean": 28,
-    "landed_cards_held": 15,
-    "native_smoke_examples": 39,
+    "landed_cards_clean": 32,
+    "landed_cards_held": 11,
+    "native_smoke_examples": 43,
     "reference_holds": [
-      "Sacred Boon (oracle-grammar#35)"
+      "Sacred Boon (oracle-grammar#35)",
+      "Glyph of Reincarnation (oracle-grammar#36; historical controller adapter compiles)"
     ]
   }
 }
